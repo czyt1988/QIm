@@ -5,11 +5,9 @@ set(QIMCORE_VERSION_MAJOR 0)
 set(QIMCORE_VERSION_MINOR 0)
 set(QIMCORE_VERSION_PATCH 1)
 set(QIMCORE_VERSION "${QIMCORE_VERSION_MAJOR}.${QIMCORE_VERSION_MINOR}.${QIMCORE_VERSION_PATCH}")
-set(QIMCORE_PROJECT_NAME "QImCore")
+set(QIMCORE_PROJECT_NAME "Core")
 
-add_library(${QIMCORE_PROJECT_NAME} ${LIB_TYPE}
-    plot/QImPlotLegendNode.h plot/QImPlotLegendNode.cpp
-    plot/QImPlotValueTrackerNodeGroup.h plot/QImPlotValueTrackerNodeGroup.cpp)
+add_library(${QIMCORE_PROJECT_NAME} ${LIB_TYPE})
 # 创建别名
 add_library(${QIM_PROJECT_NAME}::Core ALIAS ${QIMCORE_PROJECT_NAME})
 # 设置版本和输出属性
@@ -81,7 +79,7 @@ target_include_directories(${QIMCORE_PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:include/${QIM_PROJECT_NAME}/implot3d>
     # qimgui
     $<BUILD_INTERFACE:${QIM_QTIMGUI_DIR}>
-    $<INSTALL_INTERFACE:include/${QIM_PROJECT_NAME}/qimgui>
+    $<INSTALL_INTERFACE:include/${QIM_PROJECT_NAME}/qtimgui>
 )
 
 
@@ -122,33 +120,20 @@ target_link_libraries(${QIMCORE_PROJECT_NAME} PUBLIC
 # ================================================================
 
 include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
 set(QIMCORE_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/${QIM_PROJECT_NAME}/core)
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/${QIMCORE_PROJECT_NAME}ConfigVersion.cmake
-    VERSION ${QIMCORE_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/${QIMCORE_PROJECT_NAME}Config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/${QIMCORE_PROJECT_NAME}Config.cmake"
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${QIM_PROJECT_NAME}
-    PATH_VARS
-        QIMCORE_INCLUDE_INSTALL_DIR
-        CMAKE_INSTALL_INCLUDEDIR
-        CMAKE_INSTALL_LIBDIR
-        CMAKE_INSTALL_BINDIR
-)
+
 # 添加QImPlotCore到导出集
-install(TARGETS ${QIMCORE_PROJECT_NAME}
-    EXPORT ${QIM_TARGETS_NAME}
+install(TARGETS ${QIMCORE_PROJECT_NAME} # Core
+    EXPORT ${QIM_TARGET_NAME}           # 统一导出集QImTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 # 安装头文件
+install(FILES ${QIMCORE_SRC_DIR}/../QImAPI.h
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${QIM_PROJECT_NAME}
+        COMPONENT headers)
 install(FILES ${QIMCORE_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${QIM_PROJECT_NAME}/core
         COMPONENT headers)

@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.5)
+﻿cmake_minimum_required(VERSION 3.15)
 ########################################################
 # version
 ########################################################
@@ -16,7 +16,7 @@ message(STATUS "QIM Version is ${QIM_VERSION}")
 # project
 ########################################################
 set(QIM_PROJECT_NAME "QIm")
-set(QIM_TARGETS_NAME "QImTargets")
+set(QIM_TARGET_NAME "QImTargets") # 这是所有模块统一的导出集
 project(${QIM_PROJECT_NAME}
         VERSION ${QIM_VERSION}
         LANGUAGES CXX
@@ -196,3 +196,59 @@ add_subdirectory(src)
 if(QIM_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
+
+########################################################
+# 总安装
+########################################################
+include(GNUInstallDirs)
+# 生成统一的 QImConfig.cmake
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+# 统一导出所有模块的 target
+install(EXPORT ${QIM_TARGET_NAME}
+    FILE ${QIM_TARGET_NAME}.cmake
+    NAMESPACE ${QIM_PROJECT_NAME}::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${QIM_PROJECT_NAME}
+)
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+
+# ===== 调试：打印所有 targets =====
+message(STATUS "")
+message(STATUS "==========================================")
+message(STATUS "  Project: ${PROJECT_NAME} v${PROJECT_VERSION}")
+message(STATUS "  CMake: ${CMAKE_VERSION}")
+message(STATUS "  Build Type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "==========================================")
+
+# 获取所有 targets
+get_property(all_targets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
+list(SORT all_targets)  # 排序便于阅读
+
+message(STATUS "Targets (${CMAKE_PROJECT_NAME}):")
+foreach(target IN LISTS all_targets)
+    if(TARGET ${target})
+        get_target_property(type ${target} TYPE)
+        get_target_property(aliased ${target} ALIASED_TARGET)
+        if(aliased AND NOT aliased STREQUAL "ALIASED_TARGET-NOTFOUND")
+            message(STATUS "  → ${target} (ALIAS of ${aliased})")
+        else()
+            message(STATUS "  • ${target} [${type}]")
+        endif()
+    endif()
+endforeach()
+message(STATUS "==========================================")
+message(STATUS "")
