@@ -1,0 +1,49 @@
+﻿@PACKAGE_INIT@
+
+# 包含目标文件
+include("${CMAKE_CURRENT_LIST_DIR}/QImPlotTargets.cmake")
+
+# 检查依赖
+include(CMakeFindDependencyMacro)
+
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui REQUIRED)
+
+if(@QIMPLOT_BUILD_WIDGETS@)
+	find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets OpenGL REQUIRED)
+endif()
+
+if(@QIMPLOT_BUILD_QML@)
+	find_package(QT NAMES Qt6 Qt5 COMPONENTS Quick QuickWidgets REQUIRED)
+endif()
+
+
+# 提供变量供外部使用
+set(QIMPLOT_VERSION @PROJECT_VERSION@)
+set(QIMPLOT_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@")
+set(QIMPLOT_LIBRARIES QImPlot::Core)
+# 提供版本信息
+set(QIMPLOT_VERSION_MAJOR @QIMPLOT_VERSION_MAJOR@)
+set(QIMPLOT_VERSION_MINOR @QIMPLOT_VERSION_MINOR@)
+set(QIMPLOT_VERSION_PATCH @QIMPLOT_VERSION_PATCH@)
+# 提供编译选项信息
+set(QIMPLOT_BUILD_SHARED @QIMPLOT_BUILD_SHARED@)
+
+if(@QIMPLOT_BUILD_WIDGETS@)
+    list(APPEND QIMPLOT_LIBRARIES QImPlot::Widgets)
+endif()
+
+if(@QIMPLOT_BUILD_QML@)
+    list(APPEND QIMPLOT_LIBRARIES QImPlot::Qml)
+endif()
+
+if(NOT TARGET QImPlot::Core AND TARGET QImPlotCore)
+    add_library(QImPlot::Core ALIAS QImPlotCore)
+endif()
+
+if(NOT TARGET QImPlot::Widgets AND TARGET QImPlotWidgets)
+    add_library(QImPlot::Widgets ALIAS QImPlotWidgets)
+endif()
+
+if(NOT TARGET QImPlot::Qml AND TARGET QImPlotQml)
+    add_library(QImPlot::Qml ALIAS QImPlotQml)
+endif()
