@@ -1,16 +1,44 @@
-# QIM介绍
+# QIm介绍
 
-QIm将`Dear ImGui`与`ImPlot`/`ImPlot3D` 生态集成至Qt框架，为 Qt 开发者提供原生级（Qt-native）的高性能数据可视化能力。
+`QIm`将`Dear ImGui`与`ImPlot`/`ImPlot3D` 生态集成至Qt框架，为 Qt 开发者提供原生级（Qt-native）的高性能数据可视化能力。
 
-本库通过传统界面的保留模式（Retained Mode）封装，开发者无需学习 ImGui 的即时模式（Immediate Mode）编程范式，即可直接使用熟悉的 Qt 信号槽、属性系统与对象树管理机制，构建实时数据监控、科学绘图界面、工程仿真可视化等高性能应用场景。
+本库通过传统界面的保留模式（Retained Mode）封装，开发者无需学习 `ImGui` 的即时模式（Immediate Mode）编程范式，即可直接使用熟悉的 Qt 信号槽、属性系统与对象树管理机制，构建实时数据监控、科学绘图2D/3D界面、工程仿真可视化等高性能应用场景。
+
+`QIm`计划把ImGui生态的成熟库进行封装，目前正在做`ImPlot`和`ImPlot3D`的封装，旨在为Qt开发环境提供一款开箱即用的数据可视化库。
 
 ## 效果
 
+通过`QIm`的`Plot`模块，可以实现如下数据可视化效果：
 
+
+
+## 使用方法
+
+```cpp
+QIM::QImFigureWidget* figure = new QIM::QImFigureWidget();
+figure->setSubplotGrid(2, 1);
+QIM::QImPlotNode* plot1 = figure->createPlotNode()) {
+plot1->x1Axis()->setLabel(u8"x1");
+plot1->y1Axis()->setLabel(u8"y1");
+QVector<double> x1 = ...;
+QVector<double> y1 = ...;
+plot1->addLine(x1, y1, "curve a");
+
+QIM::QImPlotNode* plot2 = ui->figureWidget1->createPlotNode()) 
+plot2->x1Axis()->setLabel(u8"x2");
+plot2->y1Axis()->setLabel(u8"y2");
+plot2->setLegendEnabled(true);
+std::vector<double> x2 = ...;
+std::vector<double> y2 = ...;
+plot2->addLine(x2, y2, "curve 1");
+std::deque<double> x3 = ...;
+std::deque<double> y3 = ...;
+plot2->addLine(x3, y3, "curve 2");
+```
 
 ## 特性
 
-当前QIm的`Plot`模块存在如下**缺陷**，选用请自行评估
+当前`QIm`的`Plot`模块存在如下**缺陷**，选用请自行评估
 
 - 不能任意添加字体，你需要先加载字体文件才能加载对应字体
 - 不支持线形，你无法指定虚线、点划线等操作

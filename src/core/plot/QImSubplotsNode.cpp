@@ -21,8 +21,14 @@ public:
     QByteArray titleUtf8;
     int rows = 1;
     int cols = 1;
-    std::vector< float > row_ratios;
-    std::vector< float > col_ratios;
+    std::vector< float > rowRatios;
+    std::vector< float > columnRatios;
+    std::vector< float > lastRowRatios;
+    std::vector< float > lastColumnRatios;
+    constexpr static const float epsilon = 0.001f;
+    bool trackGridRatios {
+        false
+    };  ///< 监测subplot的grid信息变化，如果为true，每次绘图都会检测行列的比例是否变化，如果变化将会发出gridInfoChanged信号
     ImVec2 size = ImVec2(-1, -1);
     ImPlotSubplotFlags subplotFlags { ImPlotSubplotFlags_None };
 };
@@ -93,28 +99,30 @@ void QImSubplotsNode::setColumns(int c)
 
 std::vector< float > QImSubplotsNode::rowRatios() const
 {
-    return d_ptr->row_ratios;
+    return d_ptr->rowRatios;
 }
 
 void QImSubplotsNode::setRowRatios(const std::vector< float >& row_ratios)
 {
     QIM_D(d);
-    if (!fuzzyEqual< float >(d->row_ratios, row_ratios)) {
-        d_ptr->row_ratios = row_ratios;
+    if (!fuzzyEqual< float >(d->rowRatios, row_ratios, PrivateData::epsilon)) {
+        d_ptr->rowRatios     = row_ratios;
+        d_ptr->lastRowRatios = row_ratios;
         Q_EMIT gridInfoChanged();
     }
 }
 
 std::vector< float > QImSubplotsNode::columnRatios() const
 {
-    return d_ptr->col_ratios;
+    return d_ptr->columnRatios;
 }
 
 void QImSubplotsNode::setColumnRatios(const std::vector< float >& col_ratios)
 {
     QIM_D(d);
-    if (!fuzzyEqual< float >(d->col_ratios, col_ratios)) {
-        d_ptr->col_ratios = col_ratios;
+    if (!fuzzyEqual< float >(d->columnRatios, col_ratios, PrivateData::epsilon)) {
+        d_ptr->columnRatios     = col_ratios;
+        d_ptr->lastColumnRatios = col_ratios;
         Q_EMIT gridInfoChanged();
     }
 }
@@ -435,6 +443,26 @@ void QImSubplotsNode::insertPlotNode(int plotIndex, QImPlotNode* plot)
     insertChildNode(plotIndex, plot);
 }
 
+int QImSubplotsNode::plotCount() const
+{
+    return plotNodes().size();
+}
+
+int QImSubplotsNode::plotNodeSubplotIndex(QImPlotNode* plot)
+{
+    return plotNodes().indexOf(plot);
+}
+
+bool QImSubplotsNode::isTrackGridRatiosEnabled() const
+{
+    return d_ptr->trackGridRatios;
+}
+
+void QImSubplotsNode::setTrackGridRatiosEnabled(bool on)
+{
+    d_ptr->trackGridRatios = on;
+}
+
 QImPlotNode* QImSubplotsNode::createPlotNode()
 {
     const QList< QImPlotNode* > pns = plotNodes();
@@ -452,13 +480,14 @@ QImPlotNode* QImSubplotsNode::createPlotNode()
 bool QImSubplotsNode::beginDraw()
 {
     // 调用 ImPlot API（UTF-8 缓存零开销）
+    QIM_D(d);
     float* row_ratios = nullptr;
     float* col_ratios = nullptr;
-    if (!d_ptr->row_ratios.empty()) {
-        row_ratios = d_ptr->row_ratios.data();
+    if (!d->rowRatios.empty() && (static_cast< int >(d->rowRatios.size()) == d->rows)) {
+        row_ratios = d->rowRatios.data();
     }
-    if (!d_ptr->col_ratios.empty()) {
-        col_ratios = d_ptr->col_ratios.data();
+    if (!d->columnRatios.empty() && (static_cast< int >(d->columnRatios.size()) == d->cols)) {
+        col_ratios = d->columnRatios.data();
     }
     bool on = ImPlot::BeginSubplots(d_ptr->titleUtf8.isEmpty() ? "##Subplots" : d_ptr->titleUtf8.constData(),
                                     d_ptr->rows,
@@ -467,6 +496,25 @@ bool QImSubplotsNode::beginDraw()
                                     d_ptr->subplotFlags,
                                     row_ratios,
                                     col_ratios);
+    // 检测row_ratios和col_ratios是否发生了变化，变化则发出gridInfoChanged信号
+    if (d->trackGridRatios) {
+        bool isGridChanged { false };
+        if (row_ratios) {
+            if (!fuzzyEqual(d->rowRatios, d->lastRowRatios, PrivateData::epsilon)) {
+                d->lastRowRatios = d->rowRatios;
+                isGridChanged    = true;
+            }
+        }
+        if (col_ratios) {
+            if (!fuzzyEqual(d->columnRatios, d->lastColumnRatios, PrivateData::epsilon)) {
+                d->lastColumnRatios = d->columnRatios;
+                isGridChanged       = true;
+            }
+        }
+        if (isGridChanged) {
+            Q_EMIT gridInfoChanged();
+        }
+    }
     return on;
 }
 

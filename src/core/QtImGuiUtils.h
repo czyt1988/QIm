@@ -46,7 +46,7 @@ QIM_CORE_API bool fuzzyEqual(double a, double b, double epsilon = 1e-9);
 QIM_CORE_API bool fuzzyEqual(const ImVec2& a, const ImVec2& b, float epsilon = 1e-5f);
 QIM_CORE_API bool fuzzyEqual(const ImVec4& a, const ImVec4& b, float epsilon = 1e-5f);
 template< typename T >
-bool fuzzyEqual(const std::vector< T >& a, const std::vector< T >& b);
+bool fuzzyEqual(const std::vector< T >& a, const std::vector< T >& b, T epsilon = 1e-5f);
 // QDebug Support
 QIM_CORE_API QDebug operator<<(QDebug debug, const ImVec2& v);
 QIM_CORE_API QDebug operator<<(QDebug debug, const ImVec4& v);
@@ -66,14 +66,14 @@ public:
 namespace QIM
 {
 template< typename T >
-bool fuzzyEqual(const std::vector< T >& a, const std::vector< T >& b)
+bool fuzzyEqual(const std::vector< T >& a, const std::vector< T >& b, T epsilon)
 {
     if (a.size() != b.size()) {
         return false;
     }
 
     for (size_t i = 0; i < a.size(); ++i) {
-        if (!qFuzzyCompare(a[ i ], b[ i ])) {
+        if (!fuzzyEqual(a[ i ], b[ i ], epsilon)) {
             return false;
         }
     }

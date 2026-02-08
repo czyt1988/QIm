@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.5)
 project(QImPlotExamples LANGUAGES CXX)
-# add_subdirectory(qt-with-implots)
-# add_subdirectory(qimwidget-test)
+add_subdirectory(qt-with-implots)
+add_subdirectory(qimwidget-test)
 add_subdirectory(qimfigure-test)

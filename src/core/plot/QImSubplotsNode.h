@@ -53,13 +53,10 @@ public:
     std::vector< float > columnRatios() const;
     void setColumnRatios(const std::vector< float >& col_ratios);
 
-    void setGrid(
-        int r,
-        int c,
-        const std::vector< float >& row_ratios = std::vector< float >(),
-        const std::vector< float >& col_ratios = std::vector< float >()
-    );
-
+    void setGrid(int r,
+                 int c,
+                 const std::vector< float >& row_ratios = std::vector< float >(),
+                 const std::vector< float >& col_ratios = std::vector< float >());
     QSizeF size() const;
     void setSize(const QSizeF& size);
 
@@ -103,9 +100,18 @@ public:
     QList< QImPlotNode* > plotNodes() const;
     // 创建一个绘图，这个绘图会作为subplot的子节点，如果当前subplot的绘图已经和subplot的管理数量一致，此函数返回nullptr
     QImPlotNode* createPlotNode();
+    // 追加一个绘图
     void addPlotNode(QImPlotNode* plot);
     // 插入绘图，注意plotIndex是subplot节点下面绘图节点的索引，其它节点会跳过,plotIndex可以是-1，则代表在最前面插入，可以大于等于size，代表最后插入
     void insertPlotNode(int plotIndex, QImPlotNode* plot);
+    // 绘图的数量
+    int plotCount() const;
+    // plotNode在subplot下的索引
+    int plotNodeSubplotIndex(QImPlotNode* plot);
+    // 监测subplot的grid信息变化，如果为true，每次绘图都会检测行列的比例是否变化，如果变化将会发出gridInfoChanged信号
+    // 此操作会在每帧都对比grid的ratios，默认为false，如果需要才开启
+    bool isTrackGridRatiosEnabled() const;
+    void setTrackGridRatiosEnabled(bool on);
 Q_SIGNALS:
     /**
      * @brief 标题发生了改变

@@ -67,9 +67,9 @@ if(CMAKE_GENERATOR STREQUAL "Ninja")
     set(CMAKE_NINJA_FORCE_RESPONSE_FILE "1")
 endif()
 
-########################################################
-# export macro
-########################################################
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 ########################################################
 # 导出宏配置（支持MSVC和MinGW）
 ########################################################
@@ -226,29 +226,10 @@ install(FILES
 )
 
 
-# ===== 调试：打印所有 targets =====
+
 message(STATUS "")
 message(STATUS "==========================================")
 message(STATUS "  Project: ${PROJECT_NAME} v${PROJECT_VERSION}")
 message(STATUS "  CMake: ${CMAKE_VERSION}")
 message(STATUS "  Build Type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "==========================================")
-
-# 获取所有 targets
-get_property(all_targets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
-list(SORT all_targets)  # 排序便于阅读
-
-message(STATUS "Targets (${CMAKE_PROJECT_NAME}):")
-foreach(target IN LISTS all_targets)
-    if(TARGET ${target})
-        get_target_property(type ${target} TYPE)
-        get_target_property(aliased ${target} ALIASED_TARGET)
-        if(aliased AND NOT aliased STREQUAL "ALIASED_TARGET-NOTFOUND")
-            message(STATUS "  → ${target} (ALIAS of ${aliased})")
-        else()
-            message(STATUS "  • ${target} [${type}]")
-        endif()
-    endif()
-endforeach()
-message(STATUS "==========================================")
-message(STATUS "")
