@@ -10,6 +10,16 @@
 
 通过`QIm`的`Plot`模块，可以实现如下数据可视化效果：
 
+### 2D绘图
+
+|  |  |  |
+|:---:|:---:|:---:|
+| ![bars](./docs/assets/plot2D/bars.gif) | ![candle](./docs/assets/plot2D/candle.gif) | ![controls](./docs/assets/plot2D/controls.gif) |
+| ![dnd](./docs/assets/plot2D/dnd.gif) | ![heat](./docs/assets/plot2D/heat.gif) | ![markers](./docs/assets/plot2D/markers.gif) |
+| ![pie](./docs/assets/plot2D/pie.gif) | ![query](./docs/assets/plot2D/query.gif) | ![realtime](./docs/assets/plot2D/rt.gif) |
+| ![shaded](./docs/assets/plot2D/shaded.gif) | ![stem](./docs/assets/plot2D/stem.gif) | ![tables](./docs/assets/plot2D/tables.gif) |
+
+### 3D绘图
 
 
 ## 使用方法
