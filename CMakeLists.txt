@@ -31,6 +31,7 @@ option(QIM_BUILD_SHARED "Build as shared library" ON)
 option(QIM_BUILD_WIDGETS "Build Qt Widgets compatibility layer" ON)
 option(QIM_ENABLE_DEBUG_PRINT "Enable Debug Print" ON)
 option(QIM_ENABLE_DEBUG_PRINT_FPS "Enable Debug Print fps" ON)
+option(QIM_ENABLE_BENCHMARK "Enable build benchmark" ON)
 option(QIM_BUILD_QML "Build QML compatibility layer" OFF) # TODO:QML
 
 
@@ -196,7 +197,9 @@ add_subdirectory(src)
 if(QIM_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
-
+if(QIM_ENABLE_BENCHMARK)
+    add_subdirectory(benchmark)
+endif()
 ########################################################
 # 总安装
 ########################################################

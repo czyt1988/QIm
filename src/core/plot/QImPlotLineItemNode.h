@@ -61,6 +61,11 @@ public:
     // 颜色
     void setColor(const QColor& c);
     QColor color() const;
+    //===============================================================
+    // name
+    //===============================================================
+    void setAdaptivesSampling(bool on);
+    bool isAdaptiveSampling() const;
 Q_SIGNALS:
     void lineFlagChanged();
 

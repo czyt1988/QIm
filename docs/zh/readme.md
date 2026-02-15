@@ -14,17 +14,17 @@
 
 |  |  |  |
 |:---:|:---:|:---:|
-| ![bars](./docs/assets/plot2D/bars.gif) | ![candle](./docs/assets/plot2D/candle.gif) | ![controls](./docs/assets/plot2D/controls.gif) |
-| ![dnd](./docs/assets/plot2D/dnd.gif) | ![heat](./docs/assets/plot2D/heat.gif) | ![markers](./docs/assets/plot2D/markers.gif) |
-| ![pie](./docs/assets/plot2D/pie.gif) | ![query](./docs/assets/plot2D/query.gif) | ![realtime](./docs/assets/plot2D/rt.gif) |
-| ![shaded](./docs/assets/plot2D/shaded.gif) | ![stem](./docs/assets/plot2D/stem.gif) | ![tables](./docs/assets/plot2D/tables.gif) |
+| ![bars](../assets/plot2D/bars.gif) | ![candle](../assets/plot2D/candle.gif) | ![controls](../assets/plot2D/controls.gif) |
+| ![dnd](../assets/plot2D/dnd.gif) | ![heat](../assets/plot2D/heat.gif) | ![markers](../assets/plot2D/markers.gif) |
+| ![pie](../assets/plot2D/pie.gif) | ![query](../assets/plot2D/query.gif) | ![realtime](../assets/plot2D/rt.gif) |
+| ![shaded](../assets/plot2D/shaded.gif) | ![stem](../assets/plot2D/stem.gif) | ![tables](../assets/plot2D/tables.gif) |
 
 ### 3D绘图
 
 |  |  |  |
 |:---:|:---:|:---:|
-|![3D demo1](./docs/assets/plot3D/plot3d-demo1.gif)|![3D demo2](./docs/assets/plot3D/plot3d-demo2.gif)|![3D demo3](./docs/assets/plot3D/plot3d-demo3.gif)|
-|![3D demo4](./docs/assets/plot3D/plot3d-demo4.gif)|![3D demo5](./docs/assets/plot3D/plot3d-demo5.gif)|![3D demo6](./docs/assets/plot3D/plot3d-demo6.gif)|
+|![3D demo1](../assets/plot3D/plot3d-demo1.gif)|![3D demo2](../assets/plot3D/plot3d-demo2.gif)|![3D demo3](../assets/plot3D/plot3d-demo3.gif)|
+|![3D demo4](../assets/plot3D/plot3d-demo4.gif)|![3D demo5](../assets/plot3D/plot3d-demo5.gif)|![3D demo6](../assets/plot3D/plot3d-demo6.gif)|
 
 ## 核心设计
 

@@ -141,6 +141,9 @@ public:
     QPointF plotToPixels(const double& doubleX, const double& doubleY);
     // 坐标轴上渲染的文字内容，注意此函数一定只能在当前绘图的beginDraw内部使用
     std::string axisValueText(double val, QImPlotAxisId axisId) const;
+    // 自适应坐标轴，让所有曲线都能显示
+    void rescaleAxes();
+    void setAxesToFit();
 Q_SIGNALS:
     void titleChanged(const QString& title);
     void sizeChanged(const QSizeF& size);

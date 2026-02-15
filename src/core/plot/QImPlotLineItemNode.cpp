@@ -25,9 +25,11 @@ class QImPlotLineItemNode::PrivateData
     QIM_DECLARE_PUBLIC(QImPlotLineItemNode)
 public:
     PrivateData(QImPlotLineItemNode* p);
+    void resetDownSamplerData();
     std::unique_ptr< QImAbstractXYDataSeries > data;
-    std::unique_ptr< QImLTTBDownsampler > datLTTBa;
-    int downsampleThreshold { 10000 };
+    std::unique_ptr< QImLTTBDownsampler > dataLTTB;
+    bool isAdaptiveSampling { true };
+    int downsampleThreshold { 20000 };
     ImPlotLineFlags lineFlags { ImPlotLineFlags_None };
     std::optional< QImTrackedValue< ImVec4, ImVecComparator< ImVec4 > > > color;  ///< 颜色
     QImTrackedValue< float > lineWidth { 1.0f };                                  ///< 线宽
@@ -35,6 +37,21 @@ public:
 
 QImPlotLineItemNode::PrivateData::PrivateData(QImPlotLineItemNode* p) : q_ptr(p)
 {
+}
+
+/**
+ * @brief 重置降采样数据，在设置数据后或者
+ */
+void QImPlotLineItemNode::PrivateData::resetDownSamplerData()
+{
+    if (isAdaptiveSampling) {
+        if (data && (data->size() > downsampleThreshold)) {
+            QImLTTBDownsampler* lttb = new QImLTTBDownsampler(data.get(), downsampleThreshold);
+            dataLTTB.reset(lttb);
+        }
+    } else {
+        dataLTTB.reset(nullptr);
+    }
 }
 //----------------------------------------------------
 // QImPlotLineItemNode
@@ -49,31 +66,13 @@ QImPlotLineItemNode::~QImPlotLineItemNode()
 
 void QImPlotLineItemNode::setData(QImAbstractXYDataSeries* series)
 {
-    d_ptr->data.reset(series);
+    QIM_D(d);
+    d->data.reset(series);
+    if (d->isAdaptiveSampling) {
+        d->resetDownSamplerData();
+    }
 }
-#if 0
-#ifndef QImPlotLineItemNode_SETDATA
-#define QImPlotLineItemNode_SETDATA(x, y)                                                                              \
-    QIM_D(d);                                                                                                          \
-    QImAbstractXYDataSeries* data = new QImVectorXYDataSeries(x, y);                                                   \
-    if (data->size() > d->downsampleThreshold) {                                                                       \
-        QImLTTBDownsampler* lttb = new QImLTTBDownsampler(data, 5000);                                                 \
-        d->datLTTBa.reset(lttb);                                                                                       \
-    } else {                                                                                                           \
-        if (d->datLTTBa) {                                                                                             \
-            d->datLTTBa.reset();                                                                                       \
-        }                                                                                                              \
-    }                                                                                                                  \
-    d->data.reset(data);
-#endif
-#else
-#ifndef QImPlotLineItemNode_SETDATA
-#define QImPlotLineItemNode_SETDATA(x, y)                                                                              \
-    QIM_D(d);                                                                                                          \
-    QImAbstractXYDataSeries* data = new QImVectorXYDataSeries(x, y);                                                   \
-    d->data.reset(data);
-#endif
-#endif
+
 
 QImAbstractXYDataSeries* QImPlotLineItemNode::data() const
 {
@@ -186,6 +185,17 @@ void QImPlotLineItemNode::setColor(const QColor& c)
 QColor QImPlotLineItemNode::color() const
 {
     return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+}
+
+void QImPlotLineItemNode::setAdaptivesSampling(bool on)
+{
+    d_ptr->isAdaptiveSampling = on;
+    d_ptr->resetDownSamplerData();
+}
+
+bool QImPlotLineItemNode::isAdaptiveSampling() const
+{
+    return d_ptr->isAdaptiveSampling;
 }
 
 // ===== 标志访问器实现（带 Doxygen 注释）=====
@@ -335,31 +345,27 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
         return false;
     }
     QImAbstractXYDataSeries* series = d->data.get();
+    if (d->isAdaptiveSampling && d->dataLTTB) {
+        series = d->dataLTTB.get();
+    }
+    if (!series) {
+        return false;
+    }
     if (d->color && (d->color->is_dirty() || d->lineWidth.is_dirty())) {
         ImPlot::SetNextLineStyle(d->color->value(), d->lineWidth.value());
     }
     if (series->isContiguous()) {
         if (series->xRawData()) {
-            if (d->datLTTBa) {
-                QImLTTBDownsampler* lttb = d->datLTTBa.get();
-                auto limits              = ImPlot::GetPlotLimits();
-                lttb->updateViewRange(limits.X.Min, limits.X.Max);
-                // 有x指针，说明不是yonly
-                ImPlot::PlotLine(
-                    labelConstData(), lttb->xRawData(), lttb->yRawData(), lttb->size(), d->lineFlags, lttb->offset(), lttb->stride()
-                );
-            } else {
-                // 有x指针，说明不是yonly
-                ImPlot::PlotLine(
-                    labelConstData(),
-                    series->xRawData(),
-                    series->yRawData(),
-                    series->size(),
-                    d->lineFlags,
-                    series->offset(),
-                    series->stride()
-                );
-            }
+            // 有x指针，说明不是yonly
+            ImPlot::PlotLine(
+                labelConstData(),
+                series->xRawData(),
+                series->yRawData(),
+                series->size(),
+                d->lineFlags,
+                series->offset(),
+                series->stride()
+            );
         } else {
             // x指针没有说明是yonly
             ImPlot::PlotLine(

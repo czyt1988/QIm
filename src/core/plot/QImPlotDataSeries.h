@@ -243,8 +243,12 @@ public:
     {
         m_yOnly = on;
         if (on) {
-            m_xScale = xStart;
+            m_xStart = xStart;
             m_xScale = xScale;
+        } else {
+            // 非Y-only模式时重置参数，避免污染
+            m_xStart = 0.0;
+            m_xScale = 1.0;
         }
     }
     bool empty() const

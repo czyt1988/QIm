@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     if (QIM::QImPlotNode* plot1 = ui->figureWidget1->createPlotNode()) {
         plot1->x1Axis()->setLabel(u8"x1");
         plot1->y1Axis()->setLabel(u8"y1");
+        plot1->setTitle("10K Points");
         int numPoints = 100000;
         auto wave     = QIM::make_waveform< QIM::CosineWave >(15.0, 0.001);
         auto datas    = wave.generate(numPoints, 0.0, 20 * M_PI);
@@ -27,8 +28,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     if (QIM::QImPlotNode* plot2 = ui->figureWidget1->createPlotNode()) {
         plot2->x1Axis()->setLabel(u8"x2");
         plot2->y1Axis()->setLabel(u8"y2");
+        plot2->setTitle("1M Points");
         plot2->setLegendEnabled(true);
-        int numPoints = 100000;
+        int numPoints = 1000000;
         auto wave     = QIM::make_waveform< QIM::DampedSineWave >(3.0, 0.15);
         auto datas    = wave.generate(numPoints, 0.0, 4.0 * M_PI);
         plot2->addLine(datas.first, datas.second, "curve 1");

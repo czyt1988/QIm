@@ -44,6 +44,10 @@ public:
     std::array< QImPlotAxisInfo*, static_cast< std::size_t >(QImPlotAxisId::AxisCount) > axisInfo { nullptr };
     // legend
     std::unique_ptr< QImPlotLegendNode > legendNode;
+    //===============================================================
+    // 功能
+    //===============================================================
+    QImTrackedValue< bool > axesToFit { false };  ///< 是否需要自适应坐标轴，只需一次即可，因此使用QImTrackedValue
 };
 
 QImPlotNode::PrivateData::PrivateData(QImPlotNode* q) : q_ptr(q)
@@ -675,10 +679,25 @@ std::string QImPlotNode::axisValueText(double val, QImPlotAxisId xAxisId) const
     return std::string(buffer);
 }
 
+void QImPlotNode::rescaleAxes()
+{
+    d_ptr->axesToFit = true;
+}
+
+void QImPlotNode::setAxesToFit()
+{
+    d_ptr->axesToFit = true;
+}
+
 bool QImPlotNode::beginDraw()
 {
     QIM_D(d);
-    // TODO 样式
+    // 功能
+    if (d->axesToFit.is_dirty() && d->axesToFit.value()) {
+        d->axesToFit = false;
+        d->axesToFit.mark_clean();
+        ImPlot::SetNextAxesToFit();
+    }
     const char* title   = (d->titleUtf8->isEmpty() ? nullptr : d->titleUtf8->constData());
     d->beginPlotSuccess = ImPlot::BeginPlot(title, d->size, d->plotFlags);
     if (!d->beginPlotSuccess) {

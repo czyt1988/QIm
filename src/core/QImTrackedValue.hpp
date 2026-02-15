@@ -491,15 +491,6 @@ public:
     }
 
     /**
-     * @brief 转换为原始类型
-     * @return 值的副本
-     */
-    explicit operator T() const
-    {
-        return value_;
-    }
-
-    /**
      * @brief 重置为默认值
      * @details 将值重置为T的默认值，并清除脏标记
      */
@@ -568,6 +559,16 @@ public:
     bool operator!=(const T& other) const
     {
         return value_ != other;
+    }
+
+
+    /**
+     * @brief 转换为原始类型（对bool类型禁用，避免与operator bool冲突）
+     */
+    template< typename U = T, typename std::enable_if_t< !std::is_same_v< U, bool >, int > = 0 >
+    explicit operator U() const
+    {
+        return value_;
     }
 
     /**
