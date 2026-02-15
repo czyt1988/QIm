@@ -285,3 +285,5 @@ Qt 生态里能画图的库不多，主流的为`QCustomPlot`、`Qwt`、`Qt Char
 **注：**测试中的内存检测是检测整个测试过程的峰值内存差值，可能会存在偏差
 
 具体测试代码见`benchmark/performance`
+
+详细测试结果见：[docs/zh/performance.md](./docs/zh/performance.md)
