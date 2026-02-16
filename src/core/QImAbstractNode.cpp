@@ -192,12 +192,12 @@ QImAbstractNode* QImAbstractNode::parentNode() const
 
 void QImAbstractNode::setAutoIdEnabled(bool on)
 {
-    m_autoId = on;
+    setRenderOption(RenderNotAutoID, !on);
 }
 
 bool QImAbstractNode::isAutoIdEnabled() const
 {
-    return m_autoId;
+    return !testRenderOption(RenderNotAutoID);
 }
 
 int QImAbstractNode::zOrder() const
@@ -218,14 +218,14 @@ void QImAbstractNode::setZOrder(int z)
 
 void QImAbstractNode::render()
 {
-    // 对于imgui，不可见就直接不渲染就行
-    if (!m_visible) {
-        return;
+    if (!testRenderOption(RenderIgnoreVisible)) {
+        if (!isVisible()) {
+            // 对于imgui，不可见就直接不渲染就行
+            return;
+        }
     }
-    // === 处理禁用状态 ===
-    bool isDisable = !m_enabled;
-    beginDisabled(isDisable);
-    if (m_autoId) {
+    bool autoID = isAutoIdEnabled();
+    if (autoID) {
         ImGui::PushID(this);  // ImGui 原生支持 void* 重载，高效且唯一
     }
     if (beginDraw()) {
@@ -237,26 +237,35 @@ void QImAbstractNode::render()
         }
         endDraw();
     }
-    if (m_autoId) {
+    if (autoID) {
         ImGui::PopID();  // 严格匹配 PushID
     }
-    endDisabled(isDisable);
+}
+
+void QImAbstractNode::setRenderOptionFlags(RenderOptionFlags f)
+{
+    m_renderFlags = f;
+}
+
+void QImAbstractNode::setRenderOption(RenderOption f, bool on)
+{
+    m_renderFlags.setFlag(f, on);
+}
+
+bool QImAbstractNode::testRenderOption(RenderOption f) const
+{
+    return m_renderFlags.testFlag(f);
+}
+
+QImAbstractNode::RenderOptionFlags QImAbstractNode::renderOptionFlags() const
+{
+    return m_renderFlags;
 }
 
 void QImAbstractNode::endDraw()
 {
-
 }
 
-void QImAbstractNode::beginDisabled(bool isDisable)
-{
-    Q_UNUSED(isDisable);
-}
-
-void QImAbstractNode::endDisabled(bool isDisable)
-{
-    Q_UNUSED(isDisable);
-}
 
 void QImAbstractNode::removeFromParentList()
 {

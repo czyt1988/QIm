@@ -1,6 +1,9 @@
-#include "QImPlotItemNode.h"
+﻿#include "QImPlotItemNode.h"
 #include "implot.h"
+#include "implot_internal.h"
 #include "QtImGuiUtils.h"
+#include "QImPlotNode.h"
+
 namespace QIM
 {
 
@@ -14,6 +17,7 @@ public:
     QByteArray utf8Label;
     ImAxis xAxisId { ImAxis_X1 };
     ImAxis yAxisId { ImAxis_Y1 };
+    ImPlotItem* plotItem { nullptr };
 };
 
 QImPlotItemNode::PrivateData::PrivateData(QImPlotItemNode* p) : q_ptr(p)
@@ -25,6 +29,7 @@ QImPlotItemNode::PrivateData::PrivateData(QImPlotItemNode* p) : q_ptr(p)
 QImPlotItemNode::QImPlotItemNode(QObject* par) : QImAbstractNode(par), QIM_PIMPL_CONSTRUCT
 {
     setAutoIdEnabled(false);
+    setRenderOption(RenderIgnoreVisible, true);  // line的visible由ImPlotItem::Show决定，这样才可以和legend联动
 }
 
 QImPlotItemNode::~QImPlotItemNode()
@@ -77,6 +82,70 @@ QImPlotAxisId QImPlotItemNode::xAxisId() const
 QImPlotAxisId QImPlotItemNode::yAxisId() const
 {
     return toQImPlotAxisId(d_ptr->yAxisId);
+}
+
+/**
+ * @brief 获取绘图节点
+ *
+ * 此函数会一直寻找第一个为QImPlotNode的父节点
+ * @return
+ */
+QImPlotNode* QImPlotItemNode::plotNode() const
+{
+    QImAbstractNode* parent = parentNode();
+
+    while (parent != nullptr) {
+        if (auto* plotNode = qobject_cast< QImPlotNode* >(parent)) {
+            return plotNode;
+        }
+        parent = parent->parentNode();
+    }
+
+    return nullptr;
+}
+
+QColor QImPlotItemNode::itemColor() const
+{
+    QIM_DC(d);
+    if (d->plotItem) {
+        return toQColor(d->plotItem->Color);
+    }
+    return QColor();
+}
+
+
+bool QImPlotItemNode::isVisible() const
+{
+    ImPlotItem* plotItem = d_ptr->plotItem;
+    if (!plotItem) {
+        return false;
+    }
+    return plotItem->Show;
+}
+
+void QImPlotItemNode::setVisible(bool visible)
+{
+    ImPlotItem* plotItem = d_ptr->plotItem;
+    if (!plotItem) {
+        return;
+    }
+    plotItem->Show = visible;
+    // 触发信号
+    QImAbstractNode::setVisible(visible);
+}
+
+void QImPlotItemNode::endDraw()
+{
+}
+
+ImPlotItem* QImPlotItemNode::imPlotItem() const
+{
+    return d_ptr->plotItem;
+}
+
+void QImPlotItemNode::setImPlotItem(ImPlotItem* item)
+{
+    d_ptr->plotItem = item;
 }
 
 }  // end namespace QIM

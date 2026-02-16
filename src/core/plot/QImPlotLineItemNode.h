@@ -21,6 +21,14 @@ class QIM_CORE_API QImPlotLineItemNode : public QImPlotItemNode
 public:
     QImPlotLineItemNode(QObject* par = nullptr);
     ~QImPlotLineItemNode();
+    enum
+    {
+        Type = InnerType + 1
+    };
+    virtual int type() const override
+    {
+        return Type;
+    }
     //----------------------------------------------------
     // 数据设置
     //----------------------------------------------------
@@ -58,7 +66,6 @@ public:
     //===============================================================
     // style
     //===============================================================
-    // 颜色
     void setColor(const QColor& c);
     QColor color() const;
     //===============================================================
@@ -71,7 +78,6 @@ Q_SIGNALS:
 
 protected:
     virtual bool beginDraw() override;
-    virtual void endDraw() override;
 };
 
 template< typename ContainerX, typename ContainerY >

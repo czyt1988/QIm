@@ -129,8 +129,6 @@ Q_SIGNALS:
 protected:
     virtual bool beginDraw() override;
     virtual void endDraw() override;
-    virtual void beginDisabled(bool isDisable) override;
-    virtual void endDisabled(bool isDisable) override;
 };
 
 }

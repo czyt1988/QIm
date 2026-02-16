@@ -459,7 +459,9 @@ bool QImWidgetNode::beginDraw()
     for (const auto& var : d->styleVars) {
         ImGui::PushStyleVar(var.idx, var.value);
     }
-
+    if (!isEnabled()) {
+        ImGui::BeginDisabled();
+    }
     d->isWidgetCollapsed =
         ImGui::Begin(d->windowTitleUtf8.isEmpty() ? "##Widget" : d->windowTitleUtf8.constData(), nullptr, d->windowFlags);
     // 这里永远返回true，imgui的begin返回的是是否收起状态，ImGui::Begin无论如何也要匹配ImGui::End
@@ -471,32 +473,12 @@ void QImWidgetNode::endDraw()
     QIM_D(d);
     // imgui的begin返回的是是否收起状态，ImGui::Begin无论如何也要匹配ImGui::End
     ImGui::End();
+    if (!isEnabled()) {
+        ImGui::EndDisabled();
+    }
     // 匹配 PushStyleVar
     for (std::size_t i = 0; i < d->styleVars.size(); ++i) {
         ImGui::PopStyleVar();
-    }
-}
-
-/**
- * @brief 对Enable/Disabled状态的开始绘制
- *  * isDisable==true时，默认调用ImGui::BeginDisabled();
- *  * @param isDisable
- */
-void QImWidgetNode::beginDisabled(bool isDisable)
-{
-    if (isDisable) {
-        ImGui::BeginDisabled();
-    }
-}
-
-/**
- * @brief 对Enable/Disabled状态的结束绘制
- *  * @param isDisable
- */
-void QImWidgetNode::endDisabled(bool isDisable)
-{
-    if (isDisable) {
-        ImGui::EndDisabled();
     }
 }
 

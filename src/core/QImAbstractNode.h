@@ -54,16 +54,23 @@ class QIM_CORE_API QImAbstractNode : public QObject
     Q_OBJECT
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
-
+public:
+    enum RenderOption
+    {
+        RenderIgnoreVisible = 1 << 0,  ///< render函数不考虑isVisible状态
+        RenderNotAutoID     = 1 << 1   ///< 不自动推入id
+    };
+    Q_DECLARE_FLAGS(RenderOptionFlags, RenderOption)
+    Q_FLAG(RenderOptionFlags)
 public:
     explicit QImAbstractNode(QObject* parent = nullptr);
     ~QImAbstractNode() override;
     // === 状态控制 ===
-    bool isVisible() const;
-    void setVisible(bool visible);
+    virtual bool isVisible() const;
+    virtual void setVisible(bool visible);
 
-    bool isEnabled() const;
-    void setEnabled(bool enabled);
+    virtual bool isEnabled() const;
+    virtual void setEnabled(bool enabled);
 
     // === 子节点管理 (O(1) 访问，无类型转换) ===
     void addChildNode(QImAbstractNode* child);
@@ -90,6 +97,11 @@ public:
     QList< T > findChildrenNodes() const;
     // 核心渲染入口 - 由QImWidget调用
     void render();
+    // 设置渲染属性
+    void setRenderOptionFlags(RenderOptionFlags f);
+    RenderOptionFlags renderOptionFlags() const;
+    void setRenderOption(RenderOption f, bool on);
+    bool testRenderOption(RenderOption f) const;
 Q_SIGNALS:
     void visibleChanged(bool visible);
     void enabledChanged(bool enabled);
@@ -136,39 +148,6 @@ protected:
      */
     virtual void endDraw();
 
-    /**
-     * @brief 对Enable/Disabled状态的开始绘制
-     *
-     * QImAbstractNode此函数不做任何动作，你可以在此实现disable状态下的开始状态绘制，例如
-     *
-     * @code
-     * void QImWidgetNode::beginDisabled(bool isDisable)
-     * {
-     *     if (isDisable) {
-     *         ImGui::BeginDisabled();
-     *     }
-     * }
-     * @endcode
-     *
-     * @param isDisable
-     */
-    virtual void beginDisabled(bool isDisable);
-
-    /**
-     * @brief 对Enable/Disabled状态的结束绘制
-     *
-     * QImAbstractNode此函数不做任何动作，你可以在此实现disable状态下的结束状态绘制，例如
-     * @code
-     * void QImWidgetNode::endDisabled(bool isDisable)
-     * {
-     *   if (isDisable) {
-     *         ImGui::EndDisabled();
-     *     }
-     * }
-     * @endcode
-     * @param isDisable
-     */
-    virtual void endDisabled(bool isDisable);
 
 private:
     // 仅移除子列表引用（不改变 QObject 父子关系），供析构函数使用
@@ -179,11 +158,11 @@ private:
 private:
     bool m_visible { true };
     bool m_enabled { true };
-    bool m_autoId { true };
     int m_zOrder { 0 };  // z-order值
     QList< QImAbstractNode* > m_children;
     QList< QImAbstractNode* > m_childrenZordered;  // 按 z-order 预排序的子节点列表
     QPointer< QImAbstractNode > m_parent;          // 逻辑父节点（弱引用，避免循环）
+    RenderOptionFlags m_renderFlags;
 };
 
 template< typename T >

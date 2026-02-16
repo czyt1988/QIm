@@ -3,6 +3,7 @@
 #include "QImPlotDataSeries.h"
 #include "QImLTTBDownsampler.h"
 #include "implot.h"
+#include "implot_internal.h"
 #include "QImTrackedValue.hpp"
 #include "QtImGuiUtils.h"
 #include <QDebug>
@@ -33,6 +34,7 @@ public:
     ImPlotLineFlags lineFlags { ImPlotLineFlags_None };
     std::optional< QImTrackedValue< ImVec4, ImVecComparator< ImVec4 > > > color;  ///< 颜色
     QImTrackedValue< float > lineWidth { 1.0f };                                  ///< 线宽
+    bool isPlotItemVisible;
 };
 
 QImPlotLineItemNode::PrivateData::PrivateData(QImPlotLineItemNode* p) : q_ptr(p)
@@ -176,6 +178,7 @@ void QImPlotLineItemNode::setLineFlags(int flags)
         emit lineFlagChanged();
     }
 }
+
 
 void QImPlotLineItemNode::setColor(const QColor& c)
 {
@@ -382,15 +385,22 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
     } else {
         // TODO:非连续内存
     }
+    // 更新item的状态
+    ImPlotContext* ct    = ImPlot::GetCurrentContext();
+    ImPlotItem* plotItem = ct->PreviousItem;  // 通过源码，PlotLine结束后，ImPlotItem就是PreviousItem
+    setImPlotItem(plotItem);
+    if (plotItem->Show != QImAbstractNode::isVisible()) {
+        // 状态发生了变化，这种情况是label点击，设置了show状态和QImAbstractNode记录的状态不一致
+        // 这时要同步状态
+        QImAbstractNode::setVisible(plotItem->Show);  // 此函数会触发信号
+    }
     if (!d->color) {
         // 一般是首次渲染，且没设定颜色，这时是implot给的默认颜色，把这个默认颜色获取到
         d->color = ImPlot::GetLastItemColor();
     }
-    return false;
-}
+    // 绘图之后，更新状态
 
-void QImPlotLineItemNode::endDraw()
-{
+    return false;
 }
 
 
