@@ -60,17 +60,26 @@ find_package(Qt${QT_VERSION_MAJOR} ${QIM_MIN_QT_VERSION} REQUIRED COMPONENTS
     Gui
     Widgets
     OpenGL
-    Charts
 )
+if (ENABLE_QTCHARTS)
+    find_package(Qt${QT_VERSION_MAJOR} ${QIM_MIN_QT_VERSION} REQUIRED COMPONENTS
+        Charts
+    )
+endif()
+
 target_link_libraries(PlotPerformance PUBLIC
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::OpenGL
-    Qt${QT_VERSION_MAJOR}::Charts
     QIm::Core
     QIm::Widgets
 )
+if (ENABLE_QTCHARTS)
+    target_link_libraries(PlotPerformance PUBLIC
+        Qt${QT_VERSION_MAJOR}::Charts
+    )
+endif()
 
 if(${QT_VERSION_MAJOR} EQUAL 6)
     find_package(Qt6 COMPONENTS OpenGLWidgets REQUIRED)
