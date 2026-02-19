@@ -3,6 +3,9 @@
 #include "QImAPI.h"
 #include <algorithm>
 #include <QtGlobal>
+
+#include <cmath>
+
 namespace QIM
 {
 // 通用数据访问接口类
