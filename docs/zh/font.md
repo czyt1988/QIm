@@ -1,5 +1,7 @@
 # Dear ImGui：字体使用指南
 
+本文为ImGui官方文档的中文翻译
+
 （您也可以在 https://github.com/ocornut/imgui/blob/master/docs/FONTS.md 浏览此文档，或使用任意 Markdown 查看器阅读本文件）
 
 Dear ImGui 的 `imgui.cpp` 代码中内嵌了 [ProggyClean.ttf](http://proggyfonts.net)（作者：Tristan Grimmer）的副本，这是一款高度为 13 像素、像素完美的默认字体。我们将其嵌入源代码中，以便您无需文件系统访问即可使用 Dear ImGui。ProggyClean 字体无法平滑缩放，因此建议在追求美观外观并需支持多种分辨率的应用程序中加载您自己的字体文件。
