@@ -30,6 +30,8 @@ QImFigureWidget::QImFigureWidget(QWidget* parent, Qt::WindowFlags f) : QImWidget
     d_ptr->m_subplotNode = new QImSubplotsNode();
     addRenderNode(d_ptr->m_subplotNode.data());
     d_ptr->m_subplotNode->setTitleEnabled(true);
+    connect(d_ptr->m_subplotNode, &QImSubplotsNode::childNodeAdded, this, &QImFigureWidget::onSubplotChildNodeAdded);
+    connect(d_ptr->m_subplotNode, &QImSubplotsNode::childNodeRemoved, this, &QImFigureWidget::onSubplotChildNodeRemoved);
 }
 
 QImFigureWidget::~QImFigureWidget()
@@ -46,10 +48,7 @@ const QImPlotTheme& QImFigureWidget::plotTheme() const
     return d_ptr->m_theme.value();
 }
 
-void QImFigureWidget::setSubplotGrid(int rows,
-                                     int cols,
-                                     const std::vector< float >& rowsRatios,
-                                     const std::vector< float >& colsRatios)
+void QImFigureWidget::setSubplotGrid(int rows, int cols, const std::vector< float >& rowsRatios, const std::vector< float >& colsRatios)
 {
     QIM_D(d);
     if (d->m_subplotNode) {
@@ -156,6 +155,22 @@ void QImFigureWidget::initializeGL()
     QIM::QImWidget::initializeGL();
     d->m_context = ImPlot::CreateContext();
     // 默认有个subplot
+}
+
+void QImFigureWidget::onSubplotChildNodeRemoved(QImAbstractNode* c)
+{
+    QImPlotNode* plot = qobject_cast< QImPlotNode* >(c);
+    if (plot) {
+        Q_EMIT plotNodeAttached(plot, false);
+    }
+}
+
+void QImFigureWidget::onSubplotChildNodeAdded(QImAbstractNode* c)
+{
+    QImPlotNode* plot = qobject_cast< QImPlotNode* >(c);
+    if (plot) {
+        Q_EMIT plotNodeAttached(plot, true);
+    }
 }
 
 }  // end namespace QIM

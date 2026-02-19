@@ -33,10 +33,12 @@ public:
     // ===========================
     //  subplot
     // ===========================
-    void setSubplotGrid(int rows,
-                        int cols,
-                        const std::vector< float >& rowsRatios = std::vector< float >(),
-                        const std::vector< float >& colsRatios = std::vector< float >());
+    void setSubplotGrid(
+        int rows,
+        int cols,
+        const std::vector< float >& rowsRatios = std::vector< float >(),
+        const std::vector< float >& colsRatios = std::vector< float >()
+    );
     int subplotGridRows() const;
     int subplotGridColumns() const;
     std::vector< float > subplotGridRowRatios() const;
@@ -60,9 +62,19 @@ public:
     bool takePlotNode(QImPlotNode* plot);
     // 移除绘图，plot会被删除
     void removePlotNode(QImPlotNode* plot);
+Q_SIGNALS:
+    /**
+     * @brief QImPlotNode的添加或删除的信号，此信号等同绑定subplotNode的childNodeAdded/childNodeRemoved
+     * @param plot
+     * @param attach
+     */
+    void plotNodeAttached(QIM::QImPlotNode* plot, bool attach);
 
 protected:
     void initializeGL() override;
+private Q_SLOTS:
+    void onSubplotChildNodeRemoved(QIM::QImAbstractNode* c);
+    void onSubplotChildNodeAdded(QIM::QImAbstractNode* c);
 };
 }
 #endif  // QIMFIGUREWIDGET_H

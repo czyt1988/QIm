@@ -105,6 +105,12 @@ public:
 Q_SIGNALS:
     void visibleChanged(bool visible);
     void enabledChanged(bool enabled);
+    /**
+     * @brief 节点删除信号
+     *
+     * @note 此时节点还未销毁，可以调用qobject_cast
+     * @param c 删除的节点
+     */
     void childNodeRemoved(QIM::QImAbstractNode* c);
     void childNodeAdded(QIM::QImAbstractNode* c);
 

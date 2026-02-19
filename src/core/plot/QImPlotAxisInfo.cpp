@@ -89,6 +89,11 @@ int QImPlotAxisInfo::imAxis() const
     return d_ptr->axisId;
 }
 
+QImPlotNode* QImPlotAxisInfo::plotNode() const
+{
+    return d_ptr->plot;
+}
+
 /**
  * \if ENGLISH
  * @brief Gets the axis label text displayed next to the axis
@@ -1251,6 +1256,12 @@ int QImPlotAxisInfo::imPlotScale() const
 
 bool QImPlotAxisInfo::isEnabled() const
 {
+    QIM_DC(d);
+    if (d->axisId == ImAxis_::ImAxis_X1 || d->axisId == ImAxis_::ImAxis_Y1) {
+        if (isNoDecorations()) {
+            return false;
+        }
+    }
     return d_ptr->enable;
 }
 

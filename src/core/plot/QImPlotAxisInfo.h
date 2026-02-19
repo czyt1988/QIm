@@ -74,6 +74,8 @@ public:
     ~QImPlotAxisInfo();
     QImPlotAxisId axisId() const;
     int imAxis() const;
+    // 获取plot
+    QImPlotNode* plotNode() const;
     // 标签
     QString label() const;
     void setLabel(const QString& label);

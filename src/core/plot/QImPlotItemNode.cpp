@@ -113,6 +113,15 @@ QColor QImPlotItemNode::itemColor() const
     return QColor();
 }
 
+bool QImPlotItemNode::isLegendHovered() const
+{
+    QIM_DC(d);
+    if (d->plotItem) {
+        return d->plotItem->LegendHovered;
+    }
+    return false;
+}
+
 
 bool QImPlotItemNode::isVisible() const
 {

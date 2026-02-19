@@ -43,6 +43,8 @@ public:
     QImPlotNode* plotNode() const;
     // 颜色
     QColor itemColor() const;
+    // 是否在legend上悬停
+    bool isLegendHovered() const;
     //
     virtual bool isVisible() const override;
     virtual void setVisible(bool visible) override;
