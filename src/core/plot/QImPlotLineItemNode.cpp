@@ -2,6 +2,7 @@
 #include <optional>
 #include "QImPlotDataSeries.h"
 #include "QImLTTBDownsampler.h"
+#include "QImMinMaxLTTBDownsampler.h"
 #include "implot.h"
 #include "implot_internal.h"
 #include "QImTrackedValue.hpp"
@@ -28,7 +29,7 @@ public:
     PrivateData(QImPlotLineItemNode* p);
     void resetDownSamplerData();
     std::unique_ptr< QImAbstractXYDataSeries > data;
-    std::unique_ptr< QImLTTBDownsampler > dataLTTB;
+    std::unique_ptr< QImAbstractXYDataSeries > dataLTTB;
     bool isAdaptiveSampling { true };
     int downsampleThreshold { 20000 };
     ImPlotLineFlags lineFlags { ImPlotLineFlags_None };
@@ -48,8 +49,13 @@ void QImPlotLineItemNode::PrivateData::resetDownSamplerData()
 {
     if (isAdaptiveSampling) {
         if (data && (data->size() > downsampleThreshold)) {
+#if 0
             QImLTTBDownsampler* lttb = new QImLTTBDownsampler(data.get(), downsampleThreshold);
             dataLTTB.reset(lttb);
+#else
+            QImMinMaxLTTBDownsampler* lttb = new QImMinMaxLTTBDownsampler(data.get(), downsampleThreshold);
+            dataLTTB.reset(lttb);
+#endif
         }
     } else {
         dataLTTB.reset(nullptr);
