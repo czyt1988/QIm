@@ -2,11 +2,11 @@
 #define QIMPLOTERRORBARSITEMNODE_H
 #include <QColor>
 #include "QImPlotItemNode.h"
-#include "QImPlotDataSeries.h"
+#include "QImPlotErrorDataSeries.h"
 
 namespace QIM
 {
-class QImAbstractXYDataSeries;
+class QImAbstractErrorDataSeries;
 
 /**
  * \if ENGLISH
@@ -126,29 +126,38 @@ public:
     ~QImPlotErrorBarsItemNode();
 
     //----------------------------------------------------
-    // Data setting interface - Symmetric error mode
+    // Data setting interface - Using QImAbstractErrorDataSeries
     //----------------------------------------------------
 
-    // Sets data series with symmetric error values (same for positive and negative)
-    void setData(QImAbstractXYDataSeries* dataSeries, const std::vector<double>& errors);
-
-    // Sets data from X, Y containers with symmetric error values
-    template< typename ContainerX, typename ContainerY >
-    QImAbstractXYDataSeries* setData(const ContainerX& x, const ContainerY& y, const std::vector<double>& errors);
+    // Sets error data series (symmetric or asymmetric)
+    void setData(QImAbstractErrorDataSeries* errorDataSeries);
 
     //----------------------------------------------------
-    // Data setting interface - Asymmetric error mode
+    // Data setting interface - Symmetric error mode with arbitrary containers
     //----------------------------------------------------
 
-    // Sets data series with asymmetric error values (different positive and negative)
-    void setData(QImAbstractXYDataSeries* dataSeries, const std::vector<double>& negErrors, const std::vector<double>& posErrors);
+    // Sets data from X, Y, and error containers (symmetric errors)
+    template< typename ContainerX, typename ContainerY, typename ContainerError >
+    QImAbstractErrorDataSeries* setData(const ContainerX& x, const ContainerY& y, const ContainerError& errors);
 
-    // Sets data from X, Y containers with asymmetric error values
-    template< typename ContainerX, typename ContainerY >
-    QImAbstractXYDataSeries* setData(const ContainerX& x, const ContainerY& y, const std::vector<double>& negErrors, const std::vector<double>& posErrors);
+    // Sets data from X, Y, and error containers with move semantics (symmetric errors)
+    template< typename ContainerX, typename ContainerY, typename ContainerError >
+    QImAbstractErrorDataSeries* setData(ContainerX&& x, ContainerY&& y, ContainerError&& errors);
 
-    // Gets the data series
-    QImAbstractXYDataSeries* data() const;
+    //----------------------------------------------------
+    // Data setting interface - Asymmetric error mode with arbitrary containers
+    //----------------------------------------------------
+
+    // Sets data from X, Y, and separate neg/pos error containers (asymmetric errors)
+    template< typename ContainerX, typename ContainerY, typename ContainerError >
+    QImAbstractErrorDataSeries* setData(const ContainerX& x, const ContainerY& y, const ContainerError& negErrors, const ContainerError& posErrors);
+
+    // Sets data from X, Y, and separate neg/pos error containers with move semantics (asymmetric errors)
+    template< typename ContainerX, typename ContainerY, typename ContainerError >
+    QImAbstractErrorDataSeries* setData(ContainerX&& x, ContainerY&& y, ContainerError&& negErrors, ContainerError&& posErrors);
+
+    // Gets the error data series
+    QImAbstractErrorDataSeries* data() const;
 
     //----------------------------------------------------
     // Style property accessors
@@ -246,20 +255,36 @@ protected:
 };
 
 // Template function implementation - symmetric error mode
-template< typename ContainerX, typename ContainerY >
-inline QImAbstractXYDataSeries* QImPlotErrorBarsItemNode::setData(const ContainerX& x, const ContainerY& y, const std::vector<double>& errors)
+template< typename ContainerX, typename ContainerY, typename ContainerError >
+inline QImAbstractErrorDataSeries* QImPlotErrorBarsItemNode::setData(const ContainerX& x, const ContainerY& y, const ContainerError& errors)
 {
-    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(x, y);
-    setData(d, errors);
+    QImAbstractErrorDataSeries* d = new QImVectorErrorDataSeries(x, y, errors);
+    setData(d);
+    return d;
+}
+
+template< typename ContainerX, typename ContainerY, typename ContainerError >
+inline QImAbstractErrorDataSeries* QImPlotErrorBarsItemNode::setData(ContainerX&& x, ContainerY&& y, ContainerError&& errors)
+{
+    QImAbstractErrorDataSeries* d = new QImVectorErrorDataSeries(x, y, errors);
+    setData(d);
     return d;
 }
 
 // Template function implementation - asymmetric error mode
-template< typename ContainerX, typename ContainerY >
-inline QImAbstractXYDataSeries* QImPlotErrorBarsItemNode::setData(const ContainerX& x, const ContainerY& y, const std::vector<double>& negErrors, const std::vector<double>& posErrors)
+template< typename ContainerX, typename ContainerY, typename ContainerError >
+inline QImAbstractErrorDataSeries* QImPlotErrorBarsItemNode::setData(const ContainerX& x, const ContainerY& y, const ContainerError& negErrors, const ContainerError& posErrors)
 {
-    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(x, y);
-    setData(d, negErrors, posErrors);
+    QImAbstractErrorDataSeries* d = new QImVectorErrorDataSeries(x, y, negErrors, posErrors);
+    setData(d);
+    return d;
+}
+
+template< typename ContainerX, typename ContainerY, typename ContainerError >
+inline QImAbstractErrorDataSeries* QImPlotErrorBarsItemNode::setData(ContainerX&& x, ContainerY&& y, ContainerError&& negErrors, ContainerError&& posErrors)
+{
+    QImAbstractErrorDataSeries* d = new QImVectorErrorDataSeries(x, y, negErrors, posErrors);
+    setData(d);
     return d;
 }
 

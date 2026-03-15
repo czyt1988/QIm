@@ -14,10 +14,7 @@ class QImPlotErrorBarsItemNode::PrivateData
 public:
     PrivateData(QImPlotErrorBarsItemNode* p);
 
-    std::unique_ptr<QImAbstractXYDataSeries> data;  ///< Data series (X, Y values)
-    std::vector<double> posErrors;                  ///< Positive error values
-    std::vector<double> negErrors;                  ///< Negative error values (for asymmetric mode)
-    bool asymmetricMode { false };                  ///< True if using different pos/neg errors
+    std::unique_ptr<QImAbstractErrorDataSeries> data;  ///< Error data series (X, Y, errors)
     ImPlotErrorBarsFlags flags { ImPlotErrorBarsFlags_None };
     // Style tracking values
     std::optional<QImTrackedValue<ImVec4, QIM::ImVecComparator<ImVec4>>> color;
@@ -58,64 +55,34 @@ QImPlotErrorBarsItemNode::~QImPlotErrorBarsItemNode()
 
 /**
  * \if ENGLISH
- * @brief Set data series with symmetric error values
- * @param dataSeries Pointer to QImAbstractXYDataSeries containing X, Y values
- * @param errors Vector of error values (same for positive and negative)
+ * @brief Set error data series
+ * @param errorDataSeries Pointer to QImAbstractErrorDataSeries
  * \endif
  *
  * \if CHINESE
- * @brief 设置带有对称误差值的数据系列
- * @param dataSeries 包含X、Y值的QImAbstractXYDataSeries指针
- * @param errors 误差值向量（正负误差相同）
+ * @brief 设置误差数据系列
+ * @param errorDataSeries QImAbstractErrorDataSeries指针
  * \endif
  */
-void QImPlotErrorBarsItemNode::setData(QImAbstractXYDataSeries* dataSeries, const std::vector<double>& errors)
+void QImPlotErrorBarsItemNode::setData(QImAbstractErrorDataSeries* errorDataSeries)
 {
     QIM_D(d);
-    d->data.reset(dataSeries);
-    d->posErrors = errors;
-    d->negErrors.clear();
-    d->asymmetricMode = false;
+    d->data.reset(errorDataSeries);
     emit dataChanged();
 }
 
 /**
  * \if ENGLISH
- * @brief Set data series with asymmetric error values
- * @param dataSeries Pointer to QImAbstractXYDataSeries containing X, Y values
- * @param negErrors Vector of negative error values
- * @param posErrors Vector of positive error values
+ * @brief Get the error data series
+ * @return Pointer to QImAbstractErrorDataSeries
  * \endif
  *
  * \if CHINESE
- * @brief 设置带有非对称误差值的数据系列
- * @param dataSeries 包含X、Y值的QImAbstractXYDataSeries指针
- * @param negErrors 负误差值向量
- * @param posErrors 正误差值向量
+ * @brief 获取误差数据系列
+ * @return QImAbstractErrorDataSeries指针
  * \endif
  */
-void QImPlotErrorBarsItemNode::setData(QImAbstractXYDataSeries* dataSeries, const std::vector<double>& negErrors, const std::vector<double>& posErrors)
-{
-    QIM_D(d);
-    d->data.reset(dataSeries);
-    d->negErrors = negErrors;
-    d->posErrors = posErrors;
-    d->asymmetricMode = true;
-    emit dataChanged();
-}
-
-/**
- * \if ENGLISH
- * @brief Get the data series
- * @return Pointer to QImAbstractXYDataSeries
- * \endif
- *
- * \if CHINESE
- * @brief 获取数据系列
- * @return QImAbstractXYDataSeries指针
- * \endif
- */
-QImAbstractXYDataSeries* QImPlotErrorBarsItemNode::data() const
+QImAbstractErrorDataSeries* QImPlotErrorBarsItemNode::data() const
 {
     return d_ptr->data.get();
 }
@@ -247,7 +214,7 @@ void QImPlotErrorBarsItemNode::setErrorBarsFlags(int flags)
 bool QImPlotErrorBarsItemNode::isAsymmetricMode() const
 {
     QIM_DC(d);
-    return d->asymmetricMode;
+    return d->data && d->data->isAsymmetric();
 }
 
 /**
@@ -274,14 +241,9 @@ bool QImPlotErrorBarsItemNode::beginDraw()
     int dataSize = d->data->size();
     
     // Validate error array sizes
-    if (d->asymmetricMode) {
-        if (static_cast<int>(d->negErrors.size()) < dataSize || static_cast<int>(d->posErrors.size()) < dataSize) {
-            return false;
-        }
-    } else {
-        if (static_cast<int>(d->posErrors.size()) < dataSize) {
-            return false;
-        }
+    if (d->data->isAsymmetric()) {
+        // For asymmetric mode, we need both neg and pos errors
+        // The data series should handle this internally
     }
 
     // Apply style
@@ -289,72 +251,73 @@ bool QImPlotErrorBarsItemNode::beginDraw()
         ImPlot::SetNextLineStyle(d->color->value());
     }
 
-    // Call ImPlot API
-    if (d->data->isContiguous()) {
-        // Continuous memory mode: use zero-copy fast path
-        const double* xData = d->data->xRawData();
-        const double* yData = d->data->yRawData();
+    // Get raw pointers for fast rendering
+    const double* xData = d->data->xRawData();
+    const double* yData = d->data->yRawData();
+    const double* negErrorData = d->data->negErrorRawData();
+    const double* posErrorData = d->data->posErrorRawData();
 
-        if (xData) {
-            // XY mode with explicit X coordinates
-            if (d->asymmetricMode) {
-                ImPlot::PlotErrorBars(
-                    labelConstData(),
-                    xData,
-                    yData,
-                    d->negErrors.data(),
-                    d->posErrors.data(),
-                    dataSize,
-                    d->flags,
-                    0,
-                    sizeof(double));
-            } else {
-                ImPlot::PlotErrorBars(
-                    labelConstData(),
-                    xData,
-                    yData,
-                    d->posErrors.data(),
-                    dataSize,
-                    d->flags,
-                    0,
-                    sizeof(double));
-            }
+    // Call ImPlot API
+    if (xData && yData && negErrorData && posErrorData) {
+        // Fast path: all data is contiguous
+        if (d->data->isAsymmetric()) {
+            ImPlot::PlotErrorBars(
+                labelConstData(),
+                xData,
+                yData,
+                negErrorData,
+                posErrorData,
+                dataSize,
+                d->flags,
+                0,
+                sizeof(double));
         } else {
-            // Y-only mode - need to create X values based on index
-            std::vector<double> xValues(dataSize);
-            double xStart = d->data->xStart();
-            double xScale = d->data->xScale();
-            for (int i = 0; i < dataSize; ++i) {
-                xValues[i] = xStart + i * xScale;
-            }
-            
-            if (d->asymmetricMode) {
-                ImPlot::PlotErrorBars(
-                    labelConstData(),
-                    xValues.data(),
-                    yData,
-                    d->negErrors.data(),
-                    d->posErrors.data(),
-                    dataSize,
-                    d->flags,
-                    0,
-                    sizeof(double));
-            } else {
-                ImPlot::PlotErrorBars(
-                    labelConstData(),
-                    xValues.data(),
-                    yData,
-                    d->posErrors.data(),
-                    dataSize,
-                    d->flags,
-                    0,
-                    sizeof(double));
-            }
+            ImPlot::PlotErrorBars(
+                labelConstData(),
+                xData,
+                yData,
+                posErrorData,
+                dataSize,
+                d->flags,
+                0,
+                sizeof(double));
         }
     } else {
-        // Non-contiguous memory mode: not supported for error bars
-        // Error bars require contiguous memory for efficient rendering
-        return false;
+        // Slow path: need to copy data to temporary buffers
+        std::vector<double> xValues(dataSize);
+        std::vector<double> yValues(dataSize);
+        std::vector<double> negErrors(dataSize);
+        std::vector<double> posErrors(dataSize);
+        
+        for (int i = 0; i < dataSize; ++i) {
+            xValues[i] = d->data->xValue(i);
+            yValues[i] = d->data->yValue(i);
+            negErrors[i] = d->data->negError(i);
+            posErrors[i] = d->data->posError(i);
+        }
+        
+        if (d->data->isAsymmetric()) {
+            ImPlot::PlotErrorBars(
+                labelConstData(),
+                xValues.data(),
+                yValues.data(),
+                negErrors.data(),
+                posErrors.data(),
+                dataSize,
+                d->flags,
+                0,
+                sizeof(double));
+        } else {
+            ImPlot::PlotErrorBars(
+                labelConstData(),
+                xValues.data(),
+                yValues.data(),
+                posErrors.data(),
+                dataSize,
+                d->flags,
+                0,
+                sizeof(double));
+        }
     }
 
     // Update item status
