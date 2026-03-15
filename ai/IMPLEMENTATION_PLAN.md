@@ -5,7 +5,7 @@
 - 项目仓库：https://github.com/czyt1988/QIm
 - 源码文件位置：`src/`
 - 2D绘图核心代码位置：`src/core/plot/`（ImPlot 封装模块）
-- 当前进度：已完成基础框架搭建，`ImGui` 绘制封装完成，`ImPlot` 中**仅完成曲线（Line）绘制**的封装
+- 当前进度：已完成基础框架搭建，`ImGui` 绘制封装完成，`ImPlot` 中已完成 **曲线（Line）、散点图（Scatter）、阶梯图（Stairs）、柱状图（Bars）、填充图（Shaded）** 的封装
 
 ## 📋 项目概述
 
@@ -20,6 +20,7 @@
 - ✅ **散点图绘制封装**：QImPlotScatterItemNode（ImPlot::PlotScatter）
 - ✅ **阶梯图绘制封装**：QImPlotStairsItemNode（ImPlot::PlotStairs）
 - ✅ **柱状图绘制封装**：QImPlotBarsItemNode（ImPlot::PlotBars）
+- ✅ **填充图绘制封装**：QImPlotShadedItemNode（ImPlot::PlotShaded）
 - ✅ **数据系列抽象**：QImAbstractXYDataSeries 数据接口
 - ✅ **降采样支持**：LTTB 和 MinMaxLTTB 降采样算法
 
@@ -92,7 +93,7 @@ QImAbstractNode (基类)
         ├── QImPlotScatterItemNode (已实现)
         ├── QImPlotStairsItemNode (已实现)
         ├── QImPlotBarsItemNode (已实现)
-        ├── QImPlotShadedItemNode
+        ├── QImPlotShadedItemNode (已实现)
         ├── QImPlotErrorBarsItemNode
         ├── QImPlotStemsItemNode
         ├── QImPlotInfLinesItemNode
