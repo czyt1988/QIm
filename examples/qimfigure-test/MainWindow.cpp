@@ -8,6 +8,7 @@
 #include "plot/QImPlotScatterItemNode.h"
 #include "plot/QImPlotStairsItemNode.h"
 #include "plot/QImPlotBarsItemNode.h"
+#include "plot/QImPlotShadedItemNode.h"
 #include "implot.h"
 #include <cmath>
 #include <random>
@@ -28,7 +29,7 @@ void MainWindow::drawPlot2D()
 {
     QIM::QImFigureWidget* fig = ui->figureWidget1;
     fig->setRenderMode(QIM::QImWidget::RenderOnDemand);
-    fig->setSubplotGrid(5, 1);
+    fig->setSubplotGrid(6, 1);
     QIM::QImPlotValueTrackerNodeGroup* trackerGroup = new QIM::QImPlotValueTrackerNodeGroup(this);
     if (QIM::QImPlotNode* plot1 = fig->createPlotNode()) {
         plot1->x1Axis()->setLabel(u8"x1");
@@ -156,6 +157,52 @@ void MainWindow::drawPlot2D()
         QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot5);
         tracker->setGroup(trackerGroup);
         plot5->addChildNode(tracker);
+    }
+
+    // 添加填充图示例
+    if (QIM::QImPlotNode* plot6 = fig->createPlotNode()) {
+        plot6->x1Axis()->setLabel(u8"x6");
+        plot6->y1Axis()->setLabel(u8"y6");
+        plot6->setTitle("Shaded Plot");
+        plot6->setLegendEnabled(true);
+
+        // 生成填充图数据 - 正弦波
+        int numPoints = 100;
+        std::vector< double > xData(numPoints);
+        std::vector< double > yData(numPoints);
+
+        for (int i = 0; i < numPoints; ++i) {
+            xData[ i ] = i * 0.1;
+            yData[ i ] = std::sin(xData[ i ]) * 5.0 + 5.0;  // 正弦波，范围0-10
+        }
+
+        // 添加填充图 - 单线填充模式（填充到参考值0）
+        QIM::QImPlotShadedItemNode* shaded1 = new QIM::QImPlotShadedItemNode(plot6);
+        shaded1->setLabel("Shaded to Zero");
+        shaded1->setData(xData, yData);
+        shaded1->setReferenceValue(0.0);
+        shaded1->setColor(QColor(100, 150, 255, 180));
+
+        // 添加第二条填充图 - 双线填充模式（上下边界）
+        std::vector< double > yUpper(numPoints);
+        std::vector< double > yLower(numPoints);
+        for (int i = 0; i < numPoints; ++i) {
+            yUpper[ i ] = yData[ i ] + 2.0;  // 上边界
+            yLower[ i ] = yData[ i ] - 2.0;  // 下边界
+        }
+
+        // 添加第二条填充图 - 双线填充模式（上下边界）
+        QIM::QImAbstractXYDataSeries* lowerSeries = new QIM::QImVectorXYDataSeries(xData, yLower);
+        QIM::QImAbstractXYDataSeries* upperSeries = new QIM::QImVectorXYDataSeries(xData, yUpper);
+        QIM::QImPlotShadedItemNode* shaded2 = new QIM::QImPlotShadedItemNode(plot6);
+        shaded2->setLabel("Uncertainty Band");
+        shaded2->setData(lowerSeries, upperSeries);
+        shaded2->setColor(QColor(255, 100, 100, 120));
+
+        // 添加值跟踪器
+        QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot6);
+        tracker->setGroup(trackerGroup);
+        plot6->addChildNode(tracker);
     }
 }
 

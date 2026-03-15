@@ -1,6 +1,6 @@
 # 任务
 
-本次任务描述：请实现QImPlotBarsItemNode类，按要求编译通过，添加必要的注释。另外编译环境为`Qt-6.7.3-msvc2019_64_VSCommunity_2019 Release amd64`
+本次任务描述：请实现QImPlotShadedItemNode类，按要求编译通过，添加必要的注释。另外编译环境为`Qt-6.7.3-msvc2019_64_VSCommunity_2019 Release amd64`
 
 ## 🎯 任务背景
 你是一个专业的 Qt/C++ 开发 AI Agent，正在参与 **QIm** 项目的开发。QIm 是一个将 ImGui 生态（Dear ImGui、ImPlot、ImPlot3D）以保留模式封装到 Qt 框架中的开源库。
