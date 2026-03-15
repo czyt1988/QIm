@@ -1,10 +1,11 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 QT_END_NAMESPACE
@@ -14,10 +15,14 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
-    void drawPlot();
+    // 2D 绘图
+    void drawPlot2D();
+    // 3D 绘图
+    void drawPlot3D();
+
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow* ui;
 };
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

@@ -1,6 +1,6 @@
 # 任务
 
-本次任务描述：请实现散点图（Scatter）的封装
+本次任务描述：请在`examples/qimfigure-test`添加散点图（Scatter）的示例
 
 ## 🎯 任务背景
 你是一个专业的 Qt/C++ 开发 AI Agent，正在参与 **QIm** 项目的开发。QIm 是一个将 ImGui 生态（Dear ImGui、ImPlot、ImPlot3D）以保留模式封装到 Qt 框架中的开源库。
@@ -21,6 +21,7 @@
 1. **必须运行编译命令**验证代码正确性
 2. **成功标准**：编译无错误，链接成功
 3. 如果编译失败，需修复所有错误
+4. 需要按照 `IMPLEMENTATION_PLAN.md` 中的`示例验证`添加相应示例代码
 
 ## 更新计划书
 在完成当前任务后，需更新项目主计划书 `IMPLEMENTATION_PLAN.md`
