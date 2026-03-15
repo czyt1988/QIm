@@ -270,7 +270,7 @@ inline QImAbstractXYDataSeries* QImPlotShadedItemNode::setData(const ContainerX&
 template< typename ContainerX, typename ContainerY >
 inline QImAbstractXYDataSeries* QImPlotShadedItemNode::setData(ContainerX&& x, ContainerY&& y)
 {
-    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(std::move(x), std::move(y));
+    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(x, y);
     setData(d);
     return d;
 }

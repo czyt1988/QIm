@@ -288,7 +288,7 @@ inline QImAbstractXYDataSeries* QImPlotBarsItemNode::setData(const ContainerX& x
 template< typename ContainerX, typename ContainerY >
 inline QImAbstractXYDataSeries* QImPlotBarsItemNode::setData(ContainerX&& x, ContainerY&& y)
 {
-    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(std::move(x), std::move(y));
+    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(x, y);
     setData(d);
     return d;
 }

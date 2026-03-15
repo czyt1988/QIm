@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     drawPlot2D();
     drawPlot3D();
+    showMaximized();
 }
 
 MainWindow::~MainWindow()
@@ -29,7 +30,8 @@ void MainWindow::drawPlot2D()
 {
     QIM::QImFigureWidget* fig = ui->figureWidget1;
     fig->setRenderMode(QIM::QImWidget::RenderOnDemand);
-    fig->setSubplotGrid(6, 1);
+    // 显示5x2=10个子图
+    fig->setSubplotGrid(5, 2);
     QIM::QImPlotValueTrackerNodeGroup* trackerGroup = new QIM::QImPlotValueTrackerNodeGroup(this);
     if (QIM::QImPlotNode* plot1 = fig->createPlotNode()) {
         plot1->x1Axis()->setLabel(u8"x1");
@@ -91,7 +93,6 @@ void MainWindow::drawPlot2D()
         scatter->setMarkerShape(ImPlotMarker_Circle);
         scatter->setMarkerFill(true);
         scatter->setColor(Qt::blue);
-
 
         // 添加值跟踪器
         QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot3);
@@ -194,7 +195,7 @@ void MainWindow::drawPlot2D()
         // 添加第二条填充图 - 双线填充模式（上下边界）
         QIM::QImAbstractXYDataSeries* lowerSeries = new QIM::QImVectorXYDataSeries(xData, yLower);
         QIM::QImAbstractXYDataSeries* upperSeries = new QIM::QImVectorXYDataSeries(xData, yUpper);
-        QIM::QImPlotShadedItemNode* shaded2 = new QIM::QImPlotShadedItemNode(plot6);
+        QIM::QImPlotShadedItemNode* shaded2       = new QIM::QImPlotShadedItemNode(plot6);
         shaded2->setLabel("Uncertainty Band");
         shaded2->setData(lowerSeries, upperSeries);
         shaded2->setColor(QColor(255, 100, 100, 120));

@@ -430,7 +430,7 @@ inline QImAbstractXYDataSeries* QImPlotScatterItemNode::setData(const ContainerX
 template< typename ContainerX, typename ContainerY >
 inline QImAbstractXYDataSeries* QImPlotScatterItemNode::setData(ContainerX&& x, ContainerY&& y)
 {
-    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(std::move(x), std::move(y));
+    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(x, y);
     setData(d);
     return d;
 }
