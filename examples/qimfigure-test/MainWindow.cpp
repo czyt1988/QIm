@@ -10,6 +10,7 @@
 #include "plot/QImPlotBarsItemNode.h"
 #include "plot/QImPlotShadedItemNode.h"
 #include "plot/QImPlotErrorBarsItemNode.h"
+#include "plot/QImPlotStemsItemNode.h"
 #include "implot.h"
 #include <cmath>
 #include <random>
@@ -266,6 +267,49 @@ void MainWindow::drawPlot2D()
         QIM::QImPlotValueTrackerNode* tracker2 = new QIM::QImPlotValueTrackerNode(plot7);
         tracker2->setGroup(trackerGroup);
         plot7->addChildNode(tracker2);
+    }
+
+    // 添加茎叶图示例
+    if (QIM::QImPlotNode* plot8 = fig->createPlotNode()) {
+        plot8->x1Axis()->setLabel(u8"x8");
+        plot8->y1Axis()->setLabel(u8"y8");
+        plot8->setTitle("Stems Plot");
+        plot8->setLegendEnabled(true);
+
+        // 生成数据 - 离散信号数据
+        int numPoints = 20;
+        std::vector<double> xData(numPoints);
+        std::vector<double> yData(numPoints);
+
+        for (int i = 0; i < numPoints; ++i) {
+            xData[i] = i;
+            // 生成一个衰减的正弦波
+            yData[i] = std::sin(i * 0.5) * std::exp(-i * 0.1) * 10.0;
+        }
+
+        // 添加垂直茎叶图（默认基线为0）
+        QIM::QImPlotStemsItemNode* stems1 = new QIM::QImPlotStemsItemNode(plot8);
+        stems1->setLabel("Vertical Stems");
+        stems1->setData(xData, yData);
+        stems1->setReferenceValue(0.0);
+        stems1->setColor(Qt::blue);
+
+        // 添加水平茎叶图（偏移Y位置避免重叠）
+        std::vector<double> yOffset(numPoints);
+        for (int i = 0; i < numPoints; ++i) {
+            yOffset[i] = yData[i] + 5.0;  // 向上偏移
+        }
+        QIM::QImPlotStemsItemNode* stems2 = new QIM::QImPlotStemsItemNode(plot8);
+        stems2->setLabel("Horizontal Stems");
+        stems2->setData(xData, yOffset);
+        stems2->setReferenceValue(5.0);  // 基线也相应偏移
+        stems2->setHorizontal(true);
+        stems2->setColor(Qt::darkCyan);
+
+        // 添加值跟踪器
+        QIM::QImPlotValueTrackerNode* tracker3 = new QIM::QImPlotValueTrackerNode(plot8);
+        tracker3->setGroup(trackerGroup);
+        plot8->addChildNode(tracker3);
     }
 }
 
