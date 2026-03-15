@@ -19,6 +19,7 @@
 - ✅ **曲线绘制封装**：QImPlotLineItemNode（ImPlot::PlotLine）
 - ✅ **散点图绘制封装**：QImPlotScatterItemNode（ImPlot::PlotScatter）
 - ✅ **阶梯图绘制封装**：QImPlotStairsItemNode（ImPlot::PlotStairs）
+- ✅ **柱状图绘制封装**：QImPlotBarsItemNode（ImPlot::PlotBars）
 - ✅ **数据系列抽象**：QImAbstractXYDataSeries 数据接口
 - ✅ **降采样支持**：LTTB 和 MinMaxLTTB 降采样算法
 
@@ -28,12 +29,12 @@
 ## 待封装图表类型清单及优先级排序
 
 ### 第一优先级（核心图表类型）
-| 图表类型 | ImPlot API | 用途说明 | 复杂度 |
-|---------|------------|----------|--------|
-| **散点图** | `PlotScatter()` | 离散数据点可视化 | 低 |
-| **阶梯图** | `PlotStairs()` | 阶梯状数据可视化 | 低 |
-| **柱状图** | `PlotBars()` | 分类数据比较 | 中 |
-| **填充图** | `PlotShaded()` | 区域填充可视化 | 中 |
+| 图表类型 | ImPlot API | 用途说明 | 复杂度 | 状态 |
+|---------|------------|----------|--------|------|
+| **散点图** | `PlotScatter()` | 离散数据点可视化 | 低 | ✅ 已完成 |
+| **阶梯图** | `PlotStairs()` | 阶梯状数据可视化 | 低 | ✅ 已完成 |
+| **柱状图** | `PlotBars()` | 分类数据比较 | 中 | ✅ 已完成 |
+| **填充图** | `PlotShaded()` | 区域填充可视化 | 中 | 📝 待实现 |
 
 ### 第二优先级（高级图表类型）
 | 图表类型 | ImPlot API | 用途说明 | 复杂度 |
@@ -90,7 +91,7 @@ QImAbstractNode (基类)
         ├── QImPlotLineItemNode (已实现)
         ├── QImPlotScatterItemNode (已实现)
         ├── QImPlotStairsItemNode (已实现)
-        ├── QImPlotBarsItemNode
+        ├── QImPlotBarsItemNode (已实现)
         ├── QImPlotShadedItemNode
         ├── QImPlotErrorBarsItemNode
         ├── QImPlotStemsItemNode
