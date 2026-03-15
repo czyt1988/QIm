@@ -18,6 +18,7 @@
 - ✅ **ImGui 绘制封装**：Qt 与 ImGui 的桥接层
 - ✅ **曲线绘制封装**：QImPlotLineItemNode（ImPlot::PlotLine）
 - ✅ **散点图绘制封装**：QImPlotScatterItemNode（ImPlot::PlotScatter）
+- ✅ **阶梯图绘制封装**：QImPlotStairsItemNode（ImPlot::PlotStairs）
 - ✅ **数据系列抽象**：QImAbstractXYDataSeries 数据接口
 - ✅ **降采样支持**：LTTB 和 MinMaxLTTB 降采样算法
 
@@ -88,7 +89,7 @@ QImAbstractNode (基类)
     └── QImPlotItemNode (绘图项基类)
         ├── QImPlotLineItemNode (已实现)
         ├── QImPlotScatterItemNode (已实现)
-        ├── QImPlotStairsItemNode
+        ├── QImPlotStairsItemNode (已实现)
         ├── QImPlotBarsItemNode
         ├── QImPlotShadedItemNode
         ├── QImPlotErrorBarsItemNode

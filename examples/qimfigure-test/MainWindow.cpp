@@ -6,6 +6,7 @@
 #include "plot/QImPlotValueTrackerNode.h"
 #include "plot/QImPlotValueTrackerNodeGroup.h"
 #include "plot/QImPlotScatterItemNode.h"
+#include "plot/QImPlotStairsItemNode.h"
 #include "implot.h"
 #include <cmath>
 #include <random>
@@ -26,7 +27,7 @@ void MainWindow::drawPlot2D()
 {
     QIM::QImFigureWidget* fig = ui->figureWidget1;
     fig->setRenderMode(QIM::QImWidget::RenderOnDemand);
-    fig->setSubplotGrid(3, 1);
+    fig->setSubplotGrid(4, 1);
     QIM::QImPlotValueTrackerNodeGroup* trackerGroup = new QIM::QImPlotValueTrackerNodeGroup(this);
     if (QIM::QImPlotNode* plot1 = fig->createPlotNode()) {
         plot1->x1Axis()->setLabel(u8"x1");
@@ -94,6 +95,36 @@ void MainWindow::drawPlot2D()
         QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot3);
         tracker->setGroup(trackerGroup);
         plot3->addChildNode(tracker);
+    }
+
+    // 添加阶梯图示例
+    if (QIM::QImPlotNode* plot4 = fig->createPlotNode()) {
+        plot4->x1Axis()->setLabel(u8"x4");
+        plot4->y1Axis()->setLabel(u8"y4");
+        plot4->setTitle("Stairs Plot");
+        plot4->setLegendEnabled(true);
+
+        // 生成阶梯图数据
+        int numPoints = 10;
+        std::vector<double> xData(numPoints);
+        std::vector<double> yData(numPoints);
+
+        for (int i = 0; i < numPoints; ++i) {
+            xData[i] = i;
+            yData[i] = static_cast<double>(i % 3) + 1.0;
+        }
+
+        // 添加阶梯图
+        QIM::QImPlotStairsItemNode* stairs = new QIM::QImPlotStairsItemNode(plot4);
+        stairs->setLabel("Stairs Plot");
+        stairs->setData(xData, yData);
+        stairs->setColor(Qt::red);
+        stairs->setShaded(true);
+
+        // 添加值跟踪器
+        QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot4);
+        tracker->setGroup(trackerGroup);
+        plot4->addChildNode(tracker);
     }
 }
 
