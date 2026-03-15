@@ -1,4 +1,4 @@
-﻿#include "MainWindow.h"
+#include "MainWindow.h"
 #include "./ui_MainWindow.h"
 #include "plot/QImPlotNode.h"
 #include "plot/QImPlotAxisInfo.h"
@@ -9,6 +9,7 @@
 #include "plot/QImPlotStairsItemNode.h"
 #include "plot/QImPlotBarsItemNode.h"
 #include "plot/QImPlotShadedItemNode.h"
+#include "plot/QImPlotErrorBarsItemNode.h"
 #include "implot.h"
 #include <cmath>
 #include <random>
@@ -204,6 +205,67 @@ void MainWindow::drawPlot2D()
         QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot6);
         tracker->setGroup(trackerGroup);
         plot6->addChildNode(tracker);
+    }
+
+    // 添加误差棒图示例
+    if (QIM::QImPlotNode* plot7 = fig->createPlotNode()) {
+        plot7->x1Axis()->setLabel(u8"x7");
+        plot7->y1Axis()->setLabel(u8"y7");
+        plot7->setTitle("Error Bars Plot");
+        plot7->setLegendEnabled(true);
+
+        // 生成数据 - 带误差的测量数据
+        int numPoints = 10;
+        std::vector<double> xData(numPoints);
+        std::vector<double> yData(numPoints);
+        std::vector<double> errors(numPoints);
+        std::vector<double> negErrors(numPoints);
+        std::vector<double> posErrors(numPoints);
+
+        for (int i = 0; i < numPoints; ++i) {
+            xData[i] = i;
+            yData[i] = static_cast<double>(i * i) / 5.0 + 2.0;
+            errors[i] = 0.5 + static_cast<double>(i) * 0.1;           // 对称误差
+            negErrors[i] = 0.3 + static_cast<double>(i) * 0.05;       // 负误差（较小）
+            posErrors[i] = 0.7 + static_cast<double>(i) * 0.15;       // 正误差（较大）
+        }
+
+        // 添加散点图作为基础数据
+        QIM::QImPlotScatterItemNode* scatter = new QIM::QImPlotScatterItemNode(plot7);
+        scatter->setLabel("Data Points");
+        scatter->setData(xData, yData);
+        scatter->setMarkerSize(6.0f);
+        scatter->setMarkerShape(ImPlotMarker_Circle);
+        scatter->setColor(Qt::blue);
+
+        // 添加对称误差棒
+        QIM::QImPlotErrorBarsItemNode* errorBars1 = new QIM::QImPlotErrorBarsItemNode(plot7);
+        errorBars1->setLabel("Symmetric Errors");
+        errorBars1->setData(xData, yData, errors);
+        errorBars1->setColor(Qt::red);
+
+        // 添加非对称水平误差棒（偏移X位置避免重叠）
+        std::vector<double> xOffset(numPoints);
+        for (int i = 0; i < numPoints; ++i) {
+            xOffset[i] = xData[i] + 0.3;
+        }
+        QIM::QImPlotScatterItemNode* scatter2 = new QIM::QImPlotScatterItemNode(plot7);
+        scatter2->setLabel("Data Points 2");
+        scatter2->setData(xOffset, yData);
+        scatter2->setMarkerSize(6.0f);
+        scatter2->setMarkerShape(ImPlotMarker_Square);
+        scatter2->setColor(Qt::green);
+
+        QIM::QImPlotErrorBarsItemNode* errorBars2 = new QIM::QImPlotErrorBarsItemNode(plot7);
+        errorBars2->setLabel("Asymmetric Horizontal");
+        errorBars2->setData(xOffset, yData, negErrors, posErrors);
+        errorBars2->setHorizontal(true);
+        errorBars2->setColor(Qt::darkGreen);
+
+        // 添加值跟踪器
+        QIM::QImPlotValueTrackerNode* tracker2 = new QIM::QImPlotValueTrackerNode(plot7);
+        tracker2->setGroup(trackerGroup);
+        plot7->addChildNode(tracker2);
     }
 }
 

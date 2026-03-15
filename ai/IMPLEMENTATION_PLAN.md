@@ -5,7 +5,7 @@
 - 项目仓库：https://github.com/czyt1988/QIm
 - 源码文件位置：`src/`
 - 2D绘图核心代码位置：`src/core/plot/`（ImPlot 封装模块）
-- 当前进度：已完成基础框架搭建，`ImGui` 绘制封装完成，`ImPlot` 中已完成 **曲线（Line）、散点图（Scatter）、阶梯图（Stairs）、柱状图（Bars）、填充图（Shaded）** 的封装
+- 当前进度：已完成基础框架搭建，`ImGui` 绘制封装完成，`ImPlot` 中已完成 **曲线（Line）、散点图（Scatter）、阶梯图（Stairs）、柱状图（Bars）、填充图（Shaded）、误差棒图（ErrorBars）** 的封装
 
 ## 📋 项目概述
 
@@ -21,6 +21,7 @@
 - ✅ **阶梯图绘制封装**：QImPlotStairsItemNode（ImPlot::PlotStairs）
 - ✅ **柱状图绘制封装**：QImPlotBarsItemNode（ImPlot::PlotBars）
 - ✅ **填充图绘制封装**：QImPlotShadedItemNode（ImPlot::PlotShaded）
+- ✅ **误差棒图绘制封装**：QImPlotErrorBarsItemNode（ImPlot::PlotErrorBars）
 - ✅ **数据系列抽象**：QImAbstractXYDataSeries 数据接口
 - ✅ **降采样支持**：LTTB 和 MinMaxLTTB 降采样算法
 
@@ -40,7 +41,7 @@
 ### 第二优先级（高级图表类型）
 | 图表类型 | ImPlot API | 用途说明 | 复杂度 |
 |---------|------------|----------|--------|
-| **误差棒图** | `PlotErrorBars()` | 数据误差范围可视化 | 中 |
+| **误差棒图** | `PlotErrorBars()` | 数据误差范围可视化 | 中 | ✅ 已完成 |
 | **茎叶图** | `PlotStems()` | 离散数据与基线连接 | 低 |
 | **无限线** | `PlotInfLines()` | 垂直/水平参考线 | 低 |
 | **饼图** | `PlotPieChart()` | 比例数据可视化 | 高 |
@@ -94,7 +95,7 @@ QImAbstractNode (基类)
         ├── QImPlotStairsItemNode (已实现)
         ├── QImPlotBarsItemNode (已实现)
         ├── QImPlotShadedItemNode (已实现)
-        ├── QImPlotErrorBarsItemNode
+        ├── QImPlotErrorBarsItemNode (已实现)
         ├── QImPlotStemsItemNode
         ├── QImPlotInfLinesItemNode
         ├── QImPlotPieChartItemNode
