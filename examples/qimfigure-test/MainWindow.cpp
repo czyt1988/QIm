@@ -11,6 +11,8 @@
 #include "plot/QImPlotShadedItemNode.h"
 #include "plot/QImPlotErrorBarsItemNode.h"
 #include "plot/QImPlotStemsItemNode.h"
+#include "plot/QImPlotInfLinesItemNode.h"
+#include "plot/QImPlotLineItemNode.h"
 #include "implot.h"
 #include <cmath>
 #include <random>
@@ -310,6 +312,56 @@ void MainWindow::drawPlot2D()
         QIM::QImPlotValueTrackerNode* tracker3 = new QIM::QImPlotValueTrackerNode(plot8);
         tracker3->setGroup(trackerGroup);
         plot8->addChildNode(tracker3);
+    }
+
+    // 添加无限线示例
+    if (QIM::QImPlotNode* plot9 = fig->createPlotNode()) {
+        plot9->x1Axis()->setLabel(u8"x9");
+        plot9->y1Axis()->setLabel(u8"y9");
+        plot9->setTitle("Infinite Lines Plot");
+        plot9->setLegendEnabled(true);
+
+        // 生成数据 - 正弦波作为背景曲线
+        int numPoints = 200;
+        std::vector<double> xData(numPoints);
+        std::vector<double> yData(numPoints);
+
+        for (int i = 0; i < numPoints; ++i) {
+            xData[i] = i * 0.05;
+            yData[i] = std::sin(xData[i]) * 5.0;
+        }
+
+        // 添加背景曲线
+        QIM::QImPlotLineItemNode* line = new QIM::QImPlotLineItemNode(plot9);
+        line->setLabel("Sine Wave");
+        line->setData(xData, yData);
+        line->setColor(Qt::blue);
+
+        // 添加垂直无限线（参考线）- 使用初始化列表
+        QIM::QImPlotInfLinesItemNode* infLines1 = new QIM::QImPlotInfLinesItemNode(plot9);
+        infLines1->setLabel("Vertical Ref");
+        infLines1->setValues({ 1.0, 3.0, 5.0, 7.0 });  // 多条垂直无限线
+        infLines1->setHorizontal(false);
+        infLines1->setColor(Qt::red);
+
+        // 添加水平无限线（阈值线）- 使用单值接口
+        QIM::QImPlotInfLinesItemNode* infLines2 = new QIM::QImPlotInfLinesItemNode(plot9);
+        infLines2->setLabel("Zero Line");
+        infLines2->setValue(0.0);  // 单条水平无限线（零线）
+        infLines2->setHorizontal(true);
+        infLines2->setColor(Qt::darkGreen);
+
+        // 添加另一组水平无限线（阈值线）
+        QIM::QImPlotInfLinesItemNode* infLines3 = new QIM::QImPlotInfLinesItemNode(plot9);
+        infLines3->setLabel("Thresholds");
+        infLines3->setValues({ -3.0, 3.0 });  // 多条水平无限线
+        infLines3->setHorizontal(true);
+        infLines3->setColor(Qt::magenta);
+
+        // 添加值跟踪器
+        QIM::QImPlotValueTrackerNode* tracker4 = new QIM::QImPlotValueTrackerNode(plot9);
+        tracker4->setGroup(trackerGroup);
+        plot9->addChildNode(tracker4);
     }
 }
 
