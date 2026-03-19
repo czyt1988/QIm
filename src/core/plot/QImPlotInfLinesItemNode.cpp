@@ -112,6 +112,24 @@ void QImPlotInfLinesItemNode::setValues(std::initializer_list< double > values)
 
 /**
  * \if ENGLISH
+ * @brief Set infinite lines data from std::vector (move semantics)
+ * @param values std::vector of values (rvalue reference)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从std::vector设置无限线数据（移动语义）
+ * @param values 值的std::vector（右值引用）
+ * \endif
+ */
+void QImPlotInfLinesItemNode::setValues(std::vector< double >&& values)
+{
+    QIM_D(d);
+    d->values = std::move(values);
+    emit dataChanged();
+}
+
+/**
+ * \if ENGLISH
  * @brief Get the number of values
  * @return Number of values
  * \endif

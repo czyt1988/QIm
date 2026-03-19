@@ -2,6 +2,7 @@
 #define QIMPLOTINFLINESITEMNODE_H
 #include <QColor>
 #include <initializer_list>
+#include <vector>
 #include "QImPlotItemNode.h"
 
 namespace QIM
@@ -146,6 +147,9 @@ public:
     // Sets infinite lines data from initializer list
     void setValues(std::initializer_list< double > values);
 
+    // Sets infinite lines data from std::vector (move semantics)
+    void setValues(std::vector< double >&& values);
+
     // Gets the number of values (number of infinite lines)
     int count() const;
 
@@ -253,8 +257,7 @@ inline void QImPlotInfLinesItemNode::setValues(const Container& values)
 template< typename Container >
 inline void QImPlotInfLinesItemNode::setValues(Container&& values)
 {
-    d_ptr->values = std::move(values);
-    emit dataChanged();
+    setValues(std::move(values));
 }
 
 }  // namespace QIM
