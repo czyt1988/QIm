@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <QElapsedTimer>
+#include <QFileInfo>
 // imguis
 #include "QtImGui.h"
 #include "imgui.h"
@@ -95,12 +96,13 @@ QImWidget::PrivateData::PrivateData(QImWidget* p) : q_ptr(p)
     paintElapsed.restart();
     // 字体相关初始化
     std::string fontpath = QImFontFileHelper::getRecommendedChineseFontPath();
-    if (fontpath.empty()) {
+    if (!fontpath.empty() && QFileInfo::exists(QString::fromStdString(fontpath))) {
+        this->fontFiles.emplace_back(fontpath);
+        this->isNeedAddFont = true;
+    } else {
         this->isNeedAddFont = false;
     }
-    this->fontFiles.emplace_back(fontpath);
-    this->fontSize      = 16;
-    this->isNeedAddFont = true;
+    this->fontSize = 16;
     GlyphRangesFlags f;
     f.setFlag(GlyphRangesDefault);
     f.setFlag(GlyphRangesChineseSimplifiedCommon);
@@ -139,11 +141,14 @@ void QImWidget::PrivateData::reloadFontFile()
         if (f.isEmpty()) {
             continue;
         }
+        if (!QFileInfo::exists(f)) {
+            continue;
+        }
         this->fontFiles.emplace_back(f.toStdString());
         qDebug() << "font file path=" << f;
     }
     this->fontSize      = QImFontFileHelper::getFontPixelSize(font);
-    this->isNeedAddFont = true;
+    this->isNeedAddFont = !this->fontFiles.empty();
     qDebug() << "font name=" << font << ",fontSize=" << this->fontSize;
 }
 
@@ -614,6 +619,10 @@ void QImWidget::paintGL()
                 d->updateFontGlyphRanges();
             }
             for (const std::string& p : std::as_const(d->fontFiles)) {
+                if (p.empty() || !QFileInfo::exists(QString::fromStdString(p))) {
+                    qWarning() << "skip invalid font file path:" << QString::fromStdString(p);
+                    continue;
+                }
                 ImFontConfig config;
                 config.MergeMode = true;  // 合并模式
                 io.Fonts->AddFontFromFileTTF(

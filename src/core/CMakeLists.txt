@@ -116,6 +116,13 @@ target_link_libraries(${QIMCORE_PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::OpenGL
 )
 
+if(APPLE)
+    find_library(COREFOUNDATION_FRAMEWORK CoreFoundation REQUIRED)
+    target_link_libraries(${QIMCORE_PROJECT_NAME} PUBLIC
+        ${COREFOUNDATION_FRAMEWORK}
+    )
+endif()
+
 # ================================================================
 # 安装配置
 # ================================================================

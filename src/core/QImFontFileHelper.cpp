@@ -294,9 +294,21 @@ std::string QImFontFileHelper::getRecommendedChineseFontPath()
     return "";  // 不应到达此处
 
 #elif defined(__APPLE__)
-    // macOS: PingFang 是默认中文字体（从 macOS 10.11 起）
-    // 注意：PingFang 是 .ttc 格式，包含多个字重
-    return "/System/Library/Fonts/PingFang.ttc";
+    // macOS: 系统字体路径会随版本变化，按常见中文字体顺序探测
+    static const char* candidates[] = {
+        "/System/Library/Fonts/PingFang.ttc",
+        "/System/Library/Fonts/Supplemental/PingFang.ttc",
+        "/System/Library/Fonts/Hiragino Sans GB.ttc",
+        "/System/Library/Fonts/STHeiti Medium.ttc",
+        "/System/Library/Fonts/STHeiti Light.ttc"
+    };
+    for (const char* path : candidates) {
+        if (!QFileInfo::exists(path)) {
+            continue;
+        }
+        return std::string(path);
+    }
+    return "";
 
 #elif defined(__linux__) || defined(__unix__)
     // Linux: 常见中文字体（根据发行版可能不同）
