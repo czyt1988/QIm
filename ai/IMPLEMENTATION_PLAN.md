@@ -47,16 +47,6 @@
 | **无限线** | `PlotInfLines()` | 垂直/水平参考线 | 低 | ✅ 已完成 |
 | **饼图** | `PlotPieChart()` | 比例数据可视化 | 高 | ✅ 已完成 |
 
-### 高优先级（三维基础图形）
-| 图表类型 | ImPlot3D API | 用途说明 | 复杂度 | 状态 |
-|---------|--------------|----------|--------|------|
-| **三维线图** | `PlotLine()` | 三维轨迹、路径、曲线可视化 | 中 | ✅ 已完成 |
-| **三维散点图** | `PlotScatter()` | 三维离散点云可视化 | 中 | 待实现 |
-| **三维曲面图** | `PlotSurface()` | 网格曲面、标量场表面可视化 | 高 | 待实现 |
-| **三角形图元** | `PlotTriangle()` | 基础三角面片可视化 | 中 | 待实现 |
-| **四边形图元** | `PlotQuad()` | 基础四边形面片可视化 | 中 | 待实现 |
-| **网格模型** | `PlotMesh()` | 通用三维网格模型显示 | 高 | 待实现 |
-
 ### 第三优先级（专业图表类型）
 | 图表类型 | ImPlot API | 用途说明 | 复杂度 |
 |---------|------------|----------|--------|
@@ -116,18 +106,6 @@ QImAbstractNode (基类)
         ├── QImPlotImageItemNode
         ├── QImPlotTextItemNode (已实现)
         └── QImPlotDummyItemNode (已实现)
-
-ImPlot3D 基础图形建议继承体系：
-```
-QImAbstractNode (基类)
-    └── QImPlot3DItemNode (三维绘图项基类，待新增)
-        ├── QImPlot3DLineItemNode
-        ├── QImPlot3DScatterItemNode
-        ├── QImPlot3DSurfaceItemNode
-        ├── QImPlot3DTriangleItemNode
-        ├── QImPlot3DQuadItemNode
-        └── QImPlot3DMeshItemNode
-```
 ```
 
 ### 2. 数据系列扩展
