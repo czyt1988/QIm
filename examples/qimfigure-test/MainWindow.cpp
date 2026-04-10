@@ -1,6 +1,9 @@
 #include "MainWindow.h"
 #include "./ui_MainWindow.h"
+#include "QImFigure3DWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlot3DLineItemNode.h"
+#include "plot/QImPlot3DNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImWaveformGenerator.hpp"
 #include "plot/QImPlotValueTrackerNode.h"
@@ -16,6 +19,7 @@
 #include "plot/QImPlotTextItemNode.h"
 #include "plot/QImPlotDummyItemNode.h"
 #include "implot.h"
+#include <QVBoxLayout>
 #include <cmath>
 #include <random>
 
@@ -388,4 +392,41 @@ void MainWindow::drawPlot2D()
 
 void MainWindow::drawPlot3D()
 {
+    QVBoxLayout* layout = new QVBoxLayout(ui->widget_2);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    QIM::QImFigure3DWidget* fig3D = new QIM::QImFigure3DWidget(ui->widget_2);
+    fig3D->setRenderMode(QIM::QImWidget::RenderOnDemand);
+    layout->addWidget(fig3D);
+
+    QIM::QImPlot3DNode* plot = fig3D->createPlotNode();
+    plot->setTitle("3D Helix");
+    plot->setXAxisLabel("X");
+    plot->setYAxisLabel("Y");
+    plot->setZAxisLabel("Z");
+    plot->setLegendEnabled(true);
+    plot->setEqual(true);
+    plot->setAxisLimits(QIM::QImPlot3DNode::AxisX, -1.2, 1.2);
+    plot->setAxisLimits(QIM::QImPlot3DNode::AxisY, -1.2, 1.2);
+    plot->setAxisLimits(QIM::QImPlot3DNode::AxisZ, -0.2, 6.5);
+
+    std::vector< double > xData;
+    std::vector< double > yData;
+    std::vector< double > zData;
+    xData.reserve(240);
+    yData.reserve(240);
+    zData.reserve(240);
+
+    for (int i = 0; i < 240; ++i) {
+        const double t = static_cast< double >(i) * 0.08;
+        xData.push_back(std::cos(t));
+        yData.push_back(std::sin(t));
+        zData.push_back(t * 0.3);
+    }
+
+    QIM::QImPlot3DLineItemNode* line = new QIM::QImPlot3DLineItemNode(plot);
+    line->setLabel("Helix");
+    line->setData(xData, yData, zData);
+    line->setColor(QColor(33, 150, 243));
+    line->setLineWidth(2.0f);
 }
