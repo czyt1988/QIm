@@ -14,6 +14,7 @@
 #include "plot/QImPlotInfLinesItemNode.h"
 #include "plot/QImPlotPieChartItemNode.h"
 #include "plot/QImPlotTextItemNode.h"
+#include "plot/QImPlotDummyItemNode.h"
 #include "implot.h"
 #include <cmath>
 #include <random>
@@ -355,6 +356,9 @@ void MainWindow::drawPlot2D()
         text2->setPosition(QPointF(4.0, -1.5));
         text2->setVertical(true);
         text2->setColor(Qt::darkBlue);
+
+        QIM::QImPlotDummyItemNode* dummy = new QIM::QImPlotDummyItemNode(plot9);
+        dummy->setLabel("Legend Group Placeholder");
 
         QIM::QImPlotValueTrackerNode* tracker4 = new QIM::QImPlotValueTrackerNode(plot9);
         tracker4->setGroup(trackerGroup);

@@ -56,7 +56,7 @@
 | **数字图** | `PlotDigital()` | 数字信号可视化 | 中 |
 | **图像图** | `PlotImage()` | 图像显示 | 中 |
 | **文本标注** | `PlotText()` | 图表文本标注 | 低 | ✅ 已完成 |
-| **虚拟项** | `PlotDummy()` | 占位/分组项 | 低 |
+| **虚拟项** | `PlotDummy()` | 占位/分组项 | 低 | ✅ 已完成 |
 
 ### 特殊图表类型（需要自定义实现）
 | 图表类型 | 说明 | 复杂度 |
@@ -105,7 +105,7 @@ QImAbstractNode (基类)
         ├── QImPlotDigitalItemNode
         ├── QImPlotImageItemNode
         ├── QImPlotTextItemNode (已实现)
-        └── QImPlotDummyItemNode
+        └── QImPlotDummyItemNode (已实现)
 ```
 
 ### 2. 数据系列扩展
