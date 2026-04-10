@@ -157,6 +157,17 @@ void QImFigureWidget::initializeGL()
     // 默认有个subplot
 }
 
+void QImFigureWidget::beforeRenderImNodes()
+{
+    QIM_D(d);
+    QIM::QImWidget::beforeRenderImNodes();
+    if (!d->m_context) {
+        return;
+    }
+    ImPlot::SetCurrentContext(d->m_context);
+    d->m_theme.value().apply(&ImPlot::GetStyle());
+}
+
 void QImFigureWidget::onSubplotChildNodeRemoved(QImAbstractNode* c)
 {
     QImPlotNode* plot = qobject_cast< QImPlotNode* >(c);

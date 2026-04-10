@@ -72,6 +72,7 @@ Q_SIGNALS:
 
 protected:
     void initializeGL() override;
+    void beforeRenderImNodes() override;
 private Q_SLOTS:
     void onSubplotChildNodeRemoved(QIM::QImAbstractNode* c);
     void onSubplotChildNodeAdded(QIM::QImAbstractNode* c);

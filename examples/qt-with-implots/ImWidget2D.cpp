@@ -12,6 +12,7 @@ ImWidget2D::~ImWidget2D()
 
 void ImWidget2D::afterRenderImNodes()
 {
+    ImPlot::SetCurrentContext(m_context);
     ImPlot::ShowDemoWindow();
 }
 
