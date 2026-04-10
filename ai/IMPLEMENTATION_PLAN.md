@@ -45,7 +45,7 @@
 | **误差棒图** | `PlotErrorBars()` | 数据误差范围可视化 | 中 | ✅ 已完成 |
 | **茎叶图** | `PlotStems()` | 离散数据与基线连接 | 低 | ✅ 已完成 |
 | **无限线** | `PlotInfLines()` | 垂直/水平参考线 | 低 | ✅ 已完成 |
-| **饼图** | `PlotPieChart()` | 比例数据可视化 | 高 |
+| **饼图** | `PlotPieChart()` | 比例数据可视化 | 高 | ✅ 已完成 |
 
 ### 第三优先级（专业图表类型）
 | 图表类型 | ImPlot API | 用途说明 | 复杂度 |
@@ -99,7 +99,7 @@ QImAbstractNode (基类)
         ├── QImPlotErrorBarsItemNode (已实现)
         ├── QImPlotStemsItemNode (已实现)
         ├── QImPlotInfLinesItemNode (已实现)
-        ├── QImPlotPieChartItemNode
+        ├── QImPlotPieChartItemNode (已实现)
         ├── QImPlotHeatmapItemNode
         ├── QImPlotHistogramItemNode
         ├── QImPlotDigitalItemNode

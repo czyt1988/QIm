@@ -12,6 +12,7 @@
 #include "plot/QImPlotErrorBarsItemNode.h"
 #include "plot/QImPlotStemsItemNode.h"
 #include "plot/QImPlotInfLinesItemNode.h"
+#include "plot/QImPlotPieChartItemNode.h"
 #include "implot.h"
 #include <cmath>
 #include <random>
@@ -345,6 +346,26 @@ void MainWindow::drawPlot2D()
         QIM::QImPlotValueTrackerNode* tracker4 = new QIM::QImPlotValueTrackerNode(plot9);
         tracker4->setGroup(trackerGroup);
         plot9->addChildNode(tracker4);
+    }
+
+    // 添加饼图示例
+    if (QIM::QImPlotNode* plot10 = fig->createPlotNode()) {
+        plot10->setTitle("Pie Chart");
+        plot10->setEqual(true);
+        plot10->setMouseTextEnabled(false);
+        plot10->x1Axis()->setNoDecorations(true);
+        plot10->y1Axis()->setNoDecorations(true);
+        plot10->x1Axis()->setLimits(0.0, 1.0, QIM::QImPlotCondition::Always);
+        plot10->y1Axis()->setLimits(0.0, 1.0, QIM::QImPlotCondition::Always);
+
+        QIM::QImPlotPieChartItemNode* pie = new QIM::QImPlotPieChartItemNode(plot10);
+        pie->setData(QStringList() << "Alpha" << "Beta" << "Gamma" << "Delta",
+                     std::vector< double > { 12.0, 18.0, 30.0, 40.0 });
+        pie->setCenter(QPointF(0.5, 0.5));
+        pie->setRadius(0.38);
+        pie->setLabelFormat("%.0f");
+        pie->setExploding(true);
+        pie->setIgnoreHidden(true);
     }
 }
 
