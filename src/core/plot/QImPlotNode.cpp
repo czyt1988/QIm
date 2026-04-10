@@ -670,11 +670,23 @@ QPointF QImPlotNode::plotToPixels(const double& doubleX, const double& doubleY)
 std::string QImPlotNode::axisValueText(double val, QImPlotAxisId xAxisId) const
 {
     QIM_DC(d);
-    if (!d->plot) {
+    ImPlotContext* context = ImPlot::GetCurrentContext();
+    if (!context || !context->CurrentPlot) {
         return std::to_string(val);
     }
+    ImPlotPlot* currentPlot = context->CurrentPlot;
     char buffer[ 128 ]        = { 0 };
-    const ImPlotAxis* axisptr = d->imPlotAxis(xAxisId);
+    ImAxis idx = currentPlot->CurrentX;
+    if (xAxisId != QImPlotAxisId::Auto) {
+        idx = static_cast< ImAxis >(toImAxis(xAxisId));
+    }
+    if (idx < 0 || idx >= ImAxis_COUNT) {
+        return std::to_string(val);
+    }
+    const ImPlotAxis* axisptr = currentPlot->Axes + idx;
+    if (!axisptr) {
+        return std::to_string(val);
+    }
     ImPlot::LabelAxisValue(*axisptr, val, buffer, sizeof(buffer), false);
     return std::string(buffer);
 }
@@ -704,9 +716,7 @@ bool QImPlotNode::beginDraw()
         // 不成功也返回true，因为有些样式的推入或colormap需要pop出来
         return true;
     }
-    if (!(d->plot)) {
-        d->plot = ImPlot::GetCurrentPlot();
-    }
+    d->plot = ImPlot::GetCurrentPlot();
     // 构建坐标轴
     d->renderAllAxis();
     ImPlot::SetupLegend(ImPlotLocation_East);
