@@ -11,6 +11,7 @@
 #include "plot/QImPlotShadedItemNode.h"
 #include "plot/QImPlotErrorBarsItemNode.h"
 #include "plot/QImPlotStemsItemNode.h"
+#include "plot/QImPlotInfLinesItemNode.h"
 #include "implot.h"
 #include <cmath>
 #include <random>
@@ -310,6 +311,40 @@ void MainWindow::drawPlot2D()
         QIM::QImPlotValueTrackerNode* tracker3 = new QIM::QImPlotValueTrackerNode(plot8);
         tracker3->setGroup(trackerGroup);
         plot8->addChildNode(tracker3);
+    }
+
+    // 添加无限线示例
+    if (QIM::QImPlotNode* plot9 = fig->createPlotNode()) {
+        plot9->x1Axis()->setLabel(u8"x9");
+        plot9->y1Axis()->setLabel(u8"y9");
+        plot9->setTitle("InfLines Plot");
+        plot9->setLegendEnabled(true);
+
+        std::vector< double > xLineValues = { 1.5, 4.0, 7.2 };
+        std::vector< double > yLineValues = { -2.0, 0.0, 3.5 };
+        std::vector< double > xData(100);
+        std::vector< double > yData(100);
+        for (int i = 0; i < 100; ++i) {
+            xData[ i ] = i * 0.1;
+            yData[ i ] = std::sin(xData[ i ]) * 2.5;
+        }
+
+        plot9->addLine(xData, yData, "Reference Curve");
+
+        QIM::QImPlotInfLinesItemNode* verticalLines = new QIM::QImPlotInfLinesItemNode(plot9);
+        verticalLines->setLabel("Vertical Guides");
+        verticalLines->setValues(xLineValues);
+        verticalLines->setColor(Qt::darkRed);
+
+        QIM::QImPlotInfLinesItemNode* horizontalLines = new QIM::QImPlotInfLinesItemNode(plot9);
+        horizontalLines->setLabel("Horizontal Guides");
+        horizontalLines->setValues(yLineValues);
+        horizontalLines->setHorizontal(true);
+        horizontalLines->setColor(Qt::darkGreen);
+
+        QIM::QImPlotValueTrackerNode* tracker4 = new QIM::QImPlotValueTrackerNode(plot9);
+        tracker4->setGroup(trackerGroup);
+        plot9->addChildNode(tracker4);
     }
 }
 
