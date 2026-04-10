@@ -13,6 +13,7 @@
 #include "plot/QImPlotStemsItemNode.h"
 #include "plot/QImPlotInfLinesItemNode.h"
 #include "plot/QImPlotPieChartItemNode.h"
+#include "plot/QImPlotTextItemNode.h"
 #include "implot.h"
 #include <cmath>
 #include <random>
@@ -342,6 +343,18 @@ void MainWindow::drawPlot2D()
         horizontalLines->setValues(yLineValues);
         horizontalLines->setHorizontal(true);
         horizontalLines->setColor(Qt::darkGreen);
+
+        QIM::QImPlotTextItemNode* text1 = new QIM::QImPlotTextItemNode(plot9);
+        text1->setText("Peak Area");
+        text1->setPosition(QPointF(1.6, 2.6));
+        text1->setPixelOffset(QPointF(8.0, -8.0));
+        text1->setColor(Qt::darkMagenta);
+
+        QIM::QImPlotTextItemNode* text2 = new QIM::QImPlotTextItemNode(plot9);
+        text2->setText("X = 4.0");
+        text2->setPosition(QPointF(4.0, -1.5));
+        text2->setVertical(true);
+        text2->setColor(Qt::darkBlue);
 
         QIM::QImPlotValueTrackerNode* tracker4 = new QIM::QImPlotValueTrackerNode(plot9);
         tracker4->setGroup(trackerGroup);

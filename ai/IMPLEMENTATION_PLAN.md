@@ -55,7 +55,7 @@
 | **2D直方图** | `PlotHistogram2D()` | 二维数据分布 | 高 |
 | **数字图** | `PlotDigital()` | 数字信号可视化 | 中 |
 | **图像图** | `PlotImage()` | 图像显示 | 中 |
-| **文本标注** | `PlotText()` | 图表文本标注 | 低 |
+| **文本标注** | `PlotText()` | 图表文本标注 | 低 | ✅ 已完成 |
 | **虚拟项** | `PlotDummy()` | 占位/分组项 | 低 |
 
 ### 特殊图表类型（需要自定义实现）
@@ -104,7 +104,7 @@ QImAbstractNode (基类)
         ├── QImPlotHistogramItemNode
         ├── QImPlotDigitalItemNode
         ├── QImPlotImageItemNode
-        ├── QImPlotTextItemNode
+        ├── QImPlotTextItemNode (已实现)
         └── QImPlotDummyItemNode
 ```
 
