@@ -4,6 +4,7 @@
 #include "plot/QImPlotNode.h"
 #include "plot/QImPlot3DLineItemNode.h"
 #include "plot/QImPlot3DNode.h"
+#include "plot/QImPlot3DScatterItemNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImWaveformGenerator.hpp"
 #include "plot/QImPlotValueTrackerNode.h"
@@ -432,11 +433,37 @@ void MainWindow::drawPlot3D()
     }
 
     if (QIM::QImPlot3DNode* plot2 = figure3D->createPlotNode()) {
-        plot2->setTitle("3D Plot 2");
+        plot2->setTitle("3D Scatter");
         plot2->setXAxisLabel("X");
         plot2->setYAxisLabel("Y");
         plot2->setZAxisLabel("Z");
         plot2->setLegendEnabled(true);
         plot2->setEqual(true);
+        plot2->setAxisLimits(QIM::QImPlot3DNode::AxisX, -1.2, 1.2);
+        plot2->setAxisLimits(QIM::QImPlot3DNode::AxisY, -1.2, 1.2);
+        plot2->setAxisLimits(QIM::QImPlot3DNode::AxisZ, -0.2, 2.8);
+
+        std::vector< double > scatterX;
+        std::vector< double > scatterY;
+        std::vector< double > scatterZ;
+        scatterX.reserve(40);
+        scatterY.reserve(40);
+        scatterZ.reserve(40);
+
+        for (int i = 0; i < 40; ++i) {
+            const double t = static_cast< double >(i) * 0.48;
+            scatterX.push_back(std::cos(t) * 0.75);
+            scatterY.push_back(std::sin(t) * 0.75);
+            scatterZ.push_back(t * 0.12 + 0.2);
+        }
+
+        QIM::QImPlot3DScatterItemNode* scatter = new QIM::QImPlot3DScatterItemNode(plot2);
+        scatter->setLabel("Samples");
+        scatter->setData(scatterX, scatterY, scatterZ);
+        scatter->setMarkerShape(ImPlot3DMarker_Square);
+        scatter->setMarkerSize(5.0f);
+        scatter->setMarkerWeight(1.5f);
+        scatter->setFillColor(QColor(255, 140, 0));
+        scatter->setOutlineColor(QColor(120, 50, 0));
     }
 }
