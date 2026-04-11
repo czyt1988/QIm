@@ -322,7 +322,7 @@ std::string QImFontFileHelper::getRecommendedChineseFontPath()
         if (!QFileInfo::exists(path)) {
             continue;
         }
-        return std::std::string(path);
+        return std::string(path);
     }
     return "";
 
