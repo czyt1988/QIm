@@ -5,6 +5,7 @@
 #include "plot/QImPlot3DLineItemNode.h"
 #include "plot/QImPlot3DNode.h"
 #include "plot/QImPlot3DScatterItemNode.h"
+#include "plot/QImPlot3DSurfaceItemNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImWaveformGenerator.hpp"
 #include "plot/QImPlotValueTrackerNode.h"
@@ -27,6 +28,9 @@
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->splitter->setStretchFactor(0, 1);
+    ui->splitter->setStretchFactor(1, 1);
+    ui->splitter->setSizes(QList< int >() << 1 << 1);
     drawPlot2D();
     drawPlot3D();
     showMaximized();
@@ -395,7 +399,7 @@ void MainWindow::drawPlot3D()
 {
     QIM::QImFigure3DWidget* figure3D = new QIM::QImFigure3DWidget(ui->widget_2);
     figure3D->setRenderMode(QIM::QImWidget::RenderOnDemand);
-    figure3D->setSubplotGrid(1, 2);
+    figure3D->setSubplotGrid(2, 2);
     ui->widget_2->setLayout(new QVBoxLayout());
     ui->widget_2->layout()->setContentsMargins(0, 0, 0, 0);
     ui->widget_2->layout()->addWidget(figure3D);
@@ -465,5 +469,42 @@ void MainWindow::drawPlot3D()
         scatter->setMarkerWeight(1.5f);
         scatter->setFillColor(QColor(255, 140, 0));
         scatter->setOutlineColor(QColor(120, 50, 0));
+    }
+
+    if (QIM::QImPlot3DNode* plot3 = figure3D->createPlotNode()) {
+        plot3->setTitle("3D Surface");
+        plot3->setXAxisLabel("X");
+        plot3->setYAxisLabel("Y");
+        plot3->setZAxisLabel("Z");
+        plot3->setLegendEnabled(true);
+        plot3->setEqual(true);
+
+        constexpr int xCount = 32;
+        constexpr int yCount = 32;
+        std::vector< double > xs;
+        std::vector< double > ys;
+        std::vector< double > zs;
+        xs.reserve(xCount * yCount);
+        ys.reserve(xCount * yCount);
+        zs.reserve(xCount * yCount);
+
+        for (int yi = 0; yi < yCount; ++yi) {
+            const double y = -3.0 + 6.0 * static_cast< double >(yi) / static_cast< double >(yCount - 1);
+            for (int xi = 0; xi < xCount; ++xi) {
+                const double x = -3.0 + 6.0 * static_cast< double >(xi) / static_cast< double >(xCount - 1);
+                const double r = std::sqrt(x * x + y * y);
+                xs.push_back(x);
+                ys.push_back(y);
+                zs.push_back(std::sin(r * 2.0) / (1.0 + r * 0.6));
+            }
+        }
+
+        QIM::QImPlot3DSurfaceItemNode* surface = new QIM::QImPlot3DSurfaceItemNode(plot3);
+        surface->setLabel("Wave Surface");
+        surface->setData(xs, ys, zs, xCount, yCount);
+        surface->setColormapEnabled(true);
+        surface->setColormap(ImPlot3DColormap_Viridis);
+        surface->setLineColor(QColor(20, 60, 120));
+        surface->setLineWidth(1.0f);
     }
 }

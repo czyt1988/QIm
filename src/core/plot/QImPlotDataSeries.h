@@ -231,14 +231,14 @@ public:
     {
         return m_xStart;
     }
-    virtual double xValue(int index) const
+    double xValue(int index) const override
     {
         if (m_yOnly) {
             return m_xStart + (m_xScale * index);
         }
         return m_xs[ index ];
     }
-    virtual double yValue(int index) const
+    double yValue(int index) const override
     {
         return m_ys[ index ];
     }
