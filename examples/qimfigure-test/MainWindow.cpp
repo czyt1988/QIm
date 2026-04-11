@@ -507,4 +507,43 @@ void MainWindow::drawPlot3D()
         surface->setLineColor(QColor(20, 60, 120));
         surface->setLineWidth(1.0f);
     }
+
+    if (QIM::QImPlot3DNode* plot4 = figure3D->createPlotNode()) {
+        plot4->setTitle("3D Wireframe");
+        plot4->setXAxisLabel("X");
+        plot4->setYAxisLabel("Y");
+        plot4->setZAxisLabel("Z");
+        plot4->setLegendEnabled(true);
+        plot4->setEqual(true);
+
+        constexpr int xCount = 32;
+        constexpr int yCount = 32;
+        std::vector< double > xs;
+        std::vector< double > ys;
+        std::vector< double > zs;
+        xs.reserve(xCount * yCount);
+        ys.reserve(xCount * yCount);
+        zs.reserve(xCount * yCount);
+
+        for (int yi = 0; yi < yCount; ++yi) {
+            const double y = -3.0 + 6.0 * static_cast< double >(yi) / static_cast< double >(yCount - 1);
+            for (int xi = 0; xi < xCount; ++xi) {
+                const double x = -3.0 + 6.0 * static_cast< double >(xi) / static_cast< double >(xCount - 1);
+                const double r = std::sqrt(x * x + y * y);
+                const double z = std::sin(r * 2.0) / (1.0 + r * 0.6);
+                xs.push_back(x);
+                ys.push_back(y);
+                zs.push_back(z);
+            }
+        }
+
+        QIM::QImPlot3DSurfaceItemNode* wireframe = new QIM::QImPlot3DSurfaceItemNode(plot4);
+        wireframe->setLabel("Wave Wireframe");
+        wireframe->setData(xs, ys, zs, xCount, yCount);
+        wireframe->setColormapEnabled(true);
+        wireframe->setColormap(ImPlot3DColormap_Viridis);
+        wireframe->setFillVisible(false);
+        wireframe->setMarkersVisible(false);
+        wireframe->setLineWidth(1.1f);
+    }
 }
