@@ -2,6 +2,7 @@
 #include "./ui_MainWindow.h"
 #include "QImFigure3DWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlot3DLineItemNode.h"
 #include "plot/QImPlot3DNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImWaveformGenerator.hpp"
@@ -399,12 +400,35 @@ void MainWindow::drawPlot3D()
     ui->widget_2->layout()->addWidget(figure3D);
 
     if (QIM::QImPlot3DNode* plot1 = figure3D->createPlotNode()) {
-        plot1->setTitle("3D Plot 1");
+        plot1->setTitle("3D Line");
         plot1->setXAxisLabel("X");
         plot1->setYAxisLabel("Y");
         plot1->setZAxisLabel("Z");
         plot1->setLegendEnabled(true);
         plot1->setEqual(true);
+        plot1->setAxisLimits(QIM::QImPlot3DNode::AxisX, -1.2, 1.2);
+        plot1->setAxisLimits(QIM::QImPlot3DNode::AxisY, -1.2, 1.2);
+        plot1->setAxisLimits(QIM::QImPlot3DNode::AxisZ, -0.2, 6.5);
+
+        std::vector< double > xData;
+        std::vector< double > yData;
+        std::vector< double > zData;
+        xData.reserve(240);
+        yData.reserve(240);
+        zData.reserve(240);
+
+        for (int i = 0; i < 240; ++i) {
+            const double t = static_cast< double >(i) * 0.08;
+            xData.push_back(std::cos(t));
+            yData.push_back(std::sin(t));
+            zData.push_back(t * 0.3);
+        }
+
+        QIM::QImPlot3DLineItemNode* line = new QIM::QImPlot3DLineItemNode(plot1);
+        line->setLabel("Helix");
+        line->setData(xData, yData, zData);
+        line->setColor(QColor(33, 150, 243));
+        line->setLineWidth(2.0f);
     }
 
     if (QIM::QImPlot3DNode* plot2 = figure3D->createPlotNode()) {
