@@ -6,6 +6,7 @@
 #include "plot/QImPlot3DNode.h"
 #include "plot/QImPlot3DScatterItemNode.h"
 #include "plot/QImPlot3DSurfaceItemNode.h"
+#include "plot/QImPlot3DTriangleItemNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImWaveformGenerator.hpp"
 #include "plot/QImPlotValueTrackerNode.h"
@@ -399,7 +400,7 @@ void MainWindow::drawPlot3D()
 {
     QIM::QImFigure3DWidget* figure3D = new QIM::QImFigure3DWidget(ui->widget_2);
     figure3D->setRenderMode(QIM::QImWidget::RenderOnDemand);
-    figure3D->setSubplotGrid(2, 2);
+    figure3D->setSubplotGrid(3, 2);
     ui->widget_2->setLayout(new QVBoxLayout());
     ui->widget_2->layout()->setContentsMargins(0, 0, 0, 0);
     ui->widget_2->layout()->addWidget(figure3D);
@@ -545,5 +546,46 @@ void MainWindow::drawPlot3D()
         wireframe->setFillVisible(false);
         wireframe->setMarkersVisible(false);
         wireframe->setLineWidth(1.1f);
+    }
+
+    if (QIM::QImPlot3DNode* plot5 = figure3D->createPlotNode()) {
+        plot5->setTitle("3D Triangle");
+        plot5->setXAxisLabel("X");
+        plot5->setYAxisLabel("Y");
+        plot5->setZAxisLabel("Z");
+        plot5->setLegendEnabled(true);
+        plot5->setEqual(true);
+
+        std::vector< double > xs = {
+            0.0, -0.8, 0.8,
+            0.0, 0.8, 0.8,
+            0.0, 0.8, -0.8,
+            0.0, -0.8, -0.8,
+            -0.8, 0.8, 0.8,
+            -0.8, 0.8, -0.8
+        };
+        std::vector< double > ys = {
+            0.0, -0.8, -0.8,
+            0.0, -0.8, 0.8,
+            0.0, 0.8, 0.8,
+            0.0, 0.8, -0.8,
+            -0.8, -0.8, 0.8,
+            -0.8, 0.8, 0.8
+        };
+        std::vector< double > zs = {
+            1.0, -0.6, -0.6,
+            1.0, -0.6, -0.6,
+            1.0, -0.6, -0.6,
+            1.0, -0.6, -0.6,
+            -0.6, -0.6, -0.6,
+            -0.6, -0.6, -0.6
+        };
+
+        QIM::QImPlot3DTriangleItemNode* triangle = new QIM::QImPlot3DTriangleItemNode(plot5);
+        triangle->setLabel("Pyramid");
+        triangle->setData(xs, ys, zs);
+        triangle->setFillColor(QColor(255, 193, 7, 180));
+        triangle->setLineColor(QColor(120, 85, 10));
+        triangle->setLineWidth(1.2f);
     }
 }
