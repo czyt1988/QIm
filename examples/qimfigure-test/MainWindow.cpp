@@ -1,6 +1,8 @@
 #include "MainWindow.h"
 #include "./ui_MainWindow.h"
+#include "QImFigure3DWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlot3DNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImWaveformGenerator.hpp"
 #include "plot/QImPlotValueTrackerNode.h"
@@ -16,6 +18,7 @@
 #include "plot/QImPlotTextItemNode.h"
 #include "plot/QImPlotDummyItemNode.h"
 #include "implot.h"
+#include <QVBoxLayout>
 #include <cmath>
 #include <random>
 
@@ -388,4 +391,28 @@ void MainWindow::drawPlot2D()
 
 void MainWindow::drawPlot3D()
 {
+    QIM::QImFigure3DWidget* figure3D = new QIM::QImFigure3DWidget(ui->widget_2);
+    figure3D->setRenderMode(QIM::QImWidget::RenderOnDemand);
+    figure3D->setSubplotGrid(1, 2);
+    ui->widget_2->setLayout(new QVBoxLayout());
+    ui->widget_2->layout()->setContentsMargins(0, 0, 0, 0);
+    ui->widget_2->layout()->addWidget(figure3D);
+
+    if (QIM::QImPlot3DNode* plot1 = figure3D->createPlotNode()) {
+        plot1->setTitle("3D Plot 1");
+        plot1->setXAxisLabel("X");
+        plot1->setYAxisLabel("Y");
+        plot1->setZAxisLabel("Z");
+        plot1->setLegendEnabled(true);
+        plot1->setEqual(true);
+    }
+
+    if (QIM::QImPlot3DNode* plot2 = figure3D->createPlotNode()) {
+        plot2->setTitle("3D Plot 2");
+        plot2->setXAxisLabel("X");
+        plot2->setYAxisLabel("Y");
+        plot2->setZAxisLabel("Z");
+        plot2->setLegendEnabled(true);
+        plot2->setEqual(true);
+    }
 }
