@@ -186,6 +186,22 @@ void QImPlotLineItemNode::setLineFlags(int flags)
 }
 
 
+/**
+ * \if ENGLISH
+ * @brief Sets the line color
+ * @param c New color value as QColor
+ * @details Stores the color in an optional QImTrackedValue. The dirty flag is automatically
+ *          set when the value changes. In immediate mode rendering, each frame needs to
+ *          call SetNextLineStyle if a color is set.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置线条颜色
+ * @param c 新的颜色值（QColor 类型）
+ * @details 将颜色存储在 optional QImTrackedValue 中。当值变化时自动设置 dirty 标记。
+ *          在即时模式渲染中，如果设置了颜色，每帧都需要调用 SetNextLineStyle。
+ * \endif
+ */
 void QImPlotLineItemNode::setColor(const QColor& c)
 {
     d_ptr->color = toImVec4(c);
@@ -360,7 +376,10 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
     if (!series) {
         return false;
     }
-    if (d->color && (d->color->is_dirty() || d->lineWidth.is_dirty())) {
+    // ImPlot 是即时模式渲染，SetNextLineStyle 只影响下一次 PlotLine 调用
+    // 因此如果设置了颜色，每一帧都必须调用 SetNextLineStyle
+    // 否则会继承上一个曲线的颜色状态（导致多条曲线颜色相同的问题）
+    if (d->color) {
         ImPlot::SetNextLineStyle(d->color->value(), d->lineWidth.value());
     }
     if (series->isContiguous()) {
