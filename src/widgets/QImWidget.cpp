@@ -48,8 +48,8 @@ public:
     QColor backgroundColor { Qt::white };           ///< 记录背景颜色
     RenderMode renderMode { RenderAdaptive };
     int minRenderInterval { 16 };  ///< 最小渲染间隔(ms)，对应约60FPS
-    int lowInterval { 55 };        ///< 高帧率，对应 18FPS 用于持续渲染模式
-    int hightInterval { 1000 };    ///< 低帧率，对应 1FPS 用于自适应渲染模式
+    int highFPSInterval { 55 };  ///< 高帧率间隔(ms)，对应 18FPS 用于持续渲染模式
+    int lowFPSInterval { 1000 }; ///< 低帧率间隔(ms)，对应 1FPS 用于自适应渲染模式
     //----------------------------------------------------
     // font about
     //----------------------------------------------------
@@ -91,7 +91,7 @@ public:
 QImWidget::PrivateData::PrivateData(QImWidget* p) : q_ptr(p)
 {
     timer = new QTimer(p);
-    timer->setInterval(lowInterval);  // 18FPS
+    timer->setInterval(highFPSInterval);  // 18FPS
     paintElapsed.restart();
     // 字体相关初始化
     std::string fontpath = QImFontFileHelper::getRecommendedChineseFontPath();
@@ -205,7 +205,7 @@ void QImWidget::PrivateData::applyRenderMode()
     switch (renderMode) {
     case RenderContinuous:
         // 持续渲染
-        timer->setInterval(lowInterval);
+        timer->setInterval(highFPSInterval);
         if (!timer->isActive()) {
             timer->start();
         }
@@ -221,7 +221,7 @@ void QImWidget::PrivateData::applyRenderMode()
 
     case RenderAdaptive:
         // 启动自适应调度（初始低帧率）
-        timer->setInterval(hightInterval);
+        timer->setInterval(lowFPSInterval);
         if (!timer->isActive()) {
             timer->start();
         }
@@ -249,7 +249,7 @@ bool QImWidget::PrivateData::shouldUseHighFPS() const
     const qint64 elapsed = paintElapsed.elapsed();
 
     // 以下任一条件满足即需高帧率
-    return (elapsed < hightInterval) &&           // 1秒内有交互
+    return (elapsed < lowFPSInterval) &&           // 1秒内有交互
            (io.WantCaptureMouse ||                // ImGui捕获鼠标
             io.WantCaptureKeyboard ||             // ImGui捕获键盘
             io.WantTextInput ||                   // 文本输入中
@@ -263,7 +263,7 @@ void QImWidget::PrivateData::adaptiveTimer()
     // ===== Adaptive 模式智能帧率调度 =====
     if (renderMode == RenderAdaptive && timer->isActive()) {
         const bool needHighFPS   = shouldUseHighFPS();
-        const int targetInterval = needHighFPS ? lowInterval : hightInterval;
+        const int targetInterval = needHighFPS ? highFPSInterval : lowFPSInterval;
 
         // 仅当间隔变化时调整（避免频繁setInterval开销）
         if (targetInterval != timer->interval()) {
@@ -465,13 +465,13 @@ QImWidget::RenderMode QImWidget::renderMode() const
 void QImWidget::setRefreshInterval(int ms)
 {
     QIM_D(d);
-    d->lowInterval = ms;
+    d->highFPSInterval = ms;
     d->timer->setInterval(ms);
 }
 
 int QImWidget::refreshInterval() const
 {
-    return d_ptr->lowInterval;
+    return d_ptr->highFPSInterval;
 }
 
 void QImWidget::requestRender()

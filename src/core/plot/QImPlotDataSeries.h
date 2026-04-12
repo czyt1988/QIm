@@ -233,6 +233,10 @@ public:
     }
     virtual double xValue(int index) const
     {
+        const int valid_size = size();
+        if (index < 0 || index >= valid_size) {
+            return std::numeric_limits<double>::quiet_NaN();
+        }
         if (m_yOnly) {
             return m_xStart + (m_xScale * index);
         }
@@ -240,6 +244,10 @@ public:
     }
     virtual double yValue(int index) const
     {
+        const int valid_size = size();
+        if (index < 0 || index >= valid_size) {
+            return std::numeric_limits<double>::quiet_NaN();
+        }
         return m_ys[ index ];
     }
     void setYOnly(bool on, double xStart = 0.0, double xScale = 1.0)

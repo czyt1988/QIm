@@ -481,7 +481,13 @@ bool QImPlotScatterItemNode::beginDraw()
 
     // 更新item的状态
     ImPlotContext* ct    = ImPlot::GetCurrentContext();
+    if (!ct) {
+        return false;
+    }
     ImPlotItem* plotItem = ct->PreviousItem;  // 通过源码，PlotScatter结束后，ImPlotItem就是PreviousItem
+    if (!plotItem) {
+        return false;
+    }
     setImPlotItem(plotItem);
     if (plotItem->Show != QImAbstractNode::isVisible()) {
         // 状态发生了变化，这种情况是label点击，设置了show状态和QImAbstractNode记录的状态不一致

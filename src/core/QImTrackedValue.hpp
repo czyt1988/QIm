@@ -593,15 +593,7 @@ private:
     T value_;        ///< 存储的实际值
     bool is_dirty_;  ///< 脏标记，表示值是否被修改过
     Comparator comparator_;
-    void set_value(const T& new_value)
-    {
-        if (comparator_(value_, new_value)) {
-            value_    = new_value;
-            is_dirty_ = true;
-        }
-    }
-
-    void set_value(T&& new_value)
+    void set_value(T new_value)
     {
         if (comparator_(value_, new_value)) {
             value_    = std::move(new_value);

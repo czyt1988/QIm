@@ -265,12 +265,12 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
 
             int max_idx    = sub_start;
             int min_idx    = sub_start;
-            double max_val = y_values[ sub_start - start_idx ];
+            double max_val = y_values[ sub_start ];
             double min_val = max_val;
 
             // 寻找子区间内的极值
             for (int j = sub_start + 1; j < sub_end; ++j) {
-                const double y = y_values[ j - start_idx ];
+                const double y = y_values[ j ];
                 if (std::isnan(y))
                     continue;
 
@@ -301,8 +301,8 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
         int valid_count = 0;
 
         for (int idx : candidate_indices) {
-            const double x = x_values[ idx - start_idx ];
-            const double y = y_values[ idx - start_idx ];
+            const double x = x_values[ idx ];
+            const double y = y_values[ idx ];
             if (!std::isnan(x) && !std::isnan(y)) {
                 avg_x += x;
                 avg_y += y;

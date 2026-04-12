@@ -327,7 +327,13 @@ bool QImPlotBarsItemNode::beginDraw()
 
     // Update item status
     ImPlotContext* ct    = ImPlot::GetCurrentContext();
+    if (!ct) {
+        return false;
+    }
     ImPlotItem* plotItem = ct->PreviousItem;
+    if (!plotItem) {
+        return false;
+    }
     setImPlotItem(plotItem);
     if (plotItem->Show != QImAbstractNode::isVisible()) {
         QImAbstractNode::setVisible(plotItem->Show);

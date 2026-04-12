@@ -156,7 +156,7 @@ std::pair< int, int > QImLTTBDownsampler::findVisibleRange(double x_min, double 
 void QImLTTBDownsampler::lttb(const double* x_data, const double* y_data, int start_idx, int end_idx, int target_points)
 {
     // 前置校验：输入参数合法性
-    if (!m_source)
+    if (!m_source || !y_data)
         return;
     const int n = end_idx - start_idx;
     if (n <= 0 || target_points < 3 || start_idx < 0 || end_idx > m_source->size()) {
