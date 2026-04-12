@@ -1,370 +1,202 @@
 #include "MainWindow.h"
-#include "./ui_MainWindow.h"
-#include "plot/QImPlotNode.h"
-#include "plot/QImPlotAxisInfo.h"
-#include "plot/QImWaveformGenerator.hpp"
-#include "plot/QImPlotValueTrackerNode.h"
-#include "plot/QImPlotValueTrackerNodeGroup.h"
-#include "plot/QImPlotScatterItemNode.h"
-#include "plot/QImPlotStairsItemNode.h"
-#include "plot/QImPlotBarsItemNode.h"
-#include "plot/QImPlotShadedItemNode.h"
-#include "plot/QImPlotErrorBarsItemNode.h"
-#include "plot/QImPlotStemsItemNode.h"
-#include "plot/QImPlotInfLinesItemNode.h"
-#include "plot/QImPlotLineItemNode.h"
-#include "implot.h"
-#include <cmath>
-#include <random>
+#include "widgets/FunctionTreeWidget.h"
+#include "widgets/PropertyPanelWidget.h"
+#include "functions/TestFunctionManager.h"
+#include "functions/TestFunction.h"
+#include <QImFigureWidget.h>
+#include <QDockWidget>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QStringList>
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+/**
+ * \if ENGLISH
+ * @brief Initialize UI components
+ * 
+ * Creates dock widgets, central figure widget, and connects signals.
+ * Also registers all test functions and selects the first one by default.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 初始化 UI 组件
+ * 
+ * 创建停靠控件、中央图表控件并连接信号。
+ * 同时注册所有测试函数并默认选择第一个。
+ * \endif
+ */
+void MainWindow::initializeUi()
 {
-    ui->setupUi(this);
-    drawPlot2D();
-    drawPlot3D();
+    // Create function manager and register all functions
+    m_functionManager = new TestFunctionManager(this);
+    m_functionManager->registerAllFunctions();
+    
+    // Create dock widgets and central widget
+    createDockWidgets();
+    createCentralWidget();
+    
+    // Connect signals between components
+    connectSignals();
+    
+    // Initialize tree widget
+    m_treeWidget->initializeTree();
+    
+    // Select first function by default
+    QStringList allIds = m_functionManager->getAllFunctionIds();
+    if (!allIds.isEmpty()) {
+        m_currentFunctionId = allIds.first();
+        onFunctionSelected(m_currentFunctionId);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Create dock widgets for left and right panels
+ * 
+ * Creates left dock with FunctionTreeWidget and right dock with PropertyPanelWidget.
+ * Both docks are configured with appropriate allowed areas and object names.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 创建左右面板的停靠控件
+ * 
+ * 创建包含 FunctionTreeWidget 的左停靠控件和包含 PropertyPanelWidget 的右停靠控件。
+ * 两个停靠控件都配置了适当的允许区域和对象名称。
+ * \endif
+ */
+void MainWindow::createDockWidgets()
+{
+    // Create left dock for function tree
+    m_leftDock = new QDockWidget(tr("Functions"), this);
+    m_leftDock->setObjectName(QStringLiteral("leftDock"));
+    m_leftDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+    
+    // Create right dock for property panel
+    m_rightDock = new QDockWidget(tr("Properties"), this);
+    m_rightDock->setObjectName(QStringLiteral("rightDock"));
+    m_rightDock->setAllowedAreas(Qt::RightDockWidgetArea);
+    
+    addDockWidget(Qt::LeftDockWidgetArea, m_leftDock);
+    addDockWidget(Qt::RightDockWidgetArea, m_rightDock);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Create central figure widget
+ * 
+ * Creates QImFigureWidget as the central widget with render mode set to OnDemand.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 创建中央图表控件
+ * 
+ * 创建 QImFigureWidget 作为中央控件，渲染模式设置为 OnDemand。
+ * \endif
+ */
+void MainWindow::createCentralWidget()
+{
+    m_figureWidget = new QIM::QImFigureWidget(this);
+    m_figureWidget->setRenderMode(QIM::QImWidget::RenderOnDemand);
+    setCentralWidget(m_figureWidget);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Connect signals between components
+ * 
+ * Connects FunctionTreeWidget's functionSelected signal to onFunctionSelected slot.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 连接组件之间的信号
+ * 
+ * 将 FunctionTreeWidget 的 functionSelected 信号连接到 onFunctionSelected 槽。
+ * \endif
+ */
+void MainWindow::connectSignals()
+{
+    connect(m_treeWidget, &FunctionTreeWidget::functionSelected,
+            this, &MainWindow::onFunctionSelected);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Handle function selection from tree widget
+ * @param functionId The ID of the selected function
+ * 
+ * This slot is called when a user selects a function from the tree widget.
+ * It performs the following steps:
+ * 1. Cleanup the previous function's plot
+ * 2. Clear the figure widget
+ * 3. Create new plot for the selected function
+ * 4. Update property panel with the function's properties
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 处理树控件中的函数选择
+ * @param functionId 选中函数的 ID
+ * 
+ * 当用户从树控件中选择函数时调用此槽。
+ * 执行以下步骤：
+ * 1. 清理前一个函数的绘图
+ * 2. 清除图表控件
+ * 3. 为选中的函数创建新绘图
+ * 4. 用函数的属性更新属性面板
+ * \endif
+ */
+void MainWindow::onFunctionSelected(const QString& functionId)
+{
+    // Get function from manager
+    TestFunction* function = m_functionManager->getFunction(functionId);
+    if (!function) {
+        return;
+    }
+    
+    // Cleanup old function's plot
+    if (m_currentFunction && m_currentFunction != function) {
+        m_currentFunction->cleanupPlot();
+    }
+    
+    // Clear figure widget by removing all plot nodes
+    auto plotNodes = m_figureWidget->plotNodes();
+    for (auto* plot : plotNodes) {
+        m_figureWidget->removePlotNode(plot);
+    }
+    
+    // Create new plot for the selected function
+    function->createPlot(m_figureWidget);
+    
+    // Update property panel with function's properties
+    m_propertyPanel->setProperties(function->getRegisteredProperties());
+    
+    // Update current function
+    m_currentFunctionId = functionId;
+    m_currentFunction = function;
+}
+
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent)
+    , m_leftDock(nullptr)
+    , m_rightDock(nullptr)
+    , m_figureWidget(nullptr)
+    , m_treeWidget(new FunctionTreeWidget(this))
+    , m_propertyPanel(new PropertyPanelWidget(this))
+    , m_functionManager(nullptr)
+    , m_currentFunction(nullptr)
+{
+    // Set window title
+    setWindowTitle(tr("QIm Figure Test"));
+    
+    // Initialize UI components
+    initializeUi();
+    
+    // Show maximized on start
     showMaximized();
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-}
-
-void MainWindow::drawPlot2D()
-{
-    QIM::QImFigureWidget* fig = ui->figureWidget1;
-    fig->setRenderMode(QIM::QImWidget::RenderOnDemand);
-    // 显示5x2=10个子图
-    fig->setSubplotGrid(5, 2);
-    QIM::QImPlotValueTrackerNodeGroup* trackerGroup = new QIM::QImPlotValueTrackerNodeGroup(this);
-    if (QIM::QImPlotNode* plot1 = fig->createPlotNode()) {
-        plot1->x1Axis()->setLabel(u8"x1");
-        plot1->y1Axis()->setLabel(u8"y1");
-        plot1->setTitle("10K Points");
-        int numPoints = 100000;
-        auto wave     = QIM::make_waveform< QIM::CosineWave >(15.0, 0.001);
-        auto datas    = wave.generate(numPoints, 0.0, 20 * M_PI);
-        plot1->addLine(datas.first, datas.second, "curve a");
-        QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot1);
-        tracker->setGroup(trackerGroup);
-        plot1->addChildNode(tracker);
+    // Cleanup current function if exists
+    if (m_currentFunction) {
+        m_currentFunction->cleanupPlot();
     }
-    if (QIM::QImPlotNode* plot2 = fig->createPlotNode()) {
-        plot2->x1Axis()->setLabel(u8"x2");
-        plot2->y1Axis()->setLabel(u8"y2");
-        plot2->setTitle("1M Points");
-        plot2->setLegendEnabled(true);
-        int numPoints = 1000000;
-        auto wave     = QIM::make_waveform< QIM::DampedSineWave >(3.0, 0.15);
-        auto datas    = wave.generate(numPoints, 0.0, 4.0 * M_PI);
-        plot2->addLine(datas.first, datas.second, "curve 1");
-
-        auto cos_wave = QIM::make_waveform< QIM::CosineWave >(2.0, M_PI / 4.0);  // 振幅=2.0，相位=π/4
-        datas         = cos_wave.generate(numPoints, -M_PI, M_PI);
-        plot2->addLine(datas.first, datas.second, "curve 2");
-        QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot2);
-        tracker->setGroup(trackerGroup);
-        plot2->addChildNode(tracker);
-    }
-
-    // 添加散点图示例
-    if (QIM::QImPlotNode* plot3 = fig->createPlotNode()) {
-        plot3->x1Axis()->setLabel(u8"x3");
-        plot3->y1Axis()->setLabel(u8"y3");
-        plot3->setTitle("Scatter Plot");
-        plot3->setLegendEnabled(true);
-
-        // 生成随机散点数据
-        int numPoints = 1000;
-        std::vector< double > xData(numPoints);
-        std::vector< double > yData(numPoints);
-
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::normal_distribution< double > xDist(0.0, 1.0);
-        std::normal_distribution< double > yDist(0.0, 1.0);
-
-        for (int i = 0; i < numPoints; ++i) {
-            xData[ i ] = xDist(gen);
-            yData[ i ] = yDist(gen);
-        }
-
-        // 添加散点图
-        QIM::QImPlotScatterItemNode* scatter = new QIM::QImPlotScatterItemNode(plot3);
-        scatter->setLabel("Random Points");
-        scatter->setData(xData, yData);
-        scatter->setMarkerSize(4.0f);
-        scatter->setMarkerShape(ImPlotMarker_Circle);
-        scatter->setMarkerFill(true);
-        scatter->setColor(Qt::blue);
-
-        // 添加值跟踪器
-        QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot3);
-        tracker->setGroup(trackerGroup);
-        plot3->addChildNode(tracker);
-    }
-
-    // 添加阶梯图示例
-    if (QIM::QImPlotNode* plot4 = fig->createPlotNode()) {
-        plot4->x1Axis()->setLabel(u8"x4");
-        plot4->y1Axis()->setLabel(u8"y4");
-        plot4->setTitle("Stairs Plot");
-        plot4->setLegendEnabled(true);
-
-        // 生成阶梯图数据
-        int numPoints = 10;
-        std::vector< double > xData(numPoints);
-        std::vector< double > yData(numPoints);
-
-        for (int i = 0; i < numPoints; ++i) {
-            xData[ i ] = i;
-            yData[ i ] = static_cast< double >(i % 3) + 1.0;
-        }
-
-        // 添加阶梯图
-        QIM::QImPlotStairsItemNode* stairs = new QIM::QImPlotStairsItemNode(plot4);
-        stairs->setLabel("Stairs Plot");
-        stairs->setData(xData, yData);
-        stairs->setColor(Qt::red);
-        stairs->setShaded(true);
-
-        // 添加值跟踪器
-        QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot4);
-        tracker->setGroup(trackerGroup);
-        plot4->addChildNode(tracker);
-    }
-
-    // 添加柱状图示例
-    if (QIM::QImPlotNode* plot5 = fig->createPlotNode()) {
-        plot5->x1Axis()->setLabel(u8"x5");
-        plot5->y1Axis()->setLabel(u8"y5");
-        plot5->setTitle("Bars Plot");
-        plot5->setLegendEnabled(true);
-
-        // 生成柱状图数据
-        int numBars = 12;
-        std::vector< double > xData(numBars);
-        std::vector< double > yData(numBars);
-
-        for (int i = 0; i < numBars; ++i) {
-            xData[ i ] = i;
-            yData[ i ] = static_cast< double >(i * i) / 10.0 + 1.0;
-        }
-
-        // 添加柱状图
-        QIM::QImPlotBarsItemNode* bars = new QIM::QImPlotBarsItemNode(plot5);
-        bars->setLabel("Monthly Sales");
-        bars->setData(xData, yData);
-        bars->setBarWidth(0.6);
-        bars->setColor(Qt::green);
-
-        // 添加值跟踪器
-        QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot5);
-        tracker->setGroup(trackerGroup);
-        plot5->addChildNode(tracker);
-    }
-
-    // 添加填充图示例
-    if (QIM::QImPlotNode* plot6 = fig->createPlotNode()) {
-        plot6->x1Axis()->setLabel(u8"x6");
-        plot6->y1Axis()->setLabel(u8"y6");
-        plot6->setTitle("Shaded Plot");
-        plot6->setLegendEnabled(true);
-
-        // 生成填充图数据 - 正弦波
-        int numPoints = 100;
-        std::vector< double > xData(numPoints);
-        std::vector< double > yData(numPoints);
-
-        for (int i = 0; i < numPoints; ++i) {
-            xData[ i ] = i * 0.1;
-            yData[ i ] = std::sin(xData[ i ]) * 5.0 + 5.0;  // 正弦波，范围0-10
-        }
-
-        // 添加填充图 - 单线填充模式（填充到参考值0）
-        QIM::QImPlotShadedItemNode* shaded1 = new QIM::QImPlotShadedItemNode(plot6);
-        shaded1->setLabel("Shaded to Zero");
-        shaded1->setData(xData, yData);
-        shaded1->setReferenceValue(0.0);
-        shaded1->setColor(QColor(100, 150, 255, 180));
-
-        // 添加第二条填充图 - 双线填充模式（上下边界）
-        std::vector< double > yUpper(numPoints);
-        std::vector< double > yLower(numPoints);
-        for (int i = 0; i < numPoints; ++i) {
-            yUpper[ i ] = yData[ i ] + 2.0;  // 上边界
-            yLower[ i ] = yData[ i ] - 2.0;  // 下边界
-        }
-
-        // 添加第二条填充图 - 双线填充模式（上下边界）
-        QIM::QImAbstractXYDataSeries* lowerSeries = new QIM::QImVectorXYDataSeries(xData, yLower);
-        QIM::QImAbstractXYDataSeries* upperSeries = new QIM::QImVectorXYDataSeries(xData, yUpper);
-        QIM::QImPlotShadedItemNode* shaded2       = new QIM::QImPlotShadedItemNode(plot6);
-        shaded2->setLabel("Uncertainty Band");
-        shaded2->setData(lowerSeries, upperSeries);
-        shaded2->setColor(QColor(255, 100, 100, 120));
-
-        // 添加值跟踪器
-        QIM::QImPlotValueTrackerNode* tracker = new QIM::QImPlotValueTrackerNode(plot6);
-        tracker->setGroup(trackerGroup);
-        plot6->addChildNode(tracker);
-    }
-
-    // 添加误差棒图示例
-    if (QIM::QImPlotNode* plot7 = fig->createPlotNode()) {
-        plot7->x1Axis()->setLabel(u8"x7");
-        plot7->y1Axis()->setLabel(u8"y7");
-        plot7->setTitle("Error Bars Plot");
-        plot7->setLegendEnabled(true);
-
-        // 生成数据 - 带误差的测量数据
-        int numPoints = 10;
-        std::vector<double> xData(numPoints);
-        std::vector<double> yData(numPoints);
-        std::vector<double> errors(numPoints);
-        std::vector<double> negErrors(numPoints);
-        std::vector<double> posErrors(numPoints);
-
-        for (int i = 0; i < numPoints; ++i) {
-            xData[i] = i;
-            yData[i] = static_cast<double>(i * i) / 5.0 + 2.0;
-            errors[i] = 0.5 + static_cast<double>(i) * 0.1;           // 对称误差
-            negErrors[i] = 0.3 + static_cast<double>(i) * 0.05;       // 负误差（较小）
-            posErrors[i] = 0.7 + static_cast<double>(i) * 0.15;       // 正误差（较大）
-        }
-
-        // 添加散点图作为基础数据
-        QIM::QImPlotScatterItemNode* scatter = new QIM::QImPlotScatterItemNode(plot7);
-        scatter->setLabel("Data Points");
-        scatter->setData(xData, yData);
-        scatter->setMarkerSize(6.0f);
-        scatter->setMarkerShape(ImPlotMarker_Circle);
-        scatter->setColor(Qt::blue);
-
-        // 添加对称误差棒
-        QIM::QImPlotErrorBarsItemNode* errorBars1 = new QIM::QImPlotErrorBarsItemNode(plot7);
-        errorBars1->setLabel("Symmetric Errors");
-        errorBars1->setData(xData, yData, errors);
-        errorBars1->setColor(Qt::red);
-
-        // 添加非对称水平误差棒（偏移X位置避免重叠）
-        std::vector<double> xOffset(numPoints);
-        for (int i = 0; i < numPoints; ++i) {
-            xOffset[i] = xData[i] + 0.3;
-        }
-        QIM::QImPlotScatterItemNode* scatter2 = new QIM::QImPlotScatterItemNode(plot7);
-        scatter2->setLabel("Data Points 2");
-        scatter2->setData(xOffset, yData);
-        scatter2->setMarkerSize(6.0f);
-        scatter2->setMarkerShape(ImPlotMarker_Square);
-        scatter2->setColor(Qt::green);
-
-        QIM::QImPlotErrorBarsItemNode* errorBars2 = new QIM::QImPlotErrorBarsItemNode(plot7);
-        errorBars2->setLabel("Asymmetric Horizontal");
-        errorBars2->setData(xOffset, yData, negErrors, posErrors);
-        errorBars2->setHorizontal(true);
-        errorBars2->setColor(Qt::darkGreen);
-
-        // 添加值跟踪器
-        QIM::QImPlotValueTrackerNode* tracker2 = new QIM::QImPlotValueTrackerNode(plot7);
-        tracker2->setGroup(trackerGroup);
-        plot7->addChildNode(tracker2);
-    }
-
-    // 添加茎叶图示例
-    if (QIM::QImPlotNode* plot8 = fig->createPlotNode()) {
-        plot8->x1Axis()->setLabel(u8"x8");
-        plot8->y1Axis()->setLabel(u8"y8");
-        plot8->setTitle("Stems Plot");
-        plot8->setLegendEnabled(true);
-
-        // 生成数据 - 离散信号数据
-        int numPoints = 20;
-        std::vector<double> xData(numPoints);
-        std::vector<double> yData(numPoints);
-
-        for (int i = 0; i < numPoints; ++i) {
-            xData[i] = i;
-            // 生成一个衰减的正弦波
-            yData[i] = std::sin(i * 0.5) * std::exp(-i * 0.1) * 10.0;
-        }
-
-        // 添加垂直茎叶图（默认基线为0）
-        QIM::QImPlotStemsItemNode* stems1 = new QIM::QImPlotStemsItemNode(plot8);
-        stems1->setLabel("Vertical Stems");
-        stems1->setData(xData, yData);
-        stems1->setReferenceValue(0.0);
-        stems1->setColor(Qt::blue);
-
-        // 添加水平茎叶图（偏移Y位置避免重叠）
-        std::vector<double> yOffset(numPoints);
-        for (int i = 0; i < numPoints; ++i) {
-            yOffset[i] = yData[i] + 5.0;  // 向上偏移
-        }
-        QIM::QImPlotStemsItemNode* stems2 = new QIM::QImPlotStemsItemNode(plot8);
-        stems2->setLabel("Horizontal Stems");
-        stems2->setData(xData, yOffset);
-        stems2->setReferenceValue(5.0);  // 基线也相应偏移
-        stems2->setHorizontal(true);
-        stems2->setColor(Qt::darkCyan);
-
-        // 添加值跟踪器
-        QIM::QImPlotValueTrackerNode* tracker3 = new QIM::QImPlotValueTrackerNode(plot8);
-        tracker3->setGroup(trackerGroup);
-        plot8->addChildNode(tracker3);
-    }
-
-    // 添加无限线示例
-    if (QIM::QImPlotNode* plot9 = fig->createPlotNode()) {
-        plot9->x1Axis()->setLabel(u8"x9");
-        plot9->y1Axis()->setLabel(u8"y9");
-        plot9->setTitle("Infinite Lines Plot");
-        plot9->setLegendEnabled(true);
-
-        // 生成数据 - 正弦波作为背景曲线
-        int numPoints = 200;
-        std::vector<double> xData(numPoints);
-        std::vector<double> yData(numPoints);
-
-        for (int i = 0; i < numPoints; ++i) {
-            xData[i] = i * 0.05;
-            yData[i] = std::sin(xData[i]) * 5.0;
-        }
-
-        // 添加背景曲线
-        QIM::QImPlotLineItemNode* line = new QIM::QImPlotLineItemNode(plot9);
-        line->setLabel("Sine Wave");
-        line->setData(xData, yData);
-        line->setColor(Qt::blue);
-
-        // 添加垂直无限线（参考线）- 使用初始化列表
-        QIM::QImPlotInfLinesItemNode* infLines1 = new QIM::QImPlotInfLinesItemNode(plot9);
-        infLines1->setLabel("Vertical Ref");
-        infLines1->setValues({ 1.0, 3.0, 5.0, 7.0 });  // 多条垂直无限线
-        infLines1->setHorizontal(false);
-        infLines1->setColor(Qt::red);
-
-        // 添加水平无限线（阈值线）- 使用单值接口
-        QIM::QImPlotInfLinesItemNode* infLines2 = new QIM::QImPlotInfLinesItemNode(plot9);
-        infLines2->setLabel("Zero Line");
-        infLines2->setValue(0.0);  // 单条水平无限线（零线）
-        infLines2->setHorizontal(true);
-        infLines2->setColor(Qt::darkGreen);
-
-        // 添加另一组水平无限线（阈值线）
-        QIM::QImPlotInfLinesItemNode* infLines3 = new QIM::QImPlotInfLinesItemNode(plot9);
-        infLines3->setLabel("Thresholds");
-        infLines3->setValues({ -3.0, 3.0 });  // 多条水平无限线
-        infLines3->setHorizontal(true);
-        infLines3->setColor(Qt::magenta);
-
-        // 添加值跟踪器
-        QIM::QImPlotValueTrackerNode* tracker4 = new QIM::QImPlotValueTrackerNode(plot9);
-        tracker4->setGroup(trackerGroup);
-        plot9->addChildNode(tracker4);
-    }
-}
-
-void MainWindow::drawPlot3D()
-{
 }
