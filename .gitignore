@@ -20,9 +20,10 @@ tmp
 ~
 CMakeLists.txt.user
 out
-
+docs/superpowers
 #翻译文件暂时不追踪
 *.qm
+nul
 
 # 忽略MkDocs生成的文件
 site
