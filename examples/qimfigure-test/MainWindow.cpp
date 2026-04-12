@@ -2,6 +2,7 @@
 #include "./ui_MainWindow.h"
 #include "QImFigure3DWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlotHistogramItemNode.h"
 #include "plot/QImPlot3DLineItemNode.h"
 #include "plot/QImPlot3DNode.h"
 #include "plot/QImPlot3DScatterItemNode.h"
@@ -46,8 +47,8 @@ void MainWindow::drawPlot2D()
 {
     QIM::QImFigureWidget* fig = ui->figureWidget1;
     fig->setRenderMode(QIM::QImWidget::RenderOnDemand);
-    // 显示5x2=10个子图
-    fig->setSubplotGrid(5, 2);
+    // 显示6x2=12个子图
+    fig->setSubplotGrid(6, 2);
     QIM::QImPlotValueTrackerNodeGroup* trackerGroup = new QIM::QImPlotValueTrackerNodeGroup(this);
     if (QIM::QImPlotNode* plot1 = fig->createPlotNode()) {
         plot1->x1Axis()->setLabel(u8"x1");
@@ -393,6 +394,33 @@ void MainWindow::drawPlot2D()
         pie->setLabelFormat("%.0f");
         pie->setExploding(true);
         pie->setIgnoreHidden(true);
+    }
+
+    if (QIM::QImPlotNode* plot11 = fig->createPlotNode()) {
+        plot11->x1Axis()->setLabel(u8"value");
+        plot11->y1Axis()->setLabel(u8"density");
+        plot11->setTitle("Histogram");
+        plot11->setLegendEnabled(true);
+
+        std::vector< double > values;
+        values.reserve(4000);
+        std::mt19937 gen(42);
+        std::normal_distribution< double > dist1(-1.0, 0.9);
+        std::normal_distribution< double > dist2(1.2, 0.5);
+
+        for (int i = 0; i < 2500; ++i) {
+            values.push_back(dist1(gen));
+        }
+        for (int i = 0; i < 1500; ++i) {
+            values.push_back(dist2(gen));
+        }
+
+        QIM::QImPlotHistogramItemNode* hist = new QIM::QImPlotHistogramItemNode(plot11);
+        hist->setLabel("Distribution");
+        hist->setData(values);
+        hist->setBinCount(60);
+        hist->setDensity(true);
+        hist->setFillColor(QColor(33, 150, 243, 180));
     }
 }
 
