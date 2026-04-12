@@ -50,11 +50,43 @@ plugins:
           nav:
             - 概述: 
                 - QIm简介: zh/index.md
-            - 使用指南: 
+            - 核心概念:
                 - 渲染节点: zh/render-node.md
+                - 对象树: zh/object-tree.md
+                - PIMPL模式: zh/pimpl-pattern.md
+                - 信号槽: zh/signal-slot.md
+                - 属性系统: zh/property-system.md
+            - 使用指南: 
+                - Figure Widget: zh/figure-widget.md
+                - 线条图: zh/plot-line.md
+                - 数据系列: zh/data-series.md
+                - 降采样: zh/downsampling.md
+                - 渲染模式: zh/render-mode.md
+                - 自定义节点: zh/custom-node.md
             - 其它:
                 - 性能对比: zh/performance.md
                 - 字体: zh/font.md
+        - locale: en
+          name: English
+          build: true
+          nav:
+            - Overview:
+                - Introduction: en/index.md
+            - Core Concepts:
+                - Render Node: en/render-node.md
+                - Object Tree: en/object-tree.md
+                - PIMPL Pattern: en/pimpl-pattern.md
+                - Signal/Slot: en/signal-slot.md
+                - Property System: en/property-system.md
+            - Usage Guide:
+                - Figure Widget: en/figure-widget.md
+                - Line Plot: en/plot-line.md
+                - Data Series: en/data-series.md
+                - Downsampling: en/downsampling.md
+                - Render Mode: en/render-mode.md
+                - Custom Node: en/custom-node.md
+            - Others:
+                - Performance: en/performance.md
   # 需要版本切换再打开下面
   # - git-revision-date
   # - mike:                       
