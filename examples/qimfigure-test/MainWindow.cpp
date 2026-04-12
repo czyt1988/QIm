@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 #include "./ui_MainWindow.h"
-#include "QImFigure3DWidget.h"
+#include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
 #include "plot/QImPlotHistogramItemNode.h"
 #include "plot/QImPlot3DLineItemNode.h"
@@ -426,14 +426,14 @@ void MainWindow::drawPlot2D()
 
 void MainWindow::drawPlot3D()
 {
-    QIM::QImFigure3DWidget* figure3D = new QIM::QImFigure3DWidget(ui->widget_2);
+    QIM::QImFigureWidget* figure3D = new QIM::QImFigureWidget(ui->widget_2);
     figure3D->setRenderMode(QIM::QImWidget::RenderOnDemand);
     figure3D->setSubplotGrid(3, 2);
     ui->widget_2->setLayout(new QVBoxLayout());
     ui->widget_2->layout()->setContentsMargins(0, 0, 0, 0);
     ui->widget_2->layout()->addWidget(figure3D);
 
-    if (QIM::QImPlot3DNode* plot1 = figure3D->createPlotNode()) {
+    if (QIM::QImPlot3DNode* plot1 = figure3D->createPlot3DNode()) {
         plot1->setTitle("3D Line");
         plot1->setXAxisLabel("X");
         plot1->setYAxisLabel("Y");
@@ -465,7 +465,7 @@ void MainWindow::drawPlot3D()
         line->setLineWidth(2.0f);
     }
 
-    if (QIM::QImPlot3DNode* plot2 = figure3D->createPlotNode()) {
+    if (QIM::QImPlot3DNode* plot2 = figure3D->createPlot3DNode()) {
         plot2->setTitle("3D Scatter");
         plot2->setXAxisLabel("X");
         plot2->setYAxisLabel("Y");
@@ -500,7 +500,7 @@ void MainWindow::drawPlot3D()
         scatter->setOutlineColor(QColor(120, 50, 0));
     }
 
-    if (QIM::QImPlot3DNode* plot3 = figure3D->createPlotNode()) {
+    if (QIM::QImPlot3DNode* plot3 = figure3D->createPlot3DNode()) {
         plot3->setTitle("3D Surface");
         plot3->setXAxisLabel("X");
         plot3->setYAxisLabel("Y");
@@ -537,7 +537,7 @@ void MainWindow::drawPlot3D()
         surface->setLineWidth(1.0f);
     }
 
-    if (QIM::QImPlot3DNode* plot4 = figure3D->createPlotNode()) {
+    if (QIM::QImPlot3DNode* plot4 = figure3D->createPlot3DNode()) {
         plot4->setTitle("3D Wireframe");
         plot4->setXAxisLabel("X");
         plot4->setYAxisLabel("Y");
@@ -576,7 +576,7 @@ void MainWindow::drawPlot3D()
         wireframe->setLineWidth(1.1f);
     }
 
-    if (QIM::QImPlot3DNode* plot5 = figure3D->createPlotNode()) {
+    if (QIM::QImPlot3DNode* plot5 = figure3D->createPlot3DNode()) {
         plot5->setTitle("3D Triangle");
         plot5->setXAxisLabel("X");
         plot5->setYAxisLabel("Y");

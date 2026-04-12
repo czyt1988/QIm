@@ -1,4 +1,4 @@
-#include "QImFigure3DWidget.h"
+#include "QImFigureWidget.h"
 #include "plot/QImPlot3DLineItemNode.h"
 #include "plot/QImPlot3DNode.h"
 #include "plot/QImPlot3DScatterItemNode.h"
@@ -28,12 +28,12 @@ int main(int argc, char* argv[])
     QMainWindow window;
     window.setWindowTitle("QIm README 3D Example");
 
-    QIM::QImFigure3DWidget* figure3D = new QIM::QImFigure3DWidget(&window);
+    QIM::QImFigureWidget* figure3D = new QIM::QImFigureWidget(&window);
     figure3D->setSubplotGrid(2, 2);
     figure3D->setRenderMode(QIM::QImWidget::RenderOnDemand);
     window.setCentralWidget(figure3D);
 
-    if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+    if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
         plot->setTitle("3D Line");
         std::vector< double > xs, ys, zs;
         for (int i = 0; i < 200; ++i) {
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
         line->setLineWidth(2.0f);
     }
 
-    if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+    if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
         plot->setTitle("3D Scatter");
         std::vector< double > xs, ys, zs;
         for (int i = 0; i < 200; ++i) {
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
         scatter->setOutlineColor(QColor(120, 45, 10));
     }
 
-    if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+    if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
         plot->setTitle("3D Surface");
         constexpr int rows = 40;
         constexpr int cols = 40;
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
         surface->setColormap(ImPlot3DColormap_Viridis);
     }
 
-    if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+    if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
         plot->setTitle("3D Wireframe");
         constexpr int rows = 40;
         constexpr int cols = 40;

@@ -39,7 +39,7 @@
 
 ## 使用方式
 
-`QIm` 的典型使用方式是先创建 `QImFigureWidget` 或 `QImFigure3DWidget`，再设置子图网格，最后向每个 `PlotNode` 添加对应的图形节点。下面的示例代码可以直接参考 `examples/qimfigure-test` 中的实际写法。
+`QIm` 的典型使用方式是创建 `QImFigureWidget`，再设置子图网格，最后向每个 `PlotNode` 添加对应的图形节点。`QImFigureWidget` 现在同时支持二维和三维绘图，下面的示例代码可以直接参考 `examples/qimfigure-test`、`examples/qimfigure-mixed-test` 与 `examples/readme-*` 中的实际写法。
 
 ### 2D 示例
 
@@ -118,18 +118,18 @@ if (QIM::QImPlotNode* plot = figure->createPlotNode()) {
 下面示例创建一个 `2x2` 的三维图形窗口，并分别绘制三维线图、三维散点图、三维曲面图和三维网格图：
 
 ```cpp
-#include "QImFigure3DWidget.h"
+#include "QImFigureWidget.h"
 #include "plot/QImPlot3DLineItemNode.h"
 #include "plot/QImPlot3DScatterItemNode.h"
 #include "plot/QImPlot3DSurfaceItemNode.h"
 #include "implot3d.h"
 
 // 创建图窗，并设置布局为2x2
-QIM::QImFigure3DWidget* figure3D = new QIM::QImFigure3DWidget(this);
+QIM::QImFigureWidget* figure3D = new QIM::QImFigureWidget(this);
 figure3D->setSubplotGrid(2, 2);
 
 // 创建子图1-三维曲线图
-if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
     plot->setTitle("3D Line");
     std::vector<double> xs, ys, zs;
     for (int i = 0; i < 200; ++i) {
@@ -145,7 +145,7 @@ if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
     line->setLineWidth(2.0f);
 }
 // 创建子图2-三维散点图
-if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
     plot->setTitle("3D Scatter");
     std::vector<double> xs, ys, zs;
     for (int i = 0; i < 200; ++i) {
@@ -162,7 +162,7 @@ if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
     scatter->setOutlineColor(QColor(120, 45, 10));
 }
 // 创建子图3-曲面图
-if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
     plot->setTitle("3D Surface");
     constexpr int rows = 40;
     constexpr int cols = 40;
@@ -186,7 +186,7 @@ if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
     surface->setColormap(ImPlot3DColormap_Viridis);
 }
 // 创建子图4-曲面图
-if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
     plot->setTitle("3D Wireframe");
     constexpr int rows = 40;
     constexpr int cols = 40;
