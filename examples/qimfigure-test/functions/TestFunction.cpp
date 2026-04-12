@@ -43,7 +43,10 @@ TestFunction::~TestFunction() {
  * \endif
  */
 void TestFunction::cleanupPlot() {
-    clearRegistrations();
+    // Only clear plot node references, NOT property registrations
+    // Property registrations are metadata defined in constructor and should persist
+    // 只清理绘图节点引用，不清空属性注册
+    // 属性注册是在构造函数中定义的元数据，应该持久保存
     m_plotNodes.clear();
 }
 
