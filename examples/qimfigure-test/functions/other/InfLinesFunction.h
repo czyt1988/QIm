@@ -1,12 +1,16 @@
 #ifndef INFLINESFUNCTION_H
 #define INFLINESFUNCTION_H
 
-#include "TestFunction.h"
+#include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
 
 namespace QIM {
 class QImFigureWidget;
+class QImPlotNode;
+class QImPlotLineItemNode;
+class QImPlotInfLinesItemNode;
+class QImPlotValueTrackerNode;
 }
 
 /**

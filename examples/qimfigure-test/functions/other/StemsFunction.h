@@ -1,12 +1,15 @@
 #ifndef STEMSFUNCTION_H
 #define STEMSFUNCTION_H
 
-#include "TestFunction.h"
+#include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
 
 namespace QIM {
 class QImFigureWidget;
+class QImPlotNode;
+class QImPlotStemsItemNode;
+class QImPlotValueTrackerNode;
 }
 
 /**

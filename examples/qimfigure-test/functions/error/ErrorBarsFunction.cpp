@@ -1,9 +1,11 @@
 #include "ErrorBarsFunction.h"
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlotScatterItemNode.h"
 #include "plot/QImPlotErrorBarsItemNode.h"
 #include "plot/QImPlotValueTrackerNode.h"
+#include "implot.h"
 
 /**
  * \if ENGLISH

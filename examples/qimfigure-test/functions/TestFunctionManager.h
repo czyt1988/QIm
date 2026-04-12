@@ -7,6 +7,8 @@
 #include <QStringList>
 #include <QList>
 
+class TestFunction;
+
 /**
  * \if ENGLISH
  * @brief Metadata structure for test function registration and tree building

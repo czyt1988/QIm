@@ -1,7 +1,7 @@
 #ifndef ERRORBARSFUNCTION_H
 #define ERRORBARSFUNCTION_H
 
-#include "TestFunction.h"
+#include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
 

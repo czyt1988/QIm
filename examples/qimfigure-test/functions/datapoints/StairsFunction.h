@@ -1,12 +1,15 @@
 #ifndef STAIRSFUNCTION_H
 #define STAIRSFUNCTION_H
 
-#include "TestFunction.h"
+#include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
 
 namespace QIM {
 class QImFigureWidget;
+class QImPlotNode;
+class QImPlotStairsItemNode;
+class QImPlotValueTrackerNode;
 }
 
 /**

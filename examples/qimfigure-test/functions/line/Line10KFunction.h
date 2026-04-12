@@ -1,12 +1,15 @@
 #ifndef LINE10KFUNCTION_H
 #define LINE10KFUNCTION_H
 
-#include "TestFunction.h"
+#include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
 
 namespace QIM {
 class QImFigureWidget;
+class QImPlotNode;
+class QImPlotLineItemNode;
+class QImPlotValueTrackerNode;
 }
 
 /**

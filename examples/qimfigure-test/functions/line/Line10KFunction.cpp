@@ -1,6 +1,7 @@
 #include "Line10KFunction.h"
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlotLineItemNode.h"
 #include "plot/QImWaveformGenerator.hpp"
 #include "plot/QImPlotValueTrackerNode.h"

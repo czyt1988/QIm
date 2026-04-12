@@ -7,6 +7,9 @@
 
 namespace QIM {
 class QImFigureWidget;
+class QImPlotNode;
+class QImPlotShadedItemNode;
+class QImPlotValueTrackerNode;
 }
 
 /**

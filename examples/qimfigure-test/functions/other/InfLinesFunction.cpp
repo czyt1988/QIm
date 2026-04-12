@@ -1,6 +1,7 @@
 #include "InfLinesFunction.h"
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlotLineItemNode.h"
 #include "plot/QImPlotInfLinesItemNode.h"
 #include "plot/QImPlotValueTrackerNode.h"

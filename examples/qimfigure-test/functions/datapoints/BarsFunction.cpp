@@ -1,6 +1,7 @@
 #include "BarsFunction.h"
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlotBarsItemNode.h"
 #include "plot/QImPlotValueTrackerNode.h"
 #include <vector>

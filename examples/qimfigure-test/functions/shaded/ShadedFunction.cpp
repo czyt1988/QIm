@@ -1,6 +1,7 @@
 #include "ShadedFunction.h"
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlotShadedItemNode.h"
 #include "plot/QImPlotValueTrackerNode.h"
 #include <cmath>

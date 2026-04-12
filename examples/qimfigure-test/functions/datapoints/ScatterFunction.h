@@ -1,13 +1,15 @@
 #ifndef SCATTERFUNCTION_H
 #define SCATTERFUNCTION_H
 
-#include "TestFunction.h"
+#include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
 
 namespace QIM {
 class QImFigureWidget;
+class QImPlotNode;
 class QImPlotScatterItemNode;
+class QImPlotValueTrackerNode;
 }
 
 /**

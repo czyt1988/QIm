@@ -1,6 +1,7 @@
 #include "StairsFunction.h"
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlotStairsItemNode.h"
 #include "plot/QImPlotValueTrackerNode.h"
 #include <QColor>

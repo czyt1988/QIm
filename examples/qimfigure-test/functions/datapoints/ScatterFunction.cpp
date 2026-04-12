@@ -1,6 +1,7 @@
 #include "ScatterFunction.h"
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
+#include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlotScatterItemNode.h"
 #include "plot/QImPlotValueTrackerNode.h"
 #include <random>
