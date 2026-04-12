@@ -151,7 +151,7 @@ void Line10KFunction::createPlot(QIM::QImFigureWidget* figure)
     
     // Generate 10K cosine wave data
     const int numPoints = 10000;
-    auto wave = QIM::make_waveform<QIM::CosineWave>(15.0, 0.0);
+    auto wave = QIM::make_waveform<QIM::CosineWave>(15.0, 0.001);
     auto datas = wave.generate(numPoints, 0.0, 20 * M_PI);
     
     // Create line item node and set data
