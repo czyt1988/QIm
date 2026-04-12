@@ -131,27 +131,27 @@ void FunctionTreeWidget::buildTree()
     
     // Line subcategory
     QTreeWidgetItem *lineCategory = addCategoryNode(category2D, tr("Line"));
-    addFunctionNode(lineCategory, tr("10K Points"), QStringLiteral("line_10k"));
-    addFunctionNode(lineCategory, tr("1M Points"), QStringLiteral("line_1m"));
+    addFunctionNode(lineCategory, tr("10K Points"), QStringLiteral("2d_line_10k"));
+    addFunctionNode(lineCategory, tr("1M Points"), QStringLiteral("2d_line_1m"));
     
     // Data Points subcategory
     QTreeWidgetItem *dataPointsCategory = addCategoryNode(category2D, tr("Data Points"));
-    addFunctionNode(dataPointsCategory, tr("Scatter"), QStringLiteral("scatter"));
-    addFunctionNode(dataPointsCategory, tr("Stairs"), QStringLiteral("stairs"));
-    addFunctionNode(dataPointsCategory, tr("Bars"), QStringLiteral("bars"));
+    addFunctionNode(dataPointsCategory, tr("Scatter"), QStringLiteral("2d_datapoints_scatter"));
+    addFunctionNode(dataPointsCategory, tr("Stairs"), QStringLiteral("2d_datapoints_stairs"));
+    addFunctionNode(dataPointsCategory, tr("Bars"), QStringLiteral("2d_datapoints_bars"));
     
     // Shaded subcategory
     QTreeWidgetItem *shadedCategory = addCategoryNode(category2D, tr("Shaded"));
-    addFunctionNode(shadedCategory, tr("Shaded Plot"), QStringLiteral("shaded"));
+    addFunctionNode(shadedCategory, tr("Shaded Plot"), QStringLiteral("2d_shaded_shaded"));
     
     // Error subcategory
     QTreeWidgetItem *errorCategory = addCategoryNode(category2D, tr("Error"));
-    addFunctionNode(errorCategory, tr("Error Bars"), QStringLiteral("error_bars"));
+    addFunctionNode(errorCategory, tr("Error Bars"), QStringLiteral("2d_errorbars"));
     
     // Other subcategory
     QTreeWidgetItem *otherCategory = addCategoryNode(category2D, tr("Other"));
-    addFunctionNode(otherCategory, tr("Stems"), QStringLiteral("stems"));
-    addFunctionNode(otherCategory, tr("Infinite Lines"), QStringLiteral("infinite_lines"));
+    addFunctionNode(otherCategory, tr("Stems"), QStringLiteral("2d_stems"));
+    addFunctionNode(otherCategory, tr("Infinite Lines"), QStringLiteral("2d_inflines"));
     
     // === 3D Category (reserved for future) ===
     QTreeWidgetItem *category3D = addCategoryNode(root, tr("3D"));
