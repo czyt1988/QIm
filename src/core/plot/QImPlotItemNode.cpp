@@ -18,6 +18,7 @@ public:
     ImAxis xAxisId { ImAxis_X1 };
     ImAxis yAxisId { ImAxis_Y1 };
     ImPlotItem* plotItem { nullptr };
+    bool userVisible { true };  ///< 用户设置的可见性状态（首次渲染前有效）
 };
 
 QImPlotItemNode::PrivateData::PrivateData(QImPlotItemNode* p) : q_ptr(p)
@@ -126,20 +127,28 @@ bool QImPlotItemNode::isLegendHovered() const
 bool QImPlotItemNode::isVisible() const
 {
     ImPlotItem* plotItem = d_ptr->plotItem;
-    if (!plotItem) {
-        return false;
+    if (plotItem) {
+        // 渲染后返回 ImPlot 的实际状态
+        return plotItem->Show;
     }
-    return plotItem->Show;
+    // 首次渲染前返回用户设置的预期状态
+    return d_ptr->userVisible;
 }
 
 void QImPlotItemNode::setVisible(bool visible)
 {
-    ImPlotItem* plotItem = d_ptr->plotItem;
-    if (!plotItem) {
-        return;
+    // 记录用户的可见性设置（用于首次渲染）
+    if (d_ptr->userVisible != visible) {
+        d_ptr->userVisible = visible;
     }
-    plotItem->Show = visible;
-    // 触发信号
+    
+    ImPlotItem* plotItem = d_ptr->plotItem;
+    if (plotItem) {
+        // 渲染后同步到 ImPlotItem
+        plotItem->Show = visible;
+    }
+    
+    // 触发信号（无论 plotItem 是否存在）
     QImAbstractNode::setVisible(visible);
 }
 
@@ -155,6 +164,10 @@ ImPlotItem* QImPlotItemNode::imPlotItem() const
 void QImPlotItemNode::setImPlotItem(ImPlotItem* item)
 {
     d_ptr->plotItem = item;
+    // 首次设置 plotItem 时，应用用户设置的可见性状态
+    if (item && item->Show != d_ptr->userVisible) {
+        item->Show = d_ptr->userVisible;
+    }
 }
 
 }  // end namespace QIM

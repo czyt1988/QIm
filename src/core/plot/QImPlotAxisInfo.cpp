@@ -171,7 +171,7 @@ void QImPlotAxisInfo::setMinLimits(double min)
     QIM_D(d);
     d->minLimits = min;
     if (d->minLimits.is_dirty()) {
-        Q_EMIT limitsChanged(d->maxLimits.value(), d->maxLimits.value());
+        Q_EMIT limitsChanged(d->minLimits.value(), d->maxLimits.value());
     }
 }
 
@@ -213,7 +213,7 @@ void QImPlotAxisInfo::setMaxLimits(double max)
     QIM_D(d);
     d->maxLimits = max;
     if (d->maxLimits.is_dirty()) {
-        Q_EMIT limitsChanged(d->maxLimits.value(), d->maxLimits.value());
+        Q_EMIT limitsChanged(d->minLimits.value(), d->maxLimits.value());
     }
 }
 
@@ -252,7 +252,7 @@ void QImPlotAxisInfo::setLimits(double min, double max, QImPlotCondition cond)
     d->maxLimits = max;
     d->limitCond = toImPlotCond(cond);
     if (d->minLimits.is_dirty() || d->maxLimits.is_dirty()) {
-        Q_EMIT limitsChanged(d->maxLimits.value(), d->maxLimits.value());
+        Q_EMIT limitsChanged(d->minLimits.value(), d->maxLimits.value());
     }
 }
 

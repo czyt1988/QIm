@@ -650,11 +650,14 @@ QImPlotLegendNode* QImPlotNode::legendNode() const
 
 bool QImPlotNode::isPlotHovered() const
 {
-    return d_ptr->plot->Hovered;
+    return d_ptr->plot && d_ptr->plot->Hovered;
 }
 
 QPointF QImPlotNode::pixelsToPlot(const float& screenX, const float& screenY)
 {
+    if (!d_ptr->plot) {
+        return QPointF();
+    }
     ImPlotAxis& x_axis = d_ptr->plot->Axes[ d_ptr->plot->CurrentX ];
     ImPlotAxis& y_axis = d_ptr->plot->Axes[ d_ptr->plot->CurrentY ];
     return QPointF(x_axis.PixelsToPlot(screenX), y_axis.PixelsToPlot(screenY));
@@ -662,6 +665,9 @@ QPointF QImPlotNode::pixelsToPlot(const float& screenX, const float& screenY)
 
 QPointF QImPlotNode::plotToPixels(const double& doubleX, const double& doubleY)
 {
+    if (!d_ptr->plot) {
+        return QPointF();
+    }
     ImPlotAxis& x_axis = d_ptr->plot->Axes[ d_ptr->plot->CurrentX ];
     ImPlotAxis& y_axis = d_ptr->plot->Axes[ d_ptr->plot->CurrentY ];
     return QPointF(x_axis.PlotToPixels(doubleX), y_axis.PlotToPixels(doubleY));
