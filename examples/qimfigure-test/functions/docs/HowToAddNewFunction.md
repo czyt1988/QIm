@@ -133,6 +133,41 @@ void NewFunction::setTitle(const QString& title)
 // Implement other setters similarly...
 ```
 
+### Setter Implementation Guidelines
+
+Property setters should follow this pattern for real-time updates:
+
+```cpp
+void NewFunction::setColor(const QColor& color)
+{
+    // 1. Check if value changed (optimization)
+    if (m_color != color) {
+        // 2. Update member variable
+        m_color = color;
+        // 3. Emit Qt signal (for property system)
+        emit colorChanged(color);
+        // 4. Update plot node for immediate visual change
+        if (m_lineNode) {
+            m_lineNode->setColor(color);  // Live rendering update
+        }
+    }
+}
+
+// For enum properties with EnumComboBox:
+void NewFunction::setMarkerShape(int shape)
+{
+    if (m_markerShape != shape) {
+        m_markerShape = shape;
+        emit markerShapeChanged(shape);
+        if (m_scatterNode) {
+            m_scatterNode->setMarkerShape(shape);
+        }
+    }
+}
+```
+
+**Important**: Always update the plot node in the setter for immediate visual feedback. QIm's real-time rendering advantage relies on this pattern.
+
 ### Step 4: Register in TestFunctionManager
 
 Add to `TestFunctionManager.cpp` in `create2DFunctions()` or `create3DFunctions()`:
@@ -166,16 +201,48 @@ Follow the naming pattern:
 
 ### EditorType Options
 
-| EditorType | Widget | Use Case |
-|------------|---------|----------|
-| `ColorPicker` | ColorButton (Office-style) | Color selection |
-| `CheckBox` | QCheckBox | Boolean toggle |
-| `SpinBox` | QSpinBox | Integer values |
-| `DoubleSpinBox` | QDoubleSpinBox | Floating-point values |
-| `Slider` | QSlider + QLabel | Range selection |
-| `ComboBox` | QComboBox | Predefined options |
-| `LineEdit` | QLineEdit | Text input |
-| `FontComboBox` | QFontComboBox | Font selection |
+| EditorType | Widget | Use Case | Value Type |
+|------------|---------|----------|------------|
+| `ColorPicker` | ColorButton (Office-style) | Color selection | `QColor` |
+| `CheckBox` | QCheckBox | Boolean toggle | `bool` |
+| `SpinBox` | QSpinBox | Integer values | `int` |
+| `DoubleSpinBox` | QDoubleSpinBox | Floating-point values | `double`/`float` |
+| `Slider` | QSlider + QLabel | Range selection | `int` |
+| `ComboBox` | QComboBox | Predefined options (text value) | `QString` |
+| `EnumComboBox` | QComboBox | **Enum selection (index value)** | `int` |
+| `LineEdit` | QLineEdit | Text input | `QString` |
+| `FontComboBox` | QFontComboBox | Font selection | `QFont` |
+
+### EnumComboBox Usage
+
+For enum properties (e.g., marker shape, line style), use `EnumComboBox`:
+
+```cpp
+// Example: Marker shape enum (ImPlotMarker)
+PropertyRegistration shapeReg;
+shapeReg.category = tr("Scatter");
+shapeReg.subcategory = tr("Marker");
+shapeReg.displayName = tr("Shape");
+shapeReg.briefDesc = tr("Marker shape");
+shapeReg.detailDesc = tr("Sets the shape of scatter markers");
+shapeReg.editorType = EditorType::EnumComboBox;
+shapeReg.comboBoxOptions = QStringList{
+    tr("Circle"),     // Index 0 = ImPlotMarker_Circle
+    tr("Square"),     // Index 1 = ImPlotMarker_Square
+    tr("Diamond"),    // Index 2 = ImPlotMarker_Diamond
+    // ... more options
+};
+shapeReg.defaultValue = 0;  // 0 = Circle (index matches enum value)
+shapeReg.propertyName = "markerShape";
+shapeReg.target = this;
+registerProperty(shapeReg);
+```
+
+**Key points:**
+- `defaultValue` is the **enum index** (integer), not a string
+- `comboBoxOptions` order must match enum values
+- Property setter receives `int` value (currentIndex)
+- Q_PROPERTY type should be `int` for enum properties
 
 ### PropertyRegistration Fields
 
@@ -213,14 +280,88 @@ struct PropertyRegistration {
  */
 ```
 
+## Common Pitfalls
+
+### 1. EnumComboBox vs ComboBox
+
+| Type | Value | Use Case |
+|------|-------|----------|
+| `ComboBox` | `QString` (selected text) | String options (e.g., "Auto", "Manual") |
+| `EnumComboBox` | `int` (selected index) | Enum values (e.g., marker shape = 0, 1, 2...) |
+
+**Wrong**:
+```cpp
+// Using ComboBox for enum - setter receives QString, not int
+shapeReg.editorType = EditorType::ComboBox;  // Wrong!
+// Setter: void setShape(int shape) - won't work with QString!
+```
+
+**Correct**:
+```cpp
+// Using EnumComboBox for enum - setter receives int (currentIndex)
+shapeReg.editorType = EditorType::EnumComboBox;  // Correct!
+// Setter: void setShape(int shape) - matches int value
+```
+
+### 2. Property Setter Not Updating Plot
+
+If property changes don't reflect in plot, check:
+
+1. **Is plot node pointer valid?** - Ensure node is created in `createPlot()`
+2. **Is setter calling node method?** - Must update node in setter, not just emit signal
+3. **Is `requestRender()` called?** - MainWindow handles this via propertyChanged signal
+
+```cpp
+// Correct pattern:
+void setBarColor(const QColor& color) {
+    if (m_barColor != color) {
+        m_barColor = color;
+        emit barColorChanged(color);
+        if (m_barsNode) {           // Check node exists
+            m_barsNode->setColor(color);  // Update node immediately
+        }
+    }
+}
+```
+
+### 3. Q_PROPERTY Name Mismatch
+
+Property registration `propertyName` must match Q_PROPERTY declaration exactly:
+
+```cpp
+// Header:
+Q_PROPERTY(QColor barColor READ barColor WRITE setBarColor NOTIFY barColorChanged)
+
+// Registration - must match:
+colorReg.propertyName = "barColor";  // Correct
+// NOT "BarColor", "bar_color", "color" etc.
+```
+
+### 4. Function ID Format
+
+Follow the `2d_<category>_<name>` or `3d_<category>_<name>` pattern:
+
+```cpp
+// Correct:
+registerFunction(tr("2D"), tr("Data Points"), tr("Bars"),
+                 "2d_datapoints_bars", new BarsFunction(this));
+
+// Wrong (will not match tree selection):
+registerFunction(tr("2D"), tr("Data Points"), tr("Bars"),
+                 "bars", new BarsFunction(this));  // Missing prefix
+```
+
 ## Testing Checklist
 
 1. Build compiles without errors
 2. Function appears in tree navigation
 3. Clicking function shows correct plot
 4. Properties display in correct categories
-5. Editing properties updates plot live
-6. Value tracker works correctly
+5. Editing properties updates plot **immediately** (real-time)
+6. Property values persist when switching between functions
+7. Value tracker works correctly
+8. **Color changes**: Test color picker - changes should apply instantly
+9. **Enum properties**: Test EnumComboBox - selected option should update plot
 
 ## Example: Adding HistogramFunction
 
