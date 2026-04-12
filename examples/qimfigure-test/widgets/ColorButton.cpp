@@ -4,7 +4,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QEvent>
-#include <QMouseEvent>
+
 
 /**
  * \if ENGLISH
@@ -335,9 +335,9 @@ QMenu* ColorButton::buildColorMenu()
     // "More Colors..." action
     auto *moreColorsAction = menu->addAction(tr("More Colors..."));
     connect(moreColorsAction, &QAction::triggered, this, [this]() {
-        QColor color = QColorDialog::getColor(color(), this);
-        if (color.isValid()) {
-            setColor(color);
+        QColor newColor = QColorDialog::getColor(color(), this);
+        if (newColor.isValid()) {
+            setColor(newColor);
         }
     });
     

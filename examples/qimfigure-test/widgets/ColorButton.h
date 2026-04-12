@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QScopedPointer>
 #include <QPaintEvent>
+#include <QImAPI.h>
 
 /**
  * \if ENGLISH
@@ -107,9 +108,7 @@ private:
     QMenu* buildColorMenu();
 
     // Internal private data class (PIMPL pattern)
-    class PrivateData;
-    friend class PrivateData;
-    QScopedPointer<PrivateData> d_ptr;
+    QIM_DECLARE_PRIVATE(ColorButton)
 };
 
 #endif // COLORBUTTON_H
