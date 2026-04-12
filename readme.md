@@ -6,25 +6,229 @@
 
 `QIm`计划把ImGui生态的成熟库进行封装，目前正在做`ImPlot`和`ImPlot3D`的封装，旨在为Qt开发环境提供一款开箱即用的数据可视化库。
 
-## 效果
+## 编译说明
 
-通过`QIm`的`Plot`模块，可以实现如下数据可视化效果：
+在开始编译前，建议先确认以下环境要求和注意事项：
 
-### 2D绘图
+- Qt 最低版本要求：`Qt 5.14`
+- 当前支持版本：`Qt 5` 和 `Qt 6`
+- 编译器要求：项目使用 `C++17`
+- 构建工具：使用 `CMake` 构建
 
-|  |  |  |
-|:---:|:---:|:---:|
-| ![bars](./docs/assets/plot2D/bars.gif) | ![candle](./docs/assets/plot2D/candle.gif) | ![controls](./docs/assets/plot2D/controls.gif) |
-| ![dnd](./docs/assets/plot2D/dnd.gif) | ![heat](./docs/assets/plot2D/heat.gif) | ![markers](./docs/assets/plot2D/markers.gif) |
-| ![pie](./docs/assets/plot2D/pie.gif) | ![query](./docs/assets/plot2D/query.gif) | ![realtime](./docs/assets/plot2D/rt.gif) |
-| ![shaded](./docs/assets/plot2D/shaded.gif) | ![stem](./docs/assets/plot2D/stem.gif) | ![tables](./docs/assets/plot2D/tables.gif) |
+注意事项：
 
-### 3D绘图
+- 如果使用 `Qt 6`，除了 `Core / Gui / Widgets / OpenGL` 外，还需要额外提供 `OpenGLWidgets` 组件。
+- `QIm` 基于 `QOpenGLWidget`、`ImGui`、`ImPlot` 和 `ImPlot3D`，运行环境需要可用的 OpenGL 上下文。
+- 在 macOS 下，示例程序建议使用 `OpenGL 3.3 Core Profile` 默认格式，否则可能出现窗口能打开但内容无法正常渲染的问题。
+- 项目默认会同时构建 `examples` 和 `benchmark`。如果你只想先验证主库，可在 CMake 配置阶段按需关闭相关选项。
+- 首次接入项目时，建议优先运行 `examples/qimfigure-test`、`examples/qt-with-implots` 或 `examples/readme-*` 示例，先确认当前机器上的 Qt 和 OpenGL 环境工作正常。
 
-|  |  |  |
-|:---:|:---:|:---:|
-|![3D demo1](./docs/assets/plot3D/plot3d-demo1.gif)|![3D demo2](./docs/assets/plot3D/plot3d-demo2.gif)|![3D demo3](./docs/assets/plot3D/plot3d-demo3.gif)|
-|![3D demo4](./docs/assets/plot3D/plot3d-demo4.gif)|![3D demo5](./docs/assets/plot3D/plot3d-demo5.gif)|![3D demo6](./docs/assets/plot3D/plot3d-demo6.gif)|
+## 当前进展
+
+目前 `QIm` 已完成的图形能力如下：
+
+- 2D 图形：`Line`、`Scatter`、`Stairs`、`Bars`、`Shaded`、`ErrorBars`、`Stems`、`InfLines`、`PieChart`、`Text`、`Dummy`、`Histogram`
+- 3D 图形：`Line`、`Scatter`、`Surface`、`Triangle`、`Mesh`
+- 大数据能力：已支持 `LTTB` 和 `MinMaxLTTB` 降采样
+
+后续计划继续补齐以下图形能力：
+
+- 2D 图形：`Heatmap`、`Histogram2D`、`Digital`、`Image`
+- 2D 扩展图形：分组柱状图、堆叠柱状图、蜡烛图
+- 3D 图形：`Quad`
+
+## 使用方式
+
+`QIm` 的典型使用方式是先创建 `QImFigureWidget` 或 `QImFigure3DWidget`，再设置子图网格，最后向每个 `PlotNode` 添加对应的图形节点。下面的示例代码可以直接参考 `examples/qimfigure-test` 中的实际写法。
+
+### 2D 示例
+
+下面示例创建一个 `2x2` 的二维图形窗口，并分别绘制折线图、散点图、柱状图和饼图：
+
+```cpp
+#include "QImFigureWidget.h"
+#include "plot/QImPlotNode.h"
+#include "plot/QImPlotScatterItemNode.h"
+#include "plot/QImPlotBarsItemNode.h"
+#include "plot/QImPlotPieChartItemNode.h"
+
+// 创建图窗，并设置布局为2x2
+QIM::QImFigureWidget* figure = new QIM::QImFigureWidget(this);
+figure->setSubplotGrid(2, 2);
+
+// 创建子图1-折线图
+if (QIM::QImPlotNode* plot = figure->createPlotNode()) {
+    plot->setTitle("Sine Wave");
+    std::vector<double> x;
+    std::vector<double> y;
+    for (int i = 0; i < 400; ++i) {
+        double value = i * 2.0 * M_PI / 399.0;
+        x.push_back(value);
+        y.push_back(std::sin(value));
+    }
+    plot->addLine(x, y, "sin(x)");
+}
+// 创建子图2-散点图
+if (QIM::QImPlotNode* plot = figure->createPlotNode()) {
+    plot->setTitle("Scatter");
+    std::vector<double> x {0.2, 0.5, 0.9, 1.3, 1.8, 2.1, 2.6, 3.0};
+    std::vector<double> y {1.4, 1.0, 1.8, 1.3, 2.0, 1.7, 2.3, 2.1};
+    auto* scatter = new QIM::QImPlotScatterItemNode(plot);
+    scatter->setLabel("samples");
+    scatter->setData(x, y);
+    scatter->setMarkerSize(6.0f);
+    scatter->setMarkerFill(true);
+    scatter->setColor(QColor(0, 114, 189));
+}
+// 创建子图3-条形图
+if (QIM::QImPlotNode* plot = figure->createPlotNode()) {
+    plot->setTitle("Bars");
+    std::vector<double> x {1, 2, 3, 4};
+    std::vector<double> y {3.6, 5.1, 4.4, 6.2};
+    auto* bars = new QIM::QImPlotBarsItemNode(plot);
+    bars->setLabel("2026");
+    bars->setData(x, y);
+    bars->setBarWidth(0.6);
+    bars->setColor(QColor(80, 170, 90));
+}
+// 创建子图4-饼图
+if (QIM::QImPlotNode* plot = figure->createPlotNode()) {
+    plot->setTitle("Pie Chart");
+    plot->setEqual(true);
+    plot->setMouseTextEnabled(false);
+    plot->x1Axis()->setNoDecorations(true);
+    plot->y1Axis()->setNoDecorations(true);
+    plot->x1Axis()->setLimits(0.0, 1.0, QIM::QImPlotCondition::Always);
+    plot->y1Axis()->setLimits(0.0, 1.0, QIM::QImPlotCondition::Always);
+
+    auto* pie = new QIM::QImPlotPieChartItemNode(plot);
+    pie->setData(QStringList() << "Desktop" << "Web" << "Embedded" << "Tools",
+                 std::vector<double> {28.0, 34.0, 22.0, 16.0});
+    pie->setCenter(QPointF(0.5, 0.5));
+    pie->setRadius(0.40);
+    pie->setLabelFormat("%.0f");
+    pie->setExploding(true);
+}
+```
+
+![readme_2d_example](./docs/qim/readme_2d_example.png)
+
+### 3D 示例
+
+下面示例创建一个 `2x2` 的三维图形窗口，并分别绘制三维线图、三维散点图、三维曲面图和三维网格图：
+
+```cpp
+#include "QImFigure3DWidget.h"
+#include "plot/QImPlot3DLineItemNode.h"
+#include "plot/QImPlot3DScatterItemNode.h"
+#include "plot/QImPlot3DSurfaceItemNode.h"
+#include "implot3d.h"
+
+// 创建图窗，并设置布局为2x2
+QIM::QImFigure3DWidget* figure3D = new QIM::QImFigure3DWidget(this);
+figure3D->setSubplotGrid(2, 2);
+
+// 创建子图1-三维曲线图
+if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+    plot->setTitle("3D Line");
+    std::vector<double> xs, ys, zs;
+    for (int i = 0; i < 200; ++i) {
+        double t = i * 0.05;
+        xs.push_back(std::cos(t));
+        ys.push_back(std::sin(t));
+        zs.push_back(t * 0.1);
+    }
+    auto* line = new QIM::QImPlot3DLineItemNode(plot);
+    line->setLabel("helix");
+    line->setData(xs, ys, zs);
+    line->setColor(QColor(0, 114, 189));
+    line->setLineWidth(2.0f);
+}
+// 创建子图2-三维散点图
+if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+    plot->setTitle("3D Scatter");
+    std::vector<double> xs, ys, zs;
+    for (int i = 0; i < 200; ++i) {
+        double t = i * 0.05;
+        xs.push_back(std::cos(t) * 0.8);
+        ys.push_back(std::sin(t) * 0.8);
+        zs.push_back(std::sin(t * 0.5));
+    }
+    auto* scatter = new QIM::QImPlot3DScatterItemNode(plot);
+    scatter->setLabel("samples");
+    scatter->setData(xs, ys, zs);
+    scatter->setMarkerSize(4.0f);
+    scatter->setFillColor(QColor(217, 83, 25));
+    scatter->setOutlineColor(QColor(120, 45, 10));
+}
+// 创建子图3-曲面图
+if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+    plot->setTitle("3D Surface");
+    constexpr int rows = 40;
+    constexpr int cols = 40;
+    std::vector<double> xs(rows * cols);
+    std::vector<double> ys(rows * cols);
+    std::vector<double> zs(rows * cols);
+    for (int r = 0; r < rows; ++r) {
+        for (int c = 0; c < cols; ++c) {
+            int index = r * cols + c;
+            double x = -3.0 + 6.0 * c / (cols - 1);
+            double y = -3.0 + 6.0 * r / (rows - 1);
+            xs[index] = x;
+            ys[index] = y;
+            zs[index] = std::sin(x) * std::cos(y);
+        }
+    }
+    auto* surface = new QIM::QImPlot3DSurfaceItemNode(plot);
+    surface->setLabel("surface");
+    surface->setData(xs, ys, zs, rows, cols);
+    surface->setColormapEnabled(true);
+    surface->setColormap(ImPlot3DColormap_Viridis);
+}
+// 创建子图4-曲面图
+if (QIM::QImPlot3DNode* plot = figure3D->createPlotNode()) {
+    plot->setTitle("3D Wireframe");
+    constexpr int rows = 40;
+    constexpr int cols = 40;
+    std::vector<double> xs(rows * cols);
+    std::vector<double> ys(rows * cols);
+    std::vector<double> zs(rows * cols);
+    for (int r = 0; r < rows; ++r) {
+        for (int c = 0; c < cols; ++c) {
+            int index = r * cols + c;
+            double x = -3.0 + 6.0 * c / (cols - 1);
+            double y = -3.0 + 6.0 * r / (rows - 1);
+            xs[index] = x;
+            ys[index] = y;
+            zs[index] = std::sin(x) * std::cos(y);
+        }
+    }
+    auto* wireframe = new QIM::QImPlot3DSurfaceItemNode(plot);
+    wireframe->setLabel("wireframe");
+    wireframe->setData(xs, ys, zs, rows, cols);
+    wireframe->setColormapEnabled(true);
+    wireframe->setColormap(ImPlot3DColormap_Viridis);
+    wireframe->setFillVisible(false);
+    wireframe->setMarkersVisible(false);
+    wireframe->setLineWidth(1.2f);
+}
+```
+
+![readme_3d_example](./docs/qim/readme_3d_example.png)
+
+交互方式与 `ImPlot3D` 原生保持一致：
+
+- 左键拖拽：平移
+- 右键拖拽：旋转视角
+- 滚轮或中键拖拽：缩放
+- 右键双击：重置旋转
+
+如果你想看更完整的用法，可以直接运行：
+
+- `examples/qimfigure-test`
+- `examples/qt-with-implots`
+- `examples/readme-2d-example`
+- `examples/readme-3d-example`
 
 ## 核心设计
 
@@ -59,7 +263,6 @@ line->setData(...);
 
 ## 快速开始
 
-
 ### 编译和安装
 
 项目使用`cmake`构建,建议执行安装(install)后使用
@@ -76,6 +279,7 @@ cmake --build . --config Release
 # 安装（可选，默认安装到 build/install 目录）
 cmake --install .
 ```
+
 ### 项目集成
 
 在你的 Qt 项目 `CMakeLists.txt` 中引入 `QIm`：
@@ -116,51 +320,6 @@ target_link_libraries(<your_target> PRIVATE
     QIm::Widgets
 )
 
-```
-
-### 简单示例
-
-`QIm`目前把`ImPlot`进行了封装，同步封装了对应的`Widget`窗口，在一个Qt桌面应用程序中，像建立窗口一样即可实现ImGui的界面，同时还支持信号槽，实现Qt环境的数据交互
-
-```cpp
-#include <QImFigureWidget.h>
-
-class MainWindow : public QMainWindow {
-    Q_OBJECT
-public:
-    MainWindow(QWidget* parent = nullptr) : QMainWindow(parent) {
-        // 创建绘图窗口
-        QIM::QImFigureWidget* figure = new QIM::QImFigureWidget(this);
-        setCentralWidget(figure);
-        
-        // 配置2行1列的子图
-        figure->setSubplotGrid(2, 1);
-        
-        // 创建第一个子图
-        QIM::QImPlotNode* plot1 = figure->createPlotNode();
-        plot1->x1Axis()->setLabel("时间 (s)");
-        plot1->y1Axis()->setLabel("幅度");
-        
-        // 添加数据
-        QVector<double> x = {0, 1, 2, 3, 4};
-        QVector<double> y = {0, 1, 4, 9, 16};
-        plot1->addLine(x, y, "二次曲线");
-        
-        // 第二个子图
-        QIM::QImPlotNode* plot2 = figure->createPlotNode();
-        plot2->setLegendEnabled(true);
-        
-        // 添加多条曲线
-        std::vector<double> x2 = {0, 1, 2, 3, 4};
-        std::vector<double> sin_y, cos_y;
-        for (double val : x2) {
-            sin_y.push_back(std::sin(val));
-            cos_y.push_back(std::cos(val));
-        }
-        plot2->addLine(x2, sin_y, "sin(x)");
-        plot2->addLine(x2, cos_y, "cos(x)");
-    }
-};
 ```
 
 ### 大规模数据处理
@@ -223,43 +382,43 @@ Qt 生态里能画图的库不多，主流的为`QCustomPlot`、`Qwt`、`Qt Char
 
 ### 测试1：降采样关闭 + OpenGL 关闭
 
-| 绘图库 | 单次绘图耗时(MS) | FPS |
-|--------|------------------|-----|
-| QCustomPlot | 249.3 | 4.01123 |
-| Qwt | 144.1 | 6.93963 |
-| QIm | 92.45 | 10.8167 |
+| 绘图库         | 单次绘图耗时(MS) | FPS     |
+| ----------- | ---------- | ------- |
+| QCustomPlot | 249.3      | 4.01123 |
+| Qwt         | 144.1      | 6.93963 |
+| QIm         | 92.45      | 10.8167 |
 
 ### 测试2：降采样开启 + OpenGL 关闭
 
-| 绘图库 | 单次绘图耗时(MS) | FPS |
-|--------|------------------|-----|
-| QCustomPlot | 39.58 | 25.2653 |
-| Qwt | 41.51 | 24.0906 |
-| QIm | 36.61 | 27.3149 |
+| 绘图库         | 单次绘图耗时(MS) | FPS     |
+| ----------- | ---------- | ------- |
+| QCustomPlot | 39.58      | 25.2653 |
+| Qwt         | 41.51      | 24.0906 |
+| QIm         | 36.61      | 27.3149 |
 
 ### 测试3：降采样关闭 + OpenGL 开启
 
-| 绘图库 | 单次绘图耗时(MS) | FPS |
-|--------|------------------|-----|
-| QCustomPlot | 152.93 | 6.53894 |
-| Qwt | 121.78 | 8.21153 |
-| QIm | 80.72 | 12.3885 |
+| 绘图库         | 单次绘图耗时(MS) | FPS     |
+| ----------- | ---------- | ------- |
+| QCustomPlot | 152.93     | 6.53894 |
+| Qwt         | 121.78     | 8.21153 |
+| QIm         | 80.72      | 12.3885 |
 
 ### 测试4：降采样开启 + OpenGL 开启
 
-| 绘图库 | 单次绘图耗时(MS) | FPS |
-|--------|------------------|-----|
-| QCustomPlot | 44.56 | 22.4417 |
-| Qwt | 43.58 | 22.9463 |
-| QIm | 38.73 | 25.8198 |
+| 绘图库         | 单次绘图耗时(MS) | FPS     |
+| ----------- | ---------- | ------- |
+| QCustomPlot | 44.56      | 22.4417 |
+| Qwt         | 43.58      | 22.9463 |
+| QIm         | 38.73      | 25.8198 |
 
 ### 结论
 
-| 场景 | 性能排序 | 关键特征 |
-|------|----------|----------|
-| **无降采样 + 无OpenGL** | **QIm ≫ Qwt > QCustomPlot** | QIm 凭借 OpenGL 渲染管线优势，在百万级数据下性能领先 1.5~2 倍 |
-| **开启降采样（LTTB）** | **三者性能趋同** | 降采样成为性能瓶颈，库间差异缩小至 10% 以内 |
-| **内存占用** | **Qwt ≈ QCustomPlot ≪ QIm** | QIm 内存开销约为其他库的 5~15 倍（架构特性决定） |
+| 场景                 | 性能排序                        | 关键特征                                      |
+| ------------------ | --------------------------- | ----------------------------------------- |
+| **无降采样 + 无OpenGL** | **QIm ≫ Qwt > QCustomPlot** | QIm 凭借 OpenGL 渲染管线优势，在百万级数据下性能领先 1.5\~2 倍 |
+| **开启降采样（LTTB）**    | **三者性能趋同**                  | 降采样成为性能瓶颈，库间差异缩小至 10% 以内                  |
+| **内存占用**           | **Qwt ≈ QCustomPlot ≪ QIm** | QIm 内存开销约为其他库的 5\~15 倍（架构特性决定）            |
 
 #### 1. 降采样是大数据量渲染的决定性因素
 
@@ -270,19 +429,20 @@ Qt 生态里能画图的库不多，主流的为`QCustomPlot`、`Qwt`、`Qt Char
 #### 2. OpenGL 加速的实际收益有限
 
 对于Qwt,QCustomPlot等库
+
 - 在**已开启降采样**的前提下，启用 OpenGL 对 FPS 提升 <5%
 - 仅在**无降采样 + 超大数据量**场景下，OpenGL 能带来 30%+ 性能增益（但此时帧率仍低于 10 FPS，实用性低）
 - **建议**：优先启用降采样，OpenGL 作为辅助优化手段
 
 #### 3. 内存占用呈现明显差异
 
-| 库 | 100万点内存 | 500万点内存 | 特点 |
-|----|-------------|-------------|------|
-| QIm | ~460 MB | ~1.4 GB | ImGui 架构需维护双缓冲+GPU资源，内存开销大 |
-| Qwt | ~21 MB | ~134 MB | 内存效率高 |
-| QCustomPlot | ~21 MB | ~82 MB | 内存控制优秀，500万点时反超Qwt |
+| 库           | 100万点内存  | 500万点内存  | 特点                         |
+| ----------- | -------- | -------- | -------------------------- |
+| QIm         | \~460 MB | \~1.4 GB | ImGui 架构需维护双缓冲+GPU资源，内存开销大 |
+| Qwt         | \~21 MB  | \~134 MB | 内存效率高                      |
+| QCustomPlot | \~21 MB  | \~82 MB  | 内存控制优秀，500万点时反超Qwt         |
 
-**注：**测试中的内存检测是检测整个测试过程的峰值内存差值，可能会存在偏差
+\*\*注：\*\*测试中的内存检测是检测整个测试过程的峰值内存差值，可能会存在偏差
 
 具体测试代码见`benchmark/performance`
 
