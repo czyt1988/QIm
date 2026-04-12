@@ -4,10 +4,19 @@
 #include "datapoints/ScatterFunction.h"
 #include "datapoints/StairsFunction.h"
 #include "datapoints/BarsFunction.h"
+#include "datapoints/BarGroupsFunction.h"
+#include "datapoints/HistogramFunction.h"
+#include "datapoints/Histogram2DFunction.h"
 #include "shaded/ShadedFunction.h"
 #include "error/ErrorBarsFunction.h"
 #include "other/StemsFunction.h"
 #include "other/InfLinesFunction.h"
+#include "other/PieChartFunction.h"
+#include "other/HeatmapFunction.h"
+#include "other/DigitalFunction.h"
+#include "other/ImageFunction.h"
+#include "other/TextFunction.h"
+#include "other/DummyFunction.h"
 
 /**
  * \if ENGLISH
@@ -118,23 +127,23 @@ QList<FunctionMetadata> TestFunctionManager::getFunctionMetadataList() const
  * \if ENGLISH
  * @brief Create and register all 2D test functions
  * 
- * Registers 9 test functions across different categories:
+ * Registers multiple test functions across different categories:
  * - Line: 10K Points, 1M Points
- * - Data Points: Scatter, Stairs, Bars
+ * - Data Points: Scatter, Stairs, Bars, Bar Groups, Histogram
  * - Shaded: Shaded Plot
  * - Error: Error Bars
- * - Other: Stems, Infinite Lines
+ * - Other: Stems, Infinite Lines, Pie Chart, Heatmap
  * \endif
  * 
  * \if CHINESE
  * @brief 创建并注册所有 2D 测试函数
  * 
- * 注册 9 个不同类别的测试函数：
+ * 注册多个不同类别的测试函数：
  * - 线：10K 点、1M 点
- * - 数据点：散点、阶梯、柱状
+ * - 数据点：散点、阶梯、柱状、组柱状、直方图
  * - 填充：填充图
  * - 误差：误差棒
- * - 其他：茎叶图、无限线
+ * - 其他：茎叶图、无限线、饼图、热力图
  * \endif
  */
 void TestFunctionManager::create2DFunctions()
@@ -191,6 +200,36 @@ void TestFunctionManager::create2DFunctions()
         m_functions[meta.functionId] = new BarsFunction(this);
     }
     
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Data Points");
+        meta.displayName = tr("Bar Groups");
+        meta.functionId = "2d_datapoints_bargroups";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new BarGroupsFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Data Points");
+        meta.displayName = tr("Histogram");
+        meta.functionId = "2d_datapoints_histogram";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new HistogramFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Data Points");
+        meta.displayName = tr("2D Histogram");
+        meta.functionId = "2d_datapoints_histogram2d";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Histogram2DFunction(this);
+    }
+    
     // Shaded category
     {
         FunctionMetadata meta;
@@ -232,6 +271,66 @@ void TestFunctionManager::create2DFunctions()
         meta.functionId = "2d_inflines";
         m_metadataList.append(meta);
         m_functions[meta.functionId] = new InfLinesFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Other");
+        meta.displayName = tr("Pie Chart");
+        meta.functionId = "2d_other_piechart";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new PieChartFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Other");
+        meta.displayName = tr("Heatmap");
+        meta.functionId = "2d_other_heatmap";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new HeatmapFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Other");
+        meta.displayName = tr("Digital");
+        meta.functionId = "2d_other_digital";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new DigitalFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Other");
+        meta.displayName = tr("Image");
+        meta.functionId = "2d_other_image";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new ImageFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Other");
+        meta.displayName = tr("Text");
+        meta.functionId = "2d_other_text";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new TextFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Other");
+        meta.displayName = tr("Dummy");
+        meta.functionId = "2d_other_dummy";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new DummyFunction(this);
     }
 }
 
