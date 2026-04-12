@@ -257,7 +257,13 @@ QColor QImPlotShadedItemNode::color() const
  */
 void QImPlotShadedItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    ImVec4 imColor = toImVec4(c);
+    if (d_ptr->color.has_value()) {
+        d_ptr->color->operator=(imColor);  // Trigger dirty flag via assignment
+    } else {
+        d_ptr->color.emplace(imColor);
+        d_ptr->color->mark_dirty();  // Mark dirty for new color
+    }
     emit colorChanged(c);
 }
 
@@ -339,9 +345,11 @@ bool QImPlotShadedItemNode::beginDraw()
         return false;
     }
 
-    // Apply style
-    if (d->color && d->color->is_dirty()) {
-        ImPlot::SetNextLineStyle(d->color->value());
+    // Apply fill style every frame (Shaded uses fill, not line style)
+    // ImPlot::PlotShaded renders a filled area, so use SetNextFillStyle
+    if (d->color.has_value()) {
+        ImPlot::SetNextFillStyle(d->color->value());
+        d->color->clear();  // Clear dirty flag after applying
     }
 
     // Determine if we're in two-line mode

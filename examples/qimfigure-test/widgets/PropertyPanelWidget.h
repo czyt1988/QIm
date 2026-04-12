@@ -156,6 +156,21 @@ private:
      */
     void connectEditorSignal(QWidget* editor, const TestFunction::PropertyRegistration& reg);
 
+    /**
+     * \if ENGLISH
+     * @brief Set initial value for editor widget after signal connection
+     * @param editor The editor widget to set value
+     * @param reg Property registration metadata
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 在信号连接后设置编辑器控件的初始值
+     * @param editor 要设置值的编辑器控件
+     * @param reg 属性注册元数据
+     * \endif
+     */
+    void setEditorInitialValue(QWidget* editor, const TestFunction::PropertyRegistration& reg);
+
 private:
     QTreeWidget *m_treeWidget;  ///< \if ENGLISH Tree widget for displaying properties \endif \if CHINESE 用于显示属性的树控件 \endif
     QList<TestFunction::PropertyRegistration> m_properties;  ///< \if ENGLISH List of registered properties \endif \if CHINESE 已注册的属性列表 \endif

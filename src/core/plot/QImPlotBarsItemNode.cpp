@@ -4,6 +4,7 @@
 #include "implot_internal.h"
 #include "QImTrackedValue.hpp"
 #include "QtImGuiUtils.h"
+#include <QDebug>
 
 namespace QIM
 {
@@ -217,7 +218,23 @@ void QImPlotBarsItemNode::setBarsFlags(int flags)
  */
 void QImPlotBarsItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    qDebug() << "[BarsItemNode] setColor called with:" << c;
+    
+    ImVec4 imColor = toImVec4(c);
+    
+    if (d_ptr->color.has_value()) {
+        qDebug() << "[BarsItemNode] color optional has value, current dirty=" << d_ptr->color->is_dirty();
+        qDebug() << "[BarsItemNode] current color value:" << toQColor(d_ptr->color->value());
+        d_ptr->color->operator=(imColor);  // Explicitly call assignment to trigger dirty
+        qDebug() << "[BarsItemNode] after assignment, dirty=" << d_ptr->color->is_dirty();
+    } else {
+        qDebug() << "[BarsItemNode] color optional has NO value, creating new QImTrackedValue";
+        // Create with value and then mark dirty
+        d_ptr->color.emplace(imColor);
+        d_ptr->color->mark_dirty();  // Force dirty because this is a new color being set
+        qDebug() << "[BarsItemNode] after emplace+mark_dirty, dirty=" << d_ptr->color->is_dirty();
+    }
+    
     emit colorChanged(c);
 }
 
@@ -255,9 +272,20 @@ bool QImPlotBarsItemNode::beginDraw()
         return false;
     }
 
-    // Apply style
-    if (d->color && d->color->is_dirty()) {
-        ImPlot::SetNextLineStyle(d->color->value());
+    // Debug: Check color state before applying style
+    qDebug() << "[BarsItemNode] beginDraw - color has_value:" << d->color.has_value();
+    if (d->color.has_value()) {
+        qDebug() << "[BarsItemNode] beginDraw - color is_dirty:" << d->color->is_dirty();
+        qDebug() << "[BarsItemNode] beginDraw - color value:" << toQColor(d->color->value());
+    }
+
+    // Apply style - use SetNextFillStyle for bars (not SetNextLineStyle)
+    if (d->color.has_value() && d->color->is_dirty()) {
+        qDebug() << "[BarsItemNode] beginDraw - calling SetNextFillStyle with color:" << toQColor(d->color->value());
+        ImPlot::SetNextFillStyle(d->color->value());
+        d->color->clear();  // Clear dirty flag after applying
+    } else {
+        qDebug() << "[BarsItemNode] beginDraw - NOT calling SetNextFillStyle (color not dirty or no value)";
     }
 
     // Call ImPlot API

@@ -99,12 +99,21 @@ ScatterFunction::ScatterFunction(QObject* parent)
     shapeReg.subcategory = tr("Marker");
     shapeReg.displayName = tr("Shape");
     shapeReg.briefDesc = tr("Marker shape");
-    shapeReg.detailDesc = tr("Sets the shape of scatter plot markers (0=Circle, 1=Square, 2=Diamond, etc.)");
-    shapeReg.editorType = EditorType::SpinBox;
-    shapeReg.defaultValue = m_markerShape;
-    shapeReg.minValue = 0;
-    shapeReg.maxValue = 10;
-    shapeReg.stepValue = 1;
+    shapeReg.detailDesc = tr("Sets the shape of scatter plot markers");
+    shapeReg.editorType = EditorType::EnumComboBox;
+    shapeReg.comboBoxOptions = QStringList{
+        tr("Circle"),     // ImPlotMarker_Circle = 0
+        tr("Square"),     // ImPlotMarker_Square = 1
+        tr("Diamond"),    // ImPlotMarker_Diamond = 2
+        tr("Up"),         // ImPlotMarker_Up = 3
+        tr("Down"),       // ImPlotMarker_Down = 4
+        tr("Left"),       // ImPlotMarker_Left = 5
+        tr("Right"),      // ImPlotMarker_Right = 6
+        tr("Cross"),      // ImPlotMarker_Cross = 7
+        tr("Plus"),       // ImPlotMarker_Plus = 8
+        tr("Asterisk"),   // ImPlotMarker_Asterisk = 9
+    };
+    shapeReg.defaultValue = m_markerShape;  // 0 = Circle by default
     shapeReg.propertyName = "markerShape";
     shapeReg.target = this;
     registerProperty(shapeReg);

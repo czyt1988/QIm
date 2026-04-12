@@ -52,7 +52,8 @@ QIM_CORE_API QDebug operator<<(QDebug debug, const ImVec2& v);
 QIM_CORE_API QDebug operator<<(QDebug debug, const ImVec4& v);
 QIM_CORE_API QDebug operator<<(QDebug debug, const ImPlotPoint& v);
 QIM_CORE_API QDebug operator<<(QDebug debug, const ImRect& v);
-// ImVec2/ImVec4的模糊比较器
+// ImVec2/ImVec4的模糊比较器 - 返回 true 表示"不相等"(需要更新)
+// 用于 QImTrackedValue 的 comparator，语义与 DefaultComparator 一致
 template< typename T >
 class ImVecComparator
 {
@@ -86,10 +87,11 @@ inline ImVecComparator< T >::ImVecComparator()
 {
 }
 
+// 返回 true 表示"不相等"(需要更新)，与 DefaultComparator 语义一致
 template< typename T >
 inline bool ImVecComparator< T >::operator()(const T& a, const T& b) const
 {
-    return fuzzyEqual(a, b);
+    return !fuzzyEqual(a, b);  // 不相等返回 true
 }
 }
 #endif  // QTIMGUIUTILS_H

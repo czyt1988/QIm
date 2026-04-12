@@ -159,7 +159,13 @@ QColor QImPlotErrorBarsItemNode::color() const
  */
 void QImPlotErrorBarsItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    ImVec4 imColor = toImVec4(c);
+    if (d_ptr->color.has_value()) {
+        d_ptr->color->operator=(imColor);  // Trigger dirty flag via assignment
+    } else {
+        d_ptr->color.emplace(imColor);
+        d_ptr->color->mark_dirty();  // Mark dirty for new color
+    }
     emit colorChanged(c);
 }
 
@@ -246,9 +252,10 @@ bool QImPlotErrorBarsItemNode::beginDraw()
         // The data series should handle this internally
     }
 
-    // Apply style
-    if (d->color && d->color->is_dirty()) {
+    // Apply line style every frame (ErrorBars are line-based)
+    if (d->color.has_value()) {
         ImPlot::SetNextLineStyle(d->color->value());
+        d->color->clear();  // Clear dirty flag after applying
     }
 
     // Get raw pointers for fast rendering

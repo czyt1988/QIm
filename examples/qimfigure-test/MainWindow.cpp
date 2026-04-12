@@ -8,6 +8,7 @@
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QStringList>
+#include <QDebug>
 
 /**
  * \if ENGLISH
@@ -106,18 +107,31 @@ void MainWindow::createCentralWidget()
  * @brief Connect signals between components
  * 
  * Connects FunctionTreeWidget's functionSelected signal to onFunctionSelected slot.
+ * Also connects PropertyPanelWidget's propertyChanged signal to request render.
  * \endif
  * 
  * \if CHINESE
  * @brief 连接组件之间的信号
  * 
  * 将 FunctionTreeWidget 的 functionSelected 信号连接到 onFunctionSelected 槽。
+ * 同时连接 PropertyPanelWidget 的 propertyChanged 信号以请求重新渲染。
  * \endif
  */
 void MainWindow::connectSignals()
 {
     connect(m_treeWidget, &FunctionTreeWidget::functionSelected,
             this, &MainWindow::onFunctionSelected);
+    
+    // Connect property panel changes to request render
+    connect(m_propertyPanel, &PropertyPanelWidget::propertyChanged,
+            this, [this](QObject* target, const QString& propertyName, const QVariant& newValue) {
+        qDebug() << "[MainWindow] propertyChanged received: target=" << target
+                 << ", propertyName=" << propertyName << ", newValue=" << newValue;
+        m_figureWidget->requestRender();
+        qDebug() << "[MainWindow] requestRender called";
+    });
+    
+    qDebug() << "[MainWindow] connectSignals: property panel connected";
 }
 
 /**

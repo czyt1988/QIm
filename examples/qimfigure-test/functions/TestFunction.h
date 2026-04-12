@@ -144,7 +144,8 @@ public:
         SpinBox,        ///< \if ENGLISH QSpinBox with min/max/step configuration \endif \if CHINESE 带最小/最大/步长配置的整数输入框 \endif
         DoubleSpinBox,  ///< \if ENGLISH QDoubleSpinBox with min/max/step configuration \endif \if CHINESE 带最小/最大/步长配置的小数输入框 \endif
         Slider,         ///< \if ENGLISH QSlider + QLabel showing current value (min/max/step) \endif \if CHINESE 滑块 + 显示当前值的标签（带最小/最大/步长） \endif
-        ComboBox,       ///< \if ENGLISH QComboBox with options from comboBoxOptions field \endif \if CHINESE 下拉组合框（选项来自 comboBoxOptions 字段） \endif
+        ComboBox,       ///< \if ENGLISH QComboBox with options from comboBoxOptions field, value is currentText \endif \if CHINESE 下拉组合框（选项来自 comboBoxOptions 字段，值为当前文本） \endif
+        EnumComboBox,   ///< \if ENGLISH QComboBox for enum, value is currentIndex (matches enum value) \endif \if CHINESE 枚举下拉组合框（值为当前索引，对应枚举值） \endif
         LineEdit,       ///< \if ENGLISH QLineEdit for text input \endif \if CHINESE 文本输入框 \endif
         FontComboBox    ///< \if ENGLISH QFontComboBox for font selection \endif \if CHINESE 字体选择框 \endif
     };

@@ -33,7 +33,7 @@ public:
     std::unique_ptr< QImAbstractXYDataSeries > dataLTTB;
     bool isAdaptiveSampling { true };
     int downsampleThreshold { 20000 };
-    ImPlotMarker markerShape { ImPlotMarker_Circle };
+    QImTrackedValue< int > markerShape { ImPlotMarker_Circle };                      ///< 标记形状
     bool markerFill { true };
     std::optional< QImTrackedValue< ImVec4, ImVecComparator< ImVec4 > > > color;  ///< 颜色
     QImTrackedValue< float > markerSize { 4.0f };                                 ///< 标记大小
@@ -180,7 +180,7 @@ void QImPlotScatterItemNode::setMarkerSize(float size)
 int QImPlotScatterItemNode::markerShape() const
 {
     QIM_DC(d);
-    return d->markerShape;
+    return d->markerShape.value();
 }
 
 /**
@@ -207,8 +207,8 @@ int QImPlotScatterItemNode::markerShape() const
 void QImPlotScatterItemNode::setMarkerShape(int shape)
 {
     QIM_D(d);
-    if (d->markerShape != shape) {
-        d->markerShape = static_cast< ImPlotMarker >(shape);
+    d->markerShape = shape;
+    if (d->markerShape.is_dirty()) {
         emit markerShapeChanged(shape);
     }
 }
@@ -439,13 +439,19 @@ bool QImPlotScatterItemNode::beginDraw()
     }
 
     // 准备标记样式
-    ImPlotMarker marker = d->markerShape;
+    ImPlotMarker marker = static_cast<ImPlotMarker>(d->markerShape.value());
     float size          = d->markerSize.value();
     ImVec4 col          = d->color.has_value() ? d->color->value() : ImVec4(0, 0, 0, -1);
 
-    // 应用样式
-    if (d->color && (d->color->is_dirty() || d->markerSize.is_dirty())) {
-        ImPlot::SetNextMarkerStyle(marker, size, col, IMPLOT_AUTO, d->markerFill ? col : ImVec4(0, 0, 0, 0));
+    // 每次渲染都应用样式 (SetNextMarkerStyle 只影响下一次绘制)
+    // ImPlot 需要每帧重新设置样式
+    ImPlot::SetNextMarkerStyle(marker, size, col, IMPLOT_AUTO, d->markerFill ? col : ImVec4(0, 0, 0, 0));
+    
+    // Clear dirty flags after applying (for signal emission tracking)
+    d->markerSize.clear();
+    d->markerShape.clear();
+    if (d->color.has_value()) {
+        d->color->clear();
     }
 
     if (series->isContiguous()) {
