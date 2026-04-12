@@ -167,6 +167,9 @@ void MainWindow::onFunctionSelected(const QString& functionId)
     // Create new plot for the selected function
     function->createPlot(m_figureWidget);
     
+    // Request render to update display immediately
+    m_figureWidget->requestRender();
+    
     // Update property panel with function's properties
     m_propertyPanel->setProperties(function->getRegisteredProperties());
     
