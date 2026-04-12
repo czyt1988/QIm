@@ -4,6 +4,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QEvent>
+#include <QWidgetAction>
 
 
 /**
@@ -75,7 +76,7 @@ public:
                      << QColor(255, 165, 0)    // Orange
                      << Qt::green 
                      << Qt::blue 
-                     << Qt::purple 
+                     << QColor(128, 0, 128)    // Purple
                      << QColor(128, 128, 128); // Gray
 
         // Row 2: Standard colors
@@ -329,7 +330,9 @@ QMenu* ColorButton::buildColorMenu()
         }
     }
     
-    menu->addWidget(gridWidget);
+    QWidgetAction* action = new QWidgetAction(menu);
+    action->setDefaultWidget(gridWidget);
+    menu->addAction(action);
     menu->addSeparator();
     
     // "More Colors..." action
