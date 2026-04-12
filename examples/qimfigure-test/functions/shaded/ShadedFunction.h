@@ -1,7 +1,7 @@
 #ifndef SHADEDFUNCTION_H
 #define SHADEDFUNCTION_H
 
-#include "TestFunction.h"
+#include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
 
