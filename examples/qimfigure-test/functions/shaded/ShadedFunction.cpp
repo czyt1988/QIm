@@ -202,7 +202,6 @@ void ShadedFunction::createPlot(QIM::QImFigureWidget* figure)
     }
     
     m_shadedNode->setColor(m_fillColor);
-    m_plotNode->addChildNode(m_shadedNode);
     
     // Create and attach value tracker
     m_trackerNode = new QIM::QImPlotValueTrackerNode(m_plotNode);

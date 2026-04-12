@@ -204,7 +204,6 @@ void ScatterFunction::createPlot(QIM::QImFigureWidget* figure)
     m_scatterNode->setMarkerShape(m_markerShape);
     m_scatterNode->setMarkerFill(m_markerFill);
     m_scatterNode->setColor(m_markerColor);
-    m_plotNode->addChildNode(m_scatterNode);
     
     // Create and attach value tracker
     m_trackerNode = new QIM::QImPlotValueTrackerNode(m_plotNode);

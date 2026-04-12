@@ -190,7 +190,6 @@ void Line1MFunction::createPlot(QIM::QImFigureWidget* figure)
     m_line1Node = new QIM::QImPlotLineItemNode(m_plotNode);
     m_line1Node->setData(datas.first, datas.second);
     m_line1Node->setColor(m_line1Color);
-    m_plotNode->addChildNode(m_line1Node);
     
     // Generate 1M points: CosineWave for line 2
     auto cosWave = QIM::make_waveform<QIM::CosineWave>(2.0, M_PI / 4.0);
@@ -200,7 +199,6 @@ void Line1MFunction::createPlot(QIM::QImFigureWidget* figure)
     m_line2Node = new QIM::QImPlotLineItemNode(m_plotNode);
     m_line2Node->setData(datas.first, datas.second);
     m_line2Node->setColor(m_line2Color);
-    m_plotNode->addChildNode(m_line2Node);
     
     // Create and attach value tracker
     m_trackerNode = new QIM::QImPlotValueTrackerNode(m_plotNode);

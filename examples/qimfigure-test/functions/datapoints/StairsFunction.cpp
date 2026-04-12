@@ -162,7 +162,6 @@ void StairsFunction::createPlot(QIM::QImFigureWidget* figure)
     m_stairsNode->setData(xData, yData);
     m_stairsNode->setColor(m_stairsColor);
     m_stairsNode->setShaded(m_shaded);
-    m_plotNode->addChildNode(m_stairsNode);
     
     // Create and attach value tracker
     m_trackerNode = new QIM::QImPlotValueTrackerNode(m_plotNode);

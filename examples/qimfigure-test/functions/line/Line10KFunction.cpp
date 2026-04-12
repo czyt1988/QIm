@@ -159,7 +159,6 @@ void Line10KFunction::createPlot(QIM::QImFigureWidget* figure)
     m_lineNode = new QIM::QImPlotLineItemNode(m_plotNode);
     m_lineNode->setData(datas.first, datas.second);
     m_lineNode->setColor(m_lineColor);
-    m_plotNode->addChildNode(m_lineNode);
     
     // Create and attach value tracker
     m_trackerNode = new QIM::QImPlotValueTrackerNode(m_plotNode);
