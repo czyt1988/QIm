@@ -76,6 +76,10 @@ void QImAbstractNode::insertChildNode(int index, QImAbstractNode* child)
     if (m_children.contains(child)) {
         // 如果已在列表中，先移除再插入到新位置
         m_children.removeOne(child);
+        // 移除后重新调整index，防止index超出新的size
+        if (index > m_children.size()) {
+            index = m_children.size();
+        }
     } else {
         // 处理旧父节点
         if (child->m_parent && child->m_parent != this) {
