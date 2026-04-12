@@ -69,11 +69,13 @@ void MainWindow::createDockWidgets()
     m_leftDock = new QDockWidget(tr("Functions"), this);
     m_leftDock->setObjectName(QStringLiteral("leftDock"));
     m_leftDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+    m_leftDock->setWidget(m_treeWidget);  // Set FunctionTreeWidget as dock content
     
     // Create right dock for property panel
     m_rightDock = new QDockWidget(tr("Properties"), this);
     m_rightDock->setObjectName(QStringLiteral("rightDock"));
     m_rightDock->setAllowedAreas(Qt::RightDockWidgetArea);
+    m_rightDock->setWidget(m_propertyPanel);  // Set PropertyPanelWidget as dock content
     
     addDockWidget(Qt::LeftDockWidgetArea, m_leftDock);
     addDockWidget(Qt::RightDockWidgetArea, m_rightDock);
