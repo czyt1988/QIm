@@ -236,7 +236,7 @@ public:
     void setText(const QString& text);
 
     // Sets the annotation text with printf-style formatting
-    void setText(const char* fmt, ...) IM_FMTARGS(2);
+    void setText(const char* fmt, ...);
 
     //----------------------------------------------------
     // Style and configuration

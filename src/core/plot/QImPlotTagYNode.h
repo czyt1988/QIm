@@ -1,4 +1,4 @@
-#ifndef QIMPLOTTAGYNODE_H
+﻿#ifndef QIMPLOTTAGYNODE_H
 #define QIMPLOTTAGYNODE_H
 
 #include "../../QImAPI.h"
@@ -186,7 +186,7 @@ public:
     void setText(const QString& text);
 
     // Sets the tag text with printf-style formatting
-    void setText(const char* fmt, ...) IM_FMTARGS(2);
+    void setText(const char* fmt, ...);
 
     //----------------------------------------------------
     // Style and configuration

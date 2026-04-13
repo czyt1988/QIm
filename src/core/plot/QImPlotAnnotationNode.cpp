@@ -18,13 +18,13 @@ public:
     // Position values
     double x { 0.0 };
     double y { 0.0 };
-    
+
     // Style and configuration
-    std::optional<QImTrackedValue<ImVec4, QIM::ImVecComparator<ImVec4>>> color;  ///< Text color
-    QString text;                                                                 ///< Annotation text
-    ImVec2 pixelOffset { 0.0f, 0.0f };                                           ///< Pixel offset
-    bool clamp { false };                                                         ///< Clamp to plot area
-    bool round { false };                                                         ///< Round to integer pixels
+    std::optional< QImTrackedValue< ImVec4, QIM::ImVecComparator< ImVec4 > > > color;  ///< Text color
+    QString text;                                                                      ///< Annotation text
+    ImVec2 pixelOffset { 0.0f, 0.0f };                                                 ///< Pixel offset
+    bool clamp { false };                                                              ///< Clamp to plot area
+    bool round { false };                                                              ///< Round to integer pixels
 };
 
 QImPlotAnnotationNode::PrivateData::PrivateData(QImPlotAnnotationNode* p) : q_ptr(p)
@@ -42,8 +42,7 @@ QImPlotAnnotationNode::PrivateData::PrivateData(QImPlotAnnotationNode* p) : q_pt
  * @param parent 父QObject
  * \endif
  */
-QImPlotAnnotationNode::QImPlotAnnotationNode(QObject* parent)
-    : QImPlotItemNode(parent), QIM_PIMPL_CONSTRUCT
+QImPlotAnnotationNode::QImPlotAnnotationNode(QObject* parent) : QImPlotItemNode(parent), QIM_PIMPL_CONSTRUCT
 {
     // Register with default ID "2d_tools_annotation"
     setObjectName("2d_tools_annotation");
@@ -170,10 +169,10 @@ void QImPlotAnnotationNode::setText(const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    char buffer[1024];
+    char buffer[ 1024 ];
     vsnprintf(buffer, sizeof(buffer), fmt, args);
     va_end(args);
-    
+
     setText(QString::fromUtf8(buffer));
 }
 
@@ -259,7 +258,7 @@ void QImPlotAnnotationNode::setPixelOffset(double x, double y)
 {
     QIM_D(d);
     if (d->pixelOffset.x != x || d->pixelOffset.y != y) {
-        d->pixelOffset = ImVec2(static_cast<float>(x), static_cast<float>(y));
+        d->pixelOffset = ImVec2(static_cast< float >(x), static_cast< float >(y));
         emit pixelOffsetChanged(QPointF(x, y));
     }
 }
@@ -354,25 +353,25 @@ void QImPlotAnnotationNode::setRound(bool round)
 bool QImPlotAnnotationNode::beginDraw()
 {
     QIM_D(d);
-    
+
     if (!isVisible()) {
         return false;
     }
-    
+
     // Convert color to ImVec4
     ImVec4 colorVec = d->color.has_value() ? d->color->value() : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    
-    // Convert text to C string
-    QByteArray utf8 = d->text.toUtf8();
-    const char* textPtr = utf8.constData();
-    
+
+
     // Call ImPlot Annotation API
     if (d->text.isEmpty()) {
         ImPlot::Annotation(d->x, d->y, colorVec, d->pixelOffset, d->clamp, d->round);
     } else {
+        // Convert text to C string
+        QByteArray utf8     = d->text.toUtf8();
+        const char* textPtr = utf8.constData();
         ImPlot::Annotation(d->x, d->y, colorVec, d->pixelOffset, d->clamp, d->round, "%s", textPtr);
     }
-    
+
     // Update item status (for consistency with other plot items)
     ImPlotContext* ct = ImPlot::GetCurrentContext();
     if (ct) {
@@ -382,8 +381,8 @@ bool QImPlotAnnotationNode::beginDraw()
             QImAbstractNode::setVisible(plotItem->Show);
         }
     }
-    
-    return false; // Annotation doesn't need endDraw
+
+    return false;  // Annotation doesn't need endDraw
 }
 
 }  // namespace QIM
