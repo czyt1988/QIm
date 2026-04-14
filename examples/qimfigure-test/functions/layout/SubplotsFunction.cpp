@@ -160,23 +160,23 @@ SubplotsFunction::~SubplotsFunction()
 /**
  * \if ENGLISH
  * @brief Cleanup plot nodes
- * @details Deletes the subplots node and clears plot node references.
- * This prevents stale nodes from being rendered after switching functions.
+ * @details Clears plot node references. Does NOT delete the subplots node
+ * because it's the figure widget's internal subplotNode, not a newly created one.
+ * Plot nodes are managed by the figure widget and will be removed when
+ * MainWindow clears the figure.
  * \endif
  * 
  * \if CHINESE
  * @brief 清理绘图节点
- * @details 删除子图节点并清空绘图节点引用。
- * 这可以防止切换函数后残留节点继续渲染。
+ * @details 清空绘图节点引用。不删除子图节点，因为它不是新创建的，
+ * 而是 figure 控件内部的 subplotNode。绘图节点由 figure 控件管理，
+ * MainWindow 清空 figure 时会被移除。
  * \endif
  */
 void SubplotsFunction::cleanupPlot()
 {
-    // Delete the subplots node (it will delete all child plot nodes)
-    if (m_subplotsNode) {
-        m_subplotsNode->deleteLater();
-        m_subplotsNode = nullptr;
-    }
+    // Clear references - don't delete m_subplotsNode as it's figure's internal node
+    m_subplotsNode = nullptr;
     m_plotNodes.clear();
 }
 
@@ -184,7 +184,9 @@ void SubplotsFunction::cleanupPlot()
  * \if ENGLISH
  * @brief Create plot nodes in the given figure widget
  * @param figure Pointer to the figure widget where plots will be created
- * @details Creates a subplot grid with different plot types in each cell:
+ * @details Uses the figure's internal subplotNode instead of creating a new one.
+ * This prevents nested SubplotsNode which would corrupt ImPlot's style stack.
+ * Creates a subplot grid with different plot types in each cell:
  * - Top-left: Line plot
  * - Top-right: Scatter plot
  * - Bottom-left: Bar chart
@@ -194,7 +196,9 @@ void SubplotsFunction::cleanupPlot()
  * \if CHINESE
  * @brief 在指定的图表控件中创建绘图节点
  * @param figure 将要创建绘图的图表控件指针
- * @details 创建一个子图网格，每个单元格展示不同的绘图类型：
+ * @details 使用 figure 内部的 subplotNode 而不是创建新的。
+ * 这可以防止嵌套的 SubplotsNode 打乱 ImPlot 的样式栈。
+ * 创建一个子图网格，每个单元格展示不同的绘图类型：
  * - 左上：线图
  * - 右上：散点图
  * - 左下：柱状图
@@ -207,8 +211,16 @@ void SubplotsFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
-    // Create subplots node
-    m_subplotsNode = new QIM::QImSubplotsNode(figure);
+    // Use figure's internal subplotNode instead of creating a new one
+    // QImFigureWidget already has an internal QImSubplotsNode created in its constructor
+    // Creating another SubplotsNode would cause nested BeginSubplots/EndSubplots calls,
+    // which corrupts ImPlot's Push/Pop style stack and causes assertion failures.
+    m_subplotsNode = figure->subplotNode();
+    if (!m_subplotsNode) {
+        return;
+    }
+    
+    // Configure the internal subplot node
     m_subplotsNode->setTitle(m_title);
     m_subplotsNode->setGrid(m_rows, m_cols);
     m_subplotsNode->setLinkAllX(m_linkAllX);
@@ -216,7 +228,7 @@ void SubplotsFunction::createPlot(QIM::QImFigureWidget* figure)
     m_subplotsNode->setLegendEnabled(m_legendEnabled);
     m_subplotsNode->setResizable(m_resizable);
     
-    // Create plots for each subplot cell
+    // Create plots for each subplot cell using figure->createPlotNode()
     const int numPoints = 50;
     std::vector<double> xData(numPoints);
     std::vector<double> yData(numPoints);
@@ -227,7 +239,7 @@ void SubplotsFunction::createPlot(QIM::QImFigureWidget* figure)
     }
     
     // Plot 1: Line plot
-    QIM::QImPlotNode* plot1 = m_subplotsNode->createPlotNode();
+    QIM::QImPlotNode* plot1 = figure->createPlotNode();
     if (plot1) {
         plot1->setTitle(tr("Line"));
         plot1->x1Axis()->setLabel(tr("x"));
@@ -242,7 +254,7 @@ void SubplotsFunction::createPlot(QIM::QImFigureWidget* figure)
     }
     
     // Plot 2: Scatter plot
-    QIM::QImPlotNode* plot2 = m_subplotsNode->createPlotNode();
+    QIM::QImPlotNode* plot2 = figure->createPlotNode();
     if (plot2) {
         plot2->setTitle(tr("Scatter"));
         plot2->x1Axis()->setLabel(tr("x"));
@@ -261,7 +273,7 @@ void SubplotsFunction::createPlot(QIM::QImFigureWidget* figure)
     }
     
     // Plot 3: Bar chart
-    QIM::QImPlotNode* plot3 = m_subplotsNode->createPlotNode();
+    QIM::QImPlotNode* plot3 = figure->createPlotNode();
     if (plot3) {
         plot3->setTitle(tr("Bars"));
         plot3->x1Axis()->setLabel(tr("x"));
@@ -282,7 +294,7 @@ void SubplotsFunction::createPlot(QIM::QImFigureWidget* figure)
     }
     
     // Plot 4: Stairs plot
-    QIM::QImPlotNode* plot4 = m_subplotsNode->createPlotNode();
+    QIM::QImPlotNode* plot4 = figure->createPlotNode();
     if (plot4) {
         plot4->setTitle(tr("Stairs"));
         plot4->x1Axis()->setLabel(tr("x"));
