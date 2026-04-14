@@ -329,9 +329,13 @@ bool QImPlotTextItemNode::beginDraw()
         return false;
     }
 
-    // Apply style
-    if (d->color && d->color->is_dirty()) {
+    // Track if we pushed style color to ensure matching pop
+    bool pushedStyleColor = false;
+
+    // Apply style - push if color is set
+    if (d->color) {
         ImPlot::PushStyleColor(ImPlotCol_InlayText, d->color->value());
+        pushedStyleColor = true;
     }
 
     // Call ImPlot API
@@ -342,8 +346,8 @@ bool QImPlotTextItemNode::beginDraw()
         d->pixelOffset,
         d->flags);
 
-    // Pop style if applied
-    if (d->color) {
+    // Pop style only if we pushed it
+    if (pushedStyleColor) {
         ImPlot::PopStyleColor();
     }
 

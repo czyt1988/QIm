@@ -178,6 +178,10 @@ void MainWindow::onFunctionSelected(const QString& functionId)
         m_figureWidget->removePlotNode(plot);
     }
     
+    // Reset subplot grid to 1x1 for new function (unless it's SubplotsFunction)
+    // This ensures new plots are displayed correctly, not stuck in previous 2x2 grid
+    m_figureWidget->setSubplotGrid(1, 1);
+    
     // Create new plot for the selected function
     function->createPlot(m_figureWidget);
     
