@@ -72,6 +72,31 @@ QString FunctionTreeWidget::selectedFunctionId() const
 
 /**
  * \if ENGLISH
+ * @brief Set metadata and build tree dynamically
+ * @param metadata List of function metadata from TestFunctionManager
+ * 
+ * Replaces hardcoded tree building with dynamic construction based on metadata.
+ * Tree structure is automatically derived from category and subcategory fields.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 设置元数据并动态构建树
+ * @param metadata 来自 TestFunctionManager 的函数元数据列表
+ * 
+ * 用基于元数据的动态构建替代硬编码的树构建。
+ * 树结构自动从 category 和 subcategory 字段派生。
+ * \endif
+ */
+void FunctionTreeWidget::setMetadata(const QList<FunctionMetadata>& metadata)
+{
+    m_metadata = metadata;
+    clear();
+    buildTreeFromMetadata();
+    expandAll();
+}
+
+/**
+ * \if ENGLISH
  * @brief Build the complete tree hierarchy
  * 
  * Creates the root node and all category/function nodes according to the specification:
@@ -180,6 +205,63 @@ void FunctionTreeWidget::buildTree()
     reservedNode->setText(0, tr("(reserved for future)"));
     reservedNode->setFlags(reservedNode->flags() & ~Qt::ItemIsSelectable);
     category3D->addChild(reservedNode);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Build tree dynamically from metadata
+ * 
+ * Creates tree structure based on FunctionMetadata list.
+ * Groups functions by category and subcategory, then creates corresponding nodes.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 从元数据动态构建树
+ * 
+ * 根据 FunctionMetadata 列表创建树结构。
+ * 按 category 和 subcategory 分组函数，然后创建对应的节点。
+ * \endif
+ */
+void FunctionTreeWidget::buildTreeFromMetadata()
+{
+    if (m_metadata.isEmpty()) {
+        return;
+    }
+    
+    // Create root node (hidden)
+    QTreeWidgetItem *root = new QTreeWidgetItem();
+    root->setText(0, tr("Root"));
+    addTopLevelItem(root);
+    
+    // Group metadata by category -> subcategory
+    QMap<QString, QMap<QString, QList<FunctionMetadata>>> grouped;
+    for (const FunctionMetadata& meta : m_metadata) {
+        grouped[meta.category][meta.subcategory].append(meta);
+    }
+    
+    // Build tree from grouped data
+    for (const QString& category : grouped.keys()) {
+        QTreeWidgetItem* categoryNode = addCategoryNode(root, category);
+        
+        const QMap<QString, QList<FunctionMetadata>>& subcategories = grouped[category];
+        for (const QString& subcategory : subcategories.keys()) {
+            QTreeWidgetItem* subcategoryNode = addCategoryNode(categoryNode, subcategory);
+            
+            const QList<FunctionMetadata>& functions = subcategories[subcategory];
+            for (const FunctionMetadata& meta : functions) {
+                addFunctionNode(subcategoryNode, meta.displayName, meta.functionId);
+            }
+        }
+    }
+    
+    // Add 3D placeholder if no 3D functions registered
+    if (!grouped.contains(tr("3D"))) {
+        QTreeWidgetItem *category3D = addCategoryNode(root, tr("3D"));
+        QTreeWidgetItem *reservedNode = new QTreeWidgetItem();
+        reservedNode->setText(0, tr("(reserved for future)"));
+        reservedNode->setFlags(reservedNode->flags() & ~Qt::ItemIsSelectable);
+        category3D->addChild(reservedNode);
+    }
 }
 
 /**

@@ -38,8 +38,8 @@ void MainWindow::initializeUi()
     // Connect signals between components
     connectSignals();
     
-    // Initialize tree widget
-    m_treeWidget->initializeTree();
+    // Initialize tree widget with metadata from manager
+    m_treeWidget->setMetadata(m_functionManager->getFunctionMetadataList());
     
     // Select first function by default
     QStringList allIds = m_functionManager->getAllFunctionIds();

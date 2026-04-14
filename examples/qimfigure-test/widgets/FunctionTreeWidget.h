@@ -5,6 +5,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QString>
+#include "../functions/TestFunctionManager.h"
 
 /**
  * \if ENGLISH
@@ -57,6 +58,9 @@ public:
     // Initialize tree with hardcoded structure (English only)
     void initializeTree();
 
+    // Set metadata and build tree dynamically (English only)
+    void setMetadata(const QList<FunctionMetadata>& metadata);
+
     // Get the function ID of currently selected node (English only)
     QString selectedFunctionId() const;
 
@@ -82,11 +86,17 @@ private:
     // Build the complete tree hierarchy (English only)
     void buildTree();
 
+    // Build tree from metadata dynamically (English only)
+    void buildTreeFromMetadata();
+
     // Add a category node (expandable parent node) (English only)
     QTreeWidgetItem* addCategoryNode(QTreeWidgetItem *parent, const QString &name);
 
     // Add a function node (leaf node with functionId stored) (English only)
     QTreeWidgetItem* addFunctionNode(QTreeWidgetItem *parent, const QString &name, const QString &functionId);
+
+    // Metadata list for dynamic tree building (English only)
+    QList<FunctionMetadata> m_metadata;
 };
 
 #endif // FUNCTIONTREEWIDGET_H
