@@ -16,6 +16,11 @@
 - C++17 兼容编译器
 - Qt 5.14+ 或 Qt 6
 
+
+## 构建指引
+
+具体构建过程可参阅：[build.md文件](./build.md)
+
 ## Qt 集成方案
 
 为了适配Qt的使用习惯，在属性命名上，尽量使用Qt的命名方式，例如：`setColor`、`color`、`setSize`、`size`、`setOpacity`、`opacity`、`setVisible`、`visible`
@@ -141,6 +146,13 @@ QIm使用PIMPL模式，将实现细节封装在`private`成员中，对外提供
     }
     ```
 
+## 编码注意事项
+
+### 节点渲染函数尽量不做过多操作
+
+ImGui的节点是实时渲染，在渲染函数`beginDraw`中，你不应该进行过多的复杂逻辑，所有逻辑应该在属性设置过程中处理完
+
+例如QString到std::string的转换，属性接口接受QString参数，ImGui接口只接受char*，节点变量应该保存`std::string`或者`QByteArray`对象而不是QString对象，避免在`beginDraw`函数中进行toUtf8()转换
 
 ## Git 提交规范
 
