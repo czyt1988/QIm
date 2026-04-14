@@ -139,6 +139,9 @@ void FunctionTreeWidget::buildTree()
     addFunctionNode(dataPointsCategory, tr("Scatter"), QStringLiteral("2d_datapoints_scatter"));
     addFunctionNode(dataPointsCategory, tr("Stairs"), QStringLiteral("2d_datapoints_stairs"));
     addFunctionNode(dataPointsCategory, tr("Bars"), QStringLiteral("2d_datapoints_bars"));
+    addFunctionNode(dataPointsCategory, tr("Bar Groups"), QStringLiteral("2d_datapoints_bargroups"));
+    addFunctionNode(dataPointsCategory, tr("Histogram"), QStringLiteral("2d_datapoints_histogram"));
+    addFunctionNode(dataPointsCategory, tr("2D Histogram"), QStringLiteral("2d_datapoints_histogram2d"));
     
     // Shaded subcategory
     QTreeWidgetItem *shadedCategory = addCategoryNode(category2D, tr("Shaded"));
@@ -152,6 +155,24 @@ void FunctionTreeWidget::buildTree()
     QTreeWidgetItem *otherCategory = addCategoryNode(category2D, tr("Other"));
     addFunctionNode(otherCategory, tr("Stems"), QStringLiteral("2d_stems"));
     addFunctionNode(otherCategory, tr("Infinite Lines"), QStringLiteral("2d_inflines"));
+    addFunctionNode(otherCategory, tr("Pie Chart"), QStringLiteral("2d_other_piechart"));
+    addFunctionNode(otherCategory, tr("Heatmap"), QStringLiteral("2d_other_heatmap"));
+    addFunctionNode(otherCategory, tr("Digital"), QStringLiteral("2d_other_digital"));
+    addFunctionNode(otherCategory, tr("Image"), QStringLiteral("2d_other_image"));
+    addFunctionNode(otherCategory, tr("Text"), QStringLiteral("2d_other_text"));
+    addFunctionNode(otherCategory, tr("Dummy"), QStringLiteral("2d_other_dummy"));
+    
+    // Tools subcategory - Interactive drag tools
+    QTreeWidgetItem *toolsCategory = addCategoryNode(category2D, tr("Tools"));
+    addFunctionNode(toolsCategory, tr("Drag Point"), QStringLiteral("2d_tools_dragpoint"));
+    addFunctionNode(toolsCategory, tr("Drag Lines"), QStringLiteral("2d_tools_draglines"));
+    addFunctionNode(toolsCategory, tr("Drag Rect"), QStringLiteral("2d_tools_dragrect"));
+    addFunctionNode(toolsCategory, tr("Annotation"), QStringLiteral("2d_tools_annotation"));
+    addFunctionNode(toolsCategory, tr("Tags"), QStringLiteral("2d_tools_tags"));
+    
+    // Layout subcategory - Subplots
+    QTreeWidgetItem *layoutCategory = addCategoryNode(category2D, tr("Layout"));
+    addFunctionNode(layoutCategory, tr("Subplots"), QStringLiteral("2d_layout_subplots"));
     
     // === 3D Category (reserved for future) ===
     QTreeWidgetItem *category3D = addCategoryNode(root, tr("3D"));
