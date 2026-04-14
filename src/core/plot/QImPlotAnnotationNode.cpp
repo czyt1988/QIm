@@ -369,7 +369,7 @@ bool QImPlotAnnotationNode::beginDraw()
         // Convert text to C string
         QByteArray utf8     = d->text.toUtf8();
         const char* textPtr = utf8.constData();
-        ImPlot::Annotation(d->x, d->y, colorVec, d->pixelOffset, d->clamp, d->round, "%s", textPtr);
+        ImPlot::Annotation(d->x, d->y, colorVec, d->pixelOffset, d->clamp, "%s", textPtr);
     }
 
     // Update item status (for consistency with other plot items)
