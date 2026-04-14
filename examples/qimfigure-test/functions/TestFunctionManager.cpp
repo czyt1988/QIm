@@ -17,6 +17,12 @@
 #include "other/ImageFunction.h"
 #include "other/TextFunction.h"
 #include "other/DummyFunction.h"
+#include "tools/DragPointFunction.h"
+#include "tools/DragLinesFunction.h"
+#include "tools/DragRectFunction.h"
+#include "tools/AnnotationFunction.h"
+#include "tools/TagsFunction.h"
+#include "layout/SubplotsFunction.h"
 
 /**
  * \if ENGLISH
@@ -331,6 +337,68 @@ void TestFunctionManager::create2DFunctions()
         meta.functionId = "2d_other_dummy";
         m_metadataList.append(meta);
         m_functions[meta.functionId] = new DummyFunction(this);
+    }
+    
+    // Tools category - Interactive drag tools
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Tools");
+        meta.displayName = tr("Drag Point");
+        meta.functionId = "2d_tools_dragpoint";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new DragPointFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Tools");
+        meta.displayName = tr("Drag Lines");
+        meta.functionId = "2d_tools_draglines";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new DragLinesFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Tools");
+        meta.displayName = tr("Drag Rect");
+        meta.functionId = "2d_tools_dragrect";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new DragRectFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Tools");
+        meta.displayName = tr("Annotation");
+        meta.functionId = "2d_tools_annotation";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new AnnotationFunction(this);
+    }
+    
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Tools");
+        meta.displayName = tr("Tags");
+        meta.functionId = "2d_tools_tags";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new TagsFunction(this);
+    }
+    
+    // Layout category - Subplots
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Layout");
+        meta.displayName = tr("Subplots");
+        meta.functionId = "2d_layout_subplots";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new SubplotsFunction(this);
     }
 }
 
