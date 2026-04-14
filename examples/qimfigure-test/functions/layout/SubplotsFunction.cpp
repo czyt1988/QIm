@@ -159,6 +159,29 @@ SubplotsFunction::~SubplotsFunction()
 
 /**
  * \if ENGLISH
+ * @brief Cleanup plot nodes
+ * @details Deletes the subplots node and clears plot node references.
+ * This prevents stale nodes from being rendered after switching functions.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 清理绘图节点
+ * @details 删除子图节点并清空绘图节点引用。
+ * 这可以防止切换函数后残留节点继续渲染。
+ * \endif
+ */
+void SubplotsFunction::cleanupPlot()
+{
+    // Delete the subplots node (it will delete all child plot nodes)
+    if (m_subplotsNode) {
+        m_subplotsNode->deleteLater();
+        m_subplotsNode = nullptr;
+    }
+    m_plotNodes.clear();
+}
+
+/**
+ * \if ENGLISH
  * @brief Create plot nodes in the given figure widget
  * @param figure Pointer to the figure widget where plots will be created
  * @details Creates a subplot grid with different plot types in each cell:

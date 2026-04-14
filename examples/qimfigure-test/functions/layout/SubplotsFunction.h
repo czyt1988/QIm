@@ -105,6 +105,19 @@ public:
      */
     void createPlot(QIM::QImFigureWidget* figure) override;
     
+    /**
+     * \if ENGLISH
+     * @brief Cleanup plot nodes
+     * @details Deletes the subplots node to prevent stale rendering.
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 清理绘图节点
+     * @details 删除子图节点以防止残留渲染。
+     * \endif
+     */
+    void cleanupPlot() override;
+    
     // Title property accessors
     QString title() const { return m_title; }
     void setTitle(const QString& title);
