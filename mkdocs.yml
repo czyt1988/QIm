@@ -73,8 +73,10 @@ plugins:
                 - 枚举语义转换规范: zh/dev/flag-mapping.md
                 - 新节点开发指南: zh/dev/new-node-guide.md
                 - 自定义节点: zh/dev/custom-node.md
-            - 使用指南: 
+            - 使用指南:
                 - 渲染模式: zh/render-mode.md
+            - API参考:
+                - C++ API文档: zh/api-reference.md
             - 其它:
                 - 性能对比: zh/performance.md
                 - 字体: zh/font.md
@@ -109,6 +111,8 @@ plugins:
                 - Custom Node: en/dev/custom-node.md
             - Usage Guide:
                 - Render Mode: en/render-mode.md
+            - API Reference:
+                - C++ API Docs: en/api-reference.md
             - Others:
                 - Performance: en/performance.md
   # 需要版本切换再打开下面

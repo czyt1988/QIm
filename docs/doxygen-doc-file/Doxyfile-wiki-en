@@ -1,0 +1,25 @@
+# Doxyfile-wiki-en - English version of the wiki API documentation
+# This file includes the Chinese base config and overrides locale-specific settings
+
+@INCLUDE = Doxyfile-wiki-cn
+
+#---------------------------------------------------------------------------
+# Project related configuration options (overrides for English)
+#---------------------------------------------------------------------------
+
+# English project brief
+PROJECT_BRIEF          = "QIm API Reference (English)"
+
+# Output language set to English
+OUTPUT_LANGUAGE        = English
+
+#---------------------------------------------------------------------------
+# HTML output options (overrides for English)
+#---------------------------------------------------------------------------
+
+# Output to a separate directory for English API docs
+# This will be under docs/doxygen-en/
+HTML_OUTPUT            = doxygen-en
+
+# Use the same awesome CSS theme
+HTML_EXTRA_STYLESHEET  = ./doxygen-awesome-css/doxygen-awesome.css
