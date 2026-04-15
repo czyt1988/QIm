@@ -1,4 +1,4 @@
-﻿#include "QImPlotDragRectNode.h"
+#include "QImPlotDragRectNode.h"
 #include <optional>
 #include "implot.h"
 #include "implot_internal.h"
@@ -236,6 +236,62 @@ void QImPlotDragRectNode::setFlags(int flags)
         d_ptr->flags = static_cast<ImPlotDragToolFlags>(flags);
         emit flagsChanged(flags);
     }
+}
+
+bool QImPlotDragRectNode::isCursorsEnabled() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotDragToolFlags_NoCursors) == 0;
+}
+
+void QImPlotDragRectNode::setCursorsEnabled(bool enabled)
+{
+    QIM_D(d);
+    const ImPlotDragToolFlags oldFlags = d->flags;
+    if (enabled) { d->flags &= ~ImPlotDragToolFlags_NoCursors; } else { d->flags |= ImPlotDragToolFlags_NoCursors; }
+    if (d->flags != oldFlags) { Q_EMIT dragToolFlagChanged(); }
+}
+
+bool QImPlotDragRectNode::isFitEnabled() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotDragToolFlags_NoFit) == 0;
+}
+
+void QImPlotDragRectNode::setFitEnabled(bool enabled)
+{
+    QIM_D(d);
+    const ImPlotDragToolFlags oldFlags = d->flags;
+    if (enabled) { d->flags &= ~ImPlotDragToolFlags_NoFit; } else { d->flags |= ImPlotDragToolFlags_NoFit; }
+    if (d->flags != oldFlags) { Q_EMIT dragToolFlagChanged(); }
+}
+
+bool QImPlotDragRectNode::isInputsEnabled() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotDragToolFlags_NoInputs) == 0;
+}
+
+void QImPlotDragRectNode::setInputsEnabled(bool enabled)
+{
+    QIM_D(d);
+    const ImPlotDragToolFlags oldFlags = d->flags;
+    if (enabled) { d->flags &= ~ImPlotDragToolFlags_NoInputs; } else { d->flags |= ImPlotDragToolFlags_NoInputs; }
+    if (d->flags != oldFlags) { Q_EMIT dragToolFlagChanged(); }
+}
+
+bool QImPlotDragRectNode::isDelayed() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotDragToolFlags_Delayed) != 0;
+}
+
+void QImPlotDragRectNode::setDelayed(bool on)
+{
+    QIM_D(d);
+    const ImPlotDragToolFlags oldFlags = d->flags;
+    if (on) { d->flags |= ImPlotDragToolFlags_Delayed; } else { d->flags &= ~ImPlotDragToolFlags_Delayed; }
+    if (d->flags != oldFlags) { Q_EMIT dragToolFlagChanged(); }
 }
 
 /**

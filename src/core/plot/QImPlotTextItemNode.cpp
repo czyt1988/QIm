@@ -14,7 +14,7 @@ class QImPlotTextItemNode::PrivateData
 public:
     PrivateData(QImPlotTextItemNode* p);
 
-    QString text;                          ///< Text content to display
+    QByteArray textUtf8;                   ///< Text content (UTF8, used directly by ImGui)
     ImPlotPoint position { 0.0, 0.0 };     ///< Position in plot coordinates
     ImVec2 pixelOffset { 0.0f, 0.0f };     ///< Pixel offset from position
     ImPlotTextFlags flags { ImPlotTextFlags_None };  ///< Text flags
@@ -68,7 +68,7 @@ QImPlotTextItemNode::~QImPlotTextItemNode()
  */
 QString QImPlotTextItemNode::text() const
 {
-    return d_ptr->text;
+    return QString::fromUtf8(d_ptr->textUtf8);
 }
 
 /**
@@ -84,8 +84,9 @@ QString QImPlotTextItemNode::text() const
  */
 void QImPlotTextItemNode::setText(const QString& text)
 {
-    if (d_ptr->text != text) {
-        d_ptr->text = text;
+    QByteArray utf8 = text.toUtf8();
+    if (d_ptr->textUtf8 != utf8) {
+        d_ptr->textUtf8 = utf8;
         emit textChanged(text);
     }
 }
@@ -325,7 +326,7 @@ void QImPlotTextItemNode::setTextFlags(int flags)
 bool QImPlotTextItemNode::beginDraw()
 {
     QIM_D(d);
-    if (d->text.isEmpty()) {
+    if (d->textUtf8.isEmpty()) {
         return false;
     }
 
@@ -338,9 +339,9 @@ bool QImPlotTextItemNode::beginDraw()
         pushedStyleColor = true;
     }
 
-    // Call ImPlot API
+    // Call ImPlot API - use UTF8 directly (stored in setter for performance)
     ImPlot::PlotText(
-        d->text.toUtf8().constData(),
+        d->textUtf8.constData(),
         d->position.x,
         d->position.y,
         d->pixelOffset,

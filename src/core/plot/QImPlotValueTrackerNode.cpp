@@ -414,11 +414,12 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
         float labelX = textX + d->colorBoxSize + d->tooltipPadding;
         drawList->AddText(ImVec2(labelX, itemY - 1), toImU32(d->textColor), value.label);
 
-                // 绘制Y值
-        QString valueText = QString::number(value.yValue, 'f', 3);
-        float valueWidth  = ImGui::CalcTextSize(valueText.toUtf8().constData()).x;
+                // 绘制Y值（使用ImFormatString避免QString转换）
+        char yValueText[32];
+        ImFormatString(yValueText, sizeof(yValueText), "%.3f", value.yValue);
+        float valueWidth  = ImGui::CalcTextSize(yValueText).x;
         float valueX      = tooltipX + groupWidth - d->tooltipPadding - valueWidth;
-        drawList->AddText(ImVec2(valueX, itemY - 1), toImU32(d->textColor), valueText.toUtf8().constData());
+        drawList->AddText(ImVec2(valueX, itemY - 1), toImU32(d->textColor), yValueText);
 
         itemY += itemHeight;
     }

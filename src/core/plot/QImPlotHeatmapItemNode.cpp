@@ -20,7 +20,7 @@ public:
     ImPlotHeatmapFlags flags { ImPlotHeatmapFlags_None };
     double scaleMin { 0.0 };
     double scaleMax { 0.0 };
-    QString labelFormat { "%.1f" };
+    QByteArray labelFormatUtf8 { "%.1f" }; ///< Label format (UTF8, used directly by ImGui)
     QPointF boundsMin { 0.0, 0.0 };
     QPointF boundsMax { 1.0, 1.0 };
     // Style tracking values
@@ -181,7 +181,7 @@ void QImPlotHeatmapItemNode::setScaleMax(double max)
 QString QImPlotHeatmapItemNode::labelFormat() const
 {
     QIM_DC(d);
-    return d->labelFormat;
+    return QString::fromUtf8(d->labelFormatUtf8);
 }
 
 /**
@@ -198,8 +198,9 @@ QString QImPlotHeatmapItemNode::labelFormat() const
 void QImPlotHeatmapItemNode::setLabelFormat(const QString& format)
 {
     QIM_D(d);
-    if (d->labelFormat != format) {
-        d->labelFormat = format;
+    QByteArray utf8 = format.toUtf8();
+    if (d->labelFormatUtf8 != utf8) {
+        d->labelFormatUtf8 = utf8;
         emit labelFormatChanged(format);
     }
 }
@@ -393,7 +394,7 @@ bool QImPlotHeatmapItemNode::beginDraw()
     double scale_min = d->scaleMin;
     double scale_max = d->scaleMax;
     // If both zero, auto-scale
-    const char* label_fmt = d->labelFormat.isEmpty() ? nullptr : d->labelFormat.toUtf8().constData();
+    const char* label_fmt = d->labelFormatUtf8.isEmpty() ? nullptr : d->labelFormatUtf8.constData();
     ImPlotPoint bounds_min(d->boundsMin.x(), d->boundsMin.y());
     ImPlotPoint bounds_max(d->boundsMax.x(), d->boundsMax.y());
     ImPlotHeatmapFlags flags = d->flags;

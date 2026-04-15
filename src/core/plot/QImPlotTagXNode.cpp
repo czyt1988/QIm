@@ -16,8 +16,8 @@ public:
     
     // Style and configuration
     QColor color { Qt::white };  ///< Tag line color
-    QString text;                 ///< Tag text label
-    bool round { false };         ///< Round position to integer pixels
+    QByteArray textUtf8;         ///< Text label (UTF8, used directly by ImGui)
+    bool round { false };        ///< Round position to integer pixels
 };
 
 QImPlotTagXNode::PrivateData::PrivateData(QImPlotTagXNode* p) : q_ptr(p)
@@ -102,7 +102,7 @@ void QImPlotTagXNode::setValue(double value)
  */
 QString QImPlotTagXNode::text() const
 {
-    return d_ptr->text;
+    return QString::fromUtf8(d_ptr->textUtf8);
 }
 
 /**
@@ -119,8 +119,9 @@ QString QImPlotTagXNode::text() const
 void QImPlotTagXNode::setText(const QString& text)
 {
     QIM_D(d);
-    if (d->text != text) {
-        d->text = text;
+    QByteArray utf8 = text.toUtf8();
+    if (d->textUtf8 != utf8) {
+        d->textUtf8 = utf8;
         emit textChanged(text);
     }
 }
@@ -147,11 +148,12 @@ void QImPlotTagXNode::setText(const char* fmt, ...)
     QIM_D(d);
     va_list args;
     va_start(args, fmt);
-    QString text = QString::vasprintf(fmt, args);
+    QString text = QString::asprintf(fmt, args);
     va_end(args);
     
-    if (d->text != text) {
-        d->text = text;
+    QByteArray utf8 = text.toUtf8();
+    if (d->textUtf8 != utf8) {
+        d->textUtf8 = utf8;
         emit textChanged(text);
     }
 }
@@ -253,12 +255,12 @@ bool QImPlotTagXNode::beginDraw()
     ImVec4 colorVec = toImVec4(d->color);
     
     // Call ImPlot TagX API
-    if (d->text.isEmpty()) {
+    if (d->textUtf8.isEmpty()) {
         // Use the bool round version when no text
         ImPlot::TagX(d->value, colorVec, d->round);
     } else {
-        // Use the format version when text is provided
-        ImPlot::TagX(d->value, colorVec, "%s", d->text.toStdString().c_str());
+        // Use UTF8 text directly (stored in setter for performance)
+        ImPlot::TagX(d->value, colorVec, "%s", d->textUtf8.constData());
     }
     
     return false; // TagX doesn't need endDraw

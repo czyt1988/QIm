@@ -1,4 +1,4 @@
-﻿#ifndef QIMPLOTDRAGPOINTNODE_H
+#ifndef QIMPLOTDRAGPOINTNODE_H
 #define QIMPLOTDRAGPOINTNODE_H
 
 #include "../../QImAPI.h"
@@ -171,6 +171,82 @@ class QIM_CORE_API QImPlotDragPointNode : public QImPlotItemNode
 
     /**
      * \if ENGLISH
+     * @property QImPlotDragPointNode::cursorsEnabled
+     * @brief Enable cursor display during dragging
+     * @details When true (default), cursors are shown while dragging the point.
+     *          When false, ImPlotDragToolFlags_NoCursors is set.
+     * @accessors READ isCursorsEnabled WRITE setCursorsEnabled NOTIFY dragToolFlagChanged
+     * \endif
+     *
+     * \if CHINESE
+     * @property QImPlotDragPointNode::cursorsEnabled
+     * @brief 启用拖拽时光标显示
+     * @details 为true时（默认），拖拽时显示光标。
+     *          为false时，设置ImPlotDragToolFlags_NoCursors。
+     * @accessors READ isCursorsEnabled WRITE setCursorsEnabled NOTIFY dragToolFlagChanged
+     * \endif
+     */
+    Q_PROPERTY(bool cursorsEnabled READ isCursorsEnabled WRITE setCursorsEnabled NOTIFY dragToolFlagChanged)
+
+    /**
+     * \if ENGLISH
+     * @property QImPlotDragPointNode::fitEnabled
+     * @brief Enable auto-fit when dragging
+     * @details When true (default), plot auto-fits to include the dragged point.
+     *          When false, ImPlotDragToolFlags_NoFit is set.
+     * @accessors READ isFitEnabled WRITE setFitEnabled NOTIFY dragToolFlagChanged
+     * \endif
+     *
+     * \if CHINESE
+     * @property QImPlotDragPointNode::fitEnabled
+     * @brief 启用拖拽时自动适配
+     * @details 为true时（默认），绘图自动适配以包含拖拽点。
+     *          为false时，设置ImPlotDragToolFlags_NoFit。
+     * @accessors READ isFitEnabled WRITE setFitEnabled NOTIFY dragToolFlagChanged
+     * \endif
+     */
+    Q_PROPERTY(bool fitEnabled READ isFitEnabled WRITE setFitEnabled NOTIFY dragToolFlagChanged)
+
+    /**
+     * \if ENGLISH
+     * @property QImPlotDragPointNode::inputsEnabled
+     * @brief Enable user input for dragging
+     * @details When true (default), the point responds to mouse input.
+     *          When false, ImPlotDragToolFlags_NoInputs is set (point becomes non-interactive).
+     * @accessors READ isInputsEnabled WRITE setInputsEnabled NOTIFY dragToolFlagChanged
+     * \endif
+     *
+     * \if CHINESE
+     * @property QImPlotDragPointNode::inputsEnabled
+     * @brief 启用拖拽输入
+     * @details 为true时（默认），点响应鼠标输入。
+     *          为false时，设置ImPlotDragToolFlags_NoInputs（点变为不可交互）。
+     * @accessors READ isInputsEnabled WRITE setInputsEnabled NOTIFY dragToolFlagChanged
+     * \endif
+     */
+    Q_PROPERTY(bool inputsEnabled READ isInputsEnabled WRITE setInputsEnabled NOTIFY dragToolFlagChanged)
+
+    /**
+     * \if ENGLISH
+     * @property QImPlotDragPointNode::delayed
+     * @brief Delayed commit mode
+     * @details When true, position changes are only committed after mouse release.
+     *          When false (default), position changes are committed immediately during drag.
+     * @accessors READ isDelayed WRITE setDelayed NOTIFY dragToolFlagChanged
+     * \endif
+     *
+     * \if CHINESE
+     * @property QImPlotDragPointNode::delayed
+     * @brief 延迟提交模式
+     * @details 为true时，位置更改仅在鼠标释放后提交。
+     *          为false时（默认），位置更改在拖拽期间立即提交。
+     * @accessors READ isDelayed WRITE setDelayed NOTIFY dragToolFlagChanged
+     * \endif
+     */
+    Q_PROPERTY(bool delayed READ isDelayed WRITE setDelayed NOTIFY dragToolFlagChanged)
+
+    /**
+     * \if ENGLISH
      * @property QImPlotDragPointNode::clicked
      * @brief Whether the point was clicked in the current frame
      *
@@ -295,6 +371,16 @@ public:
     // Sets the ImPlotDragToolFlags
     void setFlags(int flags);
 
+    // Drag tool flag accessors (否定→肯定语义)
+    bool isCursorsEnabled() const;
+    void setCursorsEnabled(bool enabled);
+    bool isFitEnabled() const;
+    void setFitEnabled(bool enabled);
+    bool isInputsEnabled() const;
+    void setInputsEnabled(bool enabled);
+    bool isDelayed() const;
+    void setDelayed(bool on);
+
     //----------------------------------------------------
     // Interaction state (read-only)
     //----------------------------------------------------
@@ -400,6 +486,19 @@ Q_SIGNALS:
      * \endif
      */
     void flagsChanged(int flags);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any drag tool flag property changes
+     * @details Shared signal for cursorsEnabled, fitEnabled, inputsEnabled, delayed.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 任何拖拽工具标志属性更改时触发
+     * @details cursorsEnabled、fitEnabled、inputsEnabled、delayed共享的信号。
+     * \endif
+     */
+    void dragToolFlagChanged();
 
     /**
      * \if ENGLISH

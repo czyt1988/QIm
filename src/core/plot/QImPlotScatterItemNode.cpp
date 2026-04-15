@@ -37,6 +37,7 @@ public:
     bool markerFill { true };
     std::optional< QImTrackedValue< ImVec4, ImVecComparator< ImVec4 > > > color;  ///< 颜色
     QImTrackedValue< float > markerSize { 4.0f };                                 ///< 标记大小
+    ImPlotScatterFlags scatterFlags { ImPlotScatterFlags_None };                   ///< 散点图标志位
     bool isPlotItemVisible;
 };
 
@@ -89,23 +90,6 @@ QImAbstractXYDataSeries* QImPlotScatterItemNode::data() const
     return d_ptr->data.get();
 }
 
-// ===== 在 CPP 文件顶部添加辅助宏定义 =====
-#ifndef QImPlotScatterItemNode_FLAG_ACCESSOR
-#define QImPlotScatterItemNode_FLAG_ACCESSOR(FlagName, FlagEnum)                                                       \
-    bool QImPlotScatterItemNode::is##FlagName() const                                                                  \
-    {                                                                                                                  \
-        QIM_DC(d);                                                                                                     \
-        return (d->FlagName);                                                                                          \
-    }                                                                                                                  \
-    void QImPlotScatterItemNode::set##FlagName(bool on)                                                                \
-    {                                                                                                                  \
-        QIM_D(d);                                                                                                      \
-        if (d->FlagName != on) {                                                                                       \
-            d->FlagName = on;                                                                                          \
-            emit scatterFlagChanged();                                                                                 \
-        }                                                                                                              \
-    }
-#endif
 
 /**
  * \if ENGLISH
@@ -420,6 +404,111 @@ void QImPlotScatterItemNode::setColor(const QColor& c)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Checks if clipping is enabled
+ * @return true if clipping is enabled (ImPlotScatterFlags_NoClip is NOT set)
+ * @details Returns the clipping state. When true, markers at plot edges are clipped.
+ *          When false, markers may extend beyond the plot area.
+ *          Default is true (clipping enabled).
+ * @see setClippingEnabled()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查裁剪是否启用
+ * @return true表示裁剪启用（ImPlotScatterFlags_NoClip未设置）
+ * @details 返回裁剪状态。为true时，绘图边缘标记将被裁剪。
+ *          为false时，标记可能超出绘图区域。
+ *          默认为true（启用裁剪）。
+ * @see setClippingEnabled()
+ * \endif
+ */
+bool QImPlotScatterItemNode::isClippingEnabled() const
+{
+    QIM_DC(d);
+    return (d->scatterFlags & ImPlotScatterFlags_NoClip) == 0;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets clipping enabled state
+ * @param[in] enabled true to enable clipping, false to disable (sets NoClip)
+ * @details When enabled, markers at plot edges are clipped.
+ *          When disabled (NoClip), markers may extend beyond the plot area.
+ *          Emits scatterFlagChanged() signal if value changed.
+ * @see isClippingEnabled()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置裁剪启用状态
+ * @param[in] enabled true启用裁剪，false禁用（设置NoClip）
+ * @details 启用时，绘图边缘标记将被裁剪。
+ *          禁用时（NoClip），标记可能超出绘图区域。
+ *          如果值更改，触发scatterFlagChanged()信号。
+ * @see isClippingEnabled()
+ * \endif
+ */
+void QImPlotScatterItemNode::setClippingEnabled(bool enabled)
+{
+    QIM_D(d);
+    const ImPlotScatterFlags oldFlags = d->scatterFlags;
+    if (enabled) {
+        d->scatterFlags &= ~ImPlotScatterFlags_NoClip;
+    } else {
+        d->scatterFlags |= ImPlotScatterFlags_NoClip;
+    }
+    if (d->scatterFlags != oldFlags) {
+        Q_EMIT scatterFlagChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Gets the raw ImPlotScatterFlags
+ * @return Current ImPlotScatterFlags value
+ * @details Returns the raw ImPlot scatter flags for advanced usage.
+ * @see setScatterFlags()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取原始ImPlotScatterFlags
+ * @return 当前的ImPlotScatterFlags值
+ * @details 返回原始ImPlot散点图标志，供高级用户使用。
+ * @see setScatterFlags()
+ * \endif
+ */
+int QImPlotScatterItemNode::scatterFlags() const
+{
+    QIM_DC(d);
+    return d->scatterFlags;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the raw ImPlotScatterFlags
+ * @param[in] flags New ImPlotScatterFlags value
+ * @details Sets the raw ImPlot scatter flags for advanced usage.
+ *          Emits scatterFlagChanged() signal if value changed.
+ * @see scatterFlags()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置原始ImPlotScatterFlags
+ * @param[in] flags 新的ImPlotScatterFlags值
+ * @details 设置原始ImPlot散点图标志，供高级用户使用。
+ *          如果值更改，触发scatterFlagChanged()信号。
+ * @see scatterFlags()
+ * \endif
+ */
+void QImPlotScatterItemNode::setScatterFlags(int flags)
+{
+    QIM_D(d);
+    if (d->scatterFlags != static_cast<ImPlotScatterFlags>(flags)) {
+        d->scatterFlags = static_cast<ImPlotScatterFlags>(flags);
+        Q_EMIT scatterFlagChanged();
+    }
+}
+
+/**
  * @brief 绘图
  * @return  这里直接返回false，避免调用endDraw
  */
@@ -461,7 +550,7 @@ bool QImPlotScatterItemNode::beginDraw()
                                 series->xRawData(),
                                 series->yRawData(),
                                 series->size(),
-                                0,  // ImPlotScatterFlags
+                                d->scatterFlags,
                                 series->offset(),
                                 series->stride());
         } else {
@@ -471,7 +560,7 @@ bool QImPlotScatterItemNode::beginDraw()
                                 series->size(),
                                 series->xScale(),
                                 series->xStart(),
-                                0,  // ImPlotScatterFlags
+                                d->scatterFlags,
                                 series->offset(),
                                 series->stride());
         }

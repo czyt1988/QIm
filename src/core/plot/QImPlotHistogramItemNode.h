@@ -216,24 +216,26 @@ class QIM_CORE_API QImPlotHistogramItemNode : public QImPlotItemNode
 
     /**
      * \if ENGLISH
-     * @property QImPlotHistogramItemNode::noOutliers
-     * @brief Exclude outliers flag
+     * @property QImPlotHistogramItemNode::outliersIncluded
+     * @brief Whether outliers are included in histogram calculations
      *
-     * @details When true, values outside the specified histogram range are excluded from normalization and cumulative counts.
-     *          Corresponds to ImPlotHistogramFlags_NoOutliers.
-     * @accessors READ isNoOutliers WRITE setNoOutliers NOTIFY noOutliersChanged
+     * @details When true, values outside the specified histogram range are included in normalization and cumulative counts.
+     *          This is the inverse of ImPlotHistogramFlags_NoOutliers.
+     *          Default is true (outliers included, NoOutliers flag not set).
+     * @accessors READ isOutliersIncluded WRITE setOutliersIncluded NOTIFY outliersIncludedChanged
      * \endif
      *
      * \if CHINESE
-     * @property QImPlotHistogramItemNode::noOutliers
-     * @brief 排除异常值标志
+     * @property QImPlotHistogramItemNode::outliersIncluded
+     * @brief 异常值是否包含在直方图计算中
      *
-     * @details 为true时，指定直方图范围之外的值将从归一化和累积计数中排除。
-     *          对应于ImPlotHistogramFlags_NoOutliers。
-     * @accessors READ isNoOutliers WRITE setNoOutliers NOTIFY noOutliersChanged
+     * @details 为true时，指定直方图范围之外的值将包含在归一化和累积计数中。
+     *          这是ImPlotHistogramFlags_NoOutliers的逆语义。
+     *          默认为true（包含异常值，NoOutliers标志未设置）。
+     * @accessors READ isOutliersIncluded WRITE setOutliersIncluded NOTIFY outliersIncludedChanged
      * \endif
      */
-    Q_PROPERTY(bool noOutliers READ isNoOutliers WRITE setNoOutliers NOTIFY noOutliersChanged)
+    Q_PROPERTY(bool outliersIncluded READ isOutliersIncluded WRITE setOutliersIncluded NOTIFY outliersIncludedChanged)
 
     /**
      * \if ENGLISH
@@ -255,6 +257,29 @@ class QIM_CORE_API QImPlotHistogramItemNode : public QImPlotItemNode
      * \endif
      */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+
+    /**
+     * \if ENGLISH
+     * @property QImPlotHistogramItemNode::colMajor
+     * @brief Column-major data order flag
+     *
+     * @details When true, data is interpreted in column-major order instead of row-major.
+     *          Corresponds to ImPlotHistogramFlags_ColMajor.
+     *          Default is false.
+     * @accessors READ isColMajor WRITE setColMajor NOTIFY histogramFlagChanged
+     * \endif
+     *
+     * \if CHINESE
+     * @property QImPlotHistogramItemNode::colMajor
+     * @brief 列主序数据标志
+     *
+     * @details 为true时，数据按列主序解释而非行主序。
+     *          对应于ImPlotHistogramFlags_ColMajor。
+     *          默认为false。
+     * @accessors READ isColMajor WRITE setColMajor NOTIFY histogramFlagChanged
+     * \endif
+     */
+    Q_PROPERTY(bool colMajor READ isColMajor WRITE setColMajor NOTIFY histogramFlagChanged)
 
 public:
     // Unique type identifier for QImPlotHistogramItemNode
@@ -341,11 +366,17 @@ public:
     // Sets horizontal orientation
     void setHorizontal(bool horizontal);
 
-    // Checks if outliers are excluded
-    bool isNoOutliers() const;
+    // Checks if outliers are included (inverse of ImPlotHistogramFlags_NoOutliers)
+    bool isOutliersIncluded() const;
 
-    // Sets exclude outliers flag
-    void setNoOutliers(bool noOutliers);
+    // Sets whether outliers are included
+    void setOutliersIncluded(bool included);
+
+    // Checks if column-major data order is enabled
+    bool isColMajor() const;
+
+    // Sets column-major data order
+    void setColMajor(bool on);
 
     // Gets the histogram bar color
     QColor color() const;
@@ -462,20 +493,20 @@ Q_SIGNALS:
 
     /**
      * \if ENGLISH
-     * @brief Emitted when exclude outliers flag changes
-     * @param[in] noOutliers New exclude outliers flag state
-     * @details Triggered by setNoOutliers() when value actually changes.
+     * @brief Emitted when outliers inclusion flag changes
+     * @param[in] included New outliers inclusion state
+     * @details Triggered by setOutliersIncluded() when value actually changes.
      *          Connect to update UI elements or perform related actions.
      * \endif
      *
      * \if CHINESE
-     * @brief 排除异常值标志更改时触发
-     * @param[in] noOutliers 新排除异常值标志状态
-     * @details 当值实际更改时由setNoOutliers()触发。
+     * @brief 异常值包含标志更改时触发
+     * @param[in] included 新异常值包含状态
+     * @details 当值实际更改时由setOutliersIncluded()触发。
      *          连接到更新UI元素或执行相关操作。
      * \endif
      */
-    void noOutliersChanged(bool noOutliers);
+    void outliersIncludedChanged(bool included);
 
     /**
      * \if ENGLISH

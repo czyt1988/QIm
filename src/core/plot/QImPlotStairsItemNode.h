@@ -29,6 +29,29 @@ class QIM_CORE_API QImPlotStairsItemNode : public QImPlotItemNode
 
     // 阶梯图标志属性（全部采用肯定语义）
     Q_PROPERTY(bool shaded READ isShaded WRITE setShaded NOTIFY stairsFlagChanged)
+
+    /**
+     * \if ENGLISH
+     * @property QImPlotStairsItemNode::preStep
+     * @brief Enable pre-step mode for staircase rendering
+     *
+     * @details When true, the stair step is drawn before the next data point (pre-step).
+     *          When false (default), the stair step is drawn after the data point (post-step).
+     *          Corresponds to ImPlotStairsFlags_PreStep.
+     * @accessors READ isPreStep WRITE setPreStep NOTIFY stairsFlagChanged
+     * \endif
+     *
+     * \if CHINESE
+     * @property QImPlotStairsItemNode::preStep
+     * @brief 启用前阶梯渲染模式
+     *
+     * @details 为true时，阶梯在下一个数据点之前绘制（前阶梯）。
+     *          为false时（默认），阶梯在数据点之后绘制（后阶梯）。
+     *          对应于 ImPlotStairsFlags_PreStep。
+     * @accessors READ isPreStep WRITE setPreStep NOTIFY stairsFlagChanged
+     * \endif
+     */
+    Q_PROPERTY(bool preStep READ isPreStep WRITE setPreStep NOTIFY stairsFlagChanged)
 public:
     // Constructor for QImPlotStairsItemNode
     QImPlotStairsItemNode(QObject* par = nullptr);
@@ -63,6 +86,10 @@ public:
     bool isShaded() const;
     // Set shaded mode
     void setShaded(bool on);
+    // Check if pre-step mode is enabled
+    bool isPreStep() const;
+    // Set pre-step mode
+    void setPreStep(bool on);
 
     // 原始标志访问
     // Get raw ImPlotStairsFlags

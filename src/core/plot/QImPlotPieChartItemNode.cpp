@@ -21,10 +21,8 @@ public:
     double centerX { 0.0 };          ///< Center X coordinate
     double centerY { 0.0 };          ///< Center Y coordinate
     double radius { 1.0 };           ///< Pie chart radius
-    QString labelFormat { "%.1f" };  ///< Label format string
+    QByteArray labelFormatUtf8 { "%.1f" }; ///< Label format (UTF8, used directly by ImGui)
     double startAngle { 90.0 };      ///< Starting angle in degrees
-    // Cache for label format C-string
-    mutable QByteArray labelFormatBytes;
 };
 
 QImPlotPieChartItemNode::PrivateData::PrivateData(QImPlotPieChartItemNode* p) : q_ptr(p)
@@ -182,7 +180,7 @@ void QImPlotPieChartItemNode::setRadius(double radius)
 QString QImPlotPieChartItemNode::labelFormat() const
 {
     QIM_DC(d);
-    return d->labelFormat;
+    return QString::fromUtf8(d->labelFormatUtf8);
 }
 
 /**
@@ -199,9 +197,9 @@ QString QImPlotPieChartItemNode::labelFormat() const
 void QImPlotPieChartItemNode::setLabelFormat(const QString& format)
 {
     QIM_D(d);
-    if (d->labelFormat != format) {
-        d->labelFormat = format;
-        d->labelFormatBytes.clear(); // Invalidate cached bytes
+    QByteArray utf8 = format.toUtf8();
+    if (d->labelFormatUtf8 != utf8) {
+        d->labelFormatUtf8 = utf8;
         emit labelFormatChanged(format);
     }
 }
@@ -432,13 +430,10 @@ bool QImPlotPieChartItemNode::beginDraw()
     const double* values = d->data->valuesRawData();
     int count = d->data->sliceCount();
 
-    // Prepare label format C-string
+    // Prepare label format C-string (use UTF8 directly from setter)
     const char* fmt = nullptr;
-    if (!d->labelFormat.isEmpty()) {
-        if (d->labelFormatBytes.isEmpty()) {
-            d->labelFormatBytes = d->labelFormat.toUtf8();
-        }
-        fmt = d->labelFormatBytes.constData();
+    if (!d->labelFormatUtf8.isEmpty()) {
+        fmt = d->labelFormatUtf8.constData();
     }
 
     // Call ImPlot API

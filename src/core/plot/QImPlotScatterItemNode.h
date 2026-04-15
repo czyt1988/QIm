@@ -203,6 +203,31 @@ class QIM_CORE_API QImPlotScatterItemNode : public QImPlotItemNode
      */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
+    /**
+     * \if ENGLISH
+     * @property QImPlotScatterItemNode::clippingEnabled
+     * @brief Enable/disable clipping of markers at plot edges
+     *
+     * @details When true, markers at the edge of a plot will be clipped.
+     *          When false, markers on the edge will not be clipped (may extend beyond plot area).
+     *          Corresponds to negated ImPlotScatterFlags_NoClip.
+     *          Default value is true (clipping enabled, NoClip not set).
+     * @accessors READ isClippingEnabled WRITE setClippingEnabled NOTIFY scatterFlagChanged
+     * \endif
+     *
+     * \if CHINESE
+     * @property QImPlotScatterItemNode::clippingEnabled
+     * @brief 启用/禁用绘图边缘标记裁剪
+     *
+     * @details 为true时，绘图边缘的标记将被裁剪。
+     *          为false时，边缘标记不会被裁剪（可能超出绘图区域）。
+     *          对应于反转的 ImPlotScatterFlags_NoClip。
+     *          默认值为true（启用裁剪，NoClip未设置）。
+     * @accessors READ isClippingEnabled WRITE setClippingEnabled NOTIFY scatterFlagChanged
+     * \endif
+     */
+    Q_PROPERTY(bool clippingEnabled READ isClippingEnabled WRITE setClippingEnabled NOTIFY scatterFlagChanged)
+
 public:
     // Unique type identifier for QImPlotScatterItemNode
     enum
@@ -279,6 +304,22 @@ public:
 
     // Sets the marker color
     void setColor(const QColor& color);
+
+    //----------------------------------------------------
+    // ImPlotScatterFlags
+    //----------------------------------------------------
+
+    // Checks if clipping is enabled (corresponds to !ImPlotScatterFlags_NoClip)
+    bool isClippingEnabled() const;
+
+    // Sets clipping enabled state (true = clip markers, false = NoClip)
+    void setClippingEnabled(bool enabled);
+
+    // Gets the raw ImPlotScatterFlags
+    int scatterFlags() const;
+
+    // Sets the raw ImPlotScatterFlags
+    void setScatterFlags(int flags);
 
 Q_SIGNALS:
     /**

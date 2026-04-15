@@ -129,6 +129,64 @@ void QImPlotStairsItemNode::setShaded(bool on)
 
 /**
  * \if ENGLISH
+ * @brief Check if pre-step mode is enabled
+ * @return true if pre-step mode is enabled
+ * @details When true, the stair step is drawn before the next data point.
+ *          When false (default), the stair step is drawn after the data point.
+ *          Corresponds to ImPlotStairsFlags_PreStep.
+ * @see setPreStep()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查是否启用前阶梯模式
+ * @return true表示前阶梯模式启用
+ * @details 为true时，阶梯在下一个数据点之前绘制。
+ *          为false时（默认），阶梯在数据点之后绘制。
+ *          对应于 ImPlotStairsFlags_PreStep。
+ * @see setPreStep()
+ * \endif
+ */
+bool QImPlotStairsItemNode::isPreStep() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotStairsFlags_PreStep) != 0;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set pre-step mode
+ * @param[in] on true to enable pre-step, false for post-step (default)
+ * @details When enabled, the stair step is drawn before the next data point.
+ *          When disabled, the stair step is drawn after the data point (default).
+ *          Emits stairsFlagChanged() signal if value changed.
+ * @see isPreStep()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置前阶梯模式
+ * @param[in] on true启用前阶梯，false为后阶梯（默认）
+ * @details 启用时，阶梯在下一个数据点之前绘制。
+ *          禁用时，阶梯在数据点之后绘制（默认）。
+ *          如果值更改，触发stairsFlagChanged()信号。
+ * @see isPreStep()
+ * \endif
+ */
+void QImPlotStairsItemNode::setPreStep(bool on)
+{
+    QIM_D(d);
+    const ImPlotStairsFlags oldFlags = d->flags;
+    if (on) {
+        d->flags |= ImPlotStairsFlags_PreStep;
+    } else {
+        d->flags &= ~ImPlotStairsFlags_PreStep;
+    }
+    if (d->flags != oldFlags) {
+        Q_EMIT stairsFlagChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
  * @brief Get raw ImPlotStairsFlags
  * @return Current ImPlotStairsFlags
  * \endif

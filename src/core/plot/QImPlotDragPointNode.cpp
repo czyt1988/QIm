@@ -1,4 +1,4 @@
-﻿#include "QImPlotDragPointNode.h"
+#include "QImPlotDragPointNode.h"
 #include <optional>
 #include "implot.h"
 #include "implot_internal.h"
@@ -257,6 +257,198 @@ void QImPlotDragPointNode::setFlags(int flags)
     if (d_ptr->flags != flags) {
         d_ptr->flags = static_cast<ImPlotDragToolFlags>(flags);
         emit flagsChanged(flags);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if cursors are enabled during dragging
+ * @return true if cursors are enabled (ImPlotDragToolFlags_NoCursors is NOT set)
+ * @details Default is true. When false, no cursor is displayed while dragging.
+ * @see setCursorsEnabled()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查拖拽时光标是否启用
+ * @return true表示光标启用（ImPlotDragToolFlags_NoCursors未设置）
+ * @details 默认为true。为false时，拖拽时不显示光标。
+ * @see setCursorsEnabled()
+ * \endif
+ */
+bool QImPlotDragPointNode::isCursorsEnabled() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotDragToolFlags_NoCursors) == 0;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set cursor display during dragging
+ * @param[in] enabled true to enable cursors, false to disable (sets NoCursors)
+ * @see isCursorsEnabled()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置拖拽时光标显示
+ * @param[in] enabled true启用光标，false禁用（设置NoCursors）
+ * @see isCursorsEnabled()
+ * \endif
+ */
+void QImPlotDragPointNode::setCursorsEnabled(bool enabled)
+{
+    QIM_D(d);
+    const ImPlotDragToolFlags oldFlags = d->flags;
+    if (enabled) {
+        d->flags &= ~ImPlotDragToolFlags_NoCursors;
+    } else {
+        d->flags |= ImPlotDragToolFlags_NoCursors;
+    }
+    if (d->flags != oldFlags) {
+        Q_EMIT dragToolFlagChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if auto-fit is enabled during dragging
+ * @return true if auto-fit is enabled (ImPlotDragToolFlags_NoFit is NOT set)
+ * @details Default is true. When false, plot does not auto-fit to include dragged point.
+ * @see setFitEnabled()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查拖拽时自动适配是否启用
+ * @return true表示自动适配启用（ImPlotDragToolFlags_NoFit未设置）
+ * @details 默认为true。为false时，绘图不会自动适配以包含拖拽点。
+ * @see setFitEnabled()
+ * \endif
+ */
+bool QImPlotDragPointNode::isFitEnabled() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotDragToolFlags_NoFit) == 0;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set auto-fit during dragging
+ * @param[in] enabled true to enable auto-fit, false to disable (sets NoFit)
+ * @see isFitEnabled()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置拖拽时自动适配
+ * @param[in] enabled true启用自动适配，false禁用（设置NoFit）
+ * @see isFitEnabled()
+ * \endif
+ */
+void QImPlotDragPointNode::setFitEnabled(bool enabled)
+{
+    QIM_D(d);
+    const ImPlotDragToolFlags oldFlags = d->flags;
+    if (enabled) {
+        d->flags &= ~ImPlotDragToolFlags_NoFit;
+    } else {
+        d->flags |= ImPlotDragToolFlags_NoFit;
+    }
+    if (d->flags != oldFlags) {
+        Q_EMIT dragToolFlagChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if user input is enabled for dragging
+ * @return true if inputs are enabled (ImPlotDragToolFlags_NoInputs is NOT set)
+ * @details Default is true. When false, the point becomes non-interactive.
+ * @see setInputsEnabled()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查拖拽输入是否启用
+ * @return true表示输入启用（ImPlotDragToolFlags_NoInputs未设置）
+ * @details 默认为true。为false时，点变为不可交互。
+ * @see setInputsEnabled()
+ * \endif
+ */
+bool QImPlotDragPointNode::isInputsEnabled() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotDragToolFlags_NoInputs) == 0;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set user input for dragging
+ * @param[in] enabled true to enable input, false to disable (sets NoInputs)
+ * @see isInputsEnabled()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置拖拽输入
+ * @param[in] enabled true启用输入，false禁用（设置NoInputs）
+ * @see isInputsEnabled()
+ * \endif
+ */
+void QImPlotDragPointNode::setInputsEnabled(bool enabled)
+{
+    QIM_D(d);
+    const ImPlotDragToolFlags oldFlags = d->flags;
+    if (enabled) {
+        d->flags &= ~ImPlotDragToolFlags_NoInputs;
+    } else {
+        d->flags |= ImPlotDragToolFlags_NoInputs;
+    }
+    if (d->flags != oldFlags) {
+        Q_EMIT dragToolFlagChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if delayed commit mode is enabled
+ * @return true if delayed mode is enabled (ImPlotDragToolFlags_Delayed is set)
+ * @details Default is false. When true, position changes are committed after mouse release.
+ * @see setDelayed()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查延迟提交模式是否启用
+ * @return true表示延迟模式启用（ImPlotDragToolFlags_Delayed已设置）
+ * @details 默认为false。为true时，位置更改在鼠标释放后提交。
+ * @see setDelayed()
+ * \endif
+ */
+bool QImPlotDragPointNode::isDelayed() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotDragToolFlags_Delayed) != 0;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set delayed commit mode
+ * @param[in] on true to enable delayed, false for immediate commit (default)
+ * @see isDelayed()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置延迟提交模式
+ * @param[in] on true启用延迟，false为立即提交（默认）
+ * @see isDelayed()
+ * \endif
+ */
+void QImPlotDragPointNode::setDelayed(bool on)
+{
+    QIM_D(d);
+    const ImPlotDragToolFlags oldFlags = d->flags;
+    if (on) {
+        d->flags |= ImPlotDragToolFlags_Delayed;
+    } else {
+        d->flags &= ~ImPlotDragToolFlags_Delayed;
+    }
+    if (d->flags != oldFlags) {
+        Q_EMIT dragToolFlagChanged();
     }
 }
 

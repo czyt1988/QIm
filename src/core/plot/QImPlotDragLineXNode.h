@@ -1,4 +1,4 @@
-﻿#ifndef QIMPLOTDRAGLINEXNODE_H
+#ifndef QIMPLOTDRAGLINEXNODE_H
 #define QIMPLOTDRAGLINEXNODE_H
 
 #include "../../QImAPI.h"
@@ -164,6 +164,11 @@ class QIM_CORE_API QImPlotDragLineXNode : public QImPlotItemNode
      */
     Q_PROPERTY(int flags READ flags WRITE setFlags NOTIFY flagsChanged)
 
+    Q_PROPERTY(bool cursorsEnabled READ isCursorsEnabled WRITE setCursorsEnabled NOTIFY dragToolFlagChanged)
+    Q_PROPERTY(bool fitEnabled READ isFitEnabled WRITE setFitEnabled NOTIFY dragToolFlagChanged)
+    Q_PROPERTY(bool inputsEnabled READ isInputsEnabled WRITE setInputsEnabled NOTIFY dragToolFlagChanged)
+    Q_PROPERTY(bool delayed READ isDelayed WRITE setDelayed NOTIFY dragToolFlagChanged)
+
     /**
      * \if ENGLISH
      * @property QImPlotDragLineXNode::clicked
@@ -287,6 +292,16 @@ public:
     // Sets the ImPlotDragToolFlags
     void setFlags(int flags);
 
+    // Drag tool flag accessors (否定→肯定语义)
+    bool isCursorsEnabled() const;
+    void setCursorsEnabled(bool enabled);
+    bool isFitEnabled() const;
+    void setFitEnabled(bool enabled);
+    bool isInputsEnabled() const;
+    void setInputsEnabled(bool enabled);
+    bool isDelayed() const;
+    void setDelayed(bool on);
+
     //----------------------------------------------------
     // Interaction state (read-only)
     //----------------------------------------------------
@@ -392,6 +407,8 @@ Q_SIGNALS:
      * \endif
      */
     void flagsChanged(int flags);
+
+    void dragToolFlagChanged();
 
     /**
      * \if ENGLISH

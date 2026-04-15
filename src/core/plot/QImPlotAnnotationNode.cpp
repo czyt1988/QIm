@@ -21,7 +21,7 @@ public:
 
     // Style and configuration
     std::optional< QImTrackedValue< ImVec4, QIM::ImVecComparator< ImVec4 > > > color;  ///< Text color
-    QString text;                                                                      ///< Annotation text
+    QByteArray textUtf8;                                                               ///< Text content (UTF8, used directly by ImGui)
     ImVec2 pixelOffset { 0.0f, 0.0f };                                                 ///< Pixel offset
     bool clamp { false };                                                              ///< Clamp to plot area
     bool round { false };                                                              ///< Round to integer pixels
@@ -129,7 +129,7 @@ void QImPlotAnnotationNode::setPosition(double x, double y)
  */
 QString QImPlotAnnotationNode::text() const
 {
-    return d_ptr->text;
+    return QString::fromUtf8(d_ptr->textUtf8);
 }
 
 /**
@@ -146,8 +146,9 @@ QString QImPlotAnnotationNode::text() const
 void QImPlotAnnotationNode::setText(const QString& text)
 {
     QIM_D(d);
-    if (d->text != text) {
-        d->text = text;
+    QByteArray utf8 = text.toUtf8();
+    if (d->textUtf8 != utf8) {
+        d->textUtf8 = utf8;
         emit textChanged(text);
     }
 }
@@ -363,13 +364,11 @@ bool QImPlotAnnotationNode::beginDraw()
 
 
     // Call ImPlot Annotation API
-    if (d->text.isEmpty()) {
+    if (d->textUtf8.isEmpty()) {
         ImPlot::Annotation(d->x, d->y, colorVec, d->pixelOffset, d->clamp, d->round);
     } else {
-        // Convert text to C string
-        QByteArray utf8     = d->text.toUtf8();
-        const char* textPtr = utf8.constData();
-        ImPlot::Annotation(d->x, d->y, colorVec, d->pixelOffset, d->clamp, "%s", textPtr);
+        // Use UTF8 text directly (stored in setter for performance)
+        ImPlot::Annotation(d->x, d->y, colorVec, d->pixelOffset, d->clamp, "%s", d->textUtf8.constData());
     }
 
     // Update item status (for consistency with other plot items)

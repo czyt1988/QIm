@@ -21,6 +21,7 @@ tmp
 CMakeLists.txt.user
 out
 docs/superpowers
+opencode.md
 #翻译文件暂时不追踪
 *.qm
 nul

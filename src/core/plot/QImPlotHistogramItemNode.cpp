@@ -370,44 +370,98 @@ void QImPlotHistogramItemNode::setHorizontal(bool horizontal)
 
 /**
  * \if ENGLISH
- * @brief Check if outliers are excluded
- * @return true if outliers are excluded
+ * @brief Check if outliers are included in histogram calculations
+ * @return true if outliers are included (ImPlotHistogramFlags_NoOutliers is NOT set)
+ * @details Default is true. When false, values outside range are excluded.
+ * @see setOutliersIncluded()
  * \endif
  *
  * \if CHINESE
- * @brief 检查是否排除异常值
- * @return 如果排除异常值则返回true
+ * @brief 检查异常值是否包含在直方图计算中
+ * @return true表示异常值包含（ImPlotHistogramFlags_NoOutliers未设置）
+ * @details 默认为true。为false时，范围外的值被排除。
+ * @see setOutliersIncluded()
  * \endif
  */
-bool QImPlotHistogramItemNode::isNoOutliers() const
+bool QImPlotHistogramItemNode::isOutliersIncluded() const
 {
     QIM_DC(d);
-    return (d->flags & ImPlotHistogramFlags_NoOutliers) != 0;
+    return (d->flags & ImPlotHistogramFlags_NoOutliers) == 0;
 }
 
 /**
  * \if ENGLISH
- * @brief Set exclude outliers flag
- * @param noOutliers true to exclude outliers
+ * @brief Set whether outliers are included in histogram calculations
+ * @param[in] included true to include outliers, false to exclude (sets NoOutliers)
+ * @see isOutliersIncluded()
  * \endif
  *
  * \if CHINESE
- * @brief 设置排除异常值标志
- * @param noOutliers true表示排除异常值
+ * @brief 设置异常值是否包含在直方图计算中
+ * @param[in] included true包含异常值，false排除（设置NoOutliers）
+ * @see isOutliersIncluded()
  * \endif
  */
-void QImPlotHistogramItemNode::setNoOutliers(bool noOutliers)
+void QImPlotHistogramItemNode::setOutliersIncluded(bool included)
 {
     QIM_D(d);
     const ImPlotHistogramFlags oldFlags = d->flags;
-    if (noOutliers) {
-        d->flags |= ImPlotHistogramFlags_NoOutliers;
-    } else {
+    if (included) {
         d->flags &= ~ImPlotHistogramFlags_NoOutliers;
+    } else {
+        d->flags |= ImPlotHistogramFlags_NoOutliers;
     }
     if (d->flags != oldFlags) {
-        emit noOutliersChanged(noOutliers);
-        emit histogramFlagChanged();
+        Q_EMIT outliersIncludedChanged(included);
+        Q_EMIT histogramFlagChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if column-major data order is enabled
+ * @return true if column-major order is enabled (ImPlotHistogramFlags_ColMajor is set)
+ * @details Default is false. Row-major is the default data layout.
+ * @see setColMajor()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查列主序数据是否启用
+ * @return true表示列主序启用（ImPlotHistogramFlags_ColMajor已设置）
+ * @details 默认为false。行主序是默认的数据布局。
+ * @see setColMajor()
+ * \endif
+ */
+bool QImPlotHistogramItemNode::isColMajor() const
+{
+    QIM_DC(d);
+    return (d->flags & ImPlotHistogramFlags_ColMajor) != 0;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set column-major data order
+ * @param[in] on true to enable column-major, false for row-major (default)
+ * @see isColMajor()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置列主序数据顺序
+ * @param[in] on true启用列主序，false为行主序（默认）
+ * @see isColMajor()
+ * \endif
+ */
+void QImPlotHistogramItemNode::setColMajor(bool on)
+{
+    QIM_D(d);
+    const ImPlotHistogramFlags oldFlags = d->flags;
+    if (on) {
+        d->flags |= ImPlotHistogramFlags_ColMajor;
+    } else {
+        d->flags &= ~ImPlotHistogramFlags_ColMajor;
+    }
+    if (d->flags != oldFlags) {
+        Q_EMIT histogramFlagChanged();
     }
 }
 

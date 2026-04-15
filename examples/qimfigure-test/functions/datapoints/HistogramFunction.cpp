@@ -195,18 +195,18 @@ HistogramFunction::HistogramFunction(QObject* parent)
     horizontalReg.target = this;
     registerProperty(horizontalReg);
     
-    // Register exclude outliers flag property
-    PropertyRegistration noOutliersReg;
-    noOutliersReg.category = tr("Histogram");
-    noOutliersReg.subcategory = tr("Outliers");
-    noOutliersReg.displayName = tr("No Outliers");
-    noOutliersReg.briefDesc = tr("Exclude outliers");
-    noOutliersReg.detailDesc = tr("Exclude outliers from histogram calculation");
-    noOutliersReg.editorType = EditorType::CheckBox;
-    noOutliersReg.defaultValue = m_noOutliers;
-    noOutliersReg.propertyName = "noOutliers";
-    noOutliersReg.target = this;
-    registerProperty(noOutliersReg);
+    // Register outliers inclusion flag property
+    PropertyRegistration outliersIncludedReg;
+    outliersIncludedReg.category = tr("Histogram");
+    outliersIncludedReg.subcategory = tr("Outliers");
+    outliersIncludedReg.displayName = tr("Outliers Included");
+    outliersIncludedReg.briefDesc = tr("Include outliers");
+    outliersIncludedReg.detailDesc = tr("Include outliers in histogram normalization and cumulative counts");
+    outliersIncludedReg.editorType = EditorType::CheckBox;
+    outliersIncludedReg.defaultValue = m_outliersIncluded;
+    outliersIncludedReg.propertyName = "outliersIncluded";
+    outliersIncludedReg.target = this;
+    registerProperty(outliersIncludedReg);
     
     // Register bar color property
     PropertyRegistration barColorReg;
@@ -294,7 +294,7 @@ void HistogramFunction::createPlot(QIM::QImFigureWidget* figure)
     m_histogramNode->setCumulative(m_cumulative);
     m_histogramNode->setDensity(m_density);
     m_histogramNode->setHorizontal(m_horizontal);
-    m_histogramNode->setNoOutliers(m_noOutliers);
+    m_histogramNode->setOutliersIncluded(m_outliersIncluded);
     m_histogramNode->setColor(m_barColor);
     
     // Create and attach value tracker
@@ -413,13 +413,13 @@ void HistogramFunction::setHorizontal(bool horizontal)
     }
 }
 
-void HistogramFunction::setNoOutliers(bool noOutliers)
+void HistogramFunction::setOutliersIncluded(bool included)
 {
-    if (m_noOutliers != noOutliers) {
-        m_noOutliers = noOutliers;
-        emit noOutliersChanged(noOutliers);
+    if (m_outliersIncluded != included) {
+        m_outliersIncluded = included;
+        Q_EMIT outliersIncludedChanged(included);
         if (m_histogramNode) {
-            m_histogramNode->setNoOutliers(noOutliers);
+            m_histogramNode->setOutliersIncluded(included);
         }
     }
 }

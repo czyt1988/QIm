@@ -84,7 +84,7 @@ class HistogramFunction : public TestFunction {
     Q_PROPERTY(bool cumulative READ isCumulative WRITE setCumulative NOTIFY cumulativeChanged)
     Q_PROPERTY(bool density READ isDensity WRITE setDensity NOTIFY densityChanged)
     Q_PROPERTY(bool horizontal READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged)
-    Q_PROPERTY(bool noOutliers READ isNoOutliers WRITE setNoOutliers NOTIFY noOutliersChanged)
+    Q_PROPERTY(bool outliersIncluded READ isOutliersIncluded WRITE setOutliersIncluded NOTIFY outliersIncludedChanged)
     Q_PROPERTY(QColor barColor READ barColor WRITE setBarColor NOTIFY barColorChanged)
     
 public:
@@ -165,9 +165,9 @@ public:
     bool isHorizontal() const { return m_horizontal; }
     void setHorizontal(bool horizontal);
     
-    // Exclude outliers flag property accessors
-    bool isNoOutliers() const { return m_noOutliers; }
-    void setNoOutliers(bool noOutliers);
+    // Outliers inclusion flag property accessors
+    bool isOutliersIncluded() const { return m_outliersIncluded; }
+    void setOutliersIncluded(bool included);
     
     // Bar color property accessors
     QColor barColor() const { return m_barColor; }
@@ -291,16 +291,16 @@ Q_SIGNALS:
     
     /**
      * \if ENGLISH
-     * @brief Signal emitted when exclude outliers flag changes
-     * @param noOutliers New exclude outliers flag value
+     * @brief Signal emitted when outliers inclusion flag changes
+     * @param included New outliers inclusion flag value
      * \endif
-     * 
+     *
      * \if CHINESE
-     * @brief 排除异常值标志改变时发出的信号
-     * @param noOutliers 新的排除异常值标志值
+     * @brief 异常值包含标志改变时发出的信号
+     * @param included 新的异常值包含标志值
      * \endif
      */
-    void noOutliersChanged(bool noOutliers);
+    void outliersIncludedChanged(bool included);
     
     /**
      * \if ENGLISH
@@ -326,7 +326,7 @@ private:
     bool m_cumulative = false;
     bool m_density = false;
     bool m_horizontal = false;
-    bool m_noOutliers = false;
+    bool m_outliersIncluded = true;
     QColor m_barColor = Qt::green;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
