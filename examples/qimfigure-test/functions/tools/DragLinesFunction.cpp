@@ -128,6 +128,58 @@ DragLinesFunction::DragLinesFunction(QObject* parent)
     thicknessReg.propertyName = "lineThickness";
     thicknessReg.target = this;
     registerProperty(thicknessReg);
+    
+    // Register cursors enabled property
+    PropertyRegistration cursorsEnabledReg;
+    cursorsEnabledReg.category = tr("Common");
+    cursorsEnabledReg.subcategory = tr("Flags");
+    cursorsEnabledReg.displayName = tr("Cursors Enabled");
+    cursorsEnabledReg.briefDesc = tr("Show cursor guides");
+    cursorsEnabledReg.detailDesc = tr("When enabled, cursor guide lines are shown while dragging.");
+    cursorsEnabledReg.editorType = EditorType::CheckBox;
+    cursorsEnabledReg.defaultValue = m_cursorsEnabled;
+    cursorsEnabledReg.propertyName = "cursorsEnabled";
+    cursorsEnabledReg.target = this;
+    registerProperty(cursorsEnabledReg);
+    
+    // Register fit enabled property
+    PropertyRegistration fitEnabledReg;
+    fitEnabledReg.category = tr("Common");
+    fitEnabledReg.subcategory = tr("Flags");
+    fitEnabledReg.displayName = tr("Fit Enabled");
+    fitEnabledReg.briefDesc = tr("Auto-fit plot on drag");
+    fitEnabledReg.detailDesc = tr("When enabled, the plot automatically fits to include the dragged line.");
+    fitEnabledReg.editorType = EditorType::CheckBox;
+    fitEnabledReg.defaultValue = m_fitEnabled;
+    fitEnabledReg.propertyName = "fitEnabled";
+    fitEnabledReg.target = this;
+    registerProperty(fitEnabledReg);
+    
+    // Register inputs enabled property
+    PropertyRegistration inputsEnabledReg;
+    inputsEnabledReg.category = tr("Common");
+    inputsEnabledReg.subcategory = tr("Flags");
+    inputsEnabledReg.displayName = tr("Inputs Enabled");
+    inputsEnabledReg.briefDesc = tr("Enable mouse input");
+    inputsEnabledReg.detailDesc = tr("When enabled, the drag tools respond to mouse input.");
+    inputsEnabledReg.editorType = EditorType::CheckBox;
+    inputsEnabledReg.defaultValue = m_inputsEnabled;
+    inputsEnabledReg.propertyName = "inputsEnabled";
+    inputsEnabledReg.target = this;
+    registerProperty(inputsEnabledReg);
+    
+    // Register delayed property
+    PropertyRegistration delayedReg;
+    delayedReg.category = tr("Common");
+    delayedReg.subcategory = tr("Flags");
+    delayedReg.displayName = tr("Delayed");
+    delayedReg.briefDesc = tr("Delayed rendering");
+    delayedReg.detailDesc = tr("When enabled, the drag tools use delayed rendering mode for smoother interaction.");
+    delayedReg.editorType = EditorType::CheckBox;
+    delayedReg.defaultValue = m_delayed;
+    delayedReg.propertyName = "delayed";
+    delayedReg.target = this;
+    registerProperty(delayedReg);
 }
 
 /**
@@ -197,6 +249,10 @@ void DragLinesFunction::createPlot(QIM::QImFigureWidget* figure)
     m_dragLineXNode->setColor(m_lineXColor);
     m_dragLineXNode->setThickness(m_lineThickness);
     m_dragLineXNode->setId(0);
+    m_dragLineXNode->setCursorsEnabled(m_cursorsEnabled);
+    m_dragLineXNode->setFitEnabled(m_fitEnabled);
+    m_dragLineXNode->setInputsEnabled(m_inputsEnabled);
+    m_dragLineXNode->setDelayed(m_delayed);
     m_plotNode->addChildNode(m_dragLineXNode);
     
     // Create horizontal draggable line (DragLineY)
@@ -205,6 +261,10 @@ void DragLinesFunction::createPlot(QIM::QImFigureWidget* figure)
     m_dragLineYNode->setColor(m_lineYColor);
     m_dragLineYNode->setThickness(m_lineThickness);
     m_dragLineYNode->setId(1);
+    m_dragLineYNode->setCursorsEnabled(m_cursorsEnabled);
+    m_dragLineYNode->setFitEnabled(m_fitEnabled);
+    m_dragLineYNode->setInputsEnabled(m_inputsEnabled);
+    m_dragLineYNode->setDelayed(m_delayed);
     m_plotNode->addChildNode(m_dragLineYNode);
 }
 
@@ -273,6 +333,62 @@ void DragLinesFunction::setLineThickness(float thickness)
         }
         if (m_dragLineYNode) {
             m_dragLineYNode->setThickness(thickness);
+        }
+    }
+}
+
+void DragLinesFunction::setCursorsEnabled(bool enabled)
+{
+    if (m_cursorsEnabled != enabled) {
+        m_cursorsEnabled = enabled;
+        Q_EMIT cursorsEnabledChanged(enabled);
+        if (m_dragLineXNode) {
+            m_dragLineXNode->setCursorsEnabled(enabled);
+        }
+        if (m_dragLineYNode) {
+            m_dragLineYNode->setCursorsEnabled(enabled);
+        }
+    }
+}
+
+void DragLinesFunction::setFitEnabled(bool enabled)
+{
+    if (m_fitEnabled != enabled) {
+        m_fitEnabled = enabled;
+        Q_EMIT fitEnabledChanged(enabled);
+        if (m_dragLineXNode) {
+            m_dragLineXNode->setFitEnabled(enabled);
+        }
+        if (m_dragLineYNode) {
+            m_dragLineYNode->setFitEnabled(enabled);
+        }
+    }
+}
+
+void DragLinesFunction::setInputsEnabled(bool enabled)
+{
+    if (m_inputsEnabled != enabled) {
+        m_inputsEnabled = enabled;
+        Q_EMIT inputsEnabledChanged(enabled);
+        if (m_dragLineXNode) {
+            m_dragLineXNode->setInputsEnabled(enabled);
+        }
+        if (m_dragLineYNode) {
+            m_dragLineYNode->setInputsEnabled(enabled);
+        }
+    }
+}
+
+void DragLinesFunction::setDelayed(bool on)
+{
+    if (m_delayed != on) {
+        m_delayed = on;
+        Q_EMIT delayedChanged(on);
+        if (m_dragLineXNode) {
+            m_dragLineXNode->setDelayed(on);
+        }
+        if (m_dragLineYNode) {
+            m_dragLineYNode->setDelayed(on);
         }
     }
 }

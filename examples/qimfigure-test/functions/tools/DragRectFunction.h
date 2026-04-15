@@ -62,6 +62,10 @@ class DragRectFunction : public TestFunction {
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(QRectF rect READ rect WRITE setRect NOTIFY rectChanged)
     Q_PROPERTY(QColor rectColor READ rectColor WRITE setRectColor NOTIFY rectColorChanged)
+    Q_PROPERTY(bool cursorsEnabled READ isCursorsEnabled WRITE setCursorsEnabled NOTIFY cursorsEnabledChanged)
+    Q_PROPERTY(bool fitEnabled READ isFitEnabled WRITE setFitEnabled NOTIFY fitEnabledChanged)
+    Q_PROPERTY(bool inputsEnabled READ isInputsEnabled WRITE setInputsEnabled NOTIFY inputsEnabledChanged)
+    Q_PROPERTY(bool delayed READ isDelayed WRITE setDelayed NOTIFY delayedChanged)
     
 public:
     /**
@@ -113,6 +117,22 @@ public:
     QColor rectColor() const { return m_rectColor; }
     void setRectColor(const QColor& color);
     
+    // Cursors enabled property accessors
+    bool isCursorsEnabled() const { return m_cursorsEnabled; }
+    void setCursorsEnabled(bool enabled);
+    
+    // Fit enabled property accessors
+    bool isFitEnabled() const { return m_fitEnabled; }
+    void setFitEnabled(bool enabled);
+    
+    // Inputs enabled property accessors
+    bool isInputsEnabled() const { return m_inputsEnabled; }
+    void setInputsEnabled(bool enabled);
+    
+    // Delayed property accessors
+    bool isDelayed() const { return m_delayed; }
+    void setDelayed(bool on);
+    
 Q_SIGNALS:
     /**
      * \if ENGLISH
@@ -152,11 +172,19 @@ Q_SIGNALS:
      * \endif
      */
     void rectColorChanged(const QColor& color);
+    void cursorsEnabledChanged(bool enabled);
+    void fitEnabledChanged(bool enabled);
+    void inputsEnabledChanged(bool enabled);
+    void delayedChanged(bool on);
     
 private:
     QString m_title = QStringLiteral("Drag Rect Tool");
     QRectF m_rect = QRectF(2.0, 2.0, 6.0, 6.0);
     QColor m_rectColor = QColor(255, 200, 100);
+    bool m_cursorsEnabled = true;
+    bool m_fitEnabled = true;
+    bool m_inputsEnabled = true;
+    bool m_delayed = false;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotLineItemNode* m_lineNode = nullptr;

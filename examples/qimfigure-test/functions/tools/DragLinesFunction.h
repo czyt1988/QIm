@@ -69,6 +69,10 @@ class DragLinesFunction : public TestFunction {
     Q_PROPERTY(QColor lineXColor READ lineXColor WRITE setLineXColor NOTIFY lineXColorChanged)
     Q_PROPERTY(QColor lineYColor READ lineYColor WRITE setLineYColor NOTIFY lineYColorChanged)
     Q_PROPERTY(float lineThickness READ lineThickness WRITE setLineThickness NOTIFY lineThicknessChanged)
+    Q_PROPERTY(bool cursorsEnabled READ isCursorsEnabled WRITE setCursorsEnabled NOTIFY cursorsEnabledChanged)
+    Q_PROPERTY(bool fitEnabled READ isFitEnabled WRITE setFitEnabled NOTIFY fitEnabledChanged)
+    Q_PROPERTY(bool inputsEnabled READ isInputsEnabled WRITE setInputsEnabled NOTIFY inputsEnabledChanged)
+    Q_PROPERTY(bool delayed READ isDelayed WRITE setDelayed NOTIFY delayedChanged)
     
 public:
     /**
@@ -131,6 +135,22 @@ public:
     // Line thickness property accessors
     float lineThickness() const { return m_lineThickness; }
     void setLineThickness(float thickness);
+    
+    // Cursors enabled property accessors
+    bool isCursorsEnabled() const { return m_cursorsEnabled; }
+    void setCursorsEnabled(bool enabled);
+    
+    // Fit enabled property accessors
+    bool isFitEnabled() const { return m_fitEnabled; }
+    void setFitEnabled(bool enabled);
+    
+    // Inputs enabled property accessors
+    bool isInputsEnabled() const { return m_inputsEnabled; }
+    void setInputsEnabled(bool enabled);
+    
+    // Delayed property accessors
+    bool isDelayed() const { return m_delayed; }
+    void setDelayed(bool on);
     
 Q_SIGNALS:
     /**
@@ -210,6 +230,10 @@ Q_SIGNALS:
      * \endif
      */
     void lineThicknessChanged(float thickness);
+    void cursorsEnabledChanged(bool enabled);
+    void fitEnabledChanged(bool enabled);
+    void inputsEnabledChanged(bool enabled);
+    void delayedChanged(bool on);
     
 private:
     QString m_title = QStringLiteral("Drag Lines Tool");
@@ -218,6 +242,10 @@ private:
     QColor m_lineXColor = QColor(255, 100, 100);
     QColor m_lineYColor = QColor(100, 255, 100);
     float m_lineThickness = 2.0f;
+    bool m_cursorsEnabled = true;
+    bool m_fitEnabled = true;
+    bool m_inputsEnabled = true;
+    bool m_delayed = false;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotLineItemNode* m_lineNode = nullptr;

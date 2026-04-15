@@ -86,6 +86,7 @@ class HistogramFunction : public TestFunction {
     Q_PROPERTY(bool horizontal READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged)
     Q_PROPERTY(bool outliersIncluded READ isOutliersIncluded WRITE setOutliersIncluded NOTIFY outliersIncludedChanged)
     Q_PROPERTY(QColor barColor READ barColor WRITE setBarColor NOTIFY barColorChanged)
+    Q_PROPERTY(bool colMajor READ isColMajor WRITE setColMajor NOTIFY colMajorChanged)
     
 public:
     /**
@@ -172,6 +173,10 @@ public:
     // Bar color property accessors
     QColor barColor() const { return m_barColor; }
     void setBarColor(const QColor& color);
+    
+    // Column-major data order property accessors
+    bool isColMajor() const { return m_colMajor; }
+    void setColMajor(bool on);
     
 Q_SIGNALS:
     /**
@@ -314,6 +319,7 @@ Q_SIGNALS:
      * \endif
      */
     void barColorChanged(const QColor& color);
+    void colMajorChanged(bool on);
     
 private:
     QString m_title = QStringLiteral("Histogram");
@@ -328,6 +334,7 @@ private:
     bool m_horizontal = false;
     bool m_outliersIncluded = true;
     QColor m_barColor = Qt::green;
+    bool m_colMajor = false;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotHistogramItemNode* m_histogramNode = nullptr;

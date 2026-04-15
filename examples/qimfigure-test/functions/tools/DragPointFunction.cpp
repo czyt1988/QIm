@@ -110,6 +110,58 @@ DragPointFunction::DragPointFunction(QObject* parent)
     sizeReg.propertyName = "pointSize";
     sizeReg.target = this;
     registerProperty(sizeReg);
+    
+    // Register cursors enabled property
+    PropertyRegistration cursorsEnabledReg;
+    cursorsEnabledReg.category = tr("DragPoint");
+    cursorsEnabledReg.subcategory = tr("Flags");
+    cursorsEnabledReg.displayName = tr("Cursors Enabled");
+    cursorsEnabledReg.briefDesc = tr("Show cursor guides");
+    cursorsEnabledReg.detailDesc = tr("When enabled, cursor guide lines are shown while dragging.");
+    cursorsEnabledReg.editorType = EditorType::CheckBox;
+    cursorsEnabledReg.defaultValue = m_cursorsEnabled;
+    cursorsEnabledReg.propertyName = "cursorsEnabled";
+    cursorsEnabledReg.target = this;
+    registerProperty(cursorsEnabledReg);
+    
+    // Register fit enabled property
+    PropertyRegistration fitEnabledReg;
+    fitEnabledReg.category = tr("DragPoint");
+    fitEnabledReg.subcategory = tr("Flags");
+    fitEnabledReg.displayName = tr("Fit Enabled");
+    fitEnabledReg.briefDesc = tr("Auto-fit plot on drag");
+    fitEnabledReg.detailDesc = tr("When enabled, the plot automatically fits to include the dragged point.");
+    fitEnabledReg.editorType = EditorType::CheckBox;
+    fitEnabledReg.defaultValue = m_fitEnabled;
+    fitEnabledReg.propertyName = "fitEnabled";
+    fitEnabledReg.target = this;
+    registerProperty(fitEnabledReg);
+    
+    // Register inputs enabled property
+    PropertyRegistration inputsEnabledReg;
+    inputsEnabledReg.category = tr("DragPoint");
+    inputsEnabledReg.subcategory = tr("Flags");
+    inputsEnabledReg.displayName = tr("Inputs Enabled");
+    inputsEnabledReg.briefDesc = tr("Enable mouse input");
+    inputsEnabledReg.detailDesc = tr("When enabled, the drag tool responds to mouse input.");
+    inputsEnabledReg.editorType = EditorType::CheckBox;
+    inputsEnabledReg.defaultValue = m_inputsEnabled;
+    inputsEnabledReg.propertyName = "inputsEnabled";
+    inputsEnabledReg.target = this;
+    registerProperty(inputsEnabledReg);
+    
+    // Register delayed property
+    PropertyRegistration delayedReg;
+    delayedReg.category = tr("DragPoint");
+    delayedReg.subcategory = tr("Flags");
+    delayedReg.displayName = tr("Delayed");
+    delayedReg.briefDesc = tr("Delayed rendering");
+    delayedReg.detailDesc = tr("When enabled, the drag tool uses delayed rendering mode for smoother interaction.");
+    delayedReg.editorType = EditorType::CheckBox;
+    delayedReg.defaultValue = m_delayed;
+    delayedReg.propertyName = "delayed";
+    delayedReg.target = this;
+    registerProperty(delayedReg);
 }
 
 /**
@@ -179,6 +231,10 @@ void DragPointFunction::createPlot(QIM::QImFigureWidget* figure)
     m_dragPointNode->setColor(m_pointColor);
     m_dragPointNode->setSize(m_pointSize);
     m_dragPointNode->setId(0);
+    m_dragPointNode->setCursorsEnabled(m_cursorsEnabled);
+    m_dragPointNode->setFitEnabled(m_fitEnabled);
+    m_dragPointNode->setInputsEnabled(m_inputsEnabled);
+    m_dragPointNode->setDelayed(m_delayed);
     m_plotNode->addChildNode(m_dragPointNode);
 }
 
@@ -222,6 +278,50 @@ void DragPointFunction::setPointSize(float size)
         emit pointSizeChanged(size);
         if (m_dragPointNode) {
             m_dragPointNode->setSize(size);
+        }
+    }
+}
+
+void DragPointFunction::setCursorsEnabled(bool enabled)
+{
+    if (m_cursorsEnabled != enabled) {
+        m_cursorsEnabled = enabled;
+        Q_EMIT cursorsEnabledChanged(enabled);
+        if (m_dragPointNode) {
+            m_dragPointNode->setCursorsEnabled(enabled);
+        }
+    }
+}
+
+void DragPointFunction::setFitEnabled(bool enabled)
+{
+    if (m_fitEnabled != enabled) {
+        m_fitEnabled = enabled;
+        Q_EMIT fitEnabledChanged(enabled);
+        if (m_dragPointNode) {
+            m_dragPointNode->setFitEnabled(enabled);
+        }
+    }
+}
+
+void DragPointFunction::setInputsEnabled(bool enabled)
+{
+    if (m_inputsEnabled != enabled) {
+        m_inputsEnabled = enabled;
+        Q_EMIT inputsEnabledChanged(enabled);
+        if (m_dragPointNode) {
+            m_dragPointNode->setInputsEnabled(enabled);
+        }
+    }
+}
+
+void DragPointFunction::setDelayed(bool on)
+{
+    if (m_delayed != on) {
+        m_delayed = on;
+        Q_EMIT delayedChanged(on);
+        if (m_dragPointNode) {
+            m_dragPointNode->setDelayed(on);
         }
     }
 }

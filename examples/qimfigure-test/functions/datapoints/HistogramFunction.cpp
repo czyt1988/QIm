@@ -220,6 +220,19 @@ HistogramFunction::HistogramFunction(QObject* parent)
     barColorReg.propertyName = "barColor";
     barColorReg.target = this;
     registerProperty(barColorReg);
+    
+    // Register colMajor property
+    PropertyRegistration colMajorReg;
+    colMajorReg.category = tr("Histogram");
+    colMajorReg.subcategory = tr("Flags");
+    colMajorReg.displayName = tr("Col Major");
+    colMajorReg.briefDesc = tr("Column-major data order");
+    colMajorReg.detailDesc = tr("When enabled, data is interpreted in column-major order instead of row-major.");
+    colMajorReg.editorType = EditorType::CheckBox;
+    colMajorReg.defaultValue = m_colMajor;
+    colMajorReg.propertyName = "colMajor";
+    colMajorReg.target = this;
+    registerProperty(colMajorReg);
 }
 
 /**
@@ -295,6 +308,7 @@ void HistogramFunction::createPlot(QIM::QImFigureWidget* figure)
     m_histogramNode->setDensity(m_density);
     m_histogramNode->setHorizontal(m_horizontal);
     m_histogramNode->setOutliersIncluded(m_outliersIncluded);
+    m_histogramNode->setColMajor(m_colMajor);
     m_histogramNode->setColor(m_barColor);
     
     // Create and attach value tracker
@@ -420,6 +434,17 @@ void HistogramFunction::setOutliersIncluded(bool included)
         Q_EMIT outliersIncludedChanged(included);
         if (m_histogramNode) {
             m_histogramNode->setOutliersIncluded(included);
+        }
+    }
+}
+
+void HistogramFunction::setColMajor(bool on)
+{
+    if (m_colMajor != on) {
+        m_colMajor = on;
+        Q_EMIT colMajorChanged(on);
+        if (m_histogramNode) {
+            m_histogramNode->setColMajor(on);
         }
     }
 }

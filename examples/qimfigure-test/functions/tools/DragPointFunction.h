@@ -63,6 +63,10 @@ class DragPointFunction : public TestFunction {
     Q_PROPERTY(QPointF pointPosition READ pointPosition WRITE setPointPosition NOTIFY pointPositionChanged)
     Q_PROPERTY(QColor pointColor READ pointColor WRITE setPointColor NOTIFY pointColorChanged)
     Q_PROPERTY(float pointSize READ pointSize WRITE setPointSize NOTIFY pointSizeChanged)
+    Q_PROPERTY(bool cursorsEnabled READ isCursorsEnabled WRITE setCursorsEnabled NOTIFY cursorsEnabledChanged)
+    Q_PROPERTY(bool fitEnabled READ isFitEnabled WRITE setFitEnabled NOTIFY fitEnabledChanged)
+    Q_PROPERTY(bool inputsEnabled READ isInputsEnabled WRITE setInputsEnabled NOTIFY inputsEnabledChanged)
+    Q_PROPERTY(bool delayed READ isDelayed WRITE setDelayed NOTIFY delayedChanged)
     
 public:
     /**
@@ -118,6 +122,22 @@ public:
     float pointSize() const { return m_pointSize; }
     void setPointSize(float size);
     
+    // Cursors enabled property accessors
+    bool isCursorsEnabled() const { return m_cursorsEnabled; }
+    void setCursorsEnabled(bool enabled);
+    
+    // Fit enabled property accessors
+    bool isFitEnabled() const { return m_fitEnabled; }
+    void setFitEnabled(bool enabled);
+    
+    // Inputs enabled property accessors
+    bool isInputsEnabled() const { return m_inputsEnabled; }
+    void setInputsEnabled(bool enabled);
+    
+    // Delayed property accessors
+    bool isDelayed() const { return m_delayed; }
+    void setDelayed(bool on);
+    
 Q_SIGNALS:
     /**
      * \if ENGLISH
@@ -170,12 +190,20 @@ Q_SIGNALS:
      * \endif
      */
     void pointSizeChanged(float size);
+    void cursorsEnabledChanged(bool enabled);
+    void fitEnabledChanged(bool enabled);
+    void inputsEnabledChanged(bool enabled);
+    void delayedChanged(bool on);
     
 private:
     QString m_title = QStringLiteral("Drag Point Tool");
     QPointF m_pointPosition = QPointF(5.0, 5.0);
     QColor m_pointColor = QColor(255, 100, 100);
     float m_pointSize = 8.0f;
+    bool m_cursorsEnabled = true;
+    bool m_fitEnabled = true;
+    bool m_inputsEnabled = true;
+    bool m_delayed = false;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotLineItemNode* m_lineNode = nullptr;

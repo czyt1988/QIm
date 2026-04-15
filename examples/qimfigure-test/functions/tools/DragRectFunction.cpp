@@ -130,6 +130,58 @@ DragRectFunction::DragRectFunction(QObject* parent)
     colorReg.propertyName = "rectColor";
     colorReg.target = this;
     registerProperty(colorReg);
+    
+    // Register cursors enabled property
+    PropertyRegistration cursorsEnabledReg;
+    cursorsEnabledReg.category = tr("DragRect");
+    cursorsEnabledReg.subcategory = tr("Flags");
+    cursorsEnabledReg.displayName = tr("Cursors Enabled");
+    cursorsEnabledReg.briefDesc = tr("Show cursor guides");
+    cursorsEnabledReg.detailDesc = tr("When enabled, cursor guide lines are shown while dragging.");
+    cursorsEnabledReg.editorType = EditorType::CheckBox;
+    cursorsEnabledReg.defaultValue = m_cursorsEnabled;
+    cursorsEnabledReg.propertyName = "cursorsEnabled";
+    cursorsEnabledReg.target = this;
+    registerProperty(cursorsEnabledReg);
+    
+    // Register fit enabled property
+    PropertyRegistration fitEnabledReg;
+    fitEnabledReg.category = tr("DragRect");
+    fitEnabledReg.subcategory = tr("Flags");
+    fitEnabledReg.displayName = tr("Fit Enabled");
+    fitEnabledReg.briefDesc = tr("Auto-fit plot on drag");
+    fitEnabledReg.detailDesc = tr("When enabled, the plot automatically fits to include the dragged rectangle.");
+    fitEnabledReg.editorType = EditorType::CheckBox;
+    fitEnabledReg.defaultValue = m_fitEnabled;
+    fitEnabledReg.propertyName = "fitEnabled";
+    fitEnabledReg.target = this;
+    registerProperty(fitEnabledReg);
+    
+    // Register inputs enabled property
+    PropertyRegistration inputsEnabledReg;
+    inputsEnabledReg.category = tr("DragRect");
+    inputsEnabledReg.subcategory = tr("Flags");
+    inputsEnabledReg.displayName = tr("Inputs Enabled");
+    inputsEnabledReg.briefDesc = tr("Enable mouse input");
+    inputsEnabledReg.detailDesc = tr("When enabled, the drag tool responds to mouse input.");
+    inputsEnabledReg.editorType = EditorType::CheckBox;
+    inputsEnabledReg.defaultValue = m_inputsEnabled;
+    inputsEnabledReg.propertyName = "inputsEnabled";
+    inputsEnabledReg.target = this;
+    registerProperty(inputsEnabledReg);
+    
+    // Register delayed property
+    PropertyRegistration delayedReg;
+    delayedReg.category = tr("DragRect");
+    delayedReg.subcategory = tr("Flags");
+    delayedReg.displayName = tr("Delayed");
+    delayedReg.briefDesc = tr("Delayed rendering");
+    delayedReg.detailDesc = tr("When enabled, the drag tool uses delayed rendering mode for smoother interaction.");
+    delayedReg.editorType = EditorType::CheckBox;
+    delayedReg.defaultValue = m_delayed;
+    delayedReg.propertyName = "delayed";
+    delayedReg.target = this;
+    registerProperty(delayedReg);
 }
 
 /**
@@ -198,6 +250,10 @@ void DragRectFunction::createPlot(QIM::QImFigureWidget* figure)
     m_dragRectNode->setRect(m_rect.left(), m_rect.top(), m_rect.right(), m_rect.bottom());
     m_dragRectNode->setColor(m_rectColor);
     m_dragRectNode->setId(0);
+    m_dragRectNode->setCursorsEnabled(m_cursorsEnabled);
+    m_dragRectNode->setFitEnabled(m_fitEnabled);
+    m_dragRectNode->setInputsEnabled(m_inputsEnabled);
+    m_dragRectNode->setDelayed(m_delayed);
     m_plotNode->addChildNode(m_dragRectNode);
 }
 
@@ -230,6 +286,50 @@ void DragRectFunction::setRectColor(const QColor& color)
         emit rectColorChanged(color);
         if (m_dragRectNode) {
             m_dragRectNode->setColor(color);
+        }
+    }
+}
+
+void DragRectFunction::setCursorsEnabled(bool enabled)
+{
+    if (m_cursorsEnabled != enabled) {
+        m_cursorsEnabled = enabled;
+        Q_EMIT cursorsEnabledChanged(enabled);
+        if (m_dragRectNode) {
+            m_dragRectNode->setCursorsEnabled(enabled);
+        }
+    }
+}
+
+void DragRectFunction::setFitEnabled(bool enabled)
+{
+    if (m_fitEnabled != enabled) {
+        m_fitEnabled = enabled;
+        Q_EMIT fitEnabledChanged(enabled);
+        if (m_dragRectNode) {
+            m_dragRectNode->setFitEnabled(enabled);
+        }
+    }
+}
+
+void DragRectFunction::setInputsEnabled(bool enabled)
+{
+    if (m_inputsEnabled != enabled) {
+        m_inputsEnabled = enabled;
+        Q_EMIT inputsEnabledChanged(enabled);
+        if (m_dragRectNode) {
+            m_dragRectNode->setInputsEnabled(enabled);
+        }
+    }
+}
+
+void DragRectFunction::setDelayed(bool on)
+{
+    if (m_delayed != on) {
+        m_delayed = on;
+        Q_EMIT delayedChanged(on);
+        if (m_dragRectNode) {
+            m_dragRectNode->setDelayed(on);
         }
     }
 }

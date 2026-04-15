@@ -67,6 +67,8 @@ class StairsFunction : public TestFunction {
     Q_PROPERTY(QString yLabel READ yLabel WRITE setYLabel NOTIFY yLabelChanged)
     Q_PROPERTY(QColor stairsColor READ stairsColor WRITE setStairsColor NOTIFY stairsColorChanged)
     Q_PROPERTY(bool shaded READ isShaded WRITE setShaded NOTIFY shadedChanged)
+    Q_PROPERTY(bool stairsEnabled READ isStairsEnabled WRITE setStairsEnabled NOTIFY stairsEnabledChanged)
+    Q_PROPERTY(bool preStep READ isPreStep WRITE setPreStep NOTIFY preStepChanged)
     
 public:
     /**
@@ -125,6 +127,14 @@ public:
     // Shaded property accessors
     bool isShaded() const { return m_shaded; }
     void setShaded(bool shaded);
+    
+    // Stairs enabled property accessors
+    bool isStairsEnabled() const { return m_stairsEnabled; }
+    void setStairsEnabled(bool enabled);
+    
+    // PreStep property accessors
+    bool isPreStep() const { return m_preStep; }
+    void setPreStep(bool on);
     
 Q_SIGNALS:
     /**
@@ -192,12 +202,17 @@ Q_SIGNALS:
      */
     void shadedChanged(bool shaded);
     
+    void stairsEnabledChanged(bool enabled);
+    void preStepChanged(bool on);
+    
 private:
     QString m_title = QStringLiteral("Stairs Plot");
     QString m_xLabel = QStringLiteral("x");
     QString m_yLabel = QStringLiteral("y");
     QColor m_stairsColor = Qt::red;
     bool m_shaded = true;
+    bool m_stairsEnabled = true;
+    bool m_preStep = false;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotStairsItemNode* m_stairsNode = nullptr;

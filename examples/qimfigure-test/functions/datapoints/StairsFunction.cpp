@@ -98,6 +98,32 @@ StairsFunction::StairsFunction(QObject* parent)
     shadedReg.propertyName = "shaded";
     shadedReg.target = this;
     registerProperty(shadedReg);
+    
+    // Register stairs enabled property
+    PropertyRegistration stairsEnabledReg;
+    stairsEnabledReg.category = tr("Stairs");
+    stairsEnabledReg.subcategory = tr("Flags");
+    stairsEnabledReg.displayName = tr("Stairs Enabled");
+    stairsEnabledReg.briefDesc = tr("Enable stairs rendering");
+    stairsEnabledReg.detailDesc = tr("When enabled, data is rendered as staircase steps. When disabled, data is rendered as a connected line.");
+    stairsEnabledReg.editorType = EditorType::CheckBox;
+    stairsEnabledReg.defaultValue = m_stairsEnabled;
+    stairsEnabledReg.propertyName = "stairsEnabled";
+    stairsEnabledReg.target = this;
+    registerProperty(stairsEnabledReg);
+    
+    // Register preStep property
+    PropertyRegistration preStepReg;
+    preStepReg.category = tr("Stairs");
+    preStepReg.subcategory = tr("Flags");
+    preStepReg.displayName = tr("Pre Step");
+    preStepReg.briefDesc = tr("Pre-step mode");
+    preStepReg.detailDesc = tr("When enabled, the staircase uses pre-step rendering (step occurs before the data point). Default is post-step.");
+    preStepReg.editorType = EditorType::CheckBox;
+    preStepReg.defaultValue = m_preStep;
+    preStepReg.propertyName = "preStep";
+    preStepReg.target = this;
+    registerProperty(preStepReg);
 }
 
 /**
@@ -162,6 +188,8 @@ void StairsFunction::createPlot(QIM::QImFigureWidget* figure)
     m_stairsNode->setData(xData, yData);
     m_stairsNode->setColor(m_stairsColor);
     m_stairsNode->setShaded(m_shaded);
+    m_stairsNode->setStairsEnabled(m_stairsEnabled);
+    m_stairsNode->setPreStep(m_preStep);
     
     // Create and attach value tracker
     m_trackerNode = new QIM::QImPlotValueTrackerNode(m_plotNode);
@@ -220,6 +248,28 @@ void StairsFunction::setShaded(bool shaded)
         emit shadedChanged(shaded);
         if (m_stairsNode) {
             m_stairsNode->setShaded(shaded);
+        }
+    }
+}
+
+void StairsFunction::setStairsEnabled(bool enabled)
+{
+    if (m_stairsEnabled != enabled) {
+        m_stairsEnabled = enabled;
+        Q_EMIT stairsEnabledChanged(enabled);
+        if (m_stairsNode) {
+            m_stairsNode->setStairsEnabled(enabled);
+        }
+    }
+}
+
+void StairsFunction::setPreStep(bool on)
+{
+    if (m_preStep != on) {
+        m_preStep = on;
+        Q_EMIT preStepChanged(on);
+        if (m_stairsNode) {
+            m_stairsNode->setPreStep(on);
         }
     }
 }

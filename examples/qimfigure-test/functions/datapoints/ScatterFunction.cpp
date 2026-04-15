@@ -143,6 +143,19 @@ ScatterFunction::ScatterFunction(QObject* parent)
     colorReg.propertyName = "markerColor";
     colorReg.target = this;
     registerProperty(colorReg);
+    
+    // Register scatter enabled property
+    PropertyRegistration scatterEnabledReg;
+    scatterEnabledReg.category = tr("Scatter");
+    scatterEnabledReg.subcategory = tr("Flags");
+    scatterEnabledReg.displayName = tr("Scatter Enabled");
+    scatterEnabledReg.briefDesc = tr("Enable scatter rendering");
+    scatterEnabledReg.detailDesc = tr("When enabled, data points are rendered as scatter markers. When disabled, points are connected by lines instead.");
+    scatterEnabledReg.editorType = EditorType::CheckBox;
+    scatterEnabledReg.defaultValue = m_scatterEnabled;
+    scatterEnabledReg.propertyName = "scatterEnabled";
+    scatterEnabledReg.target = this;
+    registerProperty(scatterEnabledReg);
 }
 
 /**
@@ -213,6 +226,7 @@ void ScatterFunction::createPlot(QIM::QImFigureWidget* figure)
     m_scatterNode->setMarkerShape(m_markerShape);
     m_scatterNode->setMarkerFill(m_markerFill);
     m_scatterNode->setColor(m_markerColor);
+    m_scatterNode->setScatterEnabled(m_scatterEnabled);
     
     // Create and attach value tracker
     m_trackerNode = new QIM::QImPlotValueTrackerNode(m_plotNode);
@@ -293,6 +307,17 @@ void ScatterFunction::setMarkerColor(const QColor& color)
         emit markerColorChanged(color);
         if (m_scatterNode) {
             m_scatterNode->setColor(color);
+        }
+    }
+}
+
+void ScatterFunction::setScatterEnabled(bool enabled)
+{
+    if (m_scatterEnabled != enabled) {
+        m_scatterEnabled = enabled;
+        Q_EMIT scatterEnabledChanged(enabled);
+        if (m_scatterNode) {
+            m_scatterNode->setScatterEnabled(enabled);
         }
     }
 }
