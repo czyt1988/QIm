@@ -56,13 +56,25 @@ plugins:
                 - PIMPL模式: zh/pimpl-pattern.md
                 - 信号槽: zh/signal-slot.md
                 - 属性系统: zh/property-system.md
+            - 2D绘图:
+                - 概述: zh/plot2d/index.md
+                - Figure Widget: zh/plot2d/figure-widget.md
+                - 线条图: zh/plot2d/plot-line.md
+                - 数据系列: zh/plot2d/data-series.md
+                - 降采样: zh/plot2d/downsampling.md
+            - 3D绘图:
+                - 概述: zh/plot3d/index.md
+            - 开发规范:
+                - 概述: zh/dev/index.md
+                - Qt集成规范: zh/dev/qt-integration.md
+                - 代码风格与注释规范: zh/dev/coding-standards.md
+                - PIMPL开发规范: zh/dev/pimpl-dev-guide.md
+                - 渲染性能规范: zh/dev/render-guidelines.md
+                - 枚举语义转换规范: zh/dev/flag-mapping.md
+                - 新节点开发指南: zh/dev/new-node-guide.md
+                - 自定义节点: zh/dev/custom-node.md
             - 使用指南: 
-                - Figure Widget: zh/figure-widget.md
-                - 线条图: zh/plot-line.md
-                - 数据系列: zh/data-series.md
-                - 降采样: zh/downsampling.md
                 - 渲染模式: zh/render-mode.md
-                - 自定义节点: zh/custom-node.md
             - 其它:
                 - 性能对比: zh/performance.md
                 - 字体: zh/font.md
@@ -78,13 +90,25 @@ plugins:
                 - PIMPL Pattern: en/pimpl-pattern.md
                 - Signal/Slot: en/signal-slot.md
                 - Property System: en/property-system.md
+            - 2D Plot:
+                - Overview: en/plot2d/index.md
+                - Figure Widget: en/plot2d/figure-widget.md
+                - Line Plot: en/plot2d/plot-line.md
+                - Data Series: en/plot2d/data-series.md
+                - Downsampling: en/plot2d/downsampling.md
+            - 3D Plot:
+                - Overview: en/plot3d/index.md
+            - Development Standards:
+                - Overview: en/dev/index.md
+                - Qt Integration Standards: en/dev/qt-integration.md
+                - Coding & Comment Standards: en/dev/coding-standards.md
+                - PIMPL Development Guide: en/dev/pimpl-dev-guide.md
+                - Render Performance Guidelines: en/dev/render-guidelines.md
+                - Flag Mapping Standards: en/dev/flag-mapping.md
+                - New Node Development Guide: en/dev/new-node-guide.md
+                - Custom Node: en/dev/custom-node.md
             - Usage Guide:
-                - Figure Widget: en/figure-widget.md
-                - Line Plot: en/plot-line.md
-                - Data Series: en/data-series.md
-                - Downsampling: en/downsampling.md
                 - Render Mode: en/render-mode.md
-                - Custom Node: en/custom-node.md
             - Others:
                 - Performance: en/performance.md
   # 需要版本切换再打开下面

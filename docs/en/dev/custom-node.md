@@ -126,5 +126,5 @@ public:
 
 ## References
 
-- Related docs: [Render Node](render-node.md), [PIMPL Pattern](pimpl-pattern.md)
+- Related docs: [Render Node](../render-node.md), [PIMPL Pattern](../pimpl-pattern.md)
 - ImGui Docs: https://github.com/ocornut/imgui

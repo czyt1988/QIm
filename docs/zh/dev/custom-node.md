@@ -127,5 +127,5 @@ public:
 
 ## 参考
 
-- 相关文档：[渲染节点](render-node.md)、[PIMPL模式](pimpl-pattern.md)
+- 相关文档：[渲染节点](../render-node.md)、[PIMPL模式](../pimpl-pattern.md)
 - ImGui文档：https://github.com/ocornut/imgui
