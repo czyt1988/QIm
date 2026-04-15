@@ -67,7 +67,7 @@ class ScatterFunction : public TestFunction {
     Q_PROPERTY(int markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
     Q_PROPERTY(bool markerFill READ markerFill WRITE setMarkerFill NOTIFY markerFillChanged)
     Q_PROPERTY(QColor markerColor READ markerColor WRITE setMarkerColor NOTIFY markerColorChanged)
-    Q_PROPERTY(bool scatterEnabled READ isScatterEnabled WRITE setScatterEnabled NOTIFY scatterEnabledChanged)
+    Q_PROPERTY(bool clippingEnabled READ isClippingEnabled WRITE setClippingEnabled NOTIFY clippingEnabledChanged)
     
 public:
     /**
@@ -135,9 +135,9 @@ public:
     QColor markerColor() const { return m_markerColor; }
     void setMarkerColor(const QColor& color);
     
-    // Scatter enabled property accessors
-    bool isScatterEnabled() const { return m_scatterEnabled; }
-    void setScatterEnabled(bool enabled);
+    // Clipping enabled property accessors
+    bool isClippingEnabled() const { return m_clippingEnabled; }
+    void setClippingEnabled(bool enabled);
     
 Q_SIGNALS:
     /**
@@ -231,18 +231,7 @@ Q_SIGNALS:
      */
     void markerColorChanged(const QColor& color);
     
-    /**
-     * \if ENGLISH
-     * @brief Signal emitted when scatter enabled flag changes
-     * @param enabled New scatter enabled value
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 散点启用标志改变时发出的信号
-     * @param enabled 新散点启用值
-     * \endif
-     */
-    void scatterEnabledChanged(bool enabled);
+    void clippingEnabledChanged(bool enabled);
     
 private:
     QString m_title = QStringLiteral("Scatter Plot");
@@ -252,7 +241,7 @@ private:
     int m_markerShape = 0;  // ImPlotMarker_Circle
     bool m_markerFill = true;
     QColor m_markerColor = Qt::blue;
-    bool m_scatterEnabled = true;
+    bool m_clippingEnabled = true;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotScatterItemNode* m_scatterNode = nullptr;

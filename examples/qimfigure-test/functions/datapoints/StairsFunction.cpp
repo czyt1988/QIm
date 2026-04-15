@@ -99,19 +99,6 @@ StairsFunction::StairsFunction(QObject* parent)
     shadedReg.target = this;
     registerProperty(shadedReg);
     
-    // Register stairs enabled property
-    PropertyRegistration stairsEnabledReg;
-    stairsEnabledReg.category = tr("Stairs");
-    stairsEnabledReg.subcategory = tr("Flags");
-    stairsEnabledReg.displayName = tr("Stairs Enabled");
-    stairsEnabledReg.briefDesc = tr("Enable stairs rendering");
-    stairsEnabledReg.detailDesc = tr("When enabled, data is rendered as staircase steps. When disabled, data is rendered as a connected line.");
-    stairsEnabledReg.editorType = EditorType::CheckBox;
-    stairsEnabledReg.defaultValue = m_stairsEnabled;
-    stairsEnabledReg.propertyName = "stairsEnabled";
-    stairsEnabledReg.target = this;
-    registerProperty(stairsEnabledReg);
-    
     // Register preStep property
     PropertyRegistration preStepReg;
     preStepReg.category = tr("Stairs");
@@ -188,7 +175,6 @@ void StairsFunction::createPlot(QIM::QImFigureWidget* figure)
     m_stairsNode->setData(xData, yData);
     m_stairsNode->setColor(m_stairsColor);
     m_stairsNode->setShaded(m_shaded);
-    m_stairsNode->setStairsEnabled(m_stairsEnabled);
     m_stairsNode->setPreStep(m_preStep);
     
     // Create and attach value tracker
@@ -248,17 +234,6 @@ void StairsFunction::setShaded(bool shaded)
         emit shadedChanged(shaded);
         if (m_stairsNode) {
             m_stairsNode->setShaded(shaded);
-        }
-    }
-}
-
-void StairsFunction::setStairsEnabled(bool enabled)
-{
-    if (m_stairsEnabled != enabled) {
-        m_stairsEnabled = enabled;
-        Q_EMIT stairsEnabledChanged(enabled);
-        if (m_stairsNode) {
-            m_stairsNode->setStairsEnabled(enabled);
         }
     }
 }
