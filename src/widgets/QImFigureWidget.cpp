@@ -1,7 +1,8 @@
-﻿#include "QImFigureWidget.h"
+#include "QImFigureWidget.h"
 #include <QDebug>
 #include "QImTrackedValue.hpp"
 #include "implot.h"
+#include "implot3d.h"
 #include "plot/QImSubplotsNode.h"
 #include "plot/QImPlotNode.h"
 namespace QIM
@@ -36,6 +37,8 @@ QImFigureWidget::QImFigureWidget(QWidget* parent, Qt::WindowFlags f) : QImWidget
 
 QImFigureWidget::~QImFigureWidget()
 {
+    ImPlot3D::DestroyContext();
+    ImPlot::DestroyContext(d_ptr->m_context);
 }
 
 void QImFigureWidget::setPlotTheme(const QImPlotTheme& t)
@@ -154,6 +157,7 @@ void QImFigureWidget::initializeGL()
     QIM_D(d);
     QIM::QImWidget::initializeGL();
     d->m_context = ImPlot::CreateContext();
+    ImPlot3D::CreateContext();
     // 默认有个subplot
 }
 

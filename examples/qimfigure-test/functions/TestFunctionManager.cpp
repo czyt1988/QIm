@@ -23,6 +23,8 @@
 #include "tools/AnnotationFunction.h"
 #include "tools/TagsFunction.h"
 #include "layout/SubplotsFunction.h"
+#include "3d/Plot3DScatterFunction.h"
+#include "3d/Plot3DLineFunction.h"
 
 /**
  * \if ENGLISH
@@ -417,5 +419,25 @@ void TestFunctionManager::create2DFunctions()
  */
 void TestFunctionManager::create3DFunctions()
 {
-    // Reserved for future 3D functions
+    // 3D Scatter
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Data Points");
+        meta.displayName = tr("Scatter");
+        meta.functionId = "3d_datapoints_scatter";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DScatterFunction(this);
+    }
+    
+    // 3D Line
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Line");
+        meta.displayName = tr("Spiral");
+        meta.functionId = "3d_line_spiral";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DLineFunction(this);
+    }
 }

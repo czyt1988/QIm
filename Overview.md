@@ -242,3 +242,16 @@ examples/qimfigure-test/functions/
 4. **头文件注释**: public函数仅单行英文简要注释
 5. **详细注释**: 在cpp文件中使用完整Doxygen双语块
 
+### 涉及代码开发必须阅读文档
+
+1. **代码风格与注释规范**: `docs\zh\dev\coding-standards.md`
+2. **PIMPL开发规范**: `docs\zh\dev\pimpl-dev-guide.md`
+3. **Qt集成规范**: `docs\zh\dev\qt-integration.md`
+
+涉及新节点开发，你还需要阅读：
+
+1. **新节点开发指南**: `docs\zh\dev\new-node-guide.md`
+2. **渲染性能规范**: `docs\zh\dev\render-guidelines.md`
+3. **枚举语义转换规范**: `docs\zh\dev\flag-mapping.md`
+
+这些文档你可以通过**开发规范索引**了解详情: `docs\zh\dev\index.md`

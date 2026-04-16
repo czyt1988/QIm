@@ -167,6 +167,8 @@ flowchart TD
     - `PrivateData` 类中不应暴露 `ImPlot`/`ImGui` 原生类型给头文件，所有原生类型仅在 `.cpp` 中使用
     - 变量名使用 `d` 是惯例，不要使用其他名称
 
+**如果这个类使用了PIMPL，不要在类的头文件中出现私有成员变量的定义，私有成员变量都应该在`PrivateData`类**
+
 ## 参考
 
 - 核心概念：[PIMPL模式](../pimpl-pattern.md)（用户视角文档）

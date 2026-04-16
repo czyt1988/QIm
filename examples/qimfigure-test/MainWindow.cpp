@@ -4,6 +4,7 @@
 #include "functions/TestFunctionManager.h"
 #include "functions/TestFunction.h"
 #include <QImFigureWidget.h>
+#include <plot/QImSubplotsNode.h>
 #include <QDockWidget>
 #include <QMenuBar>
 #include <QStatusBar>
@@ -172,10 +173,13 @@ void MainWindow::onFunctionSelected(const QString& functionId)
         m_currentFunction->cleanupPlot();
     }
     
-    // Clear figure widget by removing all plot nodes
-    auto plotNodes = m_figureWidget->plotNodes();
-    for (auto* plot : plotNodes) {
-        m_figureWidget->removePlotNode(plot);
+    // Clear figure widget by removing all plot nodes (including 2D and 3D)
+    // Use childrenNodes() to catch both QImPlotNode (2D) and QImPlot3DNode (3D)
+    // Cast to QImAbstractNode* since childrenNodes() and removeChildNode() are base class methods
+    QIM::QImAbstractNode* subplot = m_figureWidget->subplotNode();
+    const auto allChildren = subplot->childrenNodes();
+    for (auto* child : allChildren) {
+        subplot->removeChildNode(child);
     }
     
     // Reset subplot grid to 1x1 for new function (unless it's SubplotsFunction)
