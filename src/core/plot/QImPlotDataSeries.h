@@ -231,7 +231,7 @@ public:
     {
         return m_xStart;
     }
-    virtual double xValue(int index) const
+    double xValue(int index) const override
     {
         const int valid_size = size();
         if (index < 0 || index >= valid_size) {
@@ -242,7 +242,7 @@ public:
         }
         return m_xs[ index ];
     }
-    virtual double yValue(int index) const
+    double yValue(int index) const override
     {
         const int valid_size = size();
         if (index < 0 || index >= valid_size) {

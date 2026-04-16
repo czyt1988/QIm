@@ -72,7 +72,7 @@ void QImPlotHistogramItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -124,7 +124,7 @@ void QImPlotHistogramItemNode::setBins(int bins)
     QIM_D(d);
     if (d->bins != bins) {
         d->bins = bins;
-        emit binsChanged(bins);
+        Q_EMIT binsChanged(bins);
     }
 }
 
@@ -161,7 +161,7 @@ void QImPlotHistogramItemNode::setBarScale(double scale)
     QIM_D(d);
     if (d->barScale != scale) {
         d->barScale = scale;
-        emit barScaleChanged(scale);
+        Q_EMIT barScaleChanged(scale);
     }
 }
 
@@ -198,7 +198,7 @@ void QImPlotHistogramItemNode::setRangeMin(double min)
     QIM_D(d);
     if (d->rangeMin != min) {
         d->rangeMin = min;
-        emit rangeChanged();
+        Q_EMIT rangeChanged();
     }
 }
 
@@ -235,7 +235,7 @@ void QImPlotHistogramItemNode::setRangeMax(double max)
     QIM_D(d);
     if (d->rangeMax != max) {
         d->rangeMax = max;
-        emit rangeChanged();
+        Q_EMIT rangeChanged();
     }
 }
 
@@ -277,8 +277,8 @@ void QImPlotHistogramItemNode::setCumulative(bool cumulative)
         d->flags &= ~ImPlotHistogramFlags_Cumulative;
     }
     if (d->flags != oldFlags) {
-        emit cumulativeChanged(cumulative);
-        emit histogramFlagChanged();
+        Q_EMIT cumulativeChanged(cumulative);
+        Q_EMIT histogramFlagChanged();
     }
 }
 
@@ -320,8 +320,8 @@ void QImPlotHistogramItemNode::setDensity(bool density)
         d->flags &= ~ImPlotHistogramFlags_Density;
     }
     if (d->flags != oldFlags) {
-        emit densityChanged(density);
-        emit histogramFlagChanged();
+        Q_EMIT densityChanged(density);
+        Q_EMIT histogramFlagChanged();
     }
 }
 
@@ -363,8 +363,8 @@ void QImPlotHistogramItemNode::setHorizontal(bool horizontal)
         d->flags &= ~ImPlotHistogramFlags_Horizontal;
     }
     if (d->flags != oldFlags) {
-        emit orientationChanged(horizontal);
-        emit histogramFlagChanged();
+        Q_EMIT orientationChanged(horizontal);
+        Q_EMIT histogramFlagChanged();
     }
 }
 
@@ -511,7 +511,7 @@ void QImPlotHistogramItemNode::setColor(const QColor& c)
         qDebug() << "[HistogramItemNode] after emplace+mark_dirty, dirty=" << d_ptr->color->is_dirty();
     }
     
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -547,7 +547,7 @@ void QImPlotHistogramItemNode::setHistogramFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotHistogramFlags >(flags);
-        emit histogramFlagChanged();
+        Q_EMIT histogramFlagChanged();
     }
 }
 

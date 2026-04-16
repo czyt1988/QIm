@@ -72,7 +72,7 @@ void QImPlotPieChartItemNode::setData(QImAbstractPieChartDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -449,19 +449,20 @@ bool QImPlotPieChartItemNode::beginDraw()
     }
 
     // Update item status
-    ImPlotContext* ct    = ImPlot::GetCurrentContext();
-    if (!ct) {
-        return false;
+    if(!imPlotItem()){
+        ImPlotContext* ct    = ImPlot::GetCurrentContext();
+        if (!ct) {
+            return false;
+        }
+        ImPlotItem* plotItem = ct->PreviousItem;
+        if (!plotItem) {
+            return false;
+        }
+        setImPlotItem(plotItem);
+        if (plotItem->Show != QImAbstractNode::isVisible()) {
+            QImAbstractNode::setVisible(plotItem->Show);
+        }
     }
-    ImPlotItem* plotItem = ct->PreviousItem;
-    if (!plotItem) {
-        return false;
-    }
-    setImPlotItem(plotItem);
-    if (plotItem->Show != QImAbstractNode::isVisible()) {
-        QImAbstractNode::setVisible(plotItem->Show);
-    }
-
     return false;
 }
 

@@ -64,49 +64,8 @@ class QIM_CORE_API QImPlotInfLinesItemNode : public QImPlotItemNode
 {
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotInfLinesItemNode)
-
-    /**
-     * \if ENGLISH
-     * @property QImPlotInfLinesItemNode::horizontal
-     * @brief Horizontal orientation flag
-     *
-     * @details When true, infinite lines are rendered horizontally on the current y-axis.
-     *          When false, infinite lines are rendered vertically (default).
-     * @accessors READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotInfLinesItemNode::horizontal
-     * @brief 水平方向标志
-     *
-     * @details 为true时，无限线沿当前y轴水平渲染。
-     *          为false时，无限线垂直渲染（默认）。
-     * @accessors READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged
-     * \endif
-     */
     Q_PROPERTY(bool horizontal READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged)
-
-    /**
-     * \if ENGLISH
-     * @property QImPlotInfLinesItemNode::color
-     * @brief Color of infinite lines
-     *
-     * @details Defines the color for infinite lines.
-     *          When not set, uses ImPlot's default color sequence.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotInfLinesItemNode::color
-     * @brief 无限线的颜色
-     *
-     * @details 定义无限线的颜色。
-     *          未设置时，使用ImPlot的默认颜色序列。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
-
 public:
     // Unique type identifier for QImPlotInfLinesItemNode
     enum

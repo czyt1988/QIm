@@ -36,6 +36,7 @@
 #include <sys/resource.h>
 #include <fstream>
 #include <string>
+#include <malloc.h>
 #elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
 #include <mach/mach.h>
 #endif

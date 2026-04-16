@@ -7,6 +7,7 @@ ImWidget3D::ImWidget3D(QWidget* parent, Qt::WindowFlags f) : QIM::QImWidget(pare
 
 void ImWidget3D::afterRenderImNodes()
 {
+    ImPlot3D::SetCurrentContext(m_context);
     ImPlot3D::ShowDemoWindow();
 }
 

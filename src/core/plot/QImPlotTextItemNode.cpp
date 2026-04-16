@@ -3,7 +3,7 @@
 #include "implot.h"
 #include "implot_internal.h"
 #include "QImTrackedValue.hpp"
-#include "../QtImGuiUtils.h"
+#include "QtImGuiUtils.h"
 
 namespace QIM
 {
@@ -87,7 +87,7 @@ void QImPlotTextItemNode::setText(const QString& text)
     QByteArray utf8 = text.toUtf8();
     if (d_ptr->textUtf8 != utf8) {
         d_ptr->textUtf8 = utf8;
-        emit textChanged(text);
+        Q_EMIT textChanged(text);
     }
 }
 
@@ -141,7 +141,7 @@ void QImPlotTextItemNode::setPosition(double x, double y)
     if (d_ptr->position.x != x || d_ptr->position.y != y) {
         d_ptr->position.x = x;
         d_ptr->position.y = y;
-        emit positionChanged(QPointF(x, y));
+        Q_EMIT positionChanged(QPointF(x, y));
     }
 }
 
@@ -195,7 +195,7 @@ void QImPlotTextItemNode::setPixelOffset(float dx, float dy)
     if (d_ptr->pixelOffset.x != dx || d_ptr->pixelOffset.y != dy) {
         d_ptr->pixelOffset.x = dx;
         d_ptr->pixelOffset.y = dy;
-        emit pixelOffsetChanged(QPointF(dx, dy));
+        Q_EMIT pixelOffsetChanged(QPointF(dx, dy));
     }
 }
 
@@ -234,8 +234,8 @@ void QImPlotTextItemNode::setVertical(bool vertical)
     } else {
         d->flags &= ~ImPlotTextFlags_Vertical;
     }
-    emit verticalChanged(vertical);
-    emit textFlagChanged();
+    Q_EMIT verticalChanged(vertical);
+    Q_EMIT textFlagChanged();
 }
 
 /**
@@ -268,7 +268,7 @@ QColor QImPlotTextItemNode::color() const
 void QImPlotTextItemNode::setColor(const QColor& c)
 {
     d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -304,7 +304,7 @@ void QImPlotTextItemNode::setTextFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast<ImPlotTextFlags>(flags);
-        emit textFlagChanged();
+        Q_EMIT textFlagChanged();
     }
 }
 
@@ -353,11 +353,13 @@ bool QImPlotTextItemNode::beginDraw()
     }
 
     // Update item status
-    ImPlotContext* ct = ImPlot::GetCurrentContext();
-    ImPlotItem* plotItem = ct->PreviousItem;
-    setImPlotItem(plotItem);
-    if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
-        QImAbstractNode::setVisible(plotItem->Show);
+    if(!imPlotItem()){
+        ImPlotContext* ct = ImPlot::GetCurrentContext();
+        ImPlotItem* plotItem = ct->PreviousItem;
+        setImPlotItem(plotItem);
+        if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
+            QImAbstractNode::setVisible(plotItem->Show);
+        }
     }
     if (!d->color) {
         // First render without explicit color, get default color from ImPlot

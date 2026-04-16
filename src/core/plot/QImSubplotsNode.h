@@ -1,51 +1,39 @@
-﻿#ifndef QIMSUBPLOTSNODE_H
+#ifndef QIMSUBPLOTSNODE_H
 #define QIMSUBPLOTSNODE_H
+
 #include "QImAbstractNode.h"
-#include <QSize>
+#include <QPoint>
+#include <QPointF>
+#include <QSizeF>
 #include <vector>
+
 namespace QIM
 {
 class QImPlotNode;
+class QImPlot3DNode;
 
 class QIM_CORE_API QImSubplotsNode : public QImAbstractNode
 {
     Q_OBJECT
+
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(int rows READ rows WRITE setRows NOTIFY gridInfoChanged)
     Q_PROPERTY(int cols READ columns WRITE setColumns NOTIFY gridInfoChanged)
-    Q_PROPERTY(QSizeF size READ size WRITE setSize)
-    // 语义化标志属性（内部映射到单一 ImPlotSubplotFlags）
-    Q_PROPERTY(bool isTitleEnabled READ isTitleEnabled WRITE setTitleEnabled NOTIFY titleChanged)
-    Q_PROPERTY(bool isLegendEnabled READ isLegendEnabled WRITE setLegendEnabled NOTIFY subplotFlagChanged)
-    Q_PROPERTY(bool isDefaultMenusEnabled READ isDefaultMenusEnabled WRITE setDefaultMenusEnabled NOTIFY subplotFlagChanged)
-    Q_PROPERTY(bool isResizable READ isResizable WRITE setResizable NOTIFY subplotFlagChanged)
-    Q_PROPERTY(bool isAlignedEnabled READ isAlignedEnabled WRITE setAlignedEnabled NOTIFY subplotFlagChanged)
-    Q_PROPERTY(bool isShareItemsEnabled READ isShareItemsEnabled WRITE setShareItemsEnabled NOTIFY subplotFlagChanged)
-
-    // 链接行为（自动处理互斥）
-    Q_PROPERTY(bool isLinkRows READ isLinkRows WRITE setLinkRows NOTIFY subplotFlagChanged)
-    Q_PROPERTY(bool isLinkColumns READ isLinkColumns WRITE setLinkColumns NOTIFY subplotFlagChanged)
-    Q_PROPERTY(bool isLinkAllX READ isLinkAllX WRITE setLinkAllX NOTIFY subplotFlagChanged)
-    Q_PROPERTY(bool isLinkAllY READ isLinkAllY WRITE setLinkAllY NOTIFY subplotFlagChanged)
-
-    // 布局方向
-    Q_PROPERTY(bool isColumnMajor READ isColumnMajor WRITE setColumnMajor NOTIFY subplotFlagChanged)
-
-    Q_DISABLE_COPY(QImSubplotsNode)
-    QIM_DECLARE_PRIVATE(QImSubplotsNode);
+    Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY sizeChanged)
 
 public:
     explicit QImSubplotsNode(QObject* parent = nullptr);
     explicit QImSubplotsNode(const QString& title, QObject* parent = nullptr);
-    ~QImSubplotsNode();
+    ~QImSubplotsNode() override;
+
     QString title() const;
     void setTitle(const QString& title);
 
     int rows() const;
-    void setRows(int r);
+    void setRows(int rows);
 
     int columns() const;
-    void setColumns(int c);
+    void setColumns(int columns);
 
     std::vector< float > rowRatios() const;
     void setRowRatios(const std::vector< float >& row_ratios);
@@ -53,84 +41,83 @@ public:
     std::vector< float > columnRatios() const;
     void setColumnRatios(const std::vector< float >& col_ratios);
 
-    void setGrid(int r,
-                 int c,
-                 const std::vector< float >& row_ratios = std::vector< float >(),
-                 const std::vector< float >& col_ratios = std::vector< float >());
+    void setGrid(
+        int rows,
+        int cols,
+        const std::vector< float >& row_ratios = std::vector< float >(),
+        const std::vector< float >& col_ratios = std::vector< float >()
+    );
+
     QSizeF size() const;
     void setSize(const QSizeF& size);
 
-    // 语义化标志属性
+    int gridCount() const;
+    int itemCount() const;
+
+    QImPlotNode* createPlotNode();
+    void addPlotNode(QImPlotNode* plot);
+    void insertPlotNode(int plotIndex, QImPlotNode* plot);
+    int plotNodeSubplotIndex(QImPlotNode* plot) const;
+    bool takePlotNode(QImPlotNode* plot);
+    void removePlotNode(QImPlotNode* plot);
+
+    QImPlot3DNode* createPlot3DNode();
+
+    QList< QImPlotNode* > plotNodes() const;
+    QList< QImPlot3DNode* > plot3DNodes() const;
+    int plotCount() const;
+    int plot3DCount() const;
+
     bool isTitleEnabled() const;
     void setTitleEnabled(bool on);
-
     bool isLegendEnabled() const;
     void setLegendEnabled(bool on);
-
     bool isDefaultMenusEnabled() const;
     void setDefaultMenusEnabled(bool on);
-
     bool isResizable() const;
     void setResizable(bool on);
-
     bool isAlignedEnabled() const;
     void setAlignedEnabled(bool on);
-
     bool isShareItemsEnabled() const;
     void setShareItemsEnabled(bool on);
-
-    // 链接行为
     bool isLinkRows() const;
     void setLinkRows(bool on);
-
     bool isLinkColumns() const;
     void setLinkColumns(bool on);
-
     bool isLinkAllX() const;
     void setLinkAllX(bool on);
-
     bool isLinkAllY() const;
     void setLinkAllY(bool on);
-    // 网格数量，plot数量不能超过网格数量
-    int gridCount() const;
-    // 布局方向
     bool isColumnMajor() const;
     void setColumnMajor(bool on);
-    // 获取所有的绘图节点
-    QList< QImPlotNode* > plotNodes() const;
-    // 创建一个绘图，这个绘图会作为subplot的子节点，如果当前subplot的绘图已经和subplot的管理数量一致，此函数返回nullptr
-    QImPlotNode* createPlotNode();
-    // 追加一个绘图
-    void addPlotNode(QImPlotNode* plot);
-    // 插入绘图，注意plotIndex是subplot节点下面绘图节点的索引，其它节点会跳过,plotIndex可以是-1，则代表在最前面插入，可以大于等于size，代表最后插入
-    void insertPlotNode(int plotIndex, QImPlotNode* plot);
-    // 绘图的数量
-    int plotCount() const;
-    // plotNode在subplot下的索引
-    int plotNodeSubplotIndex(QImPlotNode* plot);
-    // 监测subplot的grid信息变化，如果为true，每次绘图都会检测行列的比例是否变化，如果变化将会发出gridInfoChanged信号
-    // 此操作会在每帧都对比grid的ratios，默认为false，如果需要才开启
     bool isTrackGridRatiosEnabled() const;
     void setTrackGridRatiosEnabled(bool on);
+
 Q_SIGNALS:
-    /**
-     * @brief 标题发生了改变
-     * @param title
-     */
     void titleChanged(const QString& title);
-    /**
-     * @brief ImPlot::BeginSubplots对应的ImPlotSubplotFlags发生了改变
-     */
     void subplotFlagChanged();
-    /**
-     * @brief 网格信息发生了改变，网格信息包括行、列、行占比、列占比
-     */
     void gridInfoChanged();
+    void sizeChanged(const QSizeF& size);
 
 protected:
     bool beginDraw() override;
     void endDraw() override;
-};
 
+private:
+    class CellNode;
+    CellNode* createCellNode();
+    void updateCellIndices();
+    QPoint cellPosition(int index) const;
+    QSizeF cellSize() const;
+
+private:
+    QByteArray m_titleUtf8;
+    int m_rows { 1 };
+    int m_cols { 1 };
+    QSizeF m_size { -1.0, -1.0 };
+    QPointF m_origin { 0.0, 0.0 };
+    QSizeF m_availableSize { 0.0, 0.0 };
+};
 }  // namespace QIM
+
 #endif  // QIMSUBPLOTSNODE_H
