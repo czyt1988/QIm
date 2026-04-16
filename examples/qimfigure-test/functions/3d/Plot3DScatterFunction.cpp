@@ -1,6 +1,5 @@
 #include "Plot3DScatterFunction.h"
 #include "QImFigureWidget.h"
-#include "plot/QImSubplotsNode.h"
 #include "plot3d/QImPlot3DNode.h"
 #include "plot3d/QImPlot3DAxisInfo.h"
 #include "plot3d/QImPlot3DScatterItemNode.h"
@@ -180,11 +179,14 @@ void Plot3DScatterFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
-    // Create 3D plot node manually (figure->createPlotNode() creates 2D plot)
-    m_plot3DNode = new QIM::QImPlot3DNode(figure->subplotNode());
+    // Create 3D plot node as a top-level render node (not inside subplot)
+    // ImPlot3D does not participate in ImPlot's subplot grid system,
+    // so 3D nodes must be added via addRenderNode to fill the entire window
+    m_plot3DNode = new QIM::QImPlot3DNode();
     if (!m_plot3DNode) {
         return;
     }
+    figure->addRenderNode(m_plot3DNode);
     
     // Configure axes and title
     m_plot3DNode->xAxis()->setLabel(m_xLabel);

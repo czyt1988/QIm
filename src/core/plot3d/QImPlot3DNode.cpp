@@ -22,7 +22,7 @@ public:
     QByteArray titleUtf8;  ///< UTF-8 encoded title (no QString storage)
 
     // Size (pre-converted from QSizeF, used directly in beginDraw)
-    ImVec2 sizeVec4 {-1, 0};  ///< Pre-converted size for BeginPlot
+    ImVec2 sizeVec4 {-1, -1};  ///< Pre-converted size for BeginPlot (-1 = auto-fill)
 
     // Flags - MUST be named 'flags' for macro access via d_ptr->flags
     ImPlot3DFlags flags {ImPlot3DFlags_None};

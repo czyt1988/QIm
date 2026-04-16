@@ -4,6 +4,7 @@
 #include "functions/TestFunctionManager.h"
 #include "functions/TestFunction.h"
 #include <QImFigureWidget.h>
+#include <QImAbstractNode.h>
 #include <plot/QImSubplotsNode.h>
 #include <QDockWidget>
 #include <QMenuBar>
@@ -173,17 +174,31 @@ void MainWindow::onFunctionSelected(const QString& functionId)
         m_currentFunction->cleanupPlot();
     }
     
-    // Clear figure widget by removing all plot nodes (including 2D and 3D)
-    // Use childrenNodes() to catch both QImPlotNode (2D) and QImPlot3DNode (3D)
-    // Cast to QImAbstractNode* since childrenNodes() and removeChildNode() are base class methods
+    // Determine if this is a 3D function (3D nodes use addRenderNode, not subplot)
+    bool is3D = functionId.startsWith("3d_");
+    
+    // Clear subplot children (2D plot nodes)
     QIM::QImAbstractNode* subplot = m_figureWidget->subplotNode();
-    const auto allChildren = subplot->childrenNodes();
-    for (auto* child : allChildren) {
+    const auto subplotChildren = subplot->childrenNodes();
+    for (auto* child : subplotChildren) {
         subplot->removeChildNode(child);
     }
     
-    // Reset subplot grid to 1x1 for new function (unless it's SubplotsFunction)
-    // This ensures new plots are displayed correctly, not stuck in previous 2x2 grid
+    // Clear 3D render nodes from root (non-subplot nodes)
+    const auto renderNodes = m_figureWidget->renderNodeList();
+    for (auto* node : renderNodes) {
+        // Skip the subplot node itself — only remove other render nodes (3D nodes)
+        if (node != m_figureWidget->subplotNode()) {
+            m_figureWidget->removeRenderNode(node);
+        }
+    }
+    
+    // Hide/show subplot depending on function type
+    // 3D plots are added as top-level render nodes and don't use subplot,
+    // so subplot should be hidden to avoid empty subplot frame overlapping
+    m_figureWidget->subplotNode()->setVisible(!is3D);
+    
+    // Reset subplot grid to 1x1 for new 2D function
     m_figureWidget->setSubplotGrid(1, 1);
     
     // Create new plot for the selected function

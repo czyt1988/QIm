@@ -168,14 +168,11 @@ void Plot3DLineFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
-    // Get subplot node to add 3D plot as child
-    QIM::QImSubplotsNode* subplot = figure->subplotNode();
-    if (!subplot) {
-        return;
-    }
-    
-    // Create 3D plot node manually (not using createPlotNode for 2D)
-    m_plot3DNode = new QIM::QImPlot3DNode(subplot);
+    // Create 3D plot node as a top-level render node (not inside subplot)
+    // ImPlot3D does not participate in ImPlot's subplot grid system,
+    // so 3D nodes must be added via addRenderNode to fill the entire window
+    m_plot3DNode = new QIM::QImPlot3DNode();
+    figure->addRenderNode(m_plot3DNode);
     
     // Configure axes and title
     m_plot3DNode->xAxis()->setLabel(m_xLabel);
@@ -202,9 +199,6 @@ void Plot3DLineFunction::createPlot(QIM::QImFigureWidget* figure)
     m_line3DNode->setData(xs, ys, zs);
     m_line3DNode->setColor(m_lineColor);
     m_line3DNode->setLineWeight(m_lineWeight);
-    
-    // Add 3D plot node to subplot (as child node, not via createPlotNode)
-    subplot->addChildNode(m_plot3DNode);
 }
 
 void Plot3DLineFunction::setTitle(const QString& title)
