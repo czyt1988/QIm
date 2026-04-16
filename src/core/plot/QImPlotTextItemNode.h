@@ -55,108 +55,10 @@ class QIM_CORE_API QImPlotTextItemNode : public QImPlotItemNode
 {
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotTextItemNode)
-
-    /**
-     * \if ENGLISH
-     * @property QImPlotTextItemNode::text
-     * @brief Text content to display
-     *
-     * @details Defines the text string to be rendered at the plot position.
-     * @accessors READ text WRITE setText NOTIFY textChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotTextItemNode::text
-     * @brief 要显示的文本内容
-     *
-     * @details 定义要在绘图位置渲染的文本字符串。
-     * @accessors READ text WRITE setText NOTIFY textChanged
-     * \endif
-     */
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-
-    /**
-     * \if ENGLISH
-     * @property QImPlotTextItemNode::position
-     * @brief Position in plot coordinates
-     *
-     * @details Defines the (x, y) position where the text label will be rendered.
-     *          Coordinates are in plot space (not pixels).
-     * @accessors READ position WRITE setPosition NOTIFY positionChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotTextItemNode::position
-     * @brief 绘图坐标中的位置
-     *
-     * @details 定义文本标签将渲染的 (x, y) 位置。
-     *          坐标在绘图空间中（不是像素）。
-     * @accessors READ position WRITE setPosition NOTIFY positionChanged
-     * \endif
-     */
     Q_PROPERTY(QPointF position READ position WRITE setPosition NOTIFY positionChanged)
-
-    /**
-     * \if ENGLISH
-     * @property QImPlotTextItemNode::pixelOffset
-     * @brief Pixel offset from position
-     *
-     * @details Defines the offset in pixels from the plot position.
-     *          Positive X offset moves text right, positive Y offset moves text up.
-     * @accessors READ pixelOffset WRITE setPixelOffset NOTIFY pixelOffsetChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotTextItemNode::pixelOffset
-     * @brief 距位置的像素偏移
-     *
-     * @details 定义距绘图位置的像素偏移。
-     *          正X偏移将文本向右移动，正Y偏移将文本向上移动。
-     * @accessors READ pixelOffset WRITE setPixelOffset NOTIFY pixelOffsetChanged
-     * \endif
-     */
     Q_PROPERTY(QPointF pixelOffset READ pixelOffset WRITE setPixelOffset NOTIFY pixelOffsetChanged)
-
-    /**
-     * \if ENGLISH
-     * @property QImPlotTextItemNode::vertical
-     * @brief Vertical text orientation flag
-     *
-     * @details When true, text is rendered vertically (rotated 90 degrees).
-     *          When false (default), text is rendered horizontally.
-     * @accessors READ isVertical WRITE setVertical NOTIFY verticalChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotTextItemNode::vertical
-     * @brief 垂直文本方向标志
-     *
-     * @details 为true时，文本垂直渲染（旋转90度）。
-     *          为false时（默认），文本水平渲染。
-     * @accessors READ isVertical WRITE setVertical NOTIFY verticalChanged
-     * \endif
-     */
     Q_PROPERTY(bool vertical READ isVertical WRITE setVertical NOTIFY verticalChanged)
-
-    /**
-     * \if ENGLISH
-     * @property QImPlotTextItemNode::color
-     * @brief Color of the text label
-     *
-     * @details Defines the color for the text label.
-     *          When not set, uses ImGui's default text color.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotTextItemNode::color
-     * @brief 文本标签的颜色
-     *
-     * @details 定义文本标签的颜色。
-     *          未设置时，使用ImGui的默认文本颜色。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:

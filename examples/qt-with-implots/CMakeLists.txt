@@ -54,6 +54,10 @@ else()
     endif()
 endif()
 
+target_include_directories(${EXAMPLE_PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 # 链接库
 target_link_libraries(${EXAMPLE_PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core

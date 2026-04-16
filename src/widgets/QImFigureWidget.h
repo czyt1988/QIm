@@ -8,6 +8,7 @@ namespace QIM
 {
 class QImSubplotsNode;
 class QImPlotNode;
+class QImPlot3DNode;
 /**
  * @brief Figure Widget for plot
  *
@@ -47,34 +48,26 @@ public:
     // ===========================
     //  plot
     // ===========================
-    // 创建一个绘图，这个绘图会作为subplot的子节点，如果当前subplot的绘图已经和subplot的管理数量一致，此函数返回nullptr
     QImPlotNode* createPlotNode();
-    // 获取所有绘图节点
     QList< QImPlotNode* > plotNodes() const;
-    // 绘图的数量
     int plotCount() const;
     void addPlotNode(QImPlotNode* plot);
-    // 插入绘图，注意plotIndex是subplot节点下面绘图节点的索引，其它节点会跳过,plotIndex可以是-1，则代表在最前面插入，可以大于等于size，代表最后插入
     void insertPlotNode(int plotIndex, QImPlotNode* plot);
-    // plotNode在subplot下的索引
     int plotNodeSubplotIndex(QImPlotNode* plot);
-    // 提取出QImPlotNode，不在此figure里管理
     bool takePlotNode(QImPlotNode* plot);
-    // 移除绘图，plot会被删除
     void removePlotNode(QImPlotNode* plot);
+    // ===========================
+    //  plot3D
+    // ===========================
+    QImPlot3DNode* createPlot3DNode();
+    QList< QImPlot3DNode* > plot3DNodes() const;
+    int plot3DCount() const;
 Q_SIGNALS:
-    /**
-     * @brief QImPlotNode的添加或删除的信号，此信号等同绑定subplotNode的childNodeAdded/childNodeRemoved
-     * @param plot
-     * @param attach
-     */
     void plotNodeAttached(QIM::QImPlotNode* plot, bool attach);
 
 protected:
     void initializeGL() override;
-private Q_SLOTS:
-    void onSubplotChildNodeRemoved(QIM::QImAbstractNode* c);
-    void onSubplotChildNodeAdded(QIM::QImAbstractNode* c);
+    void beforeRenderImNodes() override;
 };
 }
 #endif  // QIMFIGUREWIDGET_H

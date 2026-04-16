@@ -305,11 +305,13 @@ bool QImPlotInfLinesItemNode::beginDraw()
         labelConstData(), d->values.data(), static_cast< int >(d->values.size()), d->flags, 0, sizeof(double));
 
     // Update item status
-    ImPlotContext* ct    = ImPlot::GetCurrentContext();
-    ImPlotItem* plotItem = ct->PreviousItem;
-    setImPlotItem(plotItem);
-    if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
-        QImAbstractNode::setVisible(plotItem->Show);
+    if(!imPlotItem()){
+        ImPlotContext* ct    = ImPlot::GetCurrentContext();
+        ImPlotItem* plotItem = ct->PreviousItem;
+        setImPlotItem(plotItem);
+        if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
+            QImAbstractNode::setVisible(plotItem->Show);
+        }
     }
     if (!d->color) {
         // First render without explicit color, get default color from ImPlot
