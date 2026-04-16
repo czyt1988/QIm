@@ -4,7 +4,6 @@
 #include "functions/TestFunctionManager.h"
 #include "functions/TestFunction.h"
 #include <QImFigureWidget.h>
-#include <QImAbstractNode.h>
 #include <plot/QImSubplotsNode.h>
 #include <QDockWidget>
 #include <QMenuBar>
@@ -174,32 +173,19 @@ void MainWindow::onFunctionSelected(const QString& functionId)
         m_currentFunction->cleanupPlot();
     }
     
-    // Determine if this is a 3D function (3D nodes use addRenderNode, not subplot)
-    bool is3D = functionId.startsWith("3d_");
-    
-    // Clear subplot children (2D plot nodes)
-    QIM::QImAbstractNode* subplot = m_figureWidget->subplotNode();
-    const auto subplotChildren = subplot->childrenNodes();
-    for (auto* child : subplotChildren) {
-        subplot->removeChildNode(child);
-    }
-    
-    // Clear 3D render nodes from root (non-subplot nodes)
+    // Clear standalone render nodes (3D nodes, root-level 2D plots)
+    // Anything that's not the subplot node gets removed
     const auto renderNodes = m_figureWidget->renderNodeList();
     for (auto* node : renderNodes) {
-        // Skip the subplot node itself — only remove other render nodes (3D nodes)
         if (node != m_figureWidget->subplotNode()) {
             m_figureWidget->removeRenderNode(node);
         }
     }
     
-    // Hide/show subplot depending on function type
-    // 3D plots are added as top-level render nodes and don't use subplot,
-    // so subplot should be hidden to avoid empty subplot frame overlapping
-    m_figureWidget->subplotNode()->setVisible(!is3D);
-    
-    // Reset subplot grid to 1x1 for new 2D function
-    m_figureWidget->setSubplotGrid(1, 1);
+    // Remove subplot entirely (returns to single-plot mode)
+    // This also destroys any 2D plots under the subplot
+    // If the new function needs subplot, it will call setSubplotGrid()
+    m_figureWidget->clearSubplotGrid();
     
     // Create new plot for the selected function
     function->createPlot(m_figureWidget);

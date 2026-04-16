@@ -1,4 +1,4 @@
-﻿#ifndef QIMFIGUREWIDGET_H
+#ifndef QIMFIGUREWIDGET_H
 #define QIMFIGUREWIDGET_H
 #include "QImWidget.h"
 #include <QWidget>
@@ -11,11 +11,17 @@ class QImPlotNode;
 /**
  * @brief Figure Widget for plot
  *
- * QImFigureWidget内部会创建一个QImSubplotsNode
+ * QImFigureWidget manages plot rendering with optional subplot layout.
  *
- * 绘图的节点都会作为QImSubplotsNode的子节点，默认QImSubplotsNode会有1行1列的布局
+ * By default, single plots are rendered as root-level nodes (no subplot wrapper),
+ * which allows them to fill the entire window naturally without ImPlot::BeginSubplots nesting.
  *
- * 你也可以直接调用@ref addRenderNode 把节点挂在顶层窗口下面，这样你可以创建任意渲染节点在subplot上面
+ * When setSubplotGrid() is called with rows*cols > 1, a QImSubplotsNode is created
+ * to manage the grid layout. All subsequent createPlotNode() calls will place plots
+ * inside the subplot grid.
+ *
+ * You can also call addRenderNode() to add any render node (including QImPlot3DNode)
+ * as a root-level node alongside or instead of subplot-based plots.
  */
 class QIM_WIDGETS_API QImFigureWidget : public QImWidget
 {
@@ -43,6 +49,9 @@ public:
     int subplotGridColumns() const;
     std::vector< float > subplotGridRowRatios() const;
     std::vector< float > subplotGridColumnRatios() const;
+    // Remove subplot grid entirely, return to single-plot mode
+    // This destroys the QImSubplotsNode and all its child plot nodes
+    void clearSubplotGrid();
     QImSubplotsNode* subplotNode() const;
     // ===========================
     //  plot
@@ -72,6 +81,8 @@ Q_SIGNALS:
 
 protected:
     void initializeGL() override;
+private:
+    QImSubplotsNode* ensureSubplotNode();
 private Q_SLOTS:
     void onSubplotChildNodeRemoved(QIM::QImAbstractNode* c);
     void onSubplotChildNodeAdded(QIM::QImAbstractNode* c);

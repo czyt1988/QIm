@@ -28,11 +28,9 @@ QImFigureWidget::PrivateData::PrivateData(QImFigureWidget* p) : q_ptr(p)
 //----------------------------------------------------
 QImFigureWidget::QImFigureWidget(QWidget* parent, Qt::WindowFlags f) : QImWidget(parent, f), QIM_PIMPL_CONSTRUCT
 {
-    d_ptr->m_subplotNode = new QImSubplotsNode();
-    addRenderNode(d_ptr->m_subplotNode.data());
-    d_ptr->m_subplotNode->setTitleEnabled(true);
-    connect(d_ptr->m_subplotNode, &QImSubplotsNode::childNodeAdded, this, &QImFigureWidget::onSubplotChildNodeAdded);
-    connect(d_ptr->m_subplotNode, &QImSubplotsNode::childNodeRemoved, this, &QImFigureWidget::onSubplotChildNodeRemoved);
+    // Subplot is no longer created by default. It will be created on demand
+    // when setSubplotGrid() is called with rows*cols > 1, or via ensureSubplotNode().
+    // Single-plot mode renders QImPlotNode directly at root level.
 }
 
 QImFigureWidget::~QImFigureWidget()
@@ -51,11 +49,28 @@ const QImPlotTheme& QImFigureWidget::plotTheme() const
     return d_ptr->m_theme.value();
 }
 
+QImSubplotsNode* QImFigureWidget::ensureSubplotNode()
+{
+    QIM_D(d);
+    if (!d->m_subplotNode) {
+        d->m_subplotNode = new QImSubplotsNode();
+        addRenderNode(d->m_subplotNode.data());
+        d->m_subplotNode->setTitleEnabled(true);
+        connect(d->m_subplotNode, &QImSubplotsNode::childNodeAdded, this, &QImFigureWidget::onSubplotChildNodeAdded);
+        connect(d->m_subplotNode, &QImSubplotsNode::childNodeRemoved, this, &QImFigureWidget::onSubplotChildNodeRemoved);
+    }
+    return d->m_subplotNode.data();
+}
+
 void QImFigureWidget::setSubplotGrid(int rows, int cols, const std::vector< float >& rowsRatios, const std::vector< float >& colsRatios)
 {
     QIM_D(d);
-    if (d->m_subplotNode) {
-        d->m_subplotNode->setGrid(rows, cols, rowsRatios, colsRatios);
+    // If no subplot exists yet and grid is 1x1, don't create one —
+    // single-plot mode uses root-level QImPlotNode directly.
+    // Only create/use subplot for multi-plot grids or if subplot already exists.
+    if (rows * cols > 1 || d->m_subplotNode) {
+        QImSubplotsNode* subplot = ensureSubplotNode();
+        subplot->setGrid(rows, cols, rowsRatios, colsRatios);
     }
 }
 
@@ -95,22 +110,39 @@ std::vector< float > QImFigureWidget::subplotGridColumnRatios() const
     return {};
 }
 
+void QImFigureWidget::clearSubplotGrid()
+{
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        removeRenderNode(d->m_subplotNode.data());
+        d->m_subplotNode = nullptr;
+    }
+}
+
 QImSubplotsNode* QImFigureWidget::subplotNode() const
 {
     return d_ptr->m_subplotNode.data();
 }
 
 /**
- * @brief 创建一个绘图，这个绘图会作为subplot的子节点
+ * @brief Create a plot node, placed intelligently based on current mode
  *
- * @note QImFigureWidget会默认创建一个网格，也就是如果@ref QImFigureWidget 没有调用过@ref setSubplotGrid ，
- * 你通过此函数添加一个绘图，但再次调用时，会超过当前网格总数而返回nullptr
+ * If no subplot exists, creates QImPlotNode as a root-level render node (fills window).
+ * If subplot exists, delegates to QImSubplotsNode::createPlotNode() (plot occupies a grid cell).
  *
- * @return 如果当前添加的绘图超过subplot的网格数量，此函数返回nullptr
+ * @return New QImPlotNode, or nullptr if subplot grid is full
  */
 QImPlotNode* QImFigureWidget::createPlotNode()
 {
-    return d_ptr->m_subplotNode->createPlotNode();
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        // Subplot exists — delegate to it (plot occupies a grid cell)
+        return d->m_subplotNode->createPlotNode();
+    }
+    // No subplot — create plot as root-level render node (fills entire window)
+    QImPlotNode* plot = new QImPlotNode();
+    addRenderNode(plot);
+    return plot;
 }
 
 /**
@@ -119,37 +151,72 @@ QImPlotNode* QImFigureWidget::createPlotNode()
  */
 QList< QImPlotNode* > QImFigureWidget::plotNodes() const
 {
-    return d_ptr->m_subplotNode->plotNodes();
+    QIM_DC(d);
+    if (d->m_subplotNode) {
+        return d->m_subplotNode->plotNodes();
+    }
+    // No subplot — search root render node children for QImPlotNode*
+    QList< QImPlotNode* > result;
+    const auto children = renderNodeList();
+    for (QImAbstractNode* node : children) {
+        if (QImPlotNode* plot = qobject_cast< QImPlotNode* >(node)) {
+            result.append(plot);
+        }
+    }
+    return result;
 }
 
 int QImFigureWidget::plotCount() const
 {
-    return d_ptr->m_subplotNode->plotCount();
+    return plotNodes().size();
 }
 
 void QImFigureWidget::addPlotNode(QImPlotNode* plot)
 {
-    return d_ptr->m_subplotNode->addPlotNode(plot);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        d->m_subplotNode->addPlotNode(plot);
+    } else {
+        addRenderNode(plot);
+    }
 }
 
 void QImFigureWidget::insertPlotNode(int plotIndex, QImPlotNode* plot)
 {
-    return d_ptr->m_subplotNode->insertPlotNode(plotIndex, plot);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        d->m_subplotNode->insertPlotNode(plotIndex, plot);
+    } else {
+        addRenderNode(plot);
+    }
 }
 
 int QImFigureWidget::plotNodeSubplotIndex(QImPlotNode* plot)
 {
-    return d_ptr->m_subplotNode->plotNodeSubplotIndex(plot);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        return d->m_subplotNode->plotNodeSubplotIndex(plot);
+    }
+    return plotNodes().indexOf(plot);
 }
 
 bool QImFigureWidget::takePlotNode(QImPlotNode* plot)
 {
-    return d_ptr->m_subplotNode->takeChildNode(plot);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        return d->m_subplotNode->takeChildNode(plot);
+    }
+    return takeRenderNode(plot);
 }
 
 void QImFigureWidget::removePlotNode(QImPlotNode* plot)
 {
-    d_ptr->m_subplotNode->removeChildNode(plot);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        d->m_subplotNode->removeChildNode(plot);
+    } else {
+        removeRenderNode(plot);
+    }
 }
 
 void QImFigureWidget::initializeGL()
