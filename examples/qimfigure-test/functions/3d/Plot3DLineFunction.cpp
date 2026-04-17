@@ -1,9 +1,9 @@
 #include "Plot3DLineFunction.h"
 #include "QImFigureWidget.h"
 #include "plot/QImSubplotsNode.h"
-#include "plot3d/QImPlot3DNode.h"
+#include "plot3d/QImPlot3DExtNode.h"
 #include "plot3d/QImPlot3DAxisInfo.h"
-#include "plot3d/QImPlot3DLineItemNode.h"
+#include "plot3d/QImPlot3DExtLineItemNode.h"
 #include "plot3d/QImPlot3DDataSeries.h"
 #include <QVector>
 #include <cmath>
@@ -171,7 +171,7 @@ void Plot3DLineFunction::createPlot(QIM::QImFigureWidget* figure)
     // Create 3D plot node as a top-level render node (not inside subplot)
     // ImPlot3D does not participate in ImPlot's subplot grid system,
     // so 3D nodes must be added via addRenderNode to fill the entire window
-    m_plot3DNode = new QIM::QImPlot3DNode();
+    m_plot3DNode = new QIM::QImPlot3DExtNode();
     figure->addRenderNode(m_plot3DNode);
     
     // Configure axes and title
@@ -195,7 +195,7 @@ void Plot3DLineFunction::createPlot(QIM::QImFigureWidget* figure)
     }
     
     // Create 3D line item node and set data
-    m_line3DNode = new QIM::QImPlot3DLineItemNode(m_plot3DNode);
+    m_line3DNode = new QIM::QImPlot3DExtLineItemNode(m_plot3DNode);
     m_line3DNode->setData(xs, ys, zs);
     m_line3DNode->setColor(m_lineColor);
     m_line3DNode->setLineWeight(m_lineWeight);

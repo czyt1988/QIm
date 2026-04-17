@@ -117,7 +117,7 @@ void QImPlotDummyItemNode::setDummyFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotDummyFlags >(flags);
-        emit dummyFlagsChanged();
+        Q_EMIT dummyFlagsChanged();
     }
 }
 
@@ -147,11 +147,13 @@ bool QImPlotDummyItemNode::beginDraw()
     ImPlot::PlotDummy(labelConstData(), d->flags);
 
     // Update item status
-    ImPlotContext* ct    = ImPlot::GetCurrentContext();
-    ImPlotItem* plotItem = ct->PreviousItem;
-    setImPlotItem(plotItem);
-    if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
-        QImAbstractNode::setVisible(plotItem->Show);
+    if(!imPlotItem()){
+        ImPlotContext* ct    = ImPlot::GetCurrentContext();
+        ImPlotItem* plotItem = ct->PreviousItem;
+        setImPlotItem(plotItem);
+        if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
+            QImAbstractNode::setVisible(plotItem->Show);
+        }
     }
     if (!d->color) {
         // First render without explicit color, get default color from ImPlot

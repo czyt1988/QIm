@@ -1,6 +1,6 @@
-#include "QImPlot3DNode.h"
+#include "QImPlot3DExtNode.h"
 #include "QImPlot3DAxisInfo.h"
-#include "QImPlot3DItemNode.h"
+#include "QImPlot3DExtItemNode.h"
 #include "implot3d.h"
 
 namespace QIM
@@ -10,12 +10,12 @@ namespace QIM
 // PrivateData Implementation
 //===============================================================
 
-class QImPlot3DNode::PrivateData
+class QImPlot3DExtNode::PrivateData
 {
-    QIM_DECLARE_PUBLIC(QImPlot3DNode)
+    QIM_DECLARE_PUBLIC(QImPlot3DExtNode)
 
 public:
-    PrivateData(QImPlot3DNode* q);
+    PrivateData(QImPlot3DExtNode* q);
 
 public:
     // UTF-8 cache (avoid conversion during rendering)
@@ -50,7 +50,7 @@ public:
     double boxScaleZ {1.0};            ///< Z-axis box scale
 };
 
-QImPlot3DNode::PrivateData::PrivateData(QImPlot3DNode* q) : q_ptr(q)
+QImPlot3DExtNode::PrivateData::PrivateData(QImPlot3DExtNode* q) : q_ptr(q)
 {
     // Default title
     titleUtf8 = "##Plot3D";
@@ -62,23 +62,23 @@ QImPlot3DNode::PrivateData::PrivateData(QImPlot3DNode* q) : q_ptr(q)
 }
 
 //===============================================================
-// QImPlot3DNode Implementation
+// QImPlot3DExtNode Implementation
 //===============================================================
 
-QImPlot3DNode::QImPlot3DNode(QObject* parent)
+QImPlot3DExtNode::QImPlot3DExtNode(QObject* parent)
     : QImAbstractNode(parent)
     , QIM_PIMPL_CONSTRUCT
 {
     setObjectName(QStringLiteral("Plot3DNode"));
 }
 
-QImPlot3DNode::QImPlot3DNode(const QString& title, QObject* parent)
-    : QImPlot3DNode(parent)
+QImPlot3DExtNode::QImPlot3DExtNode(const QString& title, QObject* parent)
+    : QImPlot3DExtNode(parent)
 {
     setTitle(title);
 }
 
-QImPlot3DNode::~QImPlot3DNode()
+QImPlot3DExtNode::~QImPlot3DExtNode()
 {
 }
 
@@ -86,13 +86,13 @@ QImPlot3DNode::~QImPlot3DNode()
 // Title
 //----------------------------------------------------
 
-QString QImPlot3DNode::title() const
+QString QImPlot3DExtNode::title() const
 {
     QIM_DC(d);
     return QString::fromUtf8(d->titleUtf8);
 }
 
-void QImPlot3DNode::setTitle(const QString& title)
+void QImPlot3DExtNode::setTitle(const QString& title)
 {
     QIM_D(d);
     QByteArray newUtf8 = title.toUtf8();
@@ -106,13 +106,13 @@ void QImPlot3DNode::setTitle(const QString& title)
 // Size
 //----------------------------------------------------
 
-QSizeF QImPlot3DNode::size() const
+QSizeF QImPlot3DExtNode::size() const
 {
     QIM_DC(d);
     return QSizeF(d->sizeVec4.x, d->sizeVec4.y);
 }
 
-void QImPlot3DNode::setSize(const QSizeF& size)
+void QImPlot3DExtNode::setSize(const QSizeF& size)
 {
     QIM_D(d);
     ImVec2 newSize(static_cast<float>(size.width()), static_cast<float>(size.height()));
@@ -135,7 +135,7 @@ void QImPlot3DNode::setSize(const QSizeF& size)
 // Axis management
 //----------------------------------------------------
 
-QImPlot3DAxisInfo* QImPlot3DNode::axisInfo(QImPlot3DAxisId aid) const
+QImPlot3DAxisInfo* QImPlot3DExtNode::axisInfo(QImPlot3DAxisId aid) const
 {
     QIM_DC(d);
     switch (aid) {
@@ -150,17 +150,17 @@ QImPlot3DAxisInfo* QImPlot3DNode::axisInfo(QImPlot3DAxisId aid) const
     }
 }
 
-QImPlot3DAxisInfo* QImPlot3DNode::xAxis() const
+QImPlot3DAxisInfo* QImPlot3DExtNode::xAxis() const
 {
     return d_ptr->xAxisInfo;
 }
 
-QImPlot3DAxisInfo* QImPlot3DNode::yAxis() const
+QImPlot3DAxisInfo* QImPlot3DExtNode::yAxis() const
 {
     return d_ptr->yAxisInfo;
 }
 
-QImPlot3DAxisInfo* QImPlot3DNode::zAxis() const
+QImPlot3DAxisInfo* QImPlot3DExtNode::zAxis() const
 {
     return d_ptr->zAxisInfo;
 }
@@ -170,18 +170,18 @@ QImPlot3DAxisInfo* QImPlot3DNode::zAxis() const
 //----------------------------------------------------
 
 // Negative to Positive semantic (NoXxx -> xxxEnabled)
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DNode, TitleEnabled, ImPlot3DFlags_NoTitle, plot3DFlagChanged)
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DNode, LegendEnabled, ImPlot3DFlags_NoLegend, plot3DFlagChanged)
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DNode, MouseTextEnabled, ImPlot3DFlags_NoMouseText, plot3DFlagChanged)
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DNode, ClipEnabled, ImPlot3DFlags_NoClip, plot3DFlagChanged)
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DNode, MenusEnabled, ImPlot3DFlags_NoMenus, plot3DFlagChanged)
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DNode, RotateEnabled, ImPlot3DFlags_NoRotate, plot3DFlagChanged)
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DNode, PanEnabled, ImPlot3DFlags_NoPan, plot3DFlagChanged)
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DNode, ZoomEnabled, ImPlot3DFlags_NoZoom, plot3DFlagChanged)
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DNode, InputsEnabled, ImPlot3DFlags_NoInputs, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtNode, TitleEnabled, ImPlot3DFlags_NoTitle, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtNode, LegendEnabled, ImPlot3DFlags_NoLegend, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtNode, MouseTextEnabled, ImPlot3DFlags_NoMouseText, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtNode, ClipEnabled, ImPlot3DFlags_NoClip, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtNode, MenusEnabled, ImPlot3DFlags_NoMenus, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtNode, RotateEnabled, ImPlot3DFlags_NoRotate, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtNode, PanEnabled, ImPlot3DFlags_NoPan, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtNode, ZoomEnabled, ImPlot3DFlags_NoZoom, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtNode, InputsEnabled, ImPlot3DFlags_NoInputs, plot3DFlagChanged)
 
 // Positive to Positive semantic (direct mapping)
-QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DNode, Equal, ImPlot3DFlags_Equal, plot3DFlagChanged)
+QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DExtNode, Equal, ImPlot3DFlags_Equal, plot3DFlagChanged)
 
 //----------------------------------------------------
 // Combined flags - Manual implementation
@@ -202,7 +202,7 @@ QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DNode, Equal, ImPlot3DFlags_Equal, plot3DFlagCha
  * @note ImPlot3DFlags_CanvasOnly = NoTitle | NoLegend | NoMouseText
  * \endif
  */
-bool QImPlot3DNode::isCanvasEnabled() const
+bool QImPlot3DExtNode::isCanvasEnabled() const
 {
     return (d_ptr->flags & ImPlot3DFlags_CanvasOnly) == 0;
 }
@@ -220,7 +220,7 @@ bool QImPlot3DNode::isCanvasEnabled() const
  * @details 便捷方法，设置/清除 ImPlot3DFlags_CanvasOnly 组件标志
  * \endif
  */
-void QImPlot3DNode::setCanvasEnabled(bool enabled)
+void QImPlot3DExtNode::setCanvasEnabled(bool enabled)
 {
     QIM_D(d);
     const auto oldFlags = d->flags;
@@ -238,12 +238,12 @@ void QImPlot3DNode::setCanvasEnabled(bool enabled)
 // Raw flags access
 //----------------------------------------------------
 
-int QImPlot3DNode::imPlot3DFlags() const
+int QImPlot3DExtNode::imPlot3DFlags() const
 {
     return d_ptr->flags;
 }
 
-void QImPlot3DNode::setImPlot3DFlags(int flags)
+void QImPlot3DExtNode::setImPlot3DFlags(int flags)
 {
     QIM_D(d);
     if (d->flags != flags) {
@@ -256,7 +256,7 @@ void QImPlot3DNode::setImPlot3DFlags(int flags)
 // 3D rotation and scale
 //----------------------------------------------------
 
-void QImPlot3DNode::setBoxRotation(double elevation, double azimuth, bool animate, QImPlot3DCondition cond)
+void QImPlot3DExtNode::setBoxRotation(double elevation, double azimuth, bool animate, QImPlot3DCondition cond)
 {
     QIM_D(d);
     d->elevation = elevation;
@@ -265,7 +265,7 @@ void QImPlot3DNode::setBoxRotation(double elevation, double azimuth, bool animat
     d->rotationCond = static_cast<ImPlot3DCond>(toImPlot3DCond(cond));
 }
 
-void QImPlot3DNode::setBoxInitialRotation(double elevation, double azimuth)
+void QImPlot3DExtNode::setBoxInitialRotation(double elevation, double azimuth)
 {
     QIM_D(d);
     d->initialElevation = elevation;
@@ -273,7 +273,7 @@ void QImPlot3DNode::setBoxInitialRotation(double elevation, double azimuth)
     d->initialRotationSet = true;
 }
 
-void QImPlot3DNode::setBoxScale(double x, double y, double z)
+void QImPlot3DExtNode::setBoxScale(double x, double y, double z)
 {
     QIM_D(d);
     d->boxScaleX = x;
@@ -285,21 +285,21 @@ void QImPlot3DNode::setBoxScale(double x, double y, double z)
 // Item management
 //----------------------------------------------------
 
-void QImPlot3DNode::addPlot3DItem(QImPlot3DItemNode* item)
+void QImPlot3DExtNode::addPlot3DItem(QImPlot3DExtItemNode* item)
 {
     addChildNode(item);
 }
 
-QList<QImPlot3DItemNode*> QImPlot3DNode::plot3DItemNodes() const
+QList<QImPlot3DExtItemNode*> QImPlot3DExtNode::plot3DItemNodes() const
 {
-    return findChildrenNodes<QImPlot3DItemNode*>();
+    return findChildrenNodes<QImPlot3DExtItemNode*>();
 }
 
 //----------------------------------------------------
 // Interaction query
 //----------------------------------------------------
 
-bool QImPlot3DNode::isPlot3DHovered() const
+bool QImPlot3DExtNode::isPlot3DHovered() const
 {
     // Note: This requires ImPlot3D plot context to be available
     // Will be implemented when we have access to ImPlot3D plot context
@@ -310,7 +310,7 @@ bool QImPlot3DNode::isPlot3DHovered() const
 // beginDraw / endDraw - Core rendering logic
 //----------------------------------------------------
 
-bool QImPlot3DNode::beginDraw()
+bool QImPlot3DExtNode::beginDraw()
 {
     QIM_D(d);
 
@@ -342,7 +342,7 @@ bool QImPlot3DNode::beginDraw()
     return true;
 }
 
-void QImPlot3DNode::endDraw()
+void QImPlot3DExtNode::endDraw()
 {
     if (d_ptr->beginPlotSuccess) {
         ImPlot3D::EndPlot();
@@ -350,3 +350,5 @@ void QImPlot3DNode::endDraw()
 }
 
 }  // namespace QIM
+
+

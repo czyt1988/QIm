@@ -7,8 +7,8 @@
 
 namespace QIM {
 class QImFigureWidget;
-class QImPlot3DNode;
-class QImPlot3DScatterItemNode;
+class QImPlot3DExtNode;
+class QImPlot3DExtScatterItemNode;
 }
 
 /**
@@ -30,8 +30,8 @@ class QImPlot3DScatterItemNode;
  * \endcode
  * 
  * @see TestFunction
- * @see QImPlot3DNode
- * @see QImPlot3DScatterItemNode
+ * @see QImPlot3DExtNode
+ * @see QImPlot3DExtScatterItemNode
  * \endif
  * 
  * \if CHINESE
@@ -52,8 +52,8 @@ class QImPlot3DScatterItemNode;
  * \endcode
  * 
  * @see TestFunction
- * @see QImPlot3DNode
- * @see QImPlot3DScatterItemNode
+ * @see QImPlot3DExtNode
+ * @see QImPlot3DExtScatterItemNode
  * \endif
  */
 class Plot3DScatterFunction : public TestFunction {
@@ -234,8 +234,8 @@ private:
     int m_markerShape = 0;  // QImPlot3DMarkerShape::Circle
     QColor m_markerColor = Qt::blue;
     
-    QIM::QImPlot3DNode* m_plot3DNode = nullptr;
-    QIM::QImPlot3DScatterItemNode* m_scatter3DNode = nullptr;
+    QIM::QImPlot3DExtNode* m_plot3DNode = nullptr;
+    QIM::QImPlot3DExtScatterItemNode* m_scatter3DNode = nullptr;
 };
 
 #endif // PLOT3DSCATTERFUNCTION_H

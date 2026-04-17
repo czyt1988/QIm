@@ -12,6 +12,9 @@ add_library(${QIMCORE_PROJECT_NAME} ${LIB_TYPE})
 add_library(${QIM_PROJECT_NAME}::Core ALIAS ${QIMCORE_PROJECT_NAME})
 # 设置版本和输出属性
 set_target_properties(${QIMCORE_PROJECT_NAME} PROPERTIES
+    AUTOMOC ON
+    AUTOUIC ON
+    AUTORCC ON
     VERSION ${QIMCORE_VERSION}
     SOVERSION ${QIMCORE_VERSION_MAJOR}
     OUTPUT_NAME QIm${QIMCORE_PROJECT_NAME}
@@ -26,18 +29,18 @@ set_target_properties(${QIMCORE_PROJECT_NAME} PROPERTIES
 # 收集核心源文件
 set(QIMCORE_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-file(GLOB QIMCORE_SOURCES
+file(GLOB QIMCORE_SOURCES CONFIGURE_DEPENDS
     "${QIMCORE_SRC_DIR}/*.cpp"
 )
-file(GLOB QIMCORE_HEADERS
+file(GLOB QIMCORE_HEADERS CONFIGURE_DEPENDS
     "${QIMCORE_SRC_DIR}/*.h"
     "${QIMCORE_SRC_DIR}/*.hpp"
 )
 #plot folder
-file(GLOB QIMCORE_PLOT_SOURCES
+file(GLOB QIMCORE_PLOT_SOURCES CONFIGURE_DEPENDS
     "${QIMCORE_SRC_DIR}/plot/*.cpp"
 )
-file(GLOB QIMCORE_PLOT_HEADERS
+file(GLOB QIMCORE_PLOT_HEADERS CONFIGURE_DEPENDS
     "${QIMCORE_SRC_DIR}/plot/*.h"
     "${QIMCORE_SRC_DIR}/plot/*.hpp"
 )
@@ -125,6 +128,13 @@ target_link_libraries(${QIMCORE_PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::OpenGL
 )
+
+if(APPLE)
+    find_library(COREFOUNDATION_FRAMEWORK CoreFoundation REQUIRED)
+    target_link_libraries(${QIMCORE_PROJECT_NAME} PUBLIC
+        ${COREFOUNDATION_FRAMEWORK}
+    )
+endif()
 
 # ================================================================
 # 安装配置

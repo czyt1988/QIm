@@ -1,6 +1,6 @@
 #include "QImPlot3DAxisInfo.h"
 #include "implot3d.h"
-#include "QImPlot3DNode.h"
+#include "QImPlot3DExtNode.h"
 
 namespace QIM
 {
@@ -20,7 +20,7 @@ public:
     bool limitsSet { false };                ///< Whether limits have been set
     ImPlot3DCond limitsCond { ImPlot3DCond_Once };
     QImPlot3DScaleType scale { QImPlot3DScaleType::Linear };
-    QImPlot3DNode* plot { nullptr };
+    QImPlot3DExtNode* plot { nullptr };
 };
 
 QImPlot3DAxisInfo::PrivateData::PrivateData(QImPlot3DAxisInfo* p) : q_ptr(p)
@@ -35,7 +35,7 @@ QImPlot3DAxisInfo::PrivateData::PrivateData(QImPlot3DAxisInfo* p) : q_ptr(p)
  * \if ENGLISH
  * @brief Constructor for QImPlot3DAxisInfo
  * @param axis The ImPlot3D axis identifier (X1, Y1, or Z1)
- * @param plot Optional QImPlot3DNode parent for memory management
+ * @param plot Optional QImPlot3DExtNode parent for memory management
  * @details Initializes axis with default settings:
  *          - Label: empty string (will use default axis name)
  *          - Limits: [0.0, 1.0] range
@@ -45,14 +45,14 @@ QImPlot3DAxisInfo::PrivateData::PrivateData(QImPlot3DAxisInfo* p) : q_ptr(p)
  * \if CHINESE
  * @brief QImPlot3DAxisInfo 构造函数
  * @param axis ImPlot3D 轴标识符（X1、Y1 或 Z1）
- * @param plot 可选的 QImPlot3DNode 父对象，用于内存管理
+ * @param plot 可选的 QImPlot3DExtNode 父对象，用于内存管理
  * @details 初始化轴的默认设置：
  *          - 标签：空字符串（将使用默认轴名称）
  *          - 范围：[0.0, 1.0]
  *          - 标志：ImPlot3DAxisFlags_None（启用所有装饰元素）
  * \endif
  */
-QImPlot3DAxisInfo::QImPlot3DAxisInfo(QImPlot3DAxisId axis, QImPlot3DNode* plot)
+QImPlot3DAxisInfo::QImPlot3DAxisInfo(QImPlot3DAxisId axis, QImPlot3DExtNode* plot)
     : QObject(plot), m_axisId(axis), QIM_PIMPL_CONSTRUCT
 {
     d_ptr->plot = plot;
@@ -96,16 +96,16 @@ int QImPlot3DAxisInfo::imAxis3D() const
 
 /**
  * \if ENGLISH
- * @brief Returns the parent QImPlot3DNode
+ * @brief Returns the parent QImPlot3DExtNode
  * @return Pointer to the parent plot node, or nullptr if not attached
  * \endif
  *
  * \if CHINESE
- * @brief 返回父级 QImPlot3DNode
+ * @brief 返回父级 QImPlot3DExtNode
  * @return 父级绘图节点指针，如未关联则返回 nullptr
  * \endif
  */
-QImPlot3DNode* QImPlot3DAxisInfo::plotNode() const
+QImPlot3DExtNode* QImPlot3DAxisInfo::plotNode() const
 {
     return d_ptr->plot;
 }
@@ -495,3 +495,4 @@ void QImPlot3DAxisInfo::applySetup() const
 }
 
 }  // namespace QIM
+

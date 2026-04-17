@@ -1,16 +1,16 @@
-#include "QImPlot3DLineItemNode.h"
+#include "QImPlot3DExtLineItemNode.h"
 #include <QColor>
 #include "implot3d.h"
 
 namespace QIM
 {
 
-class QImPlot3DLineItemNode::PrivateData
+class QImPlot3DExtLineItemNode::PrivateData
 {
-    QIM_DECLARE_PUBLIC(QImPlot3DLineItemNode)
+    QIM_DECLARE_PUBLIC(QImPlot3DExtLineItemNode)
 
 public:
-    PrivateData(QImPlot3DLineItemNode* p);
+    PrivateData(QImPlot3DExtLineItemNode* p);
 
 public:
     std::unique_ptr<QImAbstractXYZDataSeries> dataSeries;            ///< XYZ data series
@@ -19,22 +19,22 @@ public:
     ImPlot3DLineFlags flags { ImPlot3DLineFlags_None };              ///< Line flags (must be named 'flags' for macros)
 };
 
-QImPlot3DLineItemNode::PrivateData::PrivateData(QImPlot3DLineItemNode* p)
+QImPlot3DExtLineItemNode::PrivateData::PrivateData(QImPlot3DExtLineItemNode* p)
     : q_ptr(p)
 {
 }
 
 //----------------------------------------------------
-// QImPlot3DLineItemNode
+// QImPlot3DExtLineItemNode
 //----------------------------------------------------
 
-QImPlot3DLineItemNode::QImPlot3DLineItemNode(QObject* par)
-    : QImPlot3DItemNode(par)
+QImPlot3DExtLineItemNode::QImPlot3DExtLineItemNode(QObject* par)
+    : QImPlot3DExtItemNode(par)
     , QIM_PIMPL_CONSTRUCT
 {
 }
 
-QImPlot3DLineItemNode::~QImPlot3DLineItemNode()
+QImPlot3DExtLineItemNode::~QImPlot3DExtLineItemNode()
 {
 }
 
@@ -42,13 +42,13 @@ QImPlot3DLineItemNode::~QImPlot3DLineItemNode()
 // Data setting
 //----------------------------------------------------
 
-void QImPlot3DLineItemNode::setData(QImAbstractXYZDataSeries* series)
+void QImPlot3DExtLineItemNode::setData(QImAbstractXYZDataSeries* series)
 {
     QIM_D(d);
     d->dataSeries.reset(series);
 }
 
-QImAbstractXYZDataSeries* QImPlot3DLineItemNode::data() const
+QImAbstractXYZDataSeries* QImPlot3DExtLineItemNode::data() const
 {
     return d_ptr->dataSeries.get();
 }
@@ -72,14 +72,14 @@ QImAbstractXYZDataSeries* QImPlot3DLineItemNode::data() const
  *          使用 alpha=-1 作为自动颜色指示器。
  * \endif
  */
-void QImPlot3DLineItemNode::setColor(const QColor& c)
+void QImPlot3DExtLineItemNode::setColor(const QColor& c)
 {
     QIM_D(d);
     d->colorVec4 = ImVec4(c.redF(), c.greenF(), c.blueF(), c.alphaF());
     Q_EMIT colorChanged(c);
 }
 
-QColor QImPlot3DLineItemNode::color() const
+QColor QImPlot3DExtLineItemNode::color() const
 {
     const ImVec4& v = d_ptr->colorVec4;
     // Check if auto color (alpha == -1)
@@ -89,7 +89,7 @@ QColor QImPlot3DLineItemNode::color() const
     return QColor::fromRgbF(v.x, v.y, v.z, v.w);
 }
 
-void QImPlot3DLineItemNode::setLineWeight(float weight)
+void QImPlot3DExtLineItemNode::setLineWeight(float weight)
 {
     QIM_D(d);
     if (d->lineWeightVal != weight) {
@@ -98,7 +98,7 @@ void QImPlot3DLineItemNode::setLineWeight(float weight)
     }
 }
 
-float QImPlot3DLineItemNode::lineWeight() const
+float QImPlot3DExtLineItemNode::lineWeight() const
 {
     return d_ptr->lineWeightVal;
 }
@@ -118,7 +118,7 @@ float QImPlot3DLineItemNode::lineWeight() const
  * @return 当前组合的线条标志
  * \endif
  */
-int QImPlot3DLineItemNode::lineFlags() const
+int QImPlot3DExtLineItemNode::lineFlags() const
 {
     QIM_DC(d);
     return d->flags;
@@ -137,7 +137,7 @@ int QImPlot3DLineItemNode::lineFlags() const
  * @details 如果标志实际改变则发射 lineFlagChanged。
  * \endif
  */
-void QImPlot3DLineItemNode::setLineFlags(int flags)
+void QImPlot3DExtLineItemNode::setLineFlags(int flags)
 {
     QIM_D(d);
     if (d->flags != static_cast<ImPlot3DLineFlags>(flags)) {
@@ -148,9 +148,9 @@ void QImPlot3DLineItemNode::setLineFlags(int flags)
 
 // Generate flag accessors using QIMPLOT3D_FLAG_ACCESSOR
 // All ImPlot3DLineFlags_Segments, Loop, SkipNaN are Positive→Positive (NOT NoXxx)
-QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DLineItemNode, SegmentsEnabled, ImPlot3DLineFlags_Segments, lineFlagChanged)
-QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DLineItemNode, LoopEnabled, ImPlot3DLineFlags_Loop, lineFlagChanged)
-QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DLineItemNode, SkipNaNEnabled, ImPlot3DLineFlags_SkipNaN, lineFlagChanged)
+QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DExtLineItemNode, SegmentsEnabled, ImPlot3DLineFlags_Segments, lineFlagChanged)
+QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DExtLineItemNode, LoopEnabled, ImPlot3DLineFlags_Loop, lineFlagChanged)
+QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DExtLineItemNode, SkipNaNEnabled, ImPlot3DLineFlags_SkipNaN, lineFlagChanged)
 
 //----------------------------------------------------
 // Rendering
@@ -173,7 +173,7 @@ QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DLineItemNode, SkipNaNEnabled, ImPlot3DLineFlags
  *          所有数据转换在 setter 中完成，不在此处。
  * \endif
  */
-bool QImPlot3DLineItemNode::beginDraw()
+bool QImPlot3DExtLineItemNode::beginDraw()
 {
     QIM_D(d);
 
@@ -200,3 +200,5 @@ bool QImPlot3DLineItemNode::beginDraw()
 }
 
 }  // end namespace QIM
+
+

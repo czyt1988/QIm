@@ -1,8 +1,8 @@
 #include "Plot3DScatterFunction.h"
 #include "QImFigureWidget.h"
-#include "plot3d/QImPlot3DNode.h"
+#include "plot3d/QImPlot3DExtNode.h"
 #include "plot3d/QImPlot3DAxisInfo.h"
-#include "plot3d/QImPlot3DScatterItemNode.h"
+#include "plot3d/QImPlot3DExtScatterItemNode.h"
 #include "plot3d/QImPlot3DDataSeries.h"
 #include <random>
 
@@ -182,7 +182,7 @@ void Plot3DScatterFunction::createPlot(QIM::QImFigureWidget* figure)
     // Create 3D plot node as a top-level render node (not inside subplot)
     // ImPlot3D does not participate in ImPlot's subplot grid system,
     // so 3D nodes must be added via addRenderNode to fill the entire window
-    m_plot3DNode = new QIM::QImPlot3DNode();
+    m_plot3DNode = new QIM::QImPlot3DExtNode();
     if (!m_plot3DNode) {
         return;
     }
@@ -216,7 +216,7 @@ void Plot3DScatterFunction::createPlot(QIM::QImFigureWidget* figure)
     }
     
     // Create scatter item node and set data
-    m_scatter3DNode = new QIM::QImPlot3DScatterItemNode(m_plot3DNode);
+    m_scatter3DNode = new QIM::QImPlot3DExtScatterItemNode(m_plot3DNode);
     m_scatter3DNode->setData(xData, yData, zData);
     m_scatter3DNode->setMarkerSize(m_markerSize);
     m_scatter3DNode->setMarkerShape(m_markerShape);

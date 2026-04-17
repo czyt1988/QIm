@@ -1,5 +1,5 @@
-#ifndef QIMPLOT3DNODE_H
-#define QIMPLOT3DNODE_H
+#ifndef QIMPLOT3DEXTNODE_H
+#define QIMPLOT3DEXTNODE_H
 
 #include "QImAbstractNode.h"
 #include <QSizeF>
@@ -9,9 +9,9 @@ namespace QIM
 {
 
 class QImPlot3DAxisInfo;
-class QImPlot3DItemNode;
-class QImPlot3DLineItemNode;
-class QImPlot3DScatterItemNode;
+class QImPlot3DExtItemNode;
+class QImPlot3DExtLineItemNode;
+class QImPlot3DExtScatterItemNode;
 
 /**
  * \if ENGLISH
@@ -42,10 +42,10 @@ class QImPlot3DScatterItemNode;
  *          4. EndPlot()
  * \endif
  */
-class QIM_CORE_API QImPlot3DNode : public QImAbstractNode
+class QIM_CORE_API QImPlot3DExtNode : public QImAbstractNode
 {
     Q_OBJECT
-    QIM_DECLARE_PRIVATE(QImPlot3DNode)
+    QIM_DECLARE_PRIVATE(QImPlot3DExtNode)
 
     // === Title property ===
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
@@ -70,7 +70,7 @@ class QIM_CORE_API QImPlot3DNode : public QImAbstractNode
     // Combined flags
     Q_PROPERTY(bool canvasEnabled READ isCanvasEnabled WRITE setCanvasEnabled NOTIFY plot3DFlagChanged)
 
-    Q_DISABLE_COPY(QImPlot3DNode)
+    Q_DISABLE_COPY(QImPlot3DExtNode)
 
 public:
     /**
@@ -84,7 +84,7 @@ public:
      * @param parent 用于内存管理的父 QObject
      * \endif
      */
-    explicit QImPlot3DNode(QObject* parent = nullptr);
+    explicit QImPlot3DExtNode(QObject* parent = nullptr);
 
     /**
      * \if ENGLISH
@@ -99,7 +99,7 @@ public:
      * @param parent 用于内存管理的父 QObject
      * \endif
      */
-    explicit QImPlot3DNode(const QString& title, QObject* parent = nullptr);
+    explicit QImPlot3DExtNode(const QString& title, QObject* parent = nullptr);
 
     /**
      * \if ENGLISH
@@ -110,7 +110,7 @@ public:
      * @brief 析构函数
      * \endif
      */
-    ~QImPlot3DNode() override;
+    ~QImPlot3DExtNode() override;
 
     //----------------------------------------------------
     // Title
@@ -336,28 +336,28 @@ public:
     /**
      * \if ENGLISH
      * @brief Adds a 3D plot item as child
-     * @param item Pointer to QImPlot3DItemNode to add
+     * @param item Pointer to QImPlot3DExtItemNode to add
      * \endif
      *
      * \if CHINESE
      * @brief 添加 3D 绘图元素作为子节点
-     * @param item 要添加的 QImPlot3DItemNode 指针
+     * @param item 要添加的 QImPlot3DExtItemNode 指针
      * \endif
      */
-    void addPlot3DItem(QImPlot3DItemNode* item);
+    void addPlot3DItem(QImPlot3DExtItemNode* item);
 
     /**
      * \if ENGLISH
      * @brief Gets all 3D plot item children
-     * @return List of QImPlot3DItemNode pointers
+     * @return List of QImPlot3DExtItemNode pointers
      * \endif
      *
      * \if CHINESE
      * @brief 获取所有 3D 绘图元素子节点
-     * @return QImPlot3DItemNode 指针列表
+     * @return QImPlot3DExtItemNode 指针列表
      * \endif
      */
-    QList<QImPlot3DItemNode*> plot3DItemNodes() const;
+    QList<QImPlot3DExtItemNode*> plot3DItemNodes() const;
 
     //----------------------------------------------------
     // Quick add template methods
@@ -373,7 +373,7 @@ public:
      * @param y Y coordinate data
      * @param z Z coordinate data
      * @param label Item label for legend
-     * @return Pointer to created QImPlot3DLineItemNode
+     * @return Pointer to created QImPlot3DExtLineItemNode
      * \endif
      *
      * \if CHINESE
@@ -385,11 +385,11 @@ public:
      * @param y Y 坐标数据
      * @param z Z 坐标数据
      * @param label 图例中的元素标签
-     * @return 创建的 QImPlot3DLineItemNode 指针
+     * @return 创建的 QImPlot3DExtLineItemNode 指针
      * \endif
      */
     template<typename CX, typename CY, typename CZ>
-    QImPlot3DLineItemNode* addLine(const CX& x, const CY& y, const CZ& z, const QString& label);
+    QImPlot3DExtLineItemNode* addLine(const CX& x, const CY& y, const CZ& z, const QString& label);
 
     /**
      * \if ENGLISH
@@ -401,7 +401,7 @@ public:
      * @param y Y coordinate data
      * @param z Z coordinate data
      * @param label Item label for legend
-     * @return Pointer to created QImPlot3DScatterItemNode
+     * @return Pointer to created QImPlot3DExtScatterItemNode
      * \endif
      *
      * \if CHINESE
@@ -413,11 +413,11 @@ public:
      * @param y Y 坐标数据
      * @param z Z 坐标数据
      * @param label 图例中的元素标签
-     * @return 创建的 QImPlot3DScatterItemNode 指针
+     * @return 创建的 QImPlot3DExtScatterItemNode 指针
      * \endif
      */
     template<typename CX, typename CY, typename CZ>
-    QImPlot3DScatterItemNode* addScatter(const CX& x, const CY& y, const CZ& z, const QString& label);
+    QImPlot3DExtScatterItemNode* addScatter(const CX& x, const CY& y, const CZ& z, const QString& label);
 
     //----------------------------------------------------
     // Interaction query
@@ -511,22 +511,22 @@ protected:
 //===============================================================
 
 template<typename CX, typename CY, typename CZ>
-inline QImPlot3DLineItemNode* QImPlot3DNode::addLine(const CX& x, const CY& y, const CZ& z, const QString& label)
+inline QImPlot3DExtLineItemNode* QImPlot3DExtNode::addLine(const CX& x, const CY& y, const CZ& z, const QString& label)
 {
-    auto* item = new QImPlot3DLineItemNode(this);
+    auto* item = new QImPlot3DExtLineItemNode(this);
     item->setLabel(label);
-    // Note: setData method will be implemented in QImPlot3DLineItemNode
+    // Note: setData method will be implemented in QImPlot3DExtLineItemNode
     // item->setData(x, y, z);
     addPlot3DItem(item);
     return item;
 }
 
 template<typename CX, typename CY, typename CZ>
-inline QImPlot3DScatterItemNode* QImPlot3DNode::addScatter(const CX& x, const CY& y, const CZ& z, const QString& label)
+inline QImPlot3DExtScatterItemNode* QImPlot3DExtNode::addScatter(const CX& x, const CY& y, const CZ& z, const QString& label)
 {
-    auto* item = new QImPlot3DScatterItemNode(this);
+    auto* item = new QImPlot3DExtScatterItemNode(this);
     item->setLabel(label);
-    // Note: setData method will be implemented in QImPlot3DScatterItemNode
+    // Note: setData method will be implemented in QImPlot3DExtScatterItemNode
     // item->setData(x, y, z);
     addPlot3DItem(item);
     return item;
@@ -534,4 +534,6 @@ inline QImPlot3DScatterItemNode* QImPlot3DNode::addScatter(const CX& x, const CY
 
 }  // namespace QIM
 
-#endif  // QIMPLOT3DNODE_H
+#endif  // QIMPLOT3DEXTNODE_H
+
+
