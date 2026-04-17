@@ -7,7 +7,9 @@
 namespace QIM
 {
 class QImSubplotsNode;
+class QImSubplots3DNode;
 class QImPlotNode;
+class QImPlot3DNode;
 class QImPlot3DExtNode;
 /**
  * @brief Figure Widget for plot
@@ -68,11 +70,19 @@ public:
     // ===========================
     //  plot3D
     // ===========================
-    // Create a 3D plot node as a top-level render node (not inside subplot)
-    // ImPlot3D does not participate in ImPlot's subplot grid system
-    QImPlot3DExtNode* createPlotNode3D();
-    QList< QImPlot3DExtNode* > plot3DNodes() const;
+    // 3D subplot grid (using QImSubplots3DNode for manual cell layout)
+    // ImPlot3D has no built-in subplot API, so we use CellNode for positioning
+    void setSubplot3DGrid(int rows, int cols);
+    QImSubplots3DNode* subplot3DNode() const;
+    void clearSubplot3DGrid();
+    // Create a 3D plot node inside the 3D subplot grid
+    QImPlot3DNode* createPlot3DNode();
+    // Get all 3D plot nodes from the 3D subplot grid
+    QList< QImPlot3DNode* > plot3DNodes() const;
     int plot3DCount() const;
+    // Single 3D plot as top-level render node (fills entire window)
+    QImPlot3DExtNode* createPlotNode3D();
+    QList< QImPlot3DExtNode* > plot3DExtNodes() const;
     void addPlotNode3D(QImPlot3DExtNode* plot3D);
     void removePlotNode3D(QImPlot3DExtNode* plot3D);
 Q_SIGNALS:
@@ -84,6 +94,7 @@ protected:
 
 private:
     QImSubplotsNode* ensureSubplotNode();
+    QImSubplots3DNode* ensureSubplot3DNode();
 private Q_SLOTS:
     void onSubplotChildNodeRemoved(QIM::QImAbstractNode* c);
     void onSubplotChildNodeAdded(QIM::QImAbstractNode* c);

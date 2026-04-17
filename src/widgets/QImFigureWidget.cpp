@@ -3,6 +3,8 @@
 #include "implot.h"
 #include "implot3d.h"
 #include "plot/QImSubplotsNode.h"
+#include "plot/QImSubplots3DNode.h"
+#include "plot/QImPlot3DNode.h"
 #include "plot3d/QImPlot3DExtNode.h"
 #include "plot/QImPlotNode.h"
 #include <QDebug>
@@ -20,6 +22,7 @@ public:
 public:
     QImTrackedValue<QImPlotTheme> m_theme;
     QPointer<QImSubplotsNode> m_subplotNode;  // nullptr until setSubplotGrid() is called
+    QPointer<QImSubplots3DNode> m_subplot3DNode;  // nullptr until setSubplot3DGrid() is called
     ImPlotContext* m_context2D { nullptr };
     ImPlot3DContext* m_context3D { nullptr };
 };
@@ -231,13 +234,13 @@ void QImFigureWidget::removePlotNode(QImPlotNode* plot)
 
 QImPlot3DExtNode* QImFigureWidget::createPlotNode3D()
 {
-    // 3D nodes are always top-level render nodes — ImPlot3D has no subplot API
+    // 3D nodes as top-level render node (fills entire window)
     QImPlot3DExtNode* plot3D = new QImPlot3DExtNode();
     addRenderNode(plot3D);
     return plot3D;
 }
 
-QList<QImPlot3DExtNode*> QImFigureWidget::plot3DNodes() const
+QList<QImPlot3DExtNode*> QImFigureWidget::plot3DExtNodes() const
 {
     QList<QImPlot3DExtNode*> result;
     const auto children = renderNodeList();
@@ -247,11 +250,6 @@ QList<QImPlot3DExtNode*> QImFigureWidget::plot3DNodes() const
         }
     }
     return result;
-}
-
-int QImFigureWidget::plot3DCount() const
-{
-    return plot3DNodes().size();
 }
 
 void QImFigureWidget::addPlotNode3D(QImPlot3DExtNode* plot3D)
@@ -266,6 +264,77 @@ void QImFigureWidget::removePlotNode3D(QImPlot3DExtNode* plot3D)
     if (plot3D) {
         removeRenderNode(plot3D);
     }
+}
+
+// ===========================
+//  3D subplot grid
+// ===========================
+
+QImSubplots3DNode* QImFigureWidget::ensureSubplot3DNode()
+{
+    QIM_D(d);
+    if (!d->m_subplot3DNode) {
+        d->m_subplot3DNode = new QImSubplots3DNode();
+        addRenderNode(d->m_subplot3DNode.data());
+    }
+    return d->m_subplot3DNode.data();
+}
+
+void QImFigureWidget::setSubplot3DGrid(int rows, int cols)
+{
+    QIM_D(d);
+    if (rows * cols > 1 || d->m_subplot3DNode) {
+        QImSubplots3DNode* subplot3D = ensureSubplot3DNode();
+        subplot3D->setGrid(rows, cols);
+    }
+}
+
+QImSubplots3DNode* QImFigureWidget::subplot3DNode() const
+{
+    return d_ptr->m_subplot3DNode.data();
+}
+
+void QImFigureWidget::clearSubplot3DGrid()
+{
+    QIM_D(d);
+    if (d->m_subplot3DNode) {
+        removeRenderNode(d->m_subplot3DNode.data());
+        d->m_subplot3DNode = nullptr;
+    }
+}
+
+QImPlot3DNode* QImFigureWidget::createPlot3DNode()
+{
+    QIM_D(d);
+    if (d->m_subplot3DNode) {
+        return d->m_subplot3DNode->createPlotNode();
+    }
+    // No 3D subplot — create as top-level render node
+    QImPlot3DNode* plot3D = new QImPlot3DNode();
+    addRenderNode(plot3D);
+    return plot3D;
+}
+
+QList<QImPlot3DNode*> QImFigureWidget::plot3DNodes() const
+{
+    QIM_DC(d);
+    if (d->m_subplot3DNode) {
+        return d->m_subplot3DNode->plotNodes();
+    }
+    // No 3D subplot — search root render nodes
+    QList<QImPlot3DNode*> result;
+    const auto children = renderNodeList();
+    for (QImAbstractNode* node : children) {
+        if (QImPlot3DNode* plot3D = qobject_cast<QImPlot3DNode*>(node)) {
+            result.append(plot3D);
+        }
+    }
+    return result;
+}
+
+int QImFigureWidget::plot3DCount() const
+{
+    return plot3DNodes().size();
 }
 
 void QImFigureWidget::initializeGL()
