@@ -1,16 +1,16 @@
-#include "QImPlot3DExtItemNode.h"
-#include "QImPlot3DExtNode.h"
+#include "QImPlot3DItemNode.h"
+#include "QImPlot3DNode.h"
 #include "implot3d.h"
 
 namespace QIM
 {
 
-class QImPlot3DExtItemNode::PrivateData
+class QImPlot3DItemNode::PrivateData
 {
-    QIM_DECLARE_PUBLIC(QImPlot3DExtItemNode)
+    QIM_DECLARE_PUBLIC(QImPlot3DItemNode)
 
 public:
-    PrivateData(QImPlot3DExtItemNode* p);
+    PrivateData(QImPlot3DItemNode* p);
 
 public:
     QByteArray labelUtf8;                    ///< UTF8-only storage for label
@@ -18,30 +18,30 @@ public:
     bool userVisible { true };               ///< User-set visibility state (valid before first render)
 };
 
-QImPlot3DExtItemNode::PrivateData::PrivateData(QImPlot3DExtItemNode* p) : q_ptr(p)
+QImPlot3DItemNode::PrivateData::PrivateData(QImPlot3DItemNode* p) : q_ptr(p)
 {
 }
 
 //----------------------------------------------------
-// QImPlot3DExtItemNode
+// QImPlot3DItemNode
 //----------------------------------------------------
 
 /**
  * \if ENGLISH
  * @brief Constructor - initializes with default settings
- * @param par Parent object (typically QImPlot3DExtNode)
+ * @param par Parent object (typically QImPlot3DNode)
  * @details Sets auto ID disabled and render option to ignore visible,
  *          allowing visibility to be controlled by ImPlot3D item state.
  * \endif
  *
  * \if CHINESE
  * @brief 构造函数 - 使用默认设置初始化
- * @param par 父对象（通常是 QImPlot3DExtNode）
+ * @param par 父对象（通常是 QImPlot3DNode）
  * @details 设置自动 ID 禁用，渲染选项忽略可见性，
  *          允许可见性由 ImPlot3D 元素状态控制。
  * \endif
  */
-QImPlot3DExtItemNode::QImPlot3DExtItemNode(QObject* par)
+QImPlot3DItemNode::QImPlot3DItemNode(QObject* par)
     : QImAbstractNode(par)
     , QIM_PIMPL_CONSTRUCT
 {
@@ -58,7 +58,7 @@ QImPlot3DExtItemNode::QImPlot3DExtItemNode(QObject* par)
  * @brief 析构函数
  * \endif
  */
-QImPlot3DExtItemNode::~QImPlot3DExtItemNode()
+QImPlot3DItemNode::~QImPlot3DItemNode()
 {
 }
 
@@ -79,7 +79,7 @@ QImPlot3DExtItemNode::~QImPlot3DExtItemNode()
  * @details 如果标签实际改变则发射 labelChanged 信号。
  * \endif
  */
-void QImPlot3DExtItemNode::setLabel(const QString& name)
+void QImPlot3DItemNode::setLabel(const QString& name)
 {
     QIM_D(d);
     QByteArray nameUtf = name.toUtf8();
@@ -100,7 +100,7 @@ void QImPlot3DExtItemNode::setLabel(const QString& name)
  * @return 从 UTF8 存储转换的标签文本
  * \endif
  */
-QString QImPlot3DExtItemNode::label() const
+QString QImPlot3DItemNode::label() const
 {
     return QString::fromUtf8(d_ptr->labelUtf8);
 }
@@ -118,7 +118,7 @@ QString QImPlot3DExtItemNode::label() const
  * @details 在 beginDraw() 中使用，直接传递标签给 ImPlot3D 函数，无转换开销。
  * \endif
  */
-const char* QImPlot3DExtItemNode::labelConstData() const
+const char* QImPlot3DItemNode::labelConstData() const
 {
     return (d_ptr->labelUtf8.isEmpty() ? "##plot3dItem" : d_ptr->labelUtf8.constData());
 }
@@ -129,25 +129,25 @@ const char* QImPlot3DExtItemNode::labelConstData() const
 
 /**
  * \if ENGLISH
- * @brief Returns the parent QImPlot3DExtNode
+ * @brief Returns the parent QImPlot3DNode
  * @return Pointer to parent 3D plot node, nullptr if not found
- * @details Searches up the parent chain for the first QImPlot3DExtNode.
+ * @details Searches up the parent chain for the first QImPlot3DNode.
  *          Similar pattern to 2D's QImPlotItemNode::plotNode().
  * \endif
  *
  * \if CHINESE
- * @brief 返回父 QImPlot3DExtNode
+ * @brief 返回父 QImPlot3DNode
  * @return 父 3D 绘图节点指针，未找到则返回 nullptr
- * @details 向上搜索父链查找第一个 QImPlot3DExtNode。
+ * @details 向上搜索父链查找第一个 QImPlot3DNode。
  *          类似 2D 的 QImPlotItemNode::plotNode() 模式。
  * \endif
  */
-QImPlot3DExtNode* QImPlot3DExtItemNode::plot3DNode() const
+QImPlot3DNode* QImPlot3DItemNode::plot3DNode() const
 {
     QImAbstractNode* parent = parentNode();
 
     while (parent != nullptr) {
-        if (auto* plot3DNode = qobject_cast<QImPlot3DExtNode*>(parent)) {
+        if (auto* plot3DNode = qobject_cast<QImPlot3DNode*>(parent)) {
             return plot3DNode;
         }
         parent = parent->parentNode();
@@ -162,11 +162,11 @@ QImPlot3DExtNode* QImPlot3DExtItemNode::plot3DNode() const
 
 // Generate isLegendEntryEnabled/setLegendEntryEnabled using QIMPLOT3D_FLAG_ENABLED_ACCESSOR
 // Maps ImPlot3DItemFlags_NoLegend (negative) to positive semantics
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtItemNode, LegendEntryEnabled, ImPlot3DItemFlags_NoLegend, legendEntryEnabledChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DItemNode, LegendEntryEnabled, ImPlot3DItemFlags_NoLegend, legendEntryEnabledChanged)
 
 // Generate isFitEnabled/setFitEnabled using QIMPLOT3D_FLAG_ENABLED_ACCESSOR
 // Maps ImPlot3DItemFlags_NoFit (negative) to positive semantics
-QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtItemNode, FitEnabled, ImPlot3DItemFlags_NoFit, fitEnabledChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DItemNode, FitEnabled, ImPlot3DItemFlags_NoFit, fitEnabledChanged)
 
 //----------------------------------------------------
 // Visibility
@@ -187,7 +187,7 @@ QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DExtItemNode, FitEnabled, ImPlot3DItemFl
  *          ImPlot3D 暴露类似的元素结构。
  * \endif
  */
-bool QImPlot3DExtItemNode::isVisible() const
+bool QImPlot3DItemNode::isVisible() const
 {
     // Check parent visibility first
     QImAbstractNode* parent = parentNode();
@@ -211,7 +211,7 @@ bool QImPlot3DExtItemNode::isVisible() const
  * @details 存储用户可见性偏好并调用基类 setVisible。
  * \endif
  */
-void QImPlot3DExtItemNode::setVisible(bool visible)
+void QImPlot3DItemNode::setVisible(bool visible)
 {
     if (d_ptr->userVisible != visible) {
         d_ptr->userVisible = visible;
@@ -237,9 +237,8 @@ void QImPlot3DExtItemNode::setVisible(bool visible)
  *          默认实现为空。
  * \endif
  */
-void QImPlot3DExtItemNode::endDraw()
+void QImPlot3DItemNode::endDraw()
 {
 }
 
 }  // end namespace QIM
-

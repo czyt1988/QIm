@@ -8,7 +8,7 @@
 namespace QIM
 {
 
-class QImPlot3DExtNode;
+class QImPlot3DNode;
 
 /**
  * \if ENGLISH
@@ -78,16 +78,16 @@ public:
      * \if ENGLISH
      * @brief Constructor for QImPlot3DAxisInfo
      * @param axis The ImPlot3D axis identifier (X1, Y1, or Z1)
-     * @param plot Optional QImPlot3DExtNode parent for memory management
+     * @param plot Optional QImPlot3DNode parent for memory management
      * \endif
      *
      * \if CHINESE
      * @brief QImPlot3DAxisInfo 构造函数
      * @param axis ImPlot3D 轴标识符（X1、Y1 或 Z1）
-     * @param plot 可选的 QImPlot3DExtNode 父对象，用于内存管理
+     * @param plot 可选的 QImPlot3DNode 父对象，用于内存管理
      * \endif
      */
-    explicit QImPlot3DAxisInfo(QImPlot3DAxisId axis, QImPlot3DExtNode* plot = nullptr);
+    explicit QImPlot3DAxisInfo(QImPlot3DAxisId axis, QImPlot3DNode* plot = nullptr);
     ~QImPlot3DAxisInfo();
 
     /**
@@ -118,16 +118,16 @@ public:
 
     /**
      * \if ENGLISH
-     * @brief Returns the parent QImPlot3DExtNode
+     * @brief Returns the parent QImPlot3DNode
      * @return Pointer to the parent plot node, or nullptr if not attached
      * \endif
      *
      * \if CHINESE
-     * @brief 返回父级 QImPlot3DExtNode
+     * @brief 返回父级 QImPlot3DNode
      * @return 父级绘图节点指针，如未关联则返回 nullptr
      * \endif
      */
-    QImPlot3DExtNode* plotNode() const;
+    QImPlot3DNode* plotNode() const;
 
     // Label property
     QString label() const;

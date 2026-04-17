@@ -1,5 +1,5 @@
-#ifndef QIMPLOT3DEXTNODE_H
-#define QIMPLOT3DEXTNODE_H
+#ifndef QIMPLOT3DNODE_H
+#define QIMPLOT3DNODE_H
 
 #include "QImAbstractNode.h"
 #include <QSizeF>
@@ -9,9 +9,9 @@ namespace QIM
 {
 
 class QImPlot3DAxisInfo;
-class QImPlot3DExtItemNode;
-class QImPlot3DExtLineItemNode;
-class QImPlot3DExtScatterItemNode;
+class QImPlot3DItemNode;
+class QImPlot3DLineItemNode;
+class QImPlot3DScatterItemNode;
 
 /**
  * \if ENGLISH
@@ -42,16 +42,17 @@ class QImPlot3DExtScatterItemNode;
  *          4. EndPlot()
  * \endif
  */
-class QIM_CORE_API QImPlot3DExtNode : public QImAbstractNode
+class QIM_CORE_API QImPlot3DNode : public QImAbstractNode
 {
     Q_OBJECT
-    QIM_DECLARE_PRIVATE(QImPlot3DExtNode)
+    QIM_DECLARE_PRIVATE(QImPlot3DNode)
 
     // === Title property ===
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
 
     // === Size property ===
     Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY sizeChanged)
+    Q_PROPERTY(bool autoSize READ isAutoSize WRITE setAutoSize NOTIFY autoSizeChanged)
 
     // ImPlot3DFlags - Negative to Positive semantic (NoXxx -> xxxEnabled)
     Q_PROPERTY(bool titleEnabled READ isTitleEnabled WRITE setTitleEnabled NOTIFY plot3DFlagChanged)
@@ -70,7 +71,7 @@ class QIM_CORE_API QImPlot3DExtNode : public QImAbstractNode
     // Combined flags
     Q_PROPERTY(bool canvasEnabled READ isCanvasEnabled WRITE setCanvasEnabled NOTIFY plot3DFlagChanged)
 
-    Q_DISABLE_COPY(QImPlot3DExtNode)
+    Q_DISABLE_COPY(QImPlot3DNode)
 
 public:
     /**
@@ -84,7 +85,7 @@ public:
      * @param parent 用于内存管理的父 QObject
      * \endif
      */
-    explicit QImPlot3DExtNode(QObject* parent = nullptr);
+    explicit QImPlot3DNode(QObject* parent = nullptr);
 
     /**
      * \if ENGLISH
@@ -99,7 +100,7 @@ public:
      * @param parent 用于内存管理的父 QObject
      * \endif
      */
-    explicit QImPlot3DExtNode(const QString& title, QObject* parent = nullptr);
+    explicit QImPlot3DNode(const QString& title, QObject* parent = nullptr);
 
     /**
      * \if ENGLISH
@@ -110,7 +111,7 @@ public:
      * @brief 析构函数
      * \endif
      */
-    ~QImPlot3DExtNode() override;
+    ~QImPlot3DNode() override;
 
     //----------------------------------------------------
     // Title
@@ -171,6 +172,32 @@ public:
      * \endif
      */
     void setSize(const QSizeF& size);
+
+    /**
+     * \if ENGLISH
+     * @brief Checks if auto-size mode is enabled
+     * @return true if plot uses auto-fill size, false if using explicit size
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 检查是否启用自动尺寸模式
+     * @return true 表示使用自动填充尺寸，false 表示使用显式尺寸
+     * \endif
+     */
+    bool isAutoSize() const;
+
+    /**
+     * \if ENGLISH
+     * @brief Enables or disables auto-size mode
+     * @param enabled true for auto-fill, false for explicit size
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 启用或禁用自动尺寸模式
+     * @param enabled true 表示自动填充，false 表示显式尺寸
+     * \endif
+     */
+    void setAutoSize(bool enabled);
 
     //----------------------------------------------------
     // Axis management (3 axes: X, Y, Z)
@@ -336,28 +363,28 @@ public:
     /**
      * \if ENGLISH
      * @brief Adds a 3D plot item as child
-     * @param item Pointer to QImPlot3DExtItemNode to add
+     * @param item Pointer to QImPlot3DItemNode to add
      * \endif
      *
      * \if CHINESE
      * @brief 添加 3D 绘图元素作为子节点
-     * @param item 要添加的 QImPlot3DExtItemNode 指针
+     * @param item 要添加的 QImPlot3DItemNode 指针
      * \endif
      */
-    void addPlot3DItem(QImPlot3DExtItemNode* item);
+    void addPlot3DItem(QImPlot3DItemNode* item);
 
     /**
      * \if ENGLISH
      * @brief Gets all 3D plot item children
-     * @return List of QImPlot3DExtItemNode pointers
+     * @return List of QImPlot3DItemNode pointers
      * \endif
      *
      * \if CHINESE
      * @brief 获取所有 3D 绘图元素子节点
-     * @return QImPlot3DExtItemNode 指针列表
+     * @return QImPlot3DItemNode 指针列表
      * \endif
      */
-    QList<QImPlot3DExtItemNode*> plot3DItemNodes() const;
+    QList<QImPlot3DItemNode*> plot3DItemNodes() const;
 
     //----------------------------------------------------
     // Quick add template methods
@@ -373,7 +400,7 @@ public:
      * @param y Y coordinate data
      * @param z Z coordinate data
      * @param label Item label for legend
-     * @return Pointer to created QImPlot3DExtLineItemNode
+     * @return Pointer to created QImPlot3DLineItemNode
      * \endif
      *
      * \if CHINESE
@@ -385,11 +412,11 @@ public:
      * @param y Y 坐标数据
      * @param z Z 坐标数据
      * @param label 图例中的元素标签
-     * @return 创建的 QImPlot3DExtLineItemNode 指针
+     * @return 创建的 QImPlot3DLineItemNode 指针
      * \endif
      */
     template<typename CX, typename CY, typename CZ>
-    QImPlot3DExtLineItemNode* addLine(const CX& x, const CY& y, const CZ& z, const QString& label);
+    QImPlot3DLineItemNode* addLine(const CX& x, const CY& y, const CZ& z, const QString& label);
 
     /**
      * \if ENGLISH
@@ -401,7 +428,7 @@ public:
      * @param y Y coordinate data
      * @param z Z coordinate data
      * @param label Item label for legend
-     * @return Pointer to created QImPlot3DExtScatterItemNode
+     * @return Pointer to created QImPlot3DScatterItemNode
      * \endif
      *
      * \if CHINESE
@@ -413,11 +440,11 @@ public:
      * @param y Y 坐标数据
      * @param z Z 坐标数据
      * @param label 图例中的元素标签
-     * @return 创建的 QImPlot3DExtScatterItemNode 指针
+     * @return 创建的 QImPlot3DScatterItemNode 指针
      * \endif
      */
     template<typename CX, typename CY, typename CZ>
-    QImPlot3DExtScatterItemNode* addScatter(const CX& x, const CY& y, const CZ& z, const QString& label);
+    QImPlot3DScatterItemNode* addScatter(const CX& x, const CY& y, const CZ& z, const QString& label);
 
     //----------------------------------------------------
     // Interaction query
@@ -467,6 +494,19 @@ Q_SIGNALS:
 
     /**
      * \if ENGLISH
+     * @brief Emitted when auto-size mode changes
+     * @param enabled New auto-size state
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 自动尺寸模式改变时发射
+     * @param enabled 新的自动尺寸状态
+     * \endif
+     */
+    void autoSizeChanged(bool enabled);
+
+    /**
+     * \if ENGLISH
      * @brief Emitted when any ImPlot3D flag changes
      * \endif
      *
@@ -511,22 +551,22 @@ protected:
 //===============================================================
 
 template<typename CX, typename CY, typename CZ>
-inline QImPlot3DExtLineItemNode* QImPlot3DExtNode::addLine(const CX& x, const CY& y, const CZ& z, const QString& label)
+inline QImPlot3DLineItemNode* QImPlot3DNode::addLine(const CX& x, const CY& y, const CZ& z, const QString& label)
 {
-    auto* item = new QImPlot3DExtLineItemNode(this);
+    auto* item = new QImPlot3DLineItemNode(this);
     item->setLabel(label);
-    // Note: setData method will be implemented in QImPlot3DExtLineItemNode
+    // Note: setData method will be implemented in QImPlot3DLineItemNode
     // item->setData(x, y, z);
     addPlot3DItem(item);
     return item;
 }
 
 template<typename CX, typename CY, typename CZ>
-inline QImPlot3DExtScatterItemNode* QImPlot3DExtNode::addScatter(const CX& x, const CY& y, const CZ& z, const QString& label)
+inline QImPlot3DScatterItemNode* QImPlot3DNode::addScatter(const CX& x, const CY& y, const CZ& z, const QString& label)
 {
-    auto* item = new QImPlot3DExtScatterItemNode(this);
+    auto* item = new QImPlot3DScatterItemNode(this);
     item->setLabel(label);
-    // Note: setData method will be implemented in QImPlot3DExtScatterItemNode
+    // Note: setData method will be implemented in QImPlot3DScatterItemNode
     // item->setData(x, y, z);
     addPlot3DItem(item);
     return item;
@@ -534,6 +574,4 @@ inline QImPlot3DExtScatterItemNode* QImPlot3DExtNode::addScatter(const CX& x, co
 
 }  // namespace QIM
 
-#endif  // QIMPLOT3DEXTNODE_H
-
-
+#endif  // QIMPLOT3DNODE_H

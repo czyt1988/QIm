@@ -1,4 +1,4 @@
-#include "QImPlot3DExtScatterItemNode.h"
+#include "QImPlot3DScatterItemNode.h"
 #include "implot3d.h"
 #include <QColor>
 #include <memory>
@@ -8,20 +8,20 @@ namespace QIM
 
 /**
  * \if ENGLISH
- * @brief Private implementation data for QImPlot3DExtScatterItemNode
+ * @brief Private implementation data for QImPlot3DScatterItemNode
  * @details Stores all internal data following PIMPL pattern.
  *          All conversions are done in setters for minimal beginDraw overhead.
  * \endif
  *
  * \if CHINESE
- * @brief QImPlot3DExtScatterItemNode的私有实现数据
+ * @brief QImPlot3DScatterItemNode的私有实现数据
  * @details 按照PIMPL模式存储所有内部数据。
  *          所有转换都在setter中完成，以最小化beginDraw开销。
  * \endif
  */
-class QImPlot3DExtScatterItemNode::PrivateData
+class QImPlot3DScatterItemNode::PrivateData
 {
-    QIM_DECLARE_PUBLIC(QImPlot3DExtScatterItemNode)
+    QIM_DECLARE_PUBLIC(QImPlot3DScatterItemNode)
 
 public:
     /**
@@ -35,7 +35,7 @@ public:
      * @param p 公共类指针
      * \endif
      */
-    PrivateData(QImPlot3DExtScatterItemNode* p) : q_ptr(p)
+    PrivateData(QImPlot3DScatterItemNode* p) : q_ptr(p)
     {
     }
 
@@ -47,40 +47,40 @@ public:
 };
 
 //----------------------------------------------------
-// QImPlot3DExtScatterItemNode
+// QImPlot3DScatterItemNode
 //----------------------------------------------------
 
-QImPlot3DExtScatterItemNode::QImPlot3DExtScatterItemNode(QObject* parent)
-    : QImPlot3DExtItemNode(parent)
+QImPlot3DScatterItemNode::QImPlot3DScatterItemNode(QObject* parent)
+    : QImPlot3DItemNode(parent)
     , QIM_PIMPL_CONSTRUCT
 {
 }
 
-QImPlot3DExtScatterItemNode::~QImPlot3DExtScatterItemNode()
+QImPlot3DScatterItemNode::~QImPlot3DScatterItemNode()
 {
 }
 
-void QImPlot3DExtScatterItemNode::setData(QImAbstractXYZDataSeries* series)
+void QImPlot3DScatterItemNode::setData(QImAbstractXYZDataSeries* series)
 {
     QIM_D(d);
     d->dataSeries.reset(series);
     Q_EMIT dataChanged();
 }
 
-QImAbstractXYZDataSeries* QImPlot3DExtScatterItemNode::data() const
+QImAbstractXYZDataSeries* QImPlot3DScatterItemNode::data() const
 {
     QIM_DC(d);
     return d->dataSeries.get();
 }
 
-QColor QImPlot3DExtScatterItemNode::color() const
+QColor QImPlot3DScatterItemNode::color() const
 {
     QIM_DC(d);
     // Convert ImVec4 back to QColor
     return QColor::fromRgbF(d->colorVec4.x, d->colorVec4.y, d->colorVec4.z, d->colorVec4.w);
 }
 
-void QImPlot3DExtScatterItemNode::setColor(const QColor& c)
+void QImPlot3DScatterItemNode::setColor(const QColor& c)
 {
     QIM_D(d);
     // Convert QColor to ImVec4 in setter (beginDraw minimization)
@@ -88,13 +88,13 @@ void QImPlot3DExtScatterItemNode::setColor(const QColor& c)
     Q_EMIT colorChanged(c);
 }
 
-float QImPlot3DExtScatterItemNode::markerSize() const
+float QImPlot3DScatterItemNode::markerSize() const
 {
     QIM_DC(d);
     return d->markerSizeVal;
 }
 
-void QImPlot3DExtScatterItemNode::setMarkerSize(float size)
+void QImPlot3DScatterItemNode::setMarkerSize(float size)
 {
     QIM_D(d);
     if (d->markerSizeVal != size)
@@ -104,14 +104,14 @@ void QImPlot3DExtScatterItemNode::setMarkerSize(float size)
     }
 }
 
-int QImPlot3DExtScatterItemNode::markerShape() const
+int QImPlot3DScatterItemNode::markerShape() const
 {
     QIM_DC(d);
     // Convert ImPlot3DMarker back to QImPlot3DMarkerShape int value
     return static_cast<int>(toQImPlot3DMarkerShape(d->markerVal));
 }
 
-void QImPlot3DExtScatterItemNode::setMarkerShape(int shape)
+void QImPlot3DScatterItemNode::setMarkerShape(int shape)
 {
     QIM_D(d);
     // Convert QImPlot3DMarkerShape (int) to ImPlot3DMarker in setter
@@ -123,13 +123,13 @@ void QImPlot3DExtScatterItemNode::setMarkerShape(int shape)
     }
 }
 
-int QImPlot3DExtScatterItemNode::scatterFlags() const
+int QImPlot3DScatterItemNode::scatterFlags() const
 {
     QIM_DC(d);
     return static_cast<int>(d->flags);
 }
 
-void QImPlot3DExtScatterItemNode::setScatterFlags(int flags)
+void QImPlot3DScatterItemNode::setScatterFlags(int flags)
 {
     QIM_D(d);
     const auto oldFlags = d->flags;
@@ -140,7 +140,7 @@ void QImPlot3DExtScatterItemNode::setScatterFlags(int flags)
     }
 }
 
-bool QImPlot3DExtScatterItemNode::beginDraw()
+bool QImPlot3DScatterItemNode::beginDraw()
 {
     QIM_D(d);
 
@@ -173,5 +173,3 @@ bool QImPlot3DExtScatterItemNode::beginDraw()
 }
 
 }  // end namespace QIM
-
-

@@ -1,5 +1,5 @@
-#ifndef QIMPLOT3DEXTITEMNODE_H
-#define QIMPLOT3DEXTITEMNODE_H
+#ifndef QIMPLOT3DITEMNODE_H
+#define QIMPLOT3DITEMNODE_H
 
 #include "QImAbstractNode.h"
 #include "QImPlot3D.h"
@@ -7,7 +7,7 @@
 namespace QIM
 {
 
-class QImPlot3DExtNode;
+class QImPlot3DNode;
 
 /**
  * \if ENGLISH
@@ -19,7 +19,7 @@ class QImPlot3DExtNode;
  *          - Parent plot node reference
  *          All 3D plot items should inherit from this class and implement the type() method.
  * @note The type() method uses InnerType3D=1000 offset to distinguish from 2D item types.
- * @see QImPlot3DExtNode, QImAbstractNode
+ * @see QImPlot3DNode, QImAbstractNode
  * \endif
  *
  * \if CHINESE
@@ -31,13 +31,13 @@ class QImPlot3DExtNode;
  *          - 父绘图节点引用
  *          所有 3D 绘图元素都应继承此类并实现 type() 方法。
  * @note type() 方法使用 InnerType3D=1000 偏移量以区分 2D 元素类型。
- * @see QImPlot3DExtNode, QImAbstractNode
+ * @see QImPlot3DNode, QImAbstractNode
  * \endif
  */
-class QIM_CORE_API QImPlot3DExtItemNode : public QImAbstractNode
+class QIM_CORE_API QImPlot3DItemNode : public QImAbstractNode
 {
     Q_OBJECT
-    QIM_DECLARE_PRIVATE(QImPlot3DExtItemNode)
+    QIM_DECLARE_PRIVATE(QImPlot3DItemNode)
 
     Q_PROPERTY(QString label READ label WRITE setLabel NOTIFY labelChanged)
 
@@ -64,15 +64,15 @@ public:
     /**
      * \if ENGLISH
      * @brief Constructor
-     * @param par Parent object (typically a QImPlot3DExtNode)
+     * @param par Parent object (typically a QImPlot3DNode)
      * \endif
      *
      * \if CHINESE
      * @brief 构造函数
-     * @param par 父对象（通常是 QImPlot3DExtNode）
+     * @param par 父对象（通常是 QImPlot3DNode）
      * \endif
      */
-    explicit QImPlot3DExtItemNode(QObject* par = nullptr);
+    explicit QImPlot3DItemNode(QObject* par = nullptr);
 
     /**
      * \if ENGLISH
@@ -83,7 +83,7 @@ public:
      * @brief 析构函数
      * \endif
      */
-    ~QImPlot3DExtItemNode() override;
+    ~QImPlot3DItemNode() override;
 
     /**
      * \if ENGLISH
@@ -155,18 +155,18 @@ public:
 
     /**
      * \if ENGLISH
-     * @brief Returns the parent QImPlot3DExtNode
+     * @brief Returns the parent QImPlot3DNode
      * @return Pointer to parent 3D plot node, or nullptr if not found
-     * @details Searches up the parent hierarchy for the first QImPlot3DExtNode.
+     * @details Searches up the parent hierarchy for the first QImPlot3DNode.
      * \endif
      *
      * \if CHINESE
-     * @brief 返回父 QImPlot3DExtNode
+     * @brief 返回父 QImPlot3DNode
      * @return 父 3D 绘图节点指针，若未找到则返回 nullptr
-     * @details 向上搜索父级层次结构以查找第一个 QImPlot3DExtNode。
+     * @details 向上搜索父级层次结构以查找第一个 QImPlot3DNode。
      * \endif
      */
-    QImPlot3DExtNode* plot3DNode() const;
+    QImPlot3DNode* plot3DNode() const;
 
     //----------------------------------------------------
     // Item flags (positive semantics)
@@ -313,5 +313,4 @@ protected:
 
 }  // end namespace QIM
 
-#endif  // QIMPLOT3DEXTITEMNODE_H
-
+#endif  // QIMPLOT3DITEMNODE_H

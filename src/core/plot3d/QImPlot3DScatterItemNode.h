@@ -1,7 +1,7 @@
-#ifndef QIMPLOT3DEXTSCATTERITEMNODE_H
-#define QIMPLOT3DEXTSCATTERITEMNODE_H
+#ifndef QIMPLOT3DSCATTERITEMNODE_H
+#define QIMPLOT3DSCATTERITEMNODE_H
 
-#include "QImPlot3DExtItemNode.h"
+#include "QImPlot3DItemNode.h"
 #include "QImPlot3DDataSeries.h"
 
 namespace QIM
@@ -13,54 +13,54 @@ class QImAbstractXYZDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot3D scatter plot visualization
  *
- * @class QImPlot3DExtScatterItemNode
+ * @class QImPlot3DScatterItemNode
  * @ingroup plot3d_items
  *
  * @details Provides Qt-style retained mode encapsulation for ImPlot3D scatter plots.
  *          Supports marker customization (shape, size, color) and full Qt property
  *          system integration with signal-slot event handling.
- *          Inherits from QImPlot3DExtItemNode and follows the same PIMPL design pattern.
+ *          Inherits from QImPlot3DItemNode and follows the same PIMPL design pattern.
  *
  * @note Scatter plots visualize discrete data points in 3D space as markers.
- *       Use QImPlot3DExtLineItemNode for continuous line plots.
+ *       Use QImPlot3DLineItemNode for continuous line plots.
  * @warning Marker size and shape changes require redraw to take effect.
  *
- * @param[in] parent Parent QObject (optional, typically a QImPlot3DExtNode)
+ * @param[in] parent Parent QObject (optional, typically a QImPlot3DNode)
  *
- * @see QImPlot3DExtItemNode
+ * @see QImPlot3DItemNode
  * @see QImAbstractXYZDataSeries
- * @see QImPlot3DExtNode
+ * @see QImPlot3DNode
  * \endif
  *
  * \if CHINESE
  * @brief ImPlot3D散点图可视化的Qt风格封装
  *
- * @class QImPlot3DExtScatterItemNode
+ * @class QImPlot3DScatterItemNode
  * @ingroup plot3d_items
  *
  * @details 为ImPlot3D散点图提供Qt风格的保留模式封装。
  *          支持标记自定义（形状、大小、颜色）以及完整的Qt属性系统集成和信号槽事件处理。
- *          继承自QImPlot3DExtItemNode，并遵循相同的PIMPL设计模式。
+ *          继承自QImPlot3DItemNode，并遵循相同的PIMPL设计模式。
  *
  * @note 散点图以标记形式可视化3D空间中的离散数据点。
- *       连续线图请使用QImPlot3DExtLineItemNode。
+ *       连续线图请使用QImPlot3DLineItemNode。
  * @warning 标记大小和形状更改需要重绘才能生效。
  *
- * @param[in] parent 父QObject对象（可选，通常是QImPlot3DExtNode）
+ * @param[in] parent 父QObject对象（可选，通常是QImPlot3DNode）
  *
- * @see QImPlot3DExtItemNode
+ * @see QImPlot3DItemNode
  * @see QImAbstractXYZDataSeries
- * @see QImPlot3DExtNode
+ * @see QImPlot3DNode
  * \endif
  */
-class QIM_CORE_API QImPlot3DExtScatterItemNode : public QImPlot3DExtItemNode
+class QIM_CORE_API QImPlot3DScatterItemNode : public QImPlot3DItemNode
 {
     Q_OBJECT
-    QIM_DECLARE_PRIVATE(QImPlot3DExtScatterItemNode)
+    QIM_DECLARE_PRIVATE(QImPlot3DScatterItemNode)
 
     /**
      * \if ENGLISH
-     * @property QImPlot3DExtScatterItemNode::color
+     * @property QImPlot3DScatterItemNode::color
      * @brief Color of scatter plot markers
      *
      * @details Defines the primary color for scatter plot markers.
@@ -69,7 +69,7 @@ class QIM_CORE_API QImPlot3DExtScatterItemNode : public QImPlot3DExtItemNode
      * \endif
      *
      * \if CHINESE
-     * @property QImPlot3DExtScatterItemNode::color
+     * @property QImPlot3DScatterItemNode::color
      * @brief 散点图标记的颜色
      *
      * @details 定义散点图标记的主要颜色。
@@ -81,7 +81,7 @@ class QIM_CORE_API QImPlot3DExtScatterItemNode : public QImPlot3DExtItemNode
 
     /**
      * \if ENGLISH
-     * @property QImPlot3DExtScatterItemNode::markerSize
+     * @property QImPlot3DScatterItemNode::markerSize
      * @brief Size of scatter plot markers in pixels
      *
      * @details Controls the visual size of markers in the scatter plot.
@@ -91,7 +91,7 @@ class QIM_CORE_API QImPlot3DExtScatterItemNode : public QImPlot3DExtItemNode
      * \endif
      *
      * \if CHINESE
-     * @property QImPlot3DExtScatterItemNode::markerSize
+     * @property QImPlot3DScatterItemNode::markerSize
      * @brief 散点图标记的大小（像素）
      *
      * @details 控制散点图中标记的视觉大小。
@@ -104,7 +104,7 @@ class QIM_CORE_API QImPlot3DExtScatterItemNode : public QImPlot3DExtItemNode
 
     /**
      * \if ENGLISH
-     * @property QImPlot3DExtScatterItemNode::markerShape
+     * @property QImPlot3DScatterItemNode::markerShape
      * @brief Shape of scatter plot markers
      *
      * @details Defines the geometric shape used for scatter plot markers.
@@ -115,7 +115,7 @@ class QIM_CORE_API QImPlot3DExtScatterItemNode : public QImPlot3DExtItemNode
      * \endif
      *
      * \if CHINESE
-     * @property QImPlot3DExtScatterItemNode::markerShape
+     * @property QImPlot3DScatterItemNode::markerShape
      * @brief 散点图标记的形状
      *
      * @details 定义散点图标记使用的几何形状。
@@ -130,12 +130,12 @@ class QIM_CORE_API QImPlot3DExtScatterItemNode : public QImPlot3DExtItemNode
 public:
     /**
      * \if ENGLISH
-     * @brief Unique type identifier for QImPlot3DExtScatterItemNode
+     * @brief Unique type identifier for QImPlot3DScatterItemNode
      * @details InnerType3D + 1 distinguishes this from other 3D item types.
      * \endif
      *
      * \if CHINESE
-     * @brief QImPlot3DExtScatterItemNode的唯一类型标识符
+     * @brief QImPlot3DScatterItemNode的唯一类型标识符
      * @details InnerType3D + 1 用于与其他3D元素类型区分。
      * \endif
      */
@@ -162,16 +162,16 @@ public:
 
     /**
      * \if ENGLISH
-     * @brief Constructs a QImPlot3DExtScatterItemNode with optional parent
-     * @param parent Parent QObject (typically a QImPlot3DExtNode)
+     * @brief Constructs a QImPlot3DScatterItemNode with optional parent
+     * @param parent Parent QObject (typically a QImPlot3DNode)
      * \endif
      *
      * \if CHINESE
-     * @brief 构造QImPlot3DExtScatterItemNode
-     * @param parent 父QObject对象（通常是QImPlot3DExtNode）
+     * @brief 构造QImPlot3DScatterItemNode
+     * @param parent 父QObject对象（通常是QImPlot3DNode）
      * \endif
      */
-    explicit QImPlot3DExtScatterItemNode(QObject* parent = nullptr);
+    explicit QImPlot3DScatterItemNode(QObject* parent = nullptr);
 
     /**
      * \if ENGLISH
@@ -182,7 +182,7 @@ public:
      * @brief 析构函数
      * \endif
      */
-    ~QImPlot3DExtScatterItemNode() override;
+    ~QImPlot3DScatterItemNode() override;
 
     //----------------------------------------------------
     // Data setting interface
@@ -435,7 +435,7 @@ protected:
 
 // Template function implementation
 template<typename CX, typename CY, typename CZ>
-inline QImAbstractXYZDataSeries* QImPlot3DExtScatterItemNode::setData(const CX& x, const CY& y, const CZ& z)
+inline QImAbstractXYZDataSeries* QImPlot3DScatterItemNode::setData(const CX& x, const CY& y, const CZ& z)
 {
     QImAbstractXYZDataSeries* s = new QImVectorXYZDataSeries<CX, CY, CZ>(x, y, z);
     setData(s);
@@ -444,5 +444,4 @@ inline QImAbstractXYZDataSeries* QImPlot3DExtScatterItemNode::setData(const CX& 
 
 }  // end namespace QIM
 
-#endif  // QIMPLOT3DEXTSCATTERITEMNODE_H
-
+#endif  // QIMPLOT3DSCATTERITEMNODE_H

@@ -1,5 +1,5 @@
-#ifndef QIMPLOT3DSURFACEITEMNODE_H
-#define QIMPLOT3DSURFACEITEMNODE_H
+#ifndef QIMPLOT3DTRIANGLEITEMNODE_H
+#define QIMPLOT3DTRIANGLEITEMNODE_H
 
 #include "QImPlot3DItemNode.h"
 #include "implot3d.h"
@@ -8,15 +8,13 @@
 
 namespace QIM
 {
-class QIM_CORE_API QImPlot3DSurfaceItemNode : public QImPlot3DItemNode
+class QIM_CORE_API QImPlot3DTriangleItemNode : public QImPlot3DItemNode
 {
     Q_OBJECT
 
-    Q_PROPERTY(int xCount READ xCount WRITE setXCount NOTIFY gridShapeChanged)
-    Q_PROPERTY(int yCount READ yCount WRITE setYCount NOTIFY gridShapeChanged)
-    Q_PROPERTY(bool linesVisible READ isLinesVisible WRITE setLinesVisible NOTIFY surfaceFlagChanged)
-    Q_PROPERTY(bool fillVisible READ isFillVisible WRITE setFillVisible NOTIFY surfaceFlagChanged)
-    Q_PROPERTY(bool markersVisible READ isMarkersVisible WRITE setMarkersVisible NOTIFY surfaceFlagChanged)
+    Q_PROPERTY(bool linesVisible READ isLinesVisible WRITE setLinesVisible NOTIFY triangleFlagChanged)
+    Q_PROPERTY(bool fillVisible READ isFillVisible WRITE setFillVisible NOTIFY triangleFlagChanged)
+    Q_PROPERTY(bool markersVisible READ isMarkersVisible WRITE setMarkersVisible NOTIFY triangleFlagChanged)
     Q_PROPERTY(int markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
     Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerStyleChanged)
     Q_PROPERTY(float markerWeight READ markerWeight WRITE setMarkerWeight NOTIFY markerStyleChanged)
@@ -25,17 +23,15 @@ class QIM_CORE_API QImPlot3DSurfaceItemNode : public QImPlot3DItemNode
     Q_PROPERTY(QColor markerFillColor READ markerFillColor WRITE setMarkerFillColor NOTIFY markerFillColorChanged)
     Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
     Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth NOTIFY lineWidthChanged)
-    Q_PROPERTY(bool colormapEnabled READ isColormapEnabled WRITE setColormapEnabled NOTIFY colormapChanged)
-    Q_PROPERTY(int colormap READ colormap WRITE setColormap NOTIFY colormapChanged)
 
 public:
     enum
     {
-        Type = InnerType + 3
+        Type = InnerType3D + 5
     };
 
-    explicit QImPlot3DSurfaceItemNode(QObject* parent = nullptr);
-    ~QImPlot3DSurfaceItemNode() override;
+    explicit QImPlot3DTriangleItemNode(QObject* parent = nullptr);
+    ~QImPlot3DTriangleItemNode() override;
 
     int type() const override
     {
@@ -43,27 +39,18 @@ public:
     }
 
     template< typename ContainerX, typename ContainerY, typename ContainerZ >
-    void setData(const ContainerX& x, const ContainerY& y, const ContainerZ& z, int xCount, int yCount)
+    void setData(const ContainerX& x, const ContainerY& y, const ContainerZ& z)
     {
         m_xData = toVector(x);
         m_yData = toVector(y);
         m_zData = toVector(z);
-        m_xCount = xCount;
-        m_yCount = yCount;
-        trimDataToGrid();
+        trimDataToCommonSize();
         Q_EMIT dataChanged();
-        Q_EMIT gridShapeChanged();
     }
 
     const std::vector< double >& xData() const;
     const std::vector< double >& yData() const;
     const std::vector< double >& zData() const;
-
-    int xCount() const;
-    void setXCount(int count);
-
-    int yCount() const;
-    void setYCount(int count);
 
     bool isLinesVisible() const;
     void setLinesVisible(bool visible);
@@ -98,19 +85,12 @@ public:
     float lineWidth() const;
     void setLineWidth(float width);
 
-    bool isColormapEnabled() const;
-    void setColormapEnabled(bool enabled);
-
-    int colormap() const;
-    void setColormap(int colormap);
-
-    int surfaceFlags() const;
-    void setSurfaceFlags(int flags);
+    int triangleFlags() const;
+    void setTriangleFlags(int flags);
 
 Q_SIGNALS:
     void dataChanged();
-    void gridShapeChanged();
-    void surfaceFlagChanged();
+    void triangleFlagChanged();
     void markerShapeChanged(int shape);
     void markerStyleChanged();
     void fillColorChanged(const QColor& color);
@@ -118,7 +98,6 @@ Q_SIGNALS:
     void markerFillColorChanged(const QColor& color);
     void markerOutlineColorChanged(const QColor& color);
     void lineWidthChanged(float width);
-    void colormapChanged();
 
 protected:
     bool beginDraw() override;
@@ -130,15 +109,13 @@ private:
         return std::vector< double >(container.begin(), container.end());
     }
 
-    void trimDataToGrid();
+    void trimDataToCommonSize();
 
 private:
     std::vector< double > m_xData;
     std::vector< double > m_yData;
     std::vector< double > m_zData;
-    int m_xCount { 0 };
-    int m_yCount { 0 };
-    int m_surfaceFlags { 0 };
+    int m_triangleFlags { 0 };
     int m_markerShape { ImPlot3DMarker_None };
     float m_markerSize { 4.0f };
     float m_markerWeight { 1.0f };
@@ -147,9 +124,7 @@ private:
     QColor m_markerFillColor;
     QColor m_markerOutlineColor;
     float m_lineWidth { 1.0f };
-    bool m_colormapEnabled { false };
-    int m_colormap { ImPlot3DColormap_Viridis };
 };
 }  // namespace QIM
 
-#endif  // QIMPLOT3DSURFACEITEMNODE_H
+#endif  // QIMPLOT3DTRIANGLEITEMNODE_H

@@ -1,7 +1,7 @@
-#ifndef QIMPLOT3DEXTLINEITEMNODE_H
-#define QIMPLOT3DEXTLINEITEMNODE_H
+#ifndef QIMPLOT3DLINEITEMNODE_H
+#define QIMPLOT3DLINEITEMNODE_H
 
-#include "QImPlot3DExtItemNode.h"
+#include "QImPlot3DItemNode.h"
 #include "QImPlot3DDataSeries.h"
 
 namespace QIM
@@ -17,7 +17,7 @@ class QImAbstractXYZDataSeries;
  *          Supports segments, loop, and skipNaN rendering modes.
  *          Uses QImAbstractXYZDataSeries for data input (not XY like 2D).
  * @note ImPlot3DLineFlags use positive semantics (Segments, Loop, SkipNaN are NOT NoXxx).
- * @see QImPlot3DExtItemNode, QImAbstractXYZDataSeries, ImPlot3D::PlotLine
+ * @see QImPlot3DItemNode, QImAbstractXYZDataSeries, ImPlot3D::PlotLine
  * \endif
  *
  * \if CHINESE
@@ -27,13 +27,13 @@ class QImAbstractXYZDataSeries;
  *          支持线段、循环和跳过 NaN 渲染模式。
  *          使用 QImAbstractXYZDataSeries 作为数据输入（与 2D 的 XY 不同）。
  * @note ImPlot3DLineFlags 使用肯定语义（Segments、Loop、SkipNaN 不是 NoXxx 类型）。
- * @see QImPlot3DExtItemNode, QImAbstractXYZDataSeries, ImPlot3D::PlotLine
+ * @see QImPlot3DItemNode, QImAbstractXYZDataSeries, ImPlot3D::PlotLine
  * \endif
  */
-class QIM_CORE_API QImPlot3DExtLineItemNode : public QImPlot3DExtItemNode
+class QIM_CORE_API QImPlot3DLineItemNode : public QImPlot3DItemNode
 {
     Q_OBJECT
-    QIM_DECLARE_PRIVATE(QImPlot3DExtLineItemNode)
+    QIM_DECLARE_PRIVATE(QImPlot3DLineItemNode)
 
     // Style properties
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
@@ -48,15 +48,15 @@ public:
     /**
      * \if ENGLISH
      * @brief Constructor
-     * @param par Parent object (typically a QImPlot3DExtNode)
+     * @param par Parent object (typically a QImPlot3DNode)
      * \endif
      *
      * \if CHINESE
      * @brief 构造函数
-     * @param par 父对象（通常是 QImPlot3DExtNode）
+     * @param par 父对象（通常是 QImPlot3DNode）
      * \endif
      */
-    explicit QImPlot3DExtLineItemNode(QObject* par = nullptr);
+    explicit QImPlot3DLineItemNode(QObject* par = nullptr);
 
     /**
      * \if ENGLISH
@@ -67,7 +67,7 @@ public:
      * @brief 析构函数
      * \endif
      */
-    ~QImPlot3DExtLineItemNode() override;
+    ~QImPlot3DLineItemNode() override;
 
     /**
      * \if ENGLISH
@@ -378,7 +378,7 @@ protected:
 };
 
 template<typename CX, typename CY, typename CZ>
-inline QImAbstractXYZDataSeries* QImPlot3DExtLineItemNode::setData(const CX& x, const CY& y, const CZ& z)
+inline QImAbstractXYZDataSeries* QImPlot3DLineItemNode::setData(const CX& x, const CY& y, const CZ& z)
 {
     QImAbstractXYZDataSeries* s = new QImVectorXYZDataSeries<CX, CY, CZ>(x, y, z);
     setData(s);
@@ -387,5 +387,4 @@ inline QImAbstractXYZDataSeries* QImPlot3DExtLineItemNode::setData(const CX& x, 
 
 }  // end namespace QIM
 
-#endif  // QIMPLOT3DEXTLINEITEMNODE_H
-
+#endif  // QIMPLOT3DLINEITEMNODE_H

@@ -27,7 +27,7 @@ class QIM_CORE_API QImPlot3DMeshItemNode : public QImPlot3DItemNode
 public:
     enum
     {
-        Type = InnerType + 4
+        Type = InnerType3D + 4
     };
 
     explicit QImPlot3DMeshItemNode(QObject* parent = nullptr);
