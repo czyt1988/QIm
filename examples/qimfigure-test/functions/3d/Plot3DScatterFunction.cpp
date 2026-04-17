@@ -179,14 +179,11 @@ void Plot3DScatterFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
-    // Create 3D plot node as a top-level render node (not inside subplot)
-    // ImPlot3D does not participate in ImPlot's subplot grid system,
-    // so 3D nodes must be added via addRenderNode to fill the entire window
-    m_plot3DNode = new QIM::QImPlot3DExtNode();
+    // Create 3D plot node as a top-level render node via QImFigureWidget API
+    m_plot3DNode = figure->createPlotNode3D();
     if (!m_plot3DNode) {
         return;
     }
-    figure->addRenderNode(m_plot3DNode);
     
     // Configure axes and title
     m_plot3DNode->xAxis()->setLabel(m_xLabel);

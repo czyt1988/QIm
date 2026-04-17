@@ -1,5 +1,4 @@
 #include "QImSubplotsNode.h"
-#include "QImPlot3DNode.h"
 #include "QImPlotNode.h"
 #include "imgui.h"
 
@@ -27,9 +26,6 @@ public:
             if (QImPlotNode* plot2D = qobject_cast< QImPlotNode* >(child)) {
                 plot2D->setAutoSize(false);
                 plot2D->setSize(cellSz);
-            } else if (QImPlot3DNode* plot3D = qobject_cast< QImPlot3DNode* >(child)) {
-                plot3D->setAutoSize(false);
-                plot3D->setSize(cellSz);
             }
         }
         return true;
@@ -241,16 +237,6 @@ void QImSubplotsNode::removePlotNode(QImPlotNode* plot)
     }
 }
 
-QImPlot3DNode* QImSubplotsNode::createPlot3DNode()
-{
-    if (itemCount() >= gridCount()) {
-        return nullptr;
-    }
-    CellNode* cell        = createCellNode();
-    QImPlot3DNode* plot3D = new QImPlot3DNode(cell);
-    return plot3D;
-}
-
 QList< QImPlotNode* > QImSubplotsNode::plotNodes() const
 {
     QList< QImPlotNode* > plots;
@@ -267,30 +253,9 @@ QList< QImPlotNode* > QImSubplotsNode::plotNodes() const
     return plots;
 }
 
-QList< QImPlot3DNode* > QImSubplotsNode::plot3DNodes() const
-{
-    QList< QImPlot3DNode* > plots;
-    for (QImAbstractNode* child : childrenNodes()) {
-        if (!child) {
-            continue;
-        }
-        for (QImAbstractNode* cellChild : child->childrenNodes()) {
-            if (QImPlot3DNode* plot = qobject_cast< QImPlot3DNode* >(cellChild)) {
-                plots.push_back(plot);
-            }
-        }
-    }
-    return plots;
-}
-
 int QImSubplotsNode::plotCount() const
 {
     return plotNodes().size();
-}
-
-int QImSubplotsNode::plot3DCount() const
-{
-    return plot3DNodes().size();
 }
 
 bool QImSubplotsNode::isTitleEnabled() const

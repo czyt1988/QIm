@@ -8,7 +8,7 @@ namespace QIM
 {
 class QImSubplotsNode;
 class QImPlotNode;
-class QImPlot3DNode;
+class QImPlot3DExtNode;
 /**
  * @brief Figure Widget for plot
  *
@@ -68,9 +68,13 @@ public:
     // ===========================
     //  plot3D
     // ===========================
-    QImPlot3DNode* createPlot3DNode();
-    QList< QImPlot3DNode* > plot3DNodes() const;
+    // Create a 3D plot node as a top-level render node (not inside subplot)
+    // ImPlot3D does not participate in ImPlot's subplot grid system
+    QImPlot3DExtNode* createPlotNode3D();
+    QList< QImPlot3DExtNode* > plot3DNodes() const;
     int plot3DCount() const;
+    void addPlotNode3D(QImPlot3DExtNode* plot3D);
+    void removePlotNode3D(QImPlot3DExtNode* plot3D);
 Q_SIGNALS:
     void plotNodeAttached(QIM::QImPlotNode* plot, bool attach);
 

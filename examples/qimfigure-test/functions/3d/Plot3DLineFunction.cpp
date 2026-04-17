@@ -1,6 +1,5 @@
 #include "Plot3DLineFunction.h"
 #include "QImFigureWidget.h"
-#include "plot/QImSubplotsNode.h"
 #include "plot3d/QImPlot3DExtNode.h"
 #include "plot3d/QImPlot3DAxisInfo.h"
 #include "plot3d/QImPlot3DExtLineItemNode.h"
@@ -168,11 +167,8 @@ void Plot3DLineFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
-    // Create 3D plot node as a top-level render node (not inside subplot)
-    // ImPlot3D does not participate in ImPlot's subplot grid system,
-    // so 3D nodes must be added via addRenderNode to fill the entire window
-    m_plot3DNode = new QIM::QImPlot3DExtNode();
-    figure->addRenderNode(m_plot3DNode);
+    // Create 3D plot node as a top-level render node via QImFigureWidget API
+    m_plot3DNode = figure->createPlotNode3D();
     
     // Configure axes and title
     m_plot3DNode->xAxis()->setLabel(m_xLabel);

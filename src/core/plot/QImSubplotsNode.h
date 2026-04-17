@@ -10,7 +10,6 @@
 namespace QIM
 {
 class QImPlotNode;
-class QImPlot3DNode;
 
 class QIM_CORE_API QImSubplotsNode : public QImAbstractNode
 {
@@ -61,12 +60,8 @@ public:
     bool takePlotNode(QImPlotNode* plot);
     void removePlotNode(QImPlotNode* plot);
 
-    QImPlot3DNode* createPlot3DNode();
-
     QList< QImPlotNode* > plotNodes() const;
-    QList< QImPlot3DNode* > plot3DNodes() const;
     int plotCount() const;
-    int plot3DCount() const;
 
     bool isTitleEnabled() const;
     void setTitleEnabled(bool on);
