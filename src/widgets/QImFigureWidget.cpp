@@ -3,9 +3,8 @@
 #include "implot.h"
 #include "implot3d.h"
 #include "plot/QImSubplotsNode.h"
-#include "plot/QImSubplots3DNode.h"
-#include "plot/QImPlot3DNode.h"
-#include "plot3d/QImPlot3DExtNode.h"
+#include "plot3d/QImSubplots3DNode.h"
+#include "plot3d/QImPlot3DNode.h"
 #include "plot/QImPlotNode.h"
 #include <QDebug>
 
@@ -230,40 +229,6 @@ void QImFigureWidget::removePlotNode(QImPlotNode* plot)
         removeRenderNode(plot);
     }
     Q_EMIT plotNodeAttached(plot, false);
-}
-
-QImPlot3DExtNode* QImFigureWidget::createPlotNode3D()
-{
-    // 3D nodes as top-level render node (fills entire window)
-    QImPlot3DExtNode* plot3D = new QImPlot3DExtNode();
-    addRenderNode(plot3D);
-    return plot3D;
-}
-
-QList<QImPlot3DExtNode*> QImFigureWidget::plot3DExtNodes() const
-{
-    QList<QImPlot3DExtNode*> result;
-    const auto children = renderNodeList();
-    for (QImAbstractNode* node : children) {
-        if (QImPlot3DExtNode* plot3D = qobject_cast<QImPlot3DExtNode*>(node)) {
-            result.append(plot3D);
-        }
-    }
-    return result;
-}
-
-void QImFigureWidget::addPlotNode3D(QImPlot3DExtNode* plot3D)
-{
-    if (plot3D) {
-        addRenderNode(plot3D);
-    }
-}
-
-void QImFigureWidget::removePlotNode3D(QImPlot3DExtNode* plot3D)
-{
-    if (plot3D) {
-        removeRenderNode(plot3D);
-    }
 }
 
 // ===========================

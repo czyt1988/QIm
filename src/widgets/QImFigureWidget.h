@@ -10,7 +10,6 @@ class QImSubplotsNode;
 class QImSubplots3DNode;
 class QImPlotNode;
 class QImPlot3DNode;
-class QImPlot3DExtNode;
 /**
  * @brief Figure Widget for plot
  *
@@ -80,11 +79,8 @@ public:
     // Get all 3D plot nodes from the 3D subplot grid
     QList< QImPlot3DNode* > plot3DNodes() const;
     int plot3DCount() const;
-    // Single 3D plot as top-level render node (fills entire window)
-    QImPlot3DExtNode* createPlotNode3D();
-    QList< QImPlot3DExtNode* > plot3DExtNodes() const;
-    void addPlotNode3D(QImPlot3DExtNode* plot3D);
-    void removePlotNode3D(QImPlot3DExtNode* plot3D);
+// Single 3D plot as top-level render node (fills entire window)
+    // (Note: for subplot grid, use QImSubplots3DNode directly via addRenderNode())
 Q_SIGNALS:
     void plotNodeAttached(QIM::QImPlotNode* plot, bool attach);
 
