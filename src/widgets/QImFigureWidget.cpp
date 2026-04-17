@@ -129,11 +129,10 @@ QImPlotNode* QImFigureWidget::createPlotNode()
     QIM_D(d);
     if (d->m_subplotNode) {
         // Subplot exists — delegate to it (plot occupies a grid cell)
-        QImPlotNode* plot = d->m_subplotNode->createPlotNode();
-        if (plot) {
-            Q_EMIT plotNodeAttached(plot, true);
-        }
-        return plot;
+        // Note: SubplotsNode::createPlotNode() adds plot as direct child,
+        // which triggers childNodeAdded → onSubplotChildNodeAdded → plotNodeAttached signal
+        // So we don't emit here to avoid double emission
+        return d->m_subplotNode->createPlotNode();
     }
     // No subplot — create plot as root-level render node (fills entire window)
     QImPlotNode* plot = new QImPlotNode();
@@ -171,11 +170,13 @@ void QImFigureWidget::addPlotNode(QImPlotNode* plot)
     }
     QIM_D(d);
     if (d->m_subplotNode) {
+        // Subplot exists — addPlotNode triggers childNodeAdded → onSubplotChildNodeAdded → plotNodeAttached
+        // Don't emit here to avoid double emission
         d->m_subplotNode->addPlotNode(plot);
     } else {
         addRenderNode(plot);
+        Q_EMIT plotNodeAttached(plot, true);
     }
-    Q_EMIT plotNodeAttached(plot, true);
 }
 
 void QImFigureWidget::insertPlotNode(int plotIndex, QImPlotNode* plot)
@@ -185,11 +186,13 @@ void QImFigureWidget::insertPlotNode(int plotIndex, QImPlotNode* plot)
     }
     QIM_D(d);
     if (d->m_subplotNode) {
+        // Subplot exists — insertPlotNode triggers childNodeAdded → onSubplotChildNodeAdded → plotNodeAttached
+        // Don't emit here to avoid double emission
         d->m_subplotNode->insertPlotNode(plotIndex, plot);
     } else {
         addRenderNode(plot);
+        Q_EMIT plotNodeAttached(plot, true);
     }
-    Q_EMIT plotNodeAttached(plot, true);
 }
 
 int QImFigureWidget::plotNodeSubplotIndex(QImPlotNode* plot)
@@ -208,13 +211,15 @@ bool QImFigureWidget::takePlotNode(QImPlotNode* plot)
     }
     QIM_D(d);
     if (d->m_subplotNode) {
-        const bool ok = d->m_subplotNode->takePlotNode(plot);
-        if (ok) {
-            Q_EMIT plotNodeAttached(plot, false);
-        }
-        return ok;
+        // Subplot exists — takePlotNode triggers childNodeRemoved → onSubplotChildNodeRemoved → plotNodeAttached(false)
+        // Don't emit here to avoid double emission
+        return d->m_subplotNode->takePlotNode(plot);
     }
-    return takeRenderNode(plot);
+    const bool ok = takeRenderNode(plot);
+    if (ok) {
+        Q_EMIT plotNodeAttached(plot, false);
+    }
+    return ok;
 }
 
 void QImFigureWidget::removePlotNode(QImPlotNode* plot)
@@ -224,11 +229,13 @@ void QImFigureWidget::removePlotNode(QImPlotNode* plot)
     }
     QIM_D(d);
     if (d->m_subplotNode) {
+        // Subplot exists — removePlotNode triggers childNodeRemoved → onSubplotChildNodeRemoved → plotNodeAttached(false)
+        // Don't emit here to avoid double emission
         d->m_subplotNode->removePlotNode(plot);
     } else {
         removeRenderNode(plot);
+        Q_EMIT plotNodeAttached(plot, false);
     }
-    Q_EMIT plotNodeAttached(plot, false);
 }
 
 // ===========================

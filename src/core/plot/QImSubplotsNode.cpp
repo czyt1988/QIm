@@ -1,56 +1,67 @@
 #include "QImSubplotsNode.h"
+#include "implot.h"
+#include "QtImGuiUtils.h"
+#include <QList>
+#include <QDebug>
+
+// qim
 #include "QImPlotNode.h"
-#include "imgui.h"
 
 namespace QIM
 {
-class QImSubplotsNode::CellNode : public QImAbstractNode
+
+// PIMPL implementation (completely hides ImPlot dependency)
+class QImSubplotsNode::PrivateData
 {
+    QIM_DECLARE_PUBLIC(QImSubplotsNode)
+
 public:
-    explicit CellNode(int subplotIndex, QObject* parent = nullptr) : QImAbstractNode(parent), m_subplotIndex(subplotIndex)
-    {
-        setAutoIdEnabled(false);
-    }
-
-    bool beginDraw() override
-    {
-        QImSubplotsNode* subplots = qobject_cast< QImSubplotsNode* >(parentNode());
-        if (!subplots) {
-            return true;
-        }
-        const QPoint cellPos = subplots->cellPosition(m_subplotIndex);
-        const QSizeF cellSz  = subplots->cellSize();
-        ImGui::SetCursorPos(ImVec2(static_cast< float >(cellPos.x()), static_cast< float >(cellPos.y())));
-
-        for (QImAbstractNode* child : childrenNodes()) {
-            if (QImPlotNode* plot2D = qobject_cast< QImPlotNode* >(child)) {
-                plot2D->setAutoSize(false);
-                plot2D->setSize(cellSz);
-            }
-        }
-        return true;
-    }
-
-    void endDraw() override
+    explicit PrivateData(QImSubplotsNode* q) : q_ptr(q)
     {
     }
 
-    void setSubplotIndex(int subplotIndex)
-    {
-        m_subplotIndex = subplotIndex;
-    }
+    // Property storage (using QByteArray for UTF-8, avoiding conversion during render)
+    QByteArray titleUtf8;
+    int rows = 1;
+    int cols = 1;
+    std::vector<float> rowRatios;
+    std::vector<float> columnRatios;
+    std::vector<float> lastRowRatios;
+    std::vector<float> lastColumnRatios;
+    constexpr static const float epsilon = 0.001f;
 
-private:
-    int m_subplotIndex { 0 };
+    /**
+     * \if ENGLISH
+     * @brief Track grid ratio changes during resize
+     * @details When enabled, emits gridInfoChanged signal if ratios change.
+     * This checks ratios every frame, so use sparingly.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 追踪调整大小期间的网格比例变化
+     * @details 启用后，如果比例发生变化则发出 gridInfoChanged 信号。
+     * 每帧都会检查比例，因此请谨慎使用。
+     * \endif
+     */
+    bool trackGridRatios {false};
+
+    ImVec2 size = ImVec2(-1, -1);
+    ImPlotSubplotFlags subplotFlags {ImPlotSubplotFlags_None};
 };
 
-QImSubplotsNode::QImSubplotsNode(QObject* parent) : QImAbstractNode(parent)
+QImSubplotsNode::QImSubplotsNode(QObject* parent)
+    : QImAbstractNode(parent)
+    , QIM_PIMPL_CONSTRUCT
 {
+    setObjectName(QStringLiteral("SubplotsNode"));
     setTitle(QStringLiteral("##SubplotsNode"));
 }
 
-QImSubplotsNode::QImSubplotsNode(const QString& title, QObject* parent) : QImAbstractNode(parent)
+QImSubplotsNode::QImSubplotsNode(const QString& title, QObject* parent)
+    : QImAbstractNode(parent)
+    , QIM_PIMPL_CONSTRUCT
 {
+    setObjectName(QStringLiteral("SubplotsNode"));
     setTitle(title);
 }
 
@@ -58,139 +69,426 @@ QImSubplotsNode::~QImSubplotsNode()
 {
 }
 
+// === Property implementations ===
+
 QString QImSubplotsNode::title() const
 {
-    return QString::fromUtf8(m_titleUtf8);
+    QIM_DC(d);
+    return QString::fromUtf8(d->titleUtf8);
 }
 
 void QImSubplotsNode::setTitle(const QString& title)
 {
+    QIM_D(d);
     const QByteArray utf8 = title.toUtf8();
-    if (m_titleUtf8 != utf8) {
-        m_titleUtf8 = utf8;
+    if (d->titleUtf8 != utf8) {
+        d->titleUtf8 = utf8;
         Q_EMIT titleChanged(title);
     }
 }
 
 int QImSubplotsNode::rows() const
 {
-    return m_rows;
+    QIM_DC(d);
+    return d->rows;
 }
 
-void QImSubplotsNode::setRows(int rows)
+void QImSubplotsNode::setRows(int r)
 {
-    if (rows > 0 && m_rows != rows) {
-        m_rows = rows;
+    QIM_D(d);
+    if (d->rows != r && r > 0) {
+        d->rows = r;
         Q_EMIT gridInfoChanged();
     }
 }
 
 int QImSubplotsNode::columns() const
 {
-    return m_cols;
+    QIM_DC(d);
+    return d->cols;
 }
 
-void QImSubplotsNode::setColumns(int columns)
+void QImSubplotsNode::setColumns(int c)
 {
-    if (columns > 0 && m_cols != columns) {
-        m_cols = columns;
+    QIM_D(d);
+    if (d->cols != c && c > 0) {
+        d->cols = c;
         Q_EMIT gridInfoChanged();
     }
 }
 
-std::vector< float > QImSubplotsNode::rowRatios() const
+std::vector<float> QImSubplotsNode::rowRatios() const
 {
-    return {};
+    return d_ptr->rowRatios;
 }
 
-void QImSubplotsNode::setRowRatios(const std::vector< float >& row_ratios)
+void QImSubplotsNode::setRowRatios(const std::vector<float>& row_ratios)
 {
-    Q_UNUSED(row_ratios);
-}
-
-std::vector< float > QImSubplotsNode::columnRatios() const
-{
-    return {};
-}
-
-void QImSubplotsNode::setColumnRatios(const std::vector< float >& col_ratios)
-{
-    Q_UNUSED(col_ratios);
-}
-
-void QImSubplotsNode::setGrid(int rows, int cols, const std::vector< float >& row_ratios, const std::vector< float >& col_ratios)
-{
-    Q_UNUSED(row_ratios);
-    Q_UNUSED(col_ratios);
-    {
-        QSignalBlocker blocker(static_cast< QObject* >(this));
-        setRows(rows);
-        setColumns(cols);
+    QIM_D(d);
+    if (!fuzzyEqual<float>(d->rowRatios, row_ratios, PrivateData::epsilon)) {
+        d->rowRatios = row_ratios;
+        d->lastRowRatios = row_ratios;
+        Q_EMIT gridInfoChanged();
     }
+}
+
+std::vector<float> QImSubplotsNode::columnRatios() const
+{
+    return d_ptr->columnRatios;
+}
+
+void QImSubplotsNode::setColumnRatios(const std::vector<float>& col_ratios)
+{
+    QIM_D(d);
+    if (!fuzzyEqual<float>(d->columnRatios, col_ratios, PrivateData::epsilon)) {
+        d->columnRatios = col_ratios;
+        d->lastColumnRatios = col_ratios;
+        Q_EMIT gridInfoChanged();
+    }
+}
+
+void QImSubplotsNode::setGrid(int r, int c, const std::vector<float>& row_ratios, const std::vector<float>& col_ratios)
+{
+    {
+        QSignalBlocker b(this);
+        setRows(r);
+        setColumns(c);
+        setRowRatios(row_ratios);
+        setColumnRatios(col_ratios);
+    }
+    // Emit signal only once
     Q_EMIT gridInfoChanged();
 }
 
 QSizeF QImSubplotsNode::size() const
 {
-    return m_size;
+    QIM_DC(d);
+    return toQSizeF(d->size);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Set subplot grid size
+ * @param size Grid size specification
+ * @details ImPlot::BeginSubplots size parameter specifies total grid size:
+ * - ImVec2(w, h) where w>0, h>0: Exact fixed size in pixels
+ * - ImVec2(-1, h): Width fills parent, height fixed
+ * - ImVec2(w, -1): Width fixed, height fills parent
+ * - ImVec2(-1, -1): Fill parent client area (most common)
+ * - ImVec2(0, 0): Use default size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置子图网格大小
+ * @param size 网格大小规格
+ * @details ImPlot::BeginSubplots 的 size 参数指定网格总尺寸：
+ * - ImVec2(w, h) 其中 w>0, h>0：精确固定像素大小
+ * - ImVec2(-1, h)：宽度填满父窗口，高度固定
+ * - ImVec2(w, -1)：宽度固定，高度填满父窗口
+ * - ImVec2(-1, -1)：填满父窗口客户区（最常用）
+ * - ImVec2(0, 0)：使用默认大小
+ * \endif
+ */
 void QImSubplotsNode::setSize(const QSizeF& size)
 {
-    if (m_size != size) {
-        m_size = size;
-        Q_EMIT sizeChanged(size);
+    QIM_D(d);
+    ImVec2 newSize = toImVec2(size);
+
+    if (fuzzyEqual(d->size, newSize)) {
+        d->size = newSize;
+    }
+}
+
+// === Semantic flag properties ===
+
+bool QImSubplotsNode::isTitleEnabled() const
+{
+    QIM_DC(d);
+    return !(d->subplotFlags & ImPlotSubplotFlags_NoTitle);
+}
+
+void QImSubplotsNode::setTitleEnabled(bool on)
+{
+    QIM_D(d);
+    const bool current = isTitleEnabled();
+    if (current != on) {
+        if (on) {
+            d->subplotFlags &= ~ImPlotSubplotFlags_NoTitle;  // Clear NoTitle flag
+        } else {
+            d->subplotFlags |= ImPlotSubplotFlags_NoTitle;  // Set NoTitle flag
+        }
+        Q_EMIT subplotFlagChanged();
+    }
+}
+
+bool QImSubplotsNode::isLegendEnabled() const
+{
+    QIM_DC(d);
+    return !(d->subplotFlags & ImPlotSubplotFlags_NoLegend);
+}
+
+void QImSubplotsNode::setLegendEnabled(bool on)
+{
+    QIM_D(d);
+    const bool current = isLegendEnabled();
+    if (current != on) {
+        if (on) {
+            d->subplotFlags &= ~ImPlotSubplotFlags_NoLegend;
+        } else {
+            d->subplotFlags |= ImPlotSubplotFlags_NoLegend;
+        }
+        Q_EMIT subplotFlagChanged();
+    }
+}
+
+bool QImSubplotsNode::isDefaultMenusEnabled() const
+{
+    QIM_DC(d);
+    return !(d->subplotFlags & ImPlotSubplotFlags_NoMenus);
+}
+
+void QImSubplotsNode::setDefaultMenusEnabled(bool on)
+{
+    QIM_D(d);
+    const bool current = isDefaultMenusEnabled();
+    if (current != on) {
+        if (on) {
+            d->subplotFlags &= ~ImPlotSubplotFlags_NoMenus;
+        } else {
+            d->subplotFlags |= ImPlotSubplotFlags_NoMenus;
+        }
+        Q_EMIT subplotFlagChanged();
+    }
+}
+
+bool QImSubplotsNode::isResizable() const
+{
+    QIM_DC(d);
+    return !(d->subplotFlags & ImPlotSubplotFlags_NoResize);
+}
+
+void QImSubplotsNode::setResizable(bool on)
+{
+    QIM_D(d);
+    const bool current = isResizable();
+    if (current != on) {
+        if (on) {
+            d->subplotFlags &= ~ImPlotSubplotFlags_NoResize;
+        } else {
+            d->subplotFlags |= ImPlotSubplotFlags_NoResize;
+        }
+        Q_EMIT subplotFlagChanged();
+    }
+}
+
+bool QImSubplotsNode::isAlignedEnabled() const
+{
+    QIM_DC(d);
+    return !(d->subplotFlags & ImPlotSubplotFlags_NoAlign);
+}
+
+void QImSubplotsNode::setAlignedEnabled(bool on)
+{
+    QIM_D(d);
+    const bool current = isAlignedEnabled();
+    if (current != on) {
+        if (on) {
+            d->subplotFlags &= ~ImPlotSubplotFlags_NoAlign;
+        } else {
+            d->subplotFlags |= ImPlotSubplotFlags_NoAlign;
+        }
+        Q_EMIT subplotFlagChanged();
+    }
+}
+
+bool QImSubplotsNode::isShareItemsEnabled() const
+{
+    QIM_DC(d);
+    return d->subplotFlags & ImPlotSubplotFlags_ShareItems;
+}
+
+void QImSubplotsNode::setShareItemsEnabled(bool on)
+{
+    QIM_D(d);
+    const bool current = isShareItemsEnabled();
+    if (current != on) {
+        if (on) {
+            d->subplotFlags |= ImPlotSubplotFlags_ShareItems;
+        } else {
+            d->subplotFlags &= ~ImPlotSubplotFlags_ShareItems;
+        }
+        Q_EMIT subplotFlagChanged();
+    }
+}
+
+// === Link behavior (smart mutex handling) ===
+
+bool QImSubplotsNode::isLinkRows() const
+{
+    QIM_DC(d);
+    // LinkAllY has higher priority than LinkRows, LinkRows is ineffective when LinkAllY exists
+    return (d->subplotFlags & ImPlotSubplotFlags_LinkRows) && !(d->subplotFlags & ImPlotSubplotFlags_LinkAllY);
+}
+
+void QImSubplotsNode::setLinkRows(bool on)
+{
+    QIM_D(d);
+    const bool current = isLinkRows();
+    if (current != on) {
+        if (on) {
+            // Enable LinkRows, disable mutex LinkAllY
+            d->subplotFlags |= ImPlotSubplotFlags_LinkRows;
+            d->subplotFlags &= ~ImPlotSubplotFlags_LinkAllY;
+        } else {
+            d->subplotFlags &= ~ImPlotSubplotFlags_LinkRows;
+        }
+        Q_EMIT subplotFlagChanged();
+    }
+}
+
+bool QImSubplotsNode::isLinkColumns() const
+{
+    QIM_DC(d);
+    // LinkAllX has higher priority than LinkCols, LinkCols is ineffective when LinkAllX exists
+    return (d->subplotFlags & ImPlotSubplotFlags_LinkCols) && !(d->subplotFlags & ImPlotSubplotFlags_LinkAllX);
+}
+
+void QImSubplotsNode::setLinkColumns(bool on)
+{
+    QIM_D(d);
+    const bool current = isLinkColumns();
+    if (current != on) {
+        if (on) {
+            // Enable LinkCols, disable mutex LinkAllX
+            d->subplotFlags |= ImPlotSubplotFlags_LinkCols;
+            d->subplotFlags &= ~ImPlotSubplotFlags_LinkAllX;
+        } else {
+            d->subplotFlags &= ~ImPlotSubplotFlags_LinkCols;
+        }
+        Q_EMIT subplotFlagChanged();
+    }
+}
+
+bool QImSubplotsNode::isLinkAllX() const
+{
+    QIM_DC(d);
+    return d->subplotFlags & ImPlotSubplotFlags_LinkAllX;
+}
+
+void QImSubplotsNode::setLinkAllX(bool on)
+{
+    QIM_D(d);
+    const bool current = isLinkAllX();
+    if (current != on) {
+        if (on) {
+            // Enable LinkAllX, disable mutex LinkCols
+            d->subplotFlags |= ImPlotSubplotFlags_LinkAllX;
+            d->subplotFlags &= ~ImPlotSubplotFlags_LinkCols;
+        } else {
+            d->subplotFlags &= ~ImPlotSubplotFlags_LinkAllX;
+        }
+        Q_EMIT subplotFlagChanged();
+    }
+}
+
+bool QImSubplotsNode::isLinkAllY() const
+{
+    QIM_DC(d);
+    return d->subplotFlags & ImPlotSubplotFlags_LinkAllY;
+}
+
+void QImSubplotsNode::setLinkAllY(bool on)
+{
+    QIM_D(d);
+    const bool current = isLinkAllY();
+    if (current != on) {
+        if (on) {
+            // Enable LinkAllY, disable mutex LinkRows
+            d->subplotFlags |= ImPlotSubplotFlags_LinkAllY;
+            d->subplotFlags &= ~ImPlotSubplotFlags_LinkRows;
+        } else {
+            d->subplotFlags &= ~ImPlotSubplotFlags_LinkAllY;
+        }
+        Q_EMIT subplotFlagChanged();
     }
 }
 
 int QImSubplotsNode::gridCount() const
 {
-    return m_rows * m_cols;
+    return (d_ptr->cols * d_ptr->rows);
 }
 
-int QImSubplotsNode::itemCount() const
+// === Layout direction ===
+
+bool QImSubplotsNode::isColumnMajor() const
 {
-    return childrenNodes().size();
+    QIM_DC(d);
+    return d->subplotFlags & ImPlotSubplotFlags_ColMajor;
 }
 
-QImSubplotsNode::CellNode* QImSubplotsNode::createCellNode()
+void QImSubplotsNode::setColumnMajor(bool on)
 {
-    CellNode* cell = new CellNode(itemCount(), static_cast< QObject* >(this));
-    addChildNode(cell);
-    return cell;
-}
-
-QImPlotNode* QImSubplotsNode::createPlotNode()
-{
-    if (itemCount() >= gridCount()) {
-        return nullptr;
+    QIM_D(d);
+    const bool current = isColumnMajor();
+    if (current != on) {
+        if (on) {
+            d->subplotFlags |= ImPlotSubplotFlags_ColMajor;
+        } else {
+            d->subplotFlags &= ~ImPlotSubplotFlags_ColMajor;
+        }
+        Q_EMIT subplotFlagChanged();
     }
-    CellNode* cell    = createCellNode();
-    QImPlotNode* plot = new QImPlotNode(cell);
-    return plot;
+}
+
+// === Plot node management ===
+
+QList<QImPlotNode*> QImSubplotsNode::plotNodes() const
+{
+    const QList<QImAbstractNode*> cns = childrenNodes();
+    QList<QImPlotNode*> res;
+    for (QImAbstractNode* n : cns) {
+        if (QImPlotNode* pn = qobject_cast<QImPlotNode*>(n)) {
+            res.push_back(pn);
+        }
+    }
+    return res;
 }
 
 void QImSubplotsNode::addPlotNode(QImPlotNode* plot)
 {
-    insertPlotNode(plotCount(), plot);
+    if (!plot) {
+        return;
+    }
+    insertChildNode(childNodeCount(), plot);
 }
 
 void QImSubplotsNode::insertPlotNode(int plotIndex, QImPlotNode* plot)
 {
-    if (!plot || itemCount() >= gridCount()) {
+    if (!plot) {
         return;
     }
-    if (plotIndex < 0) {
-        plotIndex = 0;
+    QList<QImPlotNode*> ps = plotNodes();
+    if (plotIndex < ps.size()) {
+        if (plotIndex < 0) {
+            insertChildNode(0, plot);
+        } else {
+            int t = indexOfChildNode(ps[plotIndex]);
+            if (t >= 0) {
+                plotIndex = t + 1;
+            } else {
+                // Unreachable position
+                plotIndex = 0;
+            }
+        }
+    } else {
+        plotIndex = childNodeCount();
     }
-    if (plotIndex > itemCount()) {
-        plotIndex = itemCount();
-    }
-    CellNode* cell = new CellNode(plotIndex, static_cast< QObject* >(this));
-    insertChildNode(plotIndex, cell);
-    plot->setParent(cell);
-    cell->addChildNode(plot);
-    updateCellIndices();
+    insertChildNode(plotIndex, plot);
+}
+
+int QImSubplotsNode::plotCount() const
+{
+    return plotNodes().size();
 }
 
 int QImSubplotsNode::plotNodeSubplotIndex(QImPlotNode* plot) const
@@ -203,19 +501,13 @@ bool QImSubplotsNode::takePlotNode(QImPlotNode* plot)
     if (!plot) {
         return false;
     }
-    const QList< QImAbstractNode* >& cells = childrenNodes();
-    for (QImAbstractNode* child : cells) {
-        if (!child) {
-            continue;
-        }
-        if (child->childrenNodes().contains(plot)) {
-            child->takeChildNode(plot);
-            removeChildNode(child);
-            updateCellIndices();
-            return true;
-        }
+    // Check if plot is a direct child
+    if (!childrenNodes().contains(plot)) {
+        return false;
     }
-    return false;
+    // Take child without destroying it
+    takeChildNode(plot);
+    return true;
 }
 
 void QImSubplotsNode::removePlotNode(QImPlotNode* plot)
@@ -223,205 +515,89 @@ void QImSubplotsNode::removePlotNode(QImPlotNode* plot)
     if (!plot) {
         return;
     }
-    const QList< QImAbstractNode* >& cells = childrenNodes();
-    for (QImAbstractNode* child : cells) {
-        if (!child) {
-            continue;
-        }
-        if (child->childrenNodes().contains(plot)) {
-            child->removeChildNode(plot);
-            removeChildNode(child);
-            updateCellIndices();
-            return;
-        }
+    // Check if plot is a direct child
+    if (!childrenNodes().contains(plot)) {
+        return;
     }
-}
-
-QList< QImPlotNode* > QImSubplotsNode::plotNodes() const
-{
-    QList< QImPlotNode* > plots;
-    for (QImAbstractNode* child : childrenNodes()) {
-        if (!child) {
-            continue;
-        }
-        for (QImAbstractNode* cellChild : child->childrenNodes()) {
-            if (QImPlotNode* plot = qobject_cast< QImPlotNode* >(cellChild)) {
-                plots.push_back(plot);
-            }
-        }
-    }
-    return plots;
-}
-
-int QImSubplotsNode::plotCount() const
-{
-    return plotNodes().size();
-}
-
-bool QImSubplotsNode::isTitleEnabled() const
-{
-    return true;
-}
-
-void QImSubplotsNode::setTitleEnabled(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isLegendEnabled() const
-{
-    return true;
-}
-
-void QImSubplotsNode::setLegendEnabled(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isDefaultMenusEnabled() const
-{
-    return true;
-}
-
-void QImSubplotsNode::setDefaultMenusEnabled(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isResizable() const
-{
-    return true;
-}
-
-void QImSubplotsNode::setResizable(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isAlignedEnabled() const
-{
-    return true;
-}
-
-void QImSubplotsNode::setAlignedEnabled(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isShareItemsEnabled() const
-{
-    return false;
-}
-
-void QImSubplotsNode::setShareItemsEnabled(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isLinkRows() const
-{
-    return false;
-}
-
-void QImSubplotsNode::setLinkRows(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isLinkColumns() const
-{
-    return false;
-}
-
-void QImSubplotsNode::setLinkColumns(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isLinkAllX() const
-{
-    return false;
-}
-
-void QImSubplotsNode::setLinkAllX(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isLinkAllY() const
-{
-    return false;
-}
-
-void QImSubplotsNode::setLinkAllY(bool on)
-{
-    Q_UNUSED(on);
-}
-
-bool QImSubplotsNode::isColumnMajor() const
-{
-    return false;
-}
-
-void QImSubplotsNode::setColumnMajor(bool on)
-{
-    Q_UNUSED(on);
+    // Remove and destroy child
+    removeChildNode(plot);
 }
 
 bool QImSubplotsNode::isTrackGridRatiosEnabled() const
 {
-    return false;
+    return d_ptr->trackGridRatios;
 }
 
 void QImSubplotsNode::setTrackGridRatiosEnabled(bool on)
 {
-    Q_UNUSED(on);
+    d_ptr->trackGridRatios = on;
 }
 
-void QImSubplotsNode::updateCellIndices()
+QImPlotNode* QImSubplotsNode::createPlotNode()
 {
-    const QList< QImAbstractNode* >& cells = childrenNodes();
-    for (int i = 0; i < cells.size(); ++i) {
-        if (CellNode* cellNode = dynamic_cast< CellNode* >(cells[i])) {
-            cellNode->setSubplotIndex(i);
-        }
+    const QList<QImPlotNode*> pns = plotNodes();
+    if (pns.size() >= gridCount()) {
+        // Plot count equals grid count, cannot add more
+        return nullptr;
     }
+    QImPlotNode* p = new QImPlotNode();
+    addPlotNode(p);
+    return p;
 }
+
+// === Render implementation ===
 
 bool QImSubplotsNode::beginDraw()
 {
-    const ImVec2 cursorPos = ImGui::GetCursorPos();
-    const ImVec2 availSize = ImGui::GetContentRegionAvail();
-    m_origin = QPointF(cursorPos.x, cursorPos.y);
-    m_availableSize = QSizeF(
-        m_size.width() > 0 ? m_size.width() : static_cast< double >(availSize.x),
-        m_size.height() > 0 ? m_size.height() : static_cast< double >(availSize.y)
+    // Call ImPlot API (UTF-8 cache, zero overhead)
+    QIM_D(d);
+
+    float* row_ratios = nullptr;
+    float* col_ratios = nullptr;
+
+    if (!d->rowRatios.empty() && (static_cast<int>(d->rowRatios.size()) == d->rows)) {
+        row_ratios = d->rowRatios.data();
+    }
+    if (!d->columnRatios.empty() && (static_cast<int>(d->columnRatios.size()) == d->cols)) {
+        col_ratios = d->columnRatios.data();
+    }
+
+    bool on = ImPlot::BeginSubplots(
+        d->titleUtf8.isEmpty() ? "##Subplots" : d->titleUtf8.constData(),
+        d->rows,
+        d->cols,
+        d->size,
+        d->subplotFlags,
+        row_ratios,
+        col_ratios
     );
-    return true;
+
+    // Detect if row_ratios and col_ratios changed, emit gridInfoChanged signal
+    if (d->trackGridRatios) {
+        bool isGridChanged {false};
+        if (row_ratios) {
+            if (!fuzzyEqual(d->rowRatios, d->lastRowRatios, PrivateData::epsilon)) {
+                d->lastRowRatios = d->rowRatios;
+                isGridChanged = true;
+            }
+        }
+        if (col_ratios) {
+            if (!fuzzyEqual(d->columnRatios, d->lastColumnRatios, PrivateData::epsilon)) {
+                d->lastColumnRatios = d->columnRatios;
+                isGridChanged = true;
+            }
+        }
+        if (isGridChanged) {
+            Q_EMIT gridInfoChanged();
+        }
+    }
+
+    return on;
 }
 
 void QImSubplotsNode::endDraw()
 {
-    ImGui::SetCursorPos(ImVec2(static_cast< float >(m_origin.x()), static_cast< float >(m_origin.y())));
-    ImGui::Dummy(ImVec2(static_cast< float >(m_availableSize.width()), static_cast< float >(m_availableSize.height())));
+    ImPlot::EndSubplots();
 }
 
-QPoint QImSubplotsNode::cellPosition(int index) const
-{
-    const QSizeF sz = cellSize();
-    const int row   = (m_cols > 0) ? (index / m_cols) : 0;
-    const int col   = (m_cols > 0) ? (index % m_cols) : 0;
-    return QPoint(
-        static_cast< int >(m_origin.x() + static_cast< double >(col) * sz.width()),
-        static_cast< int >(m_origin.y() + static_cast< double >(row) * sz.height())
-    );
-}
-
-QSizeF QImSubplotsNode::cellSize() const
-{
-    const double width = (m_cols > 0) ? (m_availableSize.width() / static_cast< double >(m_cols)) : m_availableSize.width();
-    const double height =
-        (m_rows > 0) ? (m_availableSize.height() / static_cast< double >(m_rows)) : m_availableSize.height();
-    return QSizeF(width, height);
-}
 }  // namespace QIM
