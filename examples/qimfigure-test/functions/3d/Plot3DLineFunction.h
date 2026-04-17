@@ -7,8 +7,8 @@
 
 namespace QIM {
 class QImFigureWidget;
-class QImPlot3DExtNode;
-class QImPlot3DExtLineItemNode;
+class QImPlot3DNode;
+class QImPlot3DLineItemNode;
 }
 
 /**
@@ -217,8 +217,8 @@ private:
     QColor m_lineColor = Qt::blue;
     float m_lineWeight = 1.0f;
     
-    QIM::QImPlot3DExtNode* m_plot3DNode = nullptr;
-    QIM::QImPlot3DExtLineItemNode* m_line3DNode = nullptr;
+    QIM::QImPlot3DNode* m_plot3DNode = nullptr;
+    QIM::QImPlot3DLineItemNode* m_line3DNode = nullptr;
 };
 
 #endif // PLOT3DLINEFUNCTION_H

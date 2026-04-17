@@ -3,11 +3,12 @@
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
 #include "plot/QImPlotHistogramItemNode.h"
-#include "plot/QImPlot3DLineItemNode.h"
-#include "plot/QImPlot3DNode.h"
-#include "plot/QImPlot3DScatterItemNode.h"
-#include "plot/QImPlot3DSurfaceItemNode.h"
-#include "plot/QImPlot3DTriangleItemNode.h"
+#include "plot3d/QImPlot3DLineItemNode.h"
+#include "plot3d/QImPlot3DNode.h"
+#include "plot3d/QImPlot3DScatterItemNode.h"
+#include "plot3d/QImPlot3DSurfaceItemNode.h"
+#include "plot3d/QImPlot3DTriangleItemNode.h"
+#include "plot3d/QImPlot3DAxisInfo.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImWaveformGenerator.hpp"
 #include "plot/QImPlotValueTrackerNode.h"
@@ -435,14 +436,14 @@ void MainWindow::drawPlot3D()
 
     if (QIM::QImPlot3DNode* plot1 = figure3D->createPlot3DNode()) {
         plot1->setTitle("3D Line");
-        plot1->setXAxisLabel("X");
-        plot1->setYAxisLabel("Y");
-        plot1->setZAxisLabel("Z");
+        plot1->xAxis()->setLabel("X");
+        plot1->yAxis()->setLabel("Y");
+        plot1->zAxis()->setLabel("Z");
         plot1->setLegendEnabled(true);
         plot1->setEqual(true);
-        plot1->setAxisLimits(QIM::QImPlot3DNode::AxisX, -1.2, 1.2);
-        plot1->setAxisLimits(QIM::QImPlot3DNode::AxisY, -1.2, 1.2);
-        plot1->setAxisLimits(QIM::QImPlot3DNode::AxisZ, -0.2, 6.5);
+        plot1->xAxis()->setLimits(-1.2, 1.2);
+        plot1->yAxis()->setLimits(-1.2, 1.2);
+        plot1->zAxis()->setLimits(-0.2, 6.5);
 
         std::vector< double > xData;
         std::vector< double > yData;
@@ -462,19 +463,19 @@ void MainWindow::drawPlot3D()
         line->setLabel("Helix");
         line->setData(xData, yData, zData);
         line->setColor(QColor(33, 150, 243));
-        line->setLineWidth(2.0f);
+        line->setLineWeight(2.0f);
     }
 
     if (QIM::QImPlot3DNode* plot2 = figure3D->createPlot3DNode()) {
         plot2->setTitle("3D Scatter");
-        plot2->setXAxisLabel("X");
-        plot2->setYAxisLabel("Y");
-        plot2->setZAxisLabel("Z");
+        plot2->xAxis()->setLabel("X");
+        plot2->yAxis()->setLabel("Y");
+        plot2->zAxis()->setLabel("Z");
         plot2->setLegendEnabled(true);
         plot2->setEqual(true);
-        plot2->setAxisLimits(QIM::QImPlot3DNode::AxisX, -1.2, 1.2);
-        plot2->setAxisLimits(QIM::QImPlot3DNode::AxisY, -1.2, 1.2);
-        plot2->setAxisLimits(QIM::QImPlot3DNode::AxisZ, -0.2, 2.8);
+        plot2->xAxis()->setLimits(-1.2, 1.2);
+        plot2->yAxis()->setLimits(-1.2, 1.2);
+        plot2->zAxis()->setLimits(-0.2, 2.8);
 
         std::vector< double > scatterX;
         std::vector< double > scatterY;
@@ -495,16 +496,14 @@ void MainWindow::drawPlot3D()
         scatter->setData(scatterX, scatterY, scatterZ);
         scatter->setMarkerShape(ImPlot3DMarker_Square);
         scatter->setMarkerSize(5.0f);
-        scatter->setMarkerWeight(1.5f);
-        scatter->setFillColor(QColor(255, 140, 0));
-        scatter->setOutlineColor(QColor(120, 50, 0));
+        scatter->setColor(QColor(255, 140, 0));
     }
 
     if (QIM::QImPlot3DNode* plot3 = figure3D->createPlot3DNode()) {
         plot3->setTitle("3D Surface");
-        plot3->setXAxisLabel("X");
-        plot3->setYAxisLabel("Y");
-        plot3->setZAxisLabel("Z");
+        plot3->xAxis()->setLabel("X");
+        plot3->yAxis()->setLabel("Y");
+        plot3->zAxis()->setLabel("Z");
         plot3->setLegendEnabled(true);
         plot3->setEqual(true);
 
@@ -539,9 +538,9 @@ void MainWindow::drawPlot3D()
 
     if (QIM::QImPlot3DNode* plot4 = figure3D->createPlot3DNode()) {
         plot4->setTitle("3D Wireframe");
-        plot4->setXAxisLabel("X");
-        plot4->setYAxisLabel("Y");
-        plot4->setZAxisLabel("Z");
+        plot4->xAxis()->setLabel("X");
+        plot4->yAxis()->setLabel("Y");
+        plot4->zAxis()->setLabel("Z");
         plot4->setLegendEnabled(true);
         plot4->setEqual(true);
 
@@ -578,9 +577,9 @@ void MainWindow::drawPlot3D()
 
     if (QIM::QImPlot3DNode* plot5 = figure3D->createPlot3DNode()) {
         plot5->setTitle("3D Triangle");
-        plot5->setXAxisLabel("X");
-        plot5->setYAxisLabel("Y");
-        plot5->setZAxisLabel("Z");
+        plot5->xAxis()->setLabel("X");
+        plot5->yAxis()->setLabel("Y");
+        plot5->zAxis()->setLabel("Z");
         plot5->setLegendEnabled(true);
         plot5->setEqual(true);
 

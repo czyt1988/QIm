@@ -1,8 +1,8 @@
 #include "QImFigureWidget.h"
-#include "plot/QImPlot3DLineItemNode.h"
-#include "plot/QImPlot3DNode.h"
-#include "plot/QImPlot3DScatterItemNode.h"
-#include "plot/QImPlot3DSurfaceItemNode.h"
+#include "plot3d/QImPlot3DLineItemNode.h"
+#include "plot3d/QImPlot3DNode.h"
+#include "plot3d/QImPlot3DScatterItemNode.h"
+#include "plot3d/QImPlot3DSurfaceItemNode.h"
 
 #include "implot3d.h"
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
         line->setLabel("helix");
         line->setData(xs, ys, zs);
         line->setColor(QColor(0, 114, 189));
-        line->setLineWidth(2.0f);
+        line->setLineWeight(2.0f);
     }
 
     if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
@@ -62,8 +62,7 @@ int main(int argc, char* argv[])
         scatter->setLabel("samples");
         scatter->setData(xs, ys, zs);
         scatter->setMarkerSize(4.0f);
-        scatter->setFillColor(QColor(217, 83, 25));
-        scatter->setOutlineColor(QColor(120, 45, 10));
+        scatter->setColor(QColor(217, 83, 25));
     }
 
     if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {

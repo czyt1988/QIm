@@ -1,8 +1,8 @@
 #include "Plot3DLineFunction.h"
 #include "QImFigureWidget.h"
-#include "plot3d/QImPlot3DExtNode.h"
+#include "plot3d/QImPlot3DNode.h"
 #include "plot3d/QImPlot3DAxisInfo.h"
-#include "plot3d/QImPlot3DExtLineItemNode.h"
+#include "plot3d/QImPlot3DLineItemNode.h"
 #include "plot3d/QImPlot3DDataSeries.h"
 #include <QVector>
 #include <cmath>
@@ -168,7 +168,7 @@ void Plot3DLineFunction::createPlot(QIM::QImFigureWidget* figure)
     }
     
     // Create 3D plot node as a top-level render node via QImFigureWidget API
-    m_plot3DNode = figure->createPlotNode3D();
+    m_plot3DNode = figure->createPlot3DNode();
     
     // Configure axes and title
     m_plot3DNode->xAxis()->setLabel(m_xLabel);
@@ -191,7 +191,7 @@ void Plot3DLineFunction::createPlot(QIM::QImFigureWidget* figure)
     }
     
     // Create 3D line item node and set data
-    m_line3DNode = new QIM::QImPlot3DExtLineItemNode(m_plot3DNode);
+    m_line3DNode = new QIM::QImPlot3DLineItemNode(m_plot3DNode);
     m_line3DNode->setData(xs, ys, zs);
     m_line3DNode->setColor(m_lineColor);
     m_line3DNode->setLineWeight(m_lineWeight);
