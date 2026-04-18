@@ -1,4 +1,4 @@
-﻿// PerformanceTestController.h
+// PerformanceTestController.h
 #ifndef PERFORMANCETESTCONTROLLER_H
 #define PERFORMANCETESTCONTROLLER_H
 
@@ -17,6 +17,7 @@ struct TestResult
     double memoryUsage    = 0.0;    // MB
     bool usedOpenGL       = false;  // 是否使用OpenGL
     bool usedDownsampling = false;  // 是否使用降采样
+    QString qtVersion;              // Qt版本号
 };
 Q_DECLARE_METATYPE(TestResult)
 

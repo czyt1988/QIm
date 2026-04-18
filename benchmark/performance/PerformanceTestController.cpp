@@ -1,4 +1,4 @@
-﻿// PerformanceTestController.cpp
+// PerformanceTestController.cpp
 #include "PerformanceTestController.h"
 #include <QCoreApplication>
 #include <QtConcurrent/QtConcurrent>
@@ -217,7 +217,9 @@ TestResult PerformanceTestController::testQImPlot(int pointCount)
     result.libraryName      = "QIm";
     result.pointCount       = pointCount;
     result.usedDownsampling = m_config.useDownsampling;
+    // QIm uses OpenGL as its rendering backend (ImGui renders via GPU), this is not a toggleable option
     result.usedOpenGL       = true;
+    result.qtVersion        = qVersion();
     // 记录基准内存（测试开始前）
     MemoryMonitor mem;
     qDebug().noquote() << "\nBegin Test QIm Baseline memory:" << mem.recordedMemory() << "MB";
@@ -270,9 +272,9 @@ TestResult PerformanceTestController::testQImPlot(int pointCount)
             QVector< double >(m_testDataX.constData() + startIdx, m_testDataX.constData() + startIdx + pointCount - 1),
             QVector< double >(m_testDataY.constData() + startIdx, m_testDataY.constData() + startIdx + pointCount - 1)
         );
-        QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
         plotNode->rescaleAxes();
         figure->requestRender();
+        QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
         mem.updatePeak();  // 更新峰值内存
     }
     double totalTime = timer.elapsed();
@@ -296,6 +298,7 @@ TestResult PerformanceTestController::testQwt(int pointCount)
     result.pointCount       = pointCount;
     result.usedDownsampling = m_config.useDownsampling;
     result.usedOpenGL       = m_config.useOpenGL;
+    result.qtVersion        = qVersion();
     MemoryMonitor mem;
     qDebug().noquote() << "\nBegin Test QWT Baseline memory:" << mem.recordedMemory() << "MB";
     auto* plot = new QwtPlot();
@@ -368,6 +371,7 @@ TestResult PerformanceTestController::testQCustomPlot(int pointCount)
     result.pointCount       = pointCount;
     result.usedDownsampling = m_config.useDownsampling;
     result.usedOpenGL       = m_config.useOpenGL;
+    result.qtVersion        = qVersion();
     MemoryMonitor mem;
     qDebug().noquote() << "\nBegin Test QCustomPlot Baseline memory:" << mem.recordedMemory() << "MB";
 
@@ -381,7 +385,6 @@ TestResult PerformanceTestController::testQCustomPlot(int pointCount)
     customPlot->addGraph();
     customPlot->graph(0)->setName("Test Curve");
     customPlot->graph(0)->setAdaptiveSampling(result.usedDownsampling);
-    customPlot->setAntialiasedElements(QCP::aeNone);  // 关闭抗锯齿提高性能
     QCoreApplication::processEvents();
 
     int step = (m_totalDataSize - pointCount) / (m_config.testFrames - 1);
