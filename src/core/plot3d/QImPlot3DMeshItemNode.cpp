@@ -54,17 +54,20 @@ void QImPlot3DMeshItemNode::setMeshData(const std::vector<ImPlot3DPoint>& vertic
 
 const std::vector<ImPlot3DPoint>& QImPlot3DMeshItemNode::vertices() const
 {
-    return d_ptr->vertices;
+    QIM_DC(d);
+    return d->vertices;
 }
 
 const std::vector<unsigned int>& QImPlot3DMeshItemNode::indices() const
 {
-    return d_ptr->indices;
+    QIM_DC(d);
+    return d->indices;
 }
 
 bool QImPlot3DMeshItemNode::isLinesVisible() const
 {
-    return (d_ptr->meshFlags & ImPlot3DMeshFlags_NoLines) == 0;
+    QIM_DC(d);
+    return (d->meshFlags & ImPlot3DMeshFlags_NoLines) == 0;
 }
 
 void QImPlot3DMeshItemNode::setLinesVisible(bool visible)
@@ -83,7 +86,8 @@ void QImPlot3DMeshItemNode::setLinesVisible(bool visible)
 
 bool QImPlot3DMeshItemNode::isFillVisible() const
 {
-    return (d_ptr->meshFlags & ImPlot3DMeshFlags_NoFill) == 0;
+    QIM_DC(d);
+    return (d->meshFlags & ImPlot3DMeshFlags_NoFill) == 0;
 }
 
 void QImPlot3DMeshItemNode::setFillVisible(bool visible)
@@ -102,7 +106,8 @@ void QImPlot3DMeshItemNode::setFillVisible(bool visible)
 
 bool QImPlot3DMeshItemNode::isMarkersVisible() const
 {
-    return (d_ptr->meshFlags & ImPlot3DMeshFlags_NoMarkers) == 0;
+    QIM_DC(d);
+    return (d->meshFlags & ImPlot3DMeshFlags_NoMarkers) == 0;
 }
 
 void QImPlot3DMeshItemNode::setMarkersVisible(bool visible)
@@ -121,7 +126,8 @@ void QImPlot3DMeshItemNode::setMarkersVisible(bool visible)
 
 int QImPlot3DMeshItemNode::markerShape() const
 {
-    return d_ptr->markerShape;
+    QIM_DC(d);
+    return d->markerShape;
 }
 
 void QImPlot3DMeshItemNode::setMarkerShape(int shape)
@@ -135,7 +141,8 @@ void QImPlot3DMeshItemNode::setMarkerShape(int shape)
 
 float QImPlot3DMeshItemNode::markerSize() const
 {
-    return d_ptr->markerSize;
+    QIM_DC(d);
+    return d->markerSize;
 }
 
 void QImPlot3DMeshItemNode::setMarkerSize(float size)
@@ -149,7 +156,8 @@ void QImPlot3DMeshItemNode::setMarkerSize(float size)
 
 float QImPlot3DMeshItemNode::markerWeight() const
 {
-    return d_ptr->markerWeight;
+    QIM_DC(d);
+    return d->markerWeight;
 }
 
 void QImPlot3DMeshItemNode::setMarkerWeight(float weight)
@@ -163,7 +171,8 @@ void QImPlot3DMeshItemNode::setMarkerWeight(float weight)
 
 QColor QImPlot3DMeshItemNode::fillColor() const
 {
-    return d_ptr->fillColor;
+    QIM_DC(d);
+    return d->fillColor;
 }
 
 void QImPlot3DMeshItemNode::setFillColor(const QColor& color)
@@ -177,7 +186,8 @@ void QImPlot3DMeshItemNode::setFillColor(const QColor& color)
 
 QColor QImPlot3DMeshItemNode::lineColor() const
 {
-    return d_ptr->lineColor;
+    QIM_DC(d);
+    return d->lineColor;
 }
 
 void QImPlot3DMeshItemNode::setLineColor(const QColor& color)
@@ -191,7 +201,8 @@ void QImPlot3DMeshItemNode::setLineColor(const QColor& color)
 
 QColor QImPlot3DMeshItemNode::markerFillColor() const
 {
-    return d_ptr->markerFillColor;
+    QIM_DC(d);
+    return d->markerFillColor;
 }
 
 void QImPlot3DMeshItemNode::setMarkerFillColor(const QColor& color)
@@ -205,7 +216,8 @@ void QImPlot3DMeshItemNode::setMarkerFillColor(const QColor& color)
 
 QColor QImPlot3DMeshItemNode::markerOutlineColor() const
 {
-    return d_ptr->markerOutlineColor;
+    QIM_DC(d);
+    return d->markerOutlineColor;
 }
 
 void QImPlot3DMeshItemNode::setMarkerOutlineColor(const QColor& color)
@@ -219,7 +231,8 @@ void QImPlot3DMeshItemNode::setMarkerOutlineColor(const QColor& color)
 
 float QImPlot3DMeshItemNode::lineWidth() const
 {
-    return d_ptr->lineWidth;
+    QIM_DC(d);
+    return d->lineWidth;
 }
 
 void QImPlot3DMeshItemNode::setLineWidth(float width)
@@ -233,7 +246,8 @@ void QImPlot3DMeshItemNode::setLineWidth(float width)
 
 int QImPlot3DMeshItemNode::meshFlags() const
 {
-    return d_ptr->meshFlags;
+    QIM_DC(d);
+    return d->meshFlags;
 }
 
 void QImPlot3DMeshItemNode::setMeshFlags(int flags)
@@ -247,31 +261,32 @@ void QImPlot3DMeshItemNode::setMeshFlags(int flags)
 
 bool QImPlot3DMeshItemNode::beginDraw()
 {
-    if (d_ptr->vertices.empty() || d_ptr->indices.size() < 3 || (d_ptr->indices.size() % 3) != 0) {
+    QIM_D(d);
+    if (d->vertices.empty() || d->indices.size() < 3 || (d->indices.size() % 3) != 0) {
         return false;
     }
 
-    if (d_ptr->fillColor.isValid()) {
-        ImPlot3D::SetNextFillStyle(toImVec4(d_ptr->fillColor));
+    if (d->fillColor.isValid()) {
+        ImPlot3D::SetNextFillStyle(toImVec4(d->fillColor));
     }
-    if (d_ptr->lineColor.isValid()) {
-        ImPlot3D::SetNextLineStyle(toImVec4(d_ptr->lineColor), d_ptr->lineWidth);
+    if (d->lineColor.isValid()) {
+        ImPlot3D::SetNextLineStyle(toImVec4(d->lineColor), d->lineWidth);
     } else {
-        ImPlot3D::SetNextLineStyle(IMPLOT3D_AUTO_COL, d_ptr->lineWidth);
+        ImPlot3D::SetNextLineStyle(IMPLOT3D_AUTO_COL, d->lineWidth);
     }
-    if (d_ptr->markerShape != ImPlot3DMarker_None) {
-        const ImVec4 fill = d_ptr->markerFillColor.isValid() ? toImVec4(d_ptr->markerFillColor) : IMPLOT3D_AUTO_COL;
-        const ImVec4 outline = d_ptr->markerOutlineColor.isValid() ? toImVec4(d_ptr->markerOutlineColor) : IMPLOT3D_AUTO_COL;
-        ImPlot3D::SetNextMarkerStyle(static_cast<ImPlot3DMarker>(d_ptr->markerShape), d_ptr->markerSize, fill, d_ptr->markerWeight, outline);
+    if (d->markerShape != ImPlot3DMarker_None) {
+        const ImVec4 fill = d->markerFillColor.isValid() ? toImVec4(d->markerFillColor) : IMPLOT3D_AUTO_COL;
+        const ImVec4 outline = d->markerOutlineColor.isValid() ? toImVec4(d->markerOutlineColor) : IMPLOT3D_AUTO_COL;
+        ImPlot3D::SetNextMarkerStyle(static_cast<ImPlot3DMarker>(d->markerShape), d->markerSize, fill, d->markerWeight, outline);
     }
 
     ImPlot3D::PlotMesh(
         labelConstData(),
-        d_ptr->vertices.data(),
-        d_ptr->indices.data(),
-        static_cast<int>(d_ptr->vertices.size()),
-        static_cast<int>(d_ptr->indices.size()),
-        static_cast<ImPlot3DMeshFlags>(d_ptr->meshFlags)
+        d->vertices.data(),
+        d->indices.data(),
+        static_cast<int>(d->vertices.size()),
+        static_cast<int>(d->indices.size()),
+        static_cast<ImPlot3DMeshFlags>(d->meshFlags)
     );
     return false;
 }

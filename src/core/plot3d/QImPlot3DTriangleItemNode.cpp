@@ -60,7 +60,8 @@ const std::vector<double>& QImPlot3DTriangleItemNode::zData() const
 
 bool QImPlot3DTriangleItemNode::isLinesVisible() const
 {
-    return (d_ptr->triangleFlags & ImPlot3DTriangleFlags_NoLines) == 0;
+    QIM_DC(d);
+    return (d->triangleFlags & ImPlot3DTriangleFlags_NoLines) == 0;
 }
 
 void QImPlot3DTriangleItemNode::setLinesVisible(bool visible)
@@ -79,7 +80,8 @@ void QImPlot3DTriangleItemNode::setLinesVisible(bool visible)
 
 bool QImPlot3DTriangleItemNode::isFillVisible() const
 {
-    return (d_ptr->triangleFlags & ImPlot3DTriangleFlags_NoFill) == 0;
+    QIM_DC(d);
+    return (d->triangleFlags & ImPlot3DTriangleFlags_NoFill) == 0;
 }
 
 void QImPlot3DTriangleItemNode::setFillVisible(bool visible)
@@ -98,7 +100,8 @@ void QImPlot3DTriangleItemNode::setFillVisible(bool visible)
 
 bool QImPlot3DTriangleItemNode::isMarkersVisible() const
 {
-    return (d_ptr->triangleFlags & ImPlot3DTriangleFlags_NoMarkers) == 0;
+    QIM_DC(d);
+    return (d->triangleFlags & ImPlot3DTriangleFlags_NoMarkers) == 0;
 }
 
 void QImPlot3DTriangleItemNode::setMarkersVisible(bool visible)
@@ -117,7 +120,8 @@ void QImPlot3DTriangleItemNode::setMarkersVisible(bool visible)
 
 int QImPlot3DTriangleItemNode::markerShape() const
 {
-    return d_ptr->markerShape;
+    QIM_DC(d);
+    return d->markerShape;
 }
 
 void QImPlot3DTriangleItemNode::setMarkerShape(int shape)
@@ -131,7 +135,8 @@ void QImPlot3DTriangleItemNode::setMarkerShape(int shape)
 
 float QImPlot3DTriangleItemNode::markerSize() const
 {
-    return d_ptr->markerSize;
+    QIM_DC(d);
+    return d->markerSize;
 }
 
 void QImPlot3DTriangleItemNode::setMarkerSize(float size)
@@ -145,7 +150,8 @@ void QImPlot3DTriangleItemNode::setMarkerSize(float size)
 
 float QImPlot3DTriangleItemNode::markerWeight() const
 {
-    return d_ptr->markerWeight;
+    QIM_DC(d);
+    return d->markerWeight;
 }
 
 void QImPlot3DTriangleItemNode::setMarkerWeight(float weight)
@@ -159,7 +165,8 @@ void QImPlot3DTriangleItemNode::setMarkerWeight(float weight)
 
 QColor QImPlot3DTriangleItemNode::fillColor() const
 {
-    return d_ptr->fillColor;
+    QIM_DC(d);
+    return d->fillColor;
 }
 
 void QImPlot3DTriangleItemNode::setFillColor(const QColor& color)
@@ -173,7 +180,8 @@ void QImPlot3DTriangleItemNode::setFillColor(const QColor& color)
 
 QColor QImPlot3DTriangleItemNode::lineColor() const
 {
-    return d_ptr->lineColor;
+    QIM_DC(d);
+    return d->lineColor;
 }
 
 void QImPlot3DTriangleItemNode::setLineColor(const QColor& color)
@@ -187,7 +195,8 @@ void QImPlot3DTriangleItemNode::setLineColor(const QColor& color)
 
 QColor QImPlot3DTriangleItemNode::markerFillColor() const
 {
-    return d_ptr->markerFillColor;
+    QIM_DC(d);
+    return d->markerFillColor;
 }
 
 void QImPlot3DTriangleItemNode::setMarkerFillColor(const QColor& color)
@@ -201,7 +210,8 @@ void QImPlot3DTriangleItemNode::setMarkerFillColor(const QColor& color)
 
 QColor QImPlot3DTriangleItemNode::markerOutlineColor() const
 {
-    return d_ptr->markerOutlineColor;
+    QIM_DC(d);
+    return d->markerOutlineColor;
 }
 
 void QImPlot3DTriangleItemNode::setMarkerOutlineColor(const QColor& color)
@@ -215,7 +225,8 @@ void QImPlot3DTriangleItemNode::setMarkerOutlineColor(const QColor& color)
 
 float QImPlot3DTriangleItemNode::lineWidth() const
 {
-    return d_ptr->lineWidth;
+    QIM_DC(d);
+    return d->lineWidth;
 }
 
 void QImPlot3DTriangleItemNode::setLineWidth(float width)
@@ -229,7 +240,8 @@ void QImPlot3DTriangleItemNode::setLineWidth(float width)
 
 int QImPlot3DTriangleItemNode::triangleFlags() const
 {
-    return d_ptr->triangleFlags;
+    QIM_DC(d);
+    return d->triangleFlags;
 }
 
 void QImPlot3DTriangleItemNode::setTriangleFlags(int flags)
@@ -243,23 +255,24 @@ void QImPlot3DTriangleItemNode::setTriangleFlags(int flags)
 
 bool QImPlot3DTriangleItemNode::beginDraw()
 {
+    QIM_D(d);
     const int count = static_cast<int>(std::min({xData_vec.size(), yData_vec.size(), zData_vec.size()}));
     if (count < 3) {
         return false;
     }
 
-    if (d_ptr->fillColor.isValid()) {
-        ImPlot3D::SetNextFillStyle(toImVec4(d_ptr->fillColor));
+    if (d->fillColor.isValid()) {
+        ImPlot3D::SetNextFillStyle(toImVec4(d->fillColor));
     }
-    if (d_ptr->lineColor.isValid()) {
-        ImPlot3D::SetNextLineStyle(toImVec4(d_ptr->lineColor), d_ptr->lineWidth);
+    if (d->lineColor.isValid()) {
+        ImPlot3D::SetNextLineStyle(toImVec4(d->lineColor), d->lineWidth);
     } else {
-        ImPlot3D::SetNextLineStyle(IMPLOT3D_AUTO_COL, d_ptr->lineWidth);
+        ImPlot3D::SetNextLineStyle(IMPLOT3D_AUTO_COL, d->lineWidth);
     }
-    if (d_ptr->markerShape != ImPlot3DMarker_None) {
-        const ImVec4 fill = d_ptr->markerFillColor.isValid() ? toImVec4(d_ptr->markerFillColor) : IMPLOT3D_AUTO_COL;
-        const ImVec4 outline = d_ptr->markerOutlineColor.isValid() ? toImVec4(d_ptr->markerOutlineColor) : IMPLOT3D_AUTO_COL;
-        ImPlot3D::SetNextMarkerStyle(static_cast<ImPlot3DMarker>(d_ptr->markerShape), d_ptr->markerSize, fill, d_ptr->markerWeight, outline);
+    if (d->markerShape != ImPlot3DMarker_None) {
+        const ImVec4 fill = d->markerFillColor.isValid() ? toImVec4(d->markerFillColor) : IMPLOT3D_AUTO_COL;
+        const ImVec4 outline = d->markerOutlineColor.isValid() ? toImVec4(d->markerOutlineColor) : IMPLOT3D_AUTO_COL;
+        ImPlot3D::SetNextMarkerStyle(static_cast<ImPlot3DMarker>(d->markerShape), d->markerSize, fill, d->markerWeight, outline);
     }
 
     ImPlot3D::PlotTriangle(
@@ -268,7 +281,7 @@ bool QImPlot3DTriangleItemNode::beginDraw()
         yData_vec.data(),
         zData_vec.data(),
         count,
-        static_cast<ImPlot3DTriangleFlags>(d_ptr->triangleFlags)
+        static_cast<ImPlot3DTriangleFlags>(d->triangleFlags)
     );
     return false;
 }

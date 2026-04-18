@@ -25,7 +25,7 @@ public:
     ImVec2 sizeVec4 {-1, -1};  ///< Pre-converted size for BeginPlot (-1 = auto-fill)
     bool autoSize {true};      ///< Auto-size mode flag (true = use -1 for auto-fill)
 
-    // Flags - MUST be named 'flags' for macro access via d_ptr->flags
+    // Flags - MUST be named 'flags' for macro access via QIM_D(d)->flags
     ImPlot3DFlags flags {ImPlot3DFlags_None};
 
     // BeginPlot success flag
@@ -172,17 +172,20 @@ QImPlot3DAxisInfo* QImPlot3DNode::axisInfo(QImPlot3DAxisId aid) const
 
 QImPlot3DAxisInfo* QImPlot3DNode::xAxis() const
 {
-    return d_ptr->xAxisInfo;
+    QIM_DC(d);
+    return d->xAxisInfo;
 }
 
 QImPlot3DAxisInfo* QImPlot3DNode::yAxis() const
 {
-    return d_ptr->yAxisInfo;
+    QIM_DC(d);
+    return d->yAxisInfo;
 }
 
 QImPlot3DAxisInfo* QImPlot3DNode::zAxis() const
 {
-    return d_ptr->zAxisInfo;
+    QIM_DC(d);
+    return d->zAxisInfo;
 }
 
 //----------------------------------------------------
@@ -224,7 +227,8 @@ QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DNode, Equal, ImPlot3DFlags_Equal, plot3DFlagCha
  */
 bool QImPlot3DNode::isCanvasEnabled() const
 {
-    return (d_ptr->flags & ImPlot3DFlags_CanvasOnly) == 0;
+    QIM_DC(d);
+    return (d->flags & ImPlot3DFlags_CanvasOnly) == 0;
 }
 
 /**
@@ -260,7 +264,8 @@ void QImPlot3DNode::setCanvasEnabled(bool enabled)
 
 int QImPlot3DNode::imPlot3DFlags() const
 {
-    return d_ptr->flags;
+    QIM_DC(d);
+    return d->flags;
 }
 
 void QImPlot3DNode::setImPlot3DFlags(int flags)
@@ -366,7 +371,8 @@ bool QImPlot3DNode::beginDraw()
 
 void QImPlot3DNode::endDraw()
 {
-    if (d_ptr->beginPlotSuccess) {
+    QIM_D(d);
+    if (d->beginPlotSuccess) {
         ImPlot3D::EndPlot();
     }
 }

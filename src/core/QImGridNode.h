@@ -140,8 +140,15 @@ Q_SIGNALS:
     void titleChanged(const QString& title);
 
     /**
+     * \if ENGLISH
      * @brief Emitted when grid rows or columns change
-     * @brief 当网格行数或列数改变时发出
+     * @details Triggered when the number of rows or columns in the grid layout changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 当网格行数或列数改变时发射
+     * @details 当网格布局中的行数或列数发生变更时触发。
+     * \endif
      */
     void gridInfoChanged();
 

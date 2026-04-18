@@ -55,7 +55,8 @@ QImPlot3DAxisInfo::PrivateData::PrivateData(QImPlot3DAxisInfo* p) : q_ptr(p)
 QImPlot3DAxisInfo::QImPlot3DAxisInfo(QImPlot3DAxisId axis, QImPlot3DNode* plot)
     : QObject(plot), m_axisId(axis), QIM_PIMPL_CONSTRUCT
 {
-    d_ptr->plot = plot;
+    QIM_D(d);
+    d->plot = plot;
 }
 
 QImPlot3DAxisInfo::~QImPlot3DAxisInfo()
@@ -107,7 +108,8 @@ int QImPlot3DAxisInfo::imAxis3D() const
  */
 QImPlot3DNode* QImPlot3DAxisInfo::plotNode() const
 {
-    return d_ptr->plot;
+    QIM_DC(d);
+    return d->plot;
 }
 
 /**
@@ -123,7 +125,8 @@ QImPlot3DNode* QImPlot3DAxisInfo::plotNode() const
  */
 QString QImPlot3DAxisInfo::label() const
 {
-    return QString::fromUtf8(d_ptr->labelUtf8);
+    QIM_DC(d);
+    return QString::fromUtf8(d->labelUtf8);
 }
 
 /**
@@ -160,7 +163,8 @@ void QImPlot3DAxisInfo::setLabel(const QString& label)
  */
 double QImPlot3DAxisInfo::minLimit() const
 {
-    return d_ptr->minLimit;
+    QIM_DC(d);
+    return d->minLimit;
 }
 
 /**
@@ -197,7 +201,8 @@ void QImPlot3DAxisInfo::setMinLimit(double min)
  */
 double QImPlot3DAxisInfo::maxLimit() const
 {
-    return d_ptr->maxLimit;
+    QIM_DC(d);
+    return d->maxLimit;
 }
 
 /**
@@ -268,7 +273,8 @@ void QImPlot3DAxisInfo::setLimits(double min, double max, QImPlot3DCondition con
  */
 QImPlot3DScaleType QImPlot3DAxisInfo::scale() const
 {
-    return d_ptr->scale;
+    QIM_DC(d);
+    return d->scale;
 }
 
 /**
@@ -304,7 +310,8 @@ void QImPlot3DAxisInfo::setScale(QImPlot3DScaleType type)
  */
 int QImPlot3DAxisInfo::axisFlags() const
 {
-    return d_ptr->flags;
+    QIM_DC(d);
+    return d->flags;
 }
 
 /**

@@ -91,7 +91,8 @@ void QImPlot3DSurfaceItemNode::setYCount(int count)
 
 bool QImPlot3DSurfaceItemNode::isLinesVisible() const
 {
-    return (d_ptr->surfaceFlags & ImPlot3DSurfaceFlags_NoLines) == 0;
+    QIM_DC(d);
+    return (d->surfaceFlags & ImPlot3DSurfaceFlags_NoLines) == 0;
 }
 
 void QImPlot3DSurfaceItemNode::setLinesVisible(bool visible)
@@ -110,7 +111,8 @@ void QImPlot3DSurfaceItemNode::setLinesVisible(bool visible)
 
 bool QImPlot3DSurfaceItemNode::isFillVisible() const
 {
-    return (d_ptr->surfaceFlags & ImPlot3DSurfaceFlags_NoFill) == 0;
+    QIM_DC(d);
+    return (d->surfaceFlags & ImPlot3DSurfaceFlags_NoFill) == 0;
 }
 
 void QImPlot3DSurfaceItemNode::setFillVisible(bool visible)
@@ -129,7 +131,8 @@ void QImPlot3DSurfaceItemNode::setFillVisible(bool visible)
 
 bool QImPlot3DSurfaceItemNode::isMarkersVisible() const
 {
-    return (d_ptr->surfaceFlags & ImPlot3DSurfaceFlags_NoMarkers) == 0;
+    QIM_DC(d);
+    return (d->surfaceFlags & ImPlot3DSurfaceFlags_NoMarkers) == 0;
 }
 
 void QImPlot3DSurfaceItemNode::setMarkersVisible(bool visible)
@@ -148,7 +151,8 @@ void QImPlot3DSurfaceItemNode::setMarkersVisible(bool visible)
 
 int QImPlot3DSurfaceItemNode::markerShape() const
 {
-    return d_ptr->markerShape;
+    QIM_DC(d);
+    return d->markerShape;
 }
 
 void QImPlot3DSurfaceItemNode::setMarkerShape(int shape)
@@ -162,7 +166,8 @@ void QImPlot3DSurfaceItemNode::setMarkerShape(int shape)
 
 float QImPlot3DSurfaceItemNode::markerSize() const
 {
-    return d_ptr->markerSize;
+    QIM_DC(d);
+    return d->markerSize;
 }
 
 void QImPlot3DSurfaceItemNode::setMarkerSize(float size)
@@ -176,7 +181,8 @@ void QImPlot3DSurfaceItemNode::setMarkerSize(float size)
 
 float QImPlot3DSurfaceItemNode::markerWeight() const
 {
-    return d_ptr->markerWeight;
+    QIM_DC(d);
+    return d->markerWeight;
 }
 
 void QImPlot3DSurfaceItemNode::setMarkerWeight(float weight)
@@ -190,7 +196,8 @@ void QImPlot3DSurfaceItemNode::setMarkerWeight(float weight)
 
 QColor QImPlot3DSurfaceItemNode::fillColor() const
 {
-    return d_ptr->fillColor;
+    QIM_DC(d);
+    return d->fillColor;
 }
 
 void QImPlot3DSurfaceItemNode::setFillColor(const QColor& color)
@@ -204,7 +211,8 @@ void QImPlot3DSurfaceItemNode::setFillColor(const QColor& color)
 
 QColor QImPlot3DSurfaceItemNode::lineColor() const
 {
-    return d_ptr->lineColor;
+    QIM_DC(d);
+    return d->lineColor;
 }
 
 void QImPlot3DSurfaceItemNode::setLineColor(const QColor& color)
@@ -218,7 +226,8 @@ void QImPlot3DSurfaceItemNode::setLineColor(const QColor& color)
 
 QColor QImPlot3DSurfaceItemNode::markerFillColor() const
 {
-    return d_ptr->markerFillColor;
+    QIM_DC(d);
+    return d->markerFillColor;
 }
 
 void QImPlot3DSurfaceItemNode::setMarkerFillColor(const QColor& color)
@@ -232,7 +241,8 @@ void QImPlot3DSurfaceItemNode::setMarkerFillColor(const QColor& color)
 
 QColor QImPlot3DSurfaceItemNode::markerOutlineColor() const
 {
-    return d_ptr->markerOutlineColor;
+    QIM_DC(d);
+    return d->markerOutlineColor;
 }
 
 void QImPlot3DSurfaceItemNode::setMarkerOutlineColor(const QColor& color)
@@ -246,7 +256,8 @@ void QImPlot3DSurfaceItemNode::setMarkerOutlineColor(const QColor& color)
 
 float QImPlot3DSurfaceItemNode::lineWidth() const
 {
-    return d_ptr->lineWidth;
+    QIM_DC(d);
+    return d->lineWidth;
 }
 
 void QImPlot3DSurfaceItemNode::setLineWidth(float width)
@@ -260,7 +271,8 @@ void QImPlot3DSurfaceItemNode::setLineWidth(float width)
 
 bool QImPlot3DSurfaceItemNode::isColormapEnabled() const
 {
-    return d_ptr->colormapEnabled;
+    QIM_DC(d);
+    return d->colormapEnabled;
 }
 
 void QImPlot3DSurfaceItemNode::setColormapEnabled(bool enabled)
@@ -274,7 +286,8 @@ void QImPlot3DSurfaceItemNode::setColormapEnabled(bool enabled)
 
 int QImPlot3DSurfaceItemNode::colormap() const
 {
-    return d_ptr->colormap;
+    QIM_DC(d);
+    return d->colormap;
 }
 
 void QImPlot3DSurfaceItemNode::setColormap(int colormap)
@@ -288,7 +301,8 @@ void QImPlot3DSurfaceItemNode::setColormap(int colormap)
 
 int QImPlot3DSurfaceItemNode::surfaceFlags() const
 {
-    return d_ptr->surfaceFlags;
+    QIM_DC(d);
+    return d->surfaceFlags;
 }
 
 void QImPlot3DSurfaceItemNode::setSurfaceFlags(int flags)
@@ -302,6 +316,7 @@ void QImPlot3DSurfaceItemNode::setSurfaceFlags(int flags)
 
 bool QImPlot3DSurfaceItemNode::beginDraw()
 {
+    QIM_D(d);
     const int expectedCount = xCount_val * yCount_val;
     if (xCount_val < 2 || yCount_val < 2 || expectedCount <= 0) {
         return false;
@@ -311,10 +326,10 @@ bool QImPlot3DSurfaceItemNode::beginDraw()
     }
 
     const bool useGradientWireframe =
-        d_ptr->colormapEnabled &&
+        d->colormapEnabled &&
         !isFillVisible() &&
         isLinesVisible() &&
-        !d_ptr->lineColor.isValid();
+        !d->lineColor.isValid();
 
     if (useGradientWireframe) {
         const auto [zMinIt, zMaxIt] = std::minmax_element(zData_vec.begin(), zData_vec.begin() + expectedCount);
@@ -324,7 +339,7 @@ bool QImPlot3DSurfaceItemNode::beginDraw()
 
         auto sampleColor = [&](double value) {
             const float t = static_cast<float>((value - zMin) / zRange);
-            return ImPlot3D::SampleColormap(t, static_cast<ImPlot3DColormap>(d_ptr->colormap));
+            return ImPlot3D::SampleColormap(t, static_cast<ImPlot3DColormap>(d->colormap));
         };
 
         // Draw each grid edge independently so wireframe colors track local height
@@ -339,7 +354,7 @@ bool QImPlot3DSurfaceItemNode::beginDraw()
                 const double zs[2] = {zData_vec[idx0], zData_vec[idx1]};
                 const QByteArray edgeLabel =
                     QString("##surface_%1_row_%2_%3").arg(reinterpret_cast<quintptr>(this), 0, 16).arg(yi).arg(xi).toUtf8();
-                ImPlot3D::SetNextLineStyle(sampleColor(edgeZ), d_ptr->lineWidth);
+                ImPlot3D::SetNextLineStyle(sampleColor(edgeZ), d->lineWidth);
                 ImPlot3D::PlotLine(edgeLabel.constData(), xs, ys, zs, 2);
             }
         }
@@ -354,29 +369,29 @@ bool QImPlot3DSurfaceItemNode::beginDraw()
                 const double zs[2] = {zData_vec[idx0], zData_vec[idx1]};
                 const QByteArray edgeLabel =
                     QString("##surface_%1_col_%2_%3").arg(reinterpret_cast<quintptr>(this), 0, 16).arg(yi).arg(xi).toUtf8();
-                ImPlot3D::SetNextLineStyle(sampleColor(edgeZ), d_ptr->lineWidth);
+                ImPlot3D::SetNextLineStyle(sampleColor(edgeZ), d->lineWidth);
                 ImPlot3D::PlotLine(edgeLabel.constData(), xs, ys, zs, 2);
             }
         }
         return false;
     }
 
-    const bool useColormap = d_ptr->colormapEnabled && !d_ptr->fillColor.isValid();
+    const bool useColormap = d->colormapEnabled && !d->fillColor.isValid();
     if (useColormap) {
-        ImPlot3D::PushColormap(static_cast<ImPlot3DColormap>(d_ptr->colormap));
+        ImPlot3D::PushColormap(static_cast<ImPlot3DColormap>(d->colormap));
     }
-    if (d_ptr->fillColor.isValid()) {
-        ImPlot3D::SetNextFillStyle(toImVec4(d_ptr->fillColor));
+    if (d->fillColor.isValid()) {
+        ImPlot3D::SetNextFillStyle(toImVec4(d->fillColor));
     }
-    if (d_ptr->lineColor.isValid()) {
-        ImPlot3D::SetNextLineStyle(toImVec4(d_ptr->lineColor), d_ptr->lineWidth);
+    if (d->lineColor.isValid()) {
+        ImPlot3D::SetNextLineStyle(toImVec4(d->lineColor), d->lineWidth);
     } else {
-        ImPlot3D::SetNextLineStyle(IMPLOT3D_AUTO_COL, d_ptr->lineWidth);
+        ImPlot3D::SetNextLineStyle(IMPLOT3D_AUTO_COL, d->lineWidth);
     }
-    if (d_ptr->markerShape != ImPlot3DMarker_None) {
-        const ImVec4 fill = d_ptr->markerFillColor.isValid() ? toImVec4(d_ptr->markerFillColor) : IMPLOT3D_AUTO_COL;
-        const ImVec4 outline = d_ptr->markerOutlineColor.isValid() ? toImVec4(d_ptr->markerOutlineColor) : IMPLOT3D_AUTO_COL;
-        ImPlot3D::SetNextMarkerStyle(static_cast<ImPlot3DMarker>(d_ptr->markerShape), d_ptr->markerSize, fill, d_ptr->markerWeight, outline);
+    if (d->markerShape != ImPlot3DMarker_None) {
+        const ImVec4 fill = d->markerFillColor.isValid() ? toImVec4(d->markerFillColor) : IMPLOT3D_AUTO_COL;
+        const ImVec4 outline = d->markerOutlineColor.isValid() ? toImVec4(d->markerOutlineColor) : IMPLOT3D_AUTO_COL;
+        ImPlot3D::SetNextMarkerStyle(static_cast<ImPlot3DMarker>(d->markerShape), d->markerSize, fill, d->markerWeight, outline);
     }
 
     ImPlot3D::PlotSurface(
@@ -388,7 +403,7 @@ bool QImPlot3DSurfaceItemNode::beginDraw()
         yCount_val,
         0.0,
         0.0,
-        static_cast<ImPlot3DSurfaceFlags>(d_ptr->surfaceFlags)
+        static_cast<ImPlot3DSurfaceFlags>(d->surfaceFlags)
     );
     if (useColormap) {
         ImPlot3D::PopColormap();

@@ -11,6 +11,7 @@ class QImSubplots3DNode;
 class QImPlotNode;
 class QImPlot3DNode;
 /**
+ * \if ENGLISH
  * @brief Figure Widget for plot
  *
  * QImFigureWidget manages plot rendering with optional subplot layout.
@@ -24,6 +25,22 @@ class QImPlot3DNode;
  *
  * You can also call addRenderNode() to add any render node (including QImPlot3DNode)
  * as a root-level node alongside or instead of subplot-based plots.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 绘图图窗控件
+ *
+ * QImFigureWidget 管理绘图渲染，可选子图布局。
+ *
+ * 默认情况下，单个绘图作为根级节点渲染（无子图包装），使其自然填充整个窗口，
+ * 而无需 ImPlot::BeginSubplots 嵌套。
+ *
+ * 当调用 setSubplotGrid() 且 rows*cols > 1 时，会创建 QImSubplotsNode 来管理网格布局，
+ * 此后所有 createPlotNode() 调用都会将绘图放入子图网格中。
+ *
+ * 也可以调用 addRenderNode() 将任意渲染节点（包括 QImPlot3DNode）
+ * 作为根级节点添加，与子图绘图并行或替代使用。
+ * \endif
  */
 class QIM_WIDGETS_API QImFigureWidget : public QImWidget
 {
@@ -35,7 +52,7 @@ public:
     // ===========================
     //  theme
     // ===========================
-    // 获取绘图的样式
+    // Set/get plot theme
     void setPlotTheme(const QImPlotTheme& t);
     const QImPlotTheme& plotTheme() const;
     // ===========================
@@ -82,6 +99,21 @@ public:
 // Single 3D plot as top-level render node (fills entire window)
     // (Note: for subplot grid, use QImSubplots3DNode directly via addRenderNode())
 Q_SIGNALS:
+    /**
+     * \if ENGLISH
+     * @brief Emitted when a plot node is attached or detached from the figure
+     * @param[in] plot The plot node being attached or detached
+     * @param[in] attach True if the node is being attached, false if being detached
+     * @details Triggered when a QImPlotNode is added to or removed from the figure's plot management.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 绘图节点挂载或卸载时触发
+     * @param[in] plot 正在挂载或卸载的绘图节点
+     * @param[in] attach true表示节点正在挂载，false表示正在卸载
+     * @details 当QImPlotNode被添加到或从绘图管理中移除时触发。
+     * \endif
+     */
     void plotNodeAttached(QIM::QImPlotNode* plot, bool attach);
 
 protected:

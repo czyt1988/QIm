@@ -174,10 +174,26 @@ QList< QString > QImFontFileHelper::PrivateData::filterFontFilesByFont(const QSt
 // 构造函数和析构函数
 // ============================================================================
 
+/**
+ * \if ENGLISH
+ * @brief Default constructor
+ * \endif
+ * \if CHINESE
+ * @brief 默认构造函数
+ * \endif
+ */
 QImFontFileHelper::QImFontFileHelper() : QIM_PIMPL_CONSTRUCT
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor
+ * \endif
+ * \if CHINESE
+ * @brief 析构函数
+ * \endif
+ */
 QImFontFileHelper::~QImFontFileHelper()
 {
 }
@@ -186,6 +202,22 @@ QImFontFileHelper::~QImFontFileHelper()
 // 公共接口实现
 // ============================================================================
 
+/**
+ * \if ENGLISH
+ * @brief Gets font file paths matching a QFont's family name
+ * @param[in] font Qt font object whose family name is used for lookup
+ * @return List of font file paths that match the font family, empty if cache is not loaded
+ * @details Requires preloadCommonFonts() to be called first. Falls back to
+ *          fuzzy family name matching if exact match is not found.
+ * \endif
+ * \if CHINESE
+ * @brief 获取与 QFont 字体家族名称匹配的字体文件路径
+ * @param[in] font Qt 字体对象，使用其家族名称进行查找
+ * @return 匹配字体家族的文件路径列表，若缓存未加载则返回空列表
+ * @details 需要先调用 preloadCommonFonts()。若精确匹配未找到，
+ *          会尝试模糊匹配字体家族名称。
+ * \endif
+ */
 QList< QString > QImFontFileHelper::getFontFiles(const QFont& font)
 {
     QMutexLocker locker(&g_cacheMutex);
@@ -203,18 +235,51 @@ QList< QString > QImFontFileHelper::getFontFiles(const QFont& font)
     return PrivateData::filterFontFilesByFont(family, font);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets all available font family names from cache
+ * @return List of font family names that have been scanned
+ * \endif
+ * \if CHINESE
+ * @brief 获取缓存中所有可用的字体家族名称
+ * @return 已扫描的字体家族名称列表
+ * \endif
+ */
 QList< QString > QImFontFileHelper::getAvailableFamilies()
 {
     QMutexLocker locker(&g_cacheMutex);
     return g_fontCache.keys();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Clears the font file cache, requiring reload via preloadCommonFonts()
+ * \endif
+ * \if CHINESE
+ * @brief 清空字体文件缓存，需要通过 preloadCommonFonts() 重新加载
+ * \endif
+ */
 void QImFontFileHelper::clearCache()
 {
     QMutexLocker locker(&g_cacheMutex);
     g_fontCache.clear();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Scans system font directories and populates the font cache
+ * @details Scans platform-specific font directories (Windows Fonts folder,
+ *          macOS /System/Library/Fonts, Linux /usr/share/fonts) and indexes
+ *          all .ttf/.otf files by family name. Only runs once; subsequent
+ *          calls are skipped if cache is already populated.
+ * \endif
+ * \if CHINESE
+ * @brief 扫描系统字体目录并填充字体缓存
+ * @details 扫描平台特定的字体目录（Windows Fonts 目录、macOS
+ *          /System/Library/Fonts、Linux /usr/share/fonts），并按家族名称
+ *          索引所有 .ttf/.otf 文件。仅执行一次；缓存已填充后再次调用将被跳过。
+ * \endif
+ */
 void QImFontFileHelper::preloadCommonFonts()
 {
     QMutexLocker locker(&g_cacheMutex);
@@ -243,6 +308,24 @@ void QImFontFileHelper::preloadCommonFonts()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Converts a QFont's size to pixel size suitable for ImGui font loading
+ * @param[in] qtFont Qt font object to extract size from
+ * @return Pixel size in float, converted from point size using screen DPI if needed
+ * @details If the font has pixelSize set, uses it directly. If pointSize is set,
+ *          converts using screen DPI (formula: points * dpi / 72). Otherwise
+ *          uses QFontMetrics height as fallback. Minimum value is 1.0.
+ * \endif
+ * \if CHINESE
+ * @brief 将 QFont 的字体大小转换为适用于 ImGui 字体加载的像素大小
+ * @param[in] qtFont Qt 字体对象，用于提取字体大小
+ * @return 像素大小（float），如有需要会使用屏幕 DPI 从磅值转换
+ * @details 若字体设置了 pixelSize，直接使用；若设置了 pointSize，
+ *          使用屏幕 DPI 转换（公式：磅值 * DPI / 72）。否则使用
+ *          QFontMetrics 高度作为回退。最小值为 1.0。
+ * \endif
+ */
 float QImFontFileHelper::getFontPixelSize(const QFont& qtFont)
 {
     float pixelSize = 0.0f;
@@ -275,6 +358,24 @@ float QImFontFileHelper::getFontPixelSize(const QFont& qtFont)
     return pixelSize;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the recommended Chinese font file path for the current platform
+ * @return Absolute path to the best available Chinese font file, or empty string if none found
+ * @details Tries platform-specific candidates in priority order:
+ *          - Windows: msyh.ttc (Microsoft YaHei), msyhbd.ttc, simhei.ttf, simsun.ttc
+ *          - macOS: PingFang.ttc, Hiragino Sans GB.ttc, STHeiti
+ *          - Linux: NotoSansCJK, WenQuanYi Micro Hei, DroidSansFallback
+ * \endif
+ * \if CHINESE
+ * @brief 获取当前平台推荐的中文字体文件路径
+ * @return 最佳可用中文字体文件的绝对路径，若未找到则返回空字符串
+ * @details 按优先级顺序尝试平台特定的候选字体：
+ *          - Windows：msyh.ttc（微软雅黑）、msyhbd.ttc、simhei.ttf、simsun.ttc
+ *          - macOS：PingFang.ttc、Hiragino Sans GB.ttc、STHeiti
+ *          - Linux：NotoSansCJK、文泉驿微米黑、DroidSansFallback
+ * \endif
+ */
 std::string QImFontFileHelper::getRecommendedChineseFontPath()
 {
 #if defined(_WIN32)

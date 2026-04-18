@@ -1,4 +1,4 @@
-﻿#ifndef QIMWIDGETNODE_H
+#ifndef QIMWIDGETNODE_H
 #define QIMWIDGETNODE_H
 #include "QImAbstractNode.h"
 #include <QMarginsF>
@@ -7,6 +7,19 @@
 namespace QIM
 {
 /**
+ * \if ENGLISH
+ * @brief Base class for ImGui window nodes (Qt-style API)
+ *
+ * Encapsulates ImGui::Begin/End window scope with Qt-convention API naming:
+ * - windowTitle() corresponds to QWidget::windowTitle()
+ * - pos()/move() corresponds to QWidget::pos()/move()
+ * - minimumSize() corresponds to QWidget::minimumSize()
+ * - contentsMargins() corresponds to QLayout::contentsMargins()
+ * - borderRadius() corresponds to Qt stylesheet border-radius
+ *
+ * \endif
+ *
+ * \if CHINESE
  * @brief ImGui 窗口节点的基类（Qt 风格 API）
  *
  * 封装 ImGui::Begin/End 窗口作用域，API 命名遵循 Qt 惯例：
@@ -16,6 +29,7 @@ namespace QIM
  * - contentsMargins() 对应 QLayout::contentsMargins()
  * - borderRadius() 对应 Qt 样式表 border-radius
  *
+ * \endif
  */
 class QIM_CORE_API QImWidgetNode : public QImAbstractNode
 {
@@ -26,7 +40,7 @@ class QIM_CORE_API QImWidgetNode : public QImAbstractNode
     Q_PROPERTY(QSize minimumSize READ minimumSize WRITE setMinimumSize)
     Q_PROPERTY(QMarginsF contentsMargins READ contentsMargins WRITE setContentsMargins)
 
-    // 语义化窗口标志（Qt 风格命名）
+    // Semantic window flags (Qt-style naming)
     Q_PROPERTY(bool isTitleBarEnabled READ isTitleBarEnabled WRITE setTitleBarEnabled)
     Q_PROPERTY(bool isResizable READ isResizable WRITE setResizable)
     Q_PROPERTY(bool isMovable READ isMovable WRITE setMovable)
@@ -44,7 +58,7 @@ public:
     explicit QImWidgetNode(QObject* parent = nullptr);
     ~QImWidgetNode() override;
 
-    // === Qt 风格基本属性 ===
+    // === Qt-style basic properties ===
 
     QString windowTitle() const;
     void setWindowTitle(const QString& title);
@@ -54,27 +68,27 @@ public:
     void move(const QPoint& pos)
     {
         setPos(pos);
-    }  // Qt 风格便捷方法
+    }  // Qt-style convenience method
 
     QSize size() const;
     void setSize(const QSize& size);
     void resize(const QSize& size)
     {
         setSize(size);
-    }  // Qt 风格便捷方法
+    }  // Qt-style convenience method
 
     QSize minimumSize() const;
     void setMinimumSize(const QSize& size);
 
-    // Qt 风格边距（对应 QLayout::contentsMargins）
+    // Qt-style margins (corresponds to QLayout::contentsMargins)
     QMarginsF contentsMargins() const;
     void setContentsMargins(const QMarginsF& margins);
     void setContentsMargins(float paddingX, float paddingY);
 
-    // 判断当前窗口是否是收起状态
+    // Check if widget is collapsed
     bool isWidgetCollapsed() const;
 
-    // === 语义化窗口标志（Qt 风格）===
+    // === Semantic window flags (Qt-style) ===
     // ImGui window flag is ImGuiWindowFlags_NoTitleBar
     bool isTitleBarEnabled() const;
     void setTitleBarEnabled(bool on);
@@ -92,7 +106,7 @@ public:
     void setScrollbarEnabled(bool on);
 
     // ImGui window flag is ImGuiWindowFlags_NoCollapse
-    bool isCollapseEnabled() const;  // Qt 风格：isCollapsible 而非 canCollapse
+    bool isCollapseEnabled() const;  // Qt-style: isCollapsible rather than canCollapse
     void setCollapseEnabled(bool on);
 
     // ImGui window flag is ImGuiWindowFlags_NoBackground
@@ -100,7 +114,7 @@ public:
     void setBackgroundEnabled(bool on);
 
     // ImGui window flag is ImGuiWindowFlags_AlwaysAutoResize
-    bool isResizeToContents() const;  // Qt 风格：过去分词
+    bool isResizeToContents() const;  // Qt-style: past participle
     void setResizeToContents(bool on);
 
     // ImGui window flag is  ImGuiWindowFlags_NoBringToFrontOnFocus
@@ -113,17 +127,30 @@ public:
     bool noNav() const;
     void setNoNav(bool on);
 
-    // 快速方法，设置为无边框样式
+    // Convenience: set frameless style
     void setToFrameLess(bool on);
 
-    // 设置窗口适配QOpenGLWidget的窗口大小
+    // Fit window to QOpenGLWidget viewport
     void setFitToGLViewPort(bool fitWidth, bool fitHeight);
     bool isWidthFitToGLViewPort() const;
     bool isHeightFitToGLViewPort() const;
     //
-    Q_INVOKABLE QRect geometry() const;  // Qt 风格：geometry() 替代 contentRect()
+    Q_INVOKABLE QRect geometry() const;  // Qt-style: geometry() instead of contentRect()
 
 Q_SIGNALS:
+    /**
+     * \if ENGLISH
+     * @brief Emitted when the window title changes
+     * @param[in] title The new window title text
+     * @details Triggered by setWindowTitle() when the title value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 窗口标题更改时触发
+     * @param[in] title 新的窗口标题文本
+     * @details 当标题值实际更改时由setWindowTitle()触发。
+     * \endif
+     */
     void windowTitleChanged(const QString& title);
 
 protected:

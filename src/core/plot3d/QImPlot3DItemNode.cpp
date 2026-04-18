@@ -102,7 +102,8 @@ void QImPlot3DItemNode::setLabel(const QString& name)
  */
 QString QImPlot3DItemNode::label() const
 {
-    return QString::fromUtf8(d_ptr->labelUtf8);
+    QIM_DC(d);
+    return QString::fromUtf8(d->labelUtf8);
 }
 
 /**
@@ -120,7 +121,8 @@ QString QImPlot3DItemNode::label() const
  */
 const char* QImPlot3DItemNode::labelConstData() const
 {
-    return (d_ptr->labelUtf8.isEmpty() ? "##plot3dItem" : d_ptr->labelUtf8.constData());
+    QIM_DC(d);
+    return (d->labelUtf8.isEmpty() ? "##plot3dItem" : d->labelUtf8.constData());
 }
 
 //----------------------------------------------------
@@ -195,7 +197,8 @@ bool QImPlot3DItemNode::isVisible() const
         return false;
     }
     // Return user-set visibility state
-    return d_ptr->userVisible;
+    QIM_DC(d);
+    return d->userVisible;
 }
 
 /**
@@ -213,8 +216,9 @@ bool QImPlot3DItemNode::isVisible() const
  */
 void QImPlot3DItemNode::setVisible(bool visible)
 {
-    if (d_ptr->userVisible != visible) {
-        d_ptr->userVisible = visible;
+    QIM_D(d);
+    if (d->userVisible != visible) {
+        d->userVisible = visible;
         // Call base class to emit signal and update state
         QImAbstractNode::setVisible(visible);
     }

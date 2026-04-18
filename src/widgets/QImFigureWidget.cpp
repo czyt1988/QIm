@@ -26,6 +26,22 @@ public:
     ImPlot3DContext* m_context3D { nullptr };
 };
 
+/**
+ * \if ENGLISH
+ * @brief Constructor with optional parent widget and window flags
+ * @param[in] parent Parent QWidget
+ * @param[in] f Qt window flags
+ * @details Subplot grid is created on demand when setSubplotGrid() is called.
+ *          Single-plot mode renders QImPlotNode directly at root level.
+ * \endif
+ * \if CHINESE
+ * @brief 构造函数（带可选父窗口和窗口标志）
+ * @param[in] parent 父 QWidget
+ * @param[in] f Qt 窗口标志
+ * @details 子图网格在调用 setSubplotGrid() 时按需创建。
+ *          单子图模式下 QImPlotNode 直接在根层级渲染。
+ * \endif
+ */
 QImFigureWidget::QImFigureWidget(QWidget* parent, Qt::WindowFlags f) : QImWidget(parent, f), QIM_PIMPL_CONSTRUCT
 {
     // Subplot is no longer created by default. It will be created on demand
@@ -35,22 +51,25 @@ QImFigureWidget::QImFigureWidget(QWidget* parent, Qt::WindowFlags f) : QImWidget
 
 QImFigureWidget::~QImFigureWidget()
 {
-    if (d_ptr->m_context3D) {
-        ImPlot3D::DestroyContext(d_ptr->m_context3D);
+    QIM_D(d);
+    if (d->m_context3D) {
+        ImPlot3D::DestroyContext(d->m_context3D);
     }
-    if (d_ptr->m_context2D) {
-        ImPlot::DestroyContext(d_ptr->m_context2D);
+    if (d->m_context2D) {
+        ImPlot::DestroyContext(d->m_context2D);
     }
 }
 
 void QImFigureWidget::setPlotTheme(const QImPlotTheme& t)
 {
-    d_ptr->m_theme = t;
+    QIM_D(d);
+    d->m_theme = t;
 }
 
 const QImPlotTheme& QImFigureWidget::plotTheme() const
 {
-    return d_ptr->m_theme.value();
+    QIM_DC(d);
+    return d->m_theme.value();
 }
 
 QImSubplotsNode* QImFigureWidget::ensureSubplotNode()
@@ -113,7 +132,8 @@ void QImFigureWidget::clearSubplotGrid()
 
 QImSubplotsNode* QImFigureWidget::subplotNode() const
 {
-    return d_ptr->m_subplotNode.data();
+    QIM_DC(d);
+    return d->m_subplotNode.data();
 }
 
 /**
@@ -263,7 +283,8 @@ void QImFigureWidget::setSubplot3DGrid(int rows, int cols)
 
 QImSubplots3DNode* QImFigureWidget::subplot3DNode() const
 {
-    return d_ptr->m_subplot3DNode.data();
+    QIM_DC(d);
+    return d->m_subplot3DNode.data();
 }
 
 void QImFigureWidget::clearSubplot3DGrid()
