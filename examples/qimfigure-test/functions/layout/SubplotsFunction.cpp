@@ -321,19 +321,25 @@ void SubplotsFunction::setTitle(const QString& title)
 
 void SubplotsFunction::setRows(int rows)
 {
-    if (m_rows != rows) {
+    if (m_rows != rows && rows > 0) {
         m_rows = rows;
         emit rowsChanged(rows);
-        // Note: Grid changes require recreate
+        // Update subplot grid in real-time
+        if (m_subplotsNode) {
+            m_subplotsNode->setRows(rows);
+        }
     }
 }
 
 void SubplotsFunction::setCols(int cols)
 {
-    if (m_cols != cols) {
+    if (m_cols != cols && cols > 0) {
         m_cols = cols;
         emit colsChanged(cols);
-        // Note: Grid changes require recreate
+        // Update subplot grid in real-time
+        if (m_subplotsNode) {
+            m_subplotsNode->setColumns(cols);
+        }
     }
 }
 
