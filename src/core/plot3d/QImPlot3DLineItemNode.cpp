@@ -1,6 +1,7 @@
 #include "QImPlot3DLineItemNode.h"
 #include <QColor>
 #include "implot3d.h"
+#include "implot3d_internal.h"
 
 namespace QIM
 {
@@ -14,8 +15,8 @@ public:
 
 public:
     std::unique_ptr<QImAbstractXYZDataSeries> dataSeries;            ///< XYZ data series
-    ImVec4 colorVec4 { IMPLOT3D_AUTO_COL };                          ///< Pre-converted color for beginDraw
-    float lineWeightVal { IMPLOT3D_AUTO };                           ///< Line weight value
+    QImOptional3DColor color;                                         ///< 颜色（延迟初始化：首次渲染时捕获ImPlot3D默认颜色）
+    QImTrackedValue< float > lineWeight { 1.0f };                    ///< 线宽
     ImPlot3DLineFlags flags { ImPlot3DLineFlags_None };              ///< Line flags (must be named 'flags' for macros)
 };
 
@@ -60,50 +61,83 @@ QImAbstractXYZDataSeries* QImPlot3DLineItemNode::data() const
 
 /**
  * \if ENGLISH
- * @brief Sets the line color with beginDraw minimization
- * @param c New color (converted to ImVec4 in setter, not in beginDraw)
- * @details Pre-converts QColor to ImVec4 for efficient rendering.
- *          Uses alpha=-1 as auto color indicator.
+ * @brief Sets the line color
+ * @param c New color value as QColor
+ * @details Stores the color in an optional QImTrackedValue. The dirty flag is automatically
+ *          set when the value changes. In immediate mode rendering, each frame needs to
+ *          call SetNextLineStyle if a color is set.
  * \endif
  *
  * \if CHINESE
- * @brief 设置线条颜色（最小化 beginDraw）
- * @param c 新颜色（在 setter 中转换为 ImVec4，不在 beginDraw 中）
- * @details 预转换 QColor 为 ImVec4 以实现高效渲染。
- *          使用 alpha=-1 作为自动颜色指示器。
+ * @brief 设置线条颜色
+ * @param c 新的颜色值（QColor 类型）
+ * @details 将颜色存储在 optional QImTrackedValue 中。当值变化时自动设置 dirty 标记。
+ *          在即时模式渲染中，如果设置了颜色，每帧都需要调用 SetNextLineStyle。
  * \endif
  */
 void QImPlot3DLineItemNode::setColor(const QColor& c)
 {
     QIM_D(d);
-    d->colorVec4 = ImVec4(c.redF(), c.greenF(), c.blueF(), c.alphaF());
+    d->color = toImVec4(c);
     Q_EMIT colorChanged(c);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the line color
+ * @return Current color as QColor, or invalid QColor() if using ImPlot3D default
+ * @details Returns the explicit color if set, otherwise returns default QColor().
+ *          On first render without explicit color, ImPlot3D's default color is captured.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取线条颜色
+ * @return 当前颜色（QColor），使用 ImPlot3D 默认颜色时返回无效 QColor()
+ * @details 如果设置了显式颜色则返回该颜色，否则返回默认 QColor()。
+ *          首次渲染时未设置显式颜色，会捕获 ImPlot3D 的默认颜色。
+ * \endif
+ */
 QColor QImPlot3DLineItemNode::color() const
 {
     QIM_DC(d);
-    const ImVec4& v = d->colorVec4;
-    // Check if auto color (alpha == -1)
-    if (v.w < 0) {
-        return QColor();
-    }
-    return QColor::fromRgbF(v.x, v.y, v.z, v.w);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the line weight (thickness in pixels)
+ * @param weight New line weight value
+ * @details Assigns the value via QImTrackedValue which tracks dirty state automatically.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置线宽（像素厚度）
+ * @param weight 新的线宽值
+ * @details 通过 QImTrackedValue 赋值，自动跟踪 dirty 状态。
+ * \endif
+ */
 void QImPlot3DLineItemNode::setLineWeight(float weight)
 {
     QIM_D(d);
-    if (d->lineWeightVal != weight) {
-        d->lineWeightVal = weight;
-        Q_EMIT lineWeightChanged(weight);
-    }
+    d->lineWeight = weight;
+    Q_EMIT lineWeightChanged(weight);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the line weight (thickness in pixels)
+ * @return Current line weight value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取线宽（像素厚度）
+ * @return 当前线宽值
+ * \endif
+ */
 float QImPlot3DLineItemNode::lineWeight() const
 {
     QIM_DC(d);
-    return d->lineWeightVal;
+    return d->lineWeight.value();
 }
 
 //----------------------------------------------------
@@ -161,18 +195,18 @@ QIMPLOT3D_FLAG_ACCESSOR(QImPlot3DLineItemNode, SkipNaNEnabled, ImPlot3DLineFlags
 
 /**
  * \if ENGLISH
- * @brief Renders the 3D line plot with minimal conversion overhead
+ * @brief Renders the 3D line plot with pre-converted data
  * @return false (no endDraw needed)
- * @details Calls SetNextLineStyle with pre-converted color/weight,
- *          then PlotLine with XYZ data and flags.
+ * @details Calls SetNextLineStyle with color/weight if set, then PlotLine with XYZ data.
+ *          After rendering, captures ImPlot3D default color if no explicit color was set.
  *          All data conversion happens in setters, not here.
  * \endif
  *
  * \if CHINESE
- * @brief 渲染 3D 线图（最小转换开销）
+ * @brief 使用预转换数据渲染 3D 线图
  * @return false（无需 endDraw）
- * @details 使用预转换的颜色/线宽调用 SetNextLineStyle，
- *          然后使用 XYZ 数据和标志调用 PlotLine。
+ * @details 如果设置了颜色/线宽则调用 SetNextLineStyle，然后使用 XYZ 数据调用 PlotLine。
+ *          渲染后，如果未设置显式颜色，则捕获 ImPlot3D 默认颜色。
  *          所有数据转换在 setter 中完成，不在此处。
  * \endif
  */
@@ -185,10 +219,13 @@ bool QImPlot3DLineItemNode::beginDraw()
         return false;
     }
 
-    // Set line style (pre-converted, no conversion in beginDraw)
-    // IMPLOT3D_AUTO_COL has alpha=-1, IMPLOT3D_AUTO=-1 for weight
-    if (d->colorVec4.w >= 0 || d->lineWeightVal >= 0) {
-        ImPlot3D::SetNextLineStyle(d->colorVec4, d->lineWeightVal);
+    // ImPlot3D is immediate mode rendering, SetNextLineStyle only affects the next PlotLine call
+    // Therefore if a color is set, every frame must call SetNextLineStyle
+    // Otherwise it inherits the previous line's color state (causing same-color issue for multiple lines)
+    if (d->color) {
+        ImPlot3D::SetNextLineStyle(d->color->value(), d->lineWeight.value());
+    } else {
+        ImPlot3D::SetNextLineStyle(IMPLOT3D_AUTO_COL, d->lineWeight.value());
     }
 
     // Plot the 3D line
@@ -198,6 +235,11 @@ bool QImPlot3DLineItemNode::beginDraw()
                        d->dataSeries->zRawData(),
                        d->dataSeries->size(),
                        d->flags);
+
+    // Capture default color on first render when no explicit color was set
+    if (!d->color) {
+        d->color = captureItemColor();
+    }
 
     return false;
 }

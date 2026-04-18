@@ -1,6 +1,7 @@
 #include "QImPlot3DItemNode.h"
 #include "QImPlot3DNode.h"
 #include "implot3d.h"
+#include "implot3d_internal.h"
 
 namespace QIM
 {
@@ -186,7 +187,7 @@ QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DItemNode, FitEnabled, ImPlot3DItemFlags
  * @brief 检查元素是否可见
  * @return true 表示可见（用户设置），false 表示不可见
  * @details 返回用户设置的可见性状态。与 2D 有 ImPlotItem::Show 不同，
- *          ImPlot3D 暴露类似的元素结构。
+ *          ImPlot3D 不暴露类似的元素结构。
  * \endif
  */
 bool QImPlot3DItemNode::isVisible() const
@@ -227,6 +228,34 @@ void QImPlot3DItemNode::setVisible(bool visible)
 //----------------------------------------------------
 // Protected methods
 //----------------------------------------------------
+
+/**
+ * \if ENGLISH
+ * @brief Captures the default color assigned by ImPlot3D for this item
+ * @return ImVec4 color, or ImVec4() if item not found (safe fallback)
+ * @details Uses label-based lookup via ImPlot3D internal context to retrieve
+ *          the auto-assigned colormap color. Called in beginDraw() after PlotXxx()
+ *          for deferred color initialization when user hasn't set an explicit color.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 捕获 ImPlot3D 为此元素分配的默认颜色
+ * @return ImVec4 颜色值，若元素未找到则返回 ImVec4()（安全回退）
+ * @details 通过 ImPlot3D 内部上下文的标签查找获取自动分配的颜色映射颜色。
+ *          在 beginDraw() 中 PlotXxx() 之后调用，用于用户未设置显式颜色时的延迟初始化。
+ * \endif
+ */
+ImVec4 QImPlot3DItemNode::captureItemColor() const
+{
+    ImPlot3DContext* ctx = ImPlot3D::GetCurrentContext();
+    if (ctx && ctx->CurrentItems) {
+        ImPlot3DItem* item = ctx->CurrentItems->GetItem(labelConstData());
+        if (item) {
+            return ImGui::ColorConvertU32ToFloat4(item->Color);
+        }
+    }
+    return ImVec4();  // fallback: same behavior as the removed GetLastItemColor() returned
+}
 
 /**
  * \if ENGLISH

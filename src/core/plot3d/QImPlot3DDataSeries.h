@@ -1,4 +1,4 @@
-﻿#ifndef QIMPLOT3DDATASERIES_H
+#ifndef QIMPLOT3DDATASERIES_H
 #define QIMPLOT3DDATASERIES_H
 #include "QImAPI.h"
 #include <algorithm>

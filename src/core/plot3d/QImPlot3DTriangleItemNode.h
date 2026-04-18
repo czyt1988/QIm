@@ -2,8 +2,8 @@
 #define QIMPLOT3DTRIANGLEITEMNODE_H
 
 #include "QImPlot3DItemNode.h"
+#include "QImPlot3DDataSeries.h"
 #include <QColor>
-#include <vector>
 
 namespace QIM
 {
@@ -72,20 +72,20 @@ public:
         return Type;
     }
 
-    // setData template - inline to access header-level members (PrivateData is incomplete in header)
-    template< typename ContainerX, typename ContainerY, typename ContainerZ >
+    // setData template - creates QImVectorXYZDataSeries and delegates to non-template setData()
+    template<typename ContainerX, typename ContainerY, typename ContainerZ>
     void setData(const ContainerX& x, const ContainerY& y, const ContainerZ& z)
     {
-        xData_vec.assign(x.begin(), x.end());
-        yData_vec.assign(y.begin(), y.end());
-        zData_vec.assign(z.begin(), z.end());
-        trimDataToCommonSize();
+        QImAbstractXYZDataSeries* s = new QImVectorXYZDataSeries<ContainerX, ContainerY, ContainerZ>(x, y, z);
+        setData(s);
         Q_EMIT dataChanged();
     }
 
-    const std::vector< double >& xData() const;
-    const std::vector< double >& yData() const;
-    const std::vector< double >& zData() const;
+    // Non-template setData that takes ownership of the series
+    void setData(QImAbstractXYZDataSeries* series);
+
+    // Returns the current data series pointer (does not transfer ownership)
+    QImAbstractXYZDataSeries* dataSeries() const;
 
     bool isLinesVisible() const;
     void setLinesVisible(bool visible);
@@ -247,14 +247,6 @@ Q_SIGNALS:
 
 protected:
     bool beginDraw() override;
-
-private:
-    void trimDataToCommonSize();
-
-    // Template setData needs to access these directly because PrivateData is incomplete in header.
-    std::vector< double > xData_vec;
-    std::vector< double > yData_vec;
-    std::vector< double > zData_vec;
 };
 }  // namespace QIM
 

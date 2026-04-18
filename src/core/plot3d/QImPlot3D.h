@@ -1,4 +1,4 @@
-﻿#ifndef QIMPLOT3D_H
+#ifndef QIMPLOT3D_H
 #define QIMPLOT3D_H
 #include <QMetaType>
 #include "QImAPI.h"

@@ -217,7 +217,7 @@ void Plot3DScatterFunction::createPlot(QIM::QImFigureWidget* figure)
     m_scatter3DNode->setData(xData, yData, zData);
     m_scatter3DNode->setMarkerSize(m_markerSize);
     m_scatter3DNode->setMarkerShape(m_markerShape);
-    m_scatter3DNode->setColor(m_markerColor);
+    m_scatter3DNode->setMarkerFillColor(m_markerColor);
 }
 
 void Plot3DScatterFunction::setTitle(const QString& title)
@@ -292,7 +292,7 @@ void Plot3DScatterFunction::setMarkerColor(const QColor& color)
         m_markerColor = color;
         Q_EMIT markerColorChanged(color);
         if (m_scatter3DNode) {
-            m_scatter3DNode->setColor(color);
+            m_scatter3DNode->setMarkerFillColor(color);
         }
     }
 }

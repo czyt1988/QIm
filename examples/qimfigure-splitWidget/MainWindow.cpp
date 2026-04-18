@@ -497,7 +497,7 @@ void MainWindow::drawPlot3D()
         scatter->setData(scatterX, scatterY, scatterZ);
         scatter->setMarkerShape(ImPlot3DMarker_Square);
         scatter->setMarkerSize(5.0f);
-        scatter->setColor(QColor(255, 140, 0));
+        scatter->setMarkerFillColor(QColor(255, 140, 0));
     }
 
     if (QIM::QImPlot3DNode* plot3 = figure3D->createPlot3DNode()) {

@@ -119,6 +119,17 @@ public:
 Q_SIGNALS:
     /**
      * \if ENGLISH
+     * @brief Emitted when data changes
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 数据改变时发射
+     * \endif
+     */
+    void dataChanged();
+
+    /**
+     * \if ENGLISH
      * @brief Emitted when color changes
      * @param c New color value
      * \endif
@@ -164,6 +175,7 @@ inline QImAbstractXYZDataSeries* QImPlot3DLineItemNode::setData(const CX& x, con
 {
     QImAbstractXYZDataSeries* s = new QImVectorXYZDataSeries<CX, CY, CZ>(x, y, z);
     setData(s);
+    Q_EMIT dataChanged();
     return s;
 }
 

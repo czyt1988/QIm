@@ -2,6 +2,7 @@
 #include "QImAPI.h"
 #include "QtImGuiUtils.h"
 #include "implot3d.h"
+#include "implot3d_internal.h"
 
 namespace QIM
 {
@@ -19,14 +20,14 @@ public:
 
     std::vector<ImPlot3DPoint> vertices;
     std::vector<unsigned int> indices;
-    int meshFlags{0};
+    int flags{0};
     int markerShape{ImPlot3DMarker_None};
     float markerSize{4.0f};
     float markerWeight{1.0f};
-    QColor fillColor;
-    QColor lineColor;
-    QColor markerFillColor;
-    QColor markerOutlineColor;
+    QImOptional3DColor fillColor;
+    QImOptional3DColor lineColor;
+    QImOptional3DColor markerFillColor;
+    QImOptional3DColor markerOutlineColor;
     float lineWidth{1.0f};
 };
 
@@ -64,65 +65,9 @@ const std::vector<unsigned int>& QImPlot3DMeshItemNode::indices() const
     return d->indices;
 }
 
-bool QImPlot3DMeshItemNode::isLinesVisible() const
-{
-    QIM_DC(d);
-    return (d->meshFlags & ImPlot3DMeshFlags_NoLines) == 0;
-}
-
-void QImPlot3DMeshItemNode::setLinesVisible(bool visible)
-{
-    QIM_D(d);
-    const int oldFlags = d->meshFlags;
-    if (visible) {
-        d->meshFlags &= ~ImPlot3DMeshFlags_NoLines;
-    } else {
-        d->meshFlags |= ImPlot3DMeshFlags_NoLines;
-    }
-    if (d->meshFlags != oldFlags) {
-        Q_EMIT meshFlagChanged();
-    }
-}
-
-bool QImPlot3DMeshItemNode::isFillVisible() const
-{
-    QIM_DC(d);
-    return (d->meshFlags & ImPlot3DMeshFlags_NoFill) == 0;
-}
-
-void QImPlot3DMeshItemNode::setFillVisible(bool visible)
-{
-    QIM_D(d);
-    const int oldFlags = d->meshFlags;
-    if (visible) {
-        d->meshFlags &= ~ImPlot3DMeshFlags_NoFill;
-    } else {
-        d->meshFlags |= ImPlot3DMeshFlags_NoFill;
-    }
-    if (d->meshFlags != oldFlags) {
-        Q_EMIT meshFlagChanged();
-    }
-}
-
-bool QImPlot3DMeshItemNode::isMarkersVisible() const
-{
-    QIM_DC(d);
-    return (d->meshFlags & ImPlot3DMeshFlags_NoMarkers) == 0;
-}
-
-void QImPlot3DMeshItemNode::setMarkersVisible(bool visible)
-{
-    QIM_D(d);
-    const int oldFlags = d->meshFlags;
-    if (visible) {
-        d->meshFlags &= ~ImPlot3DMeshFlags_NoMarkers;
-    } else {
-        d->meshFlags |= ImPlot3DMeshFlags_NoMarkers;
-    }
-    if (d->meshFlags != oldFlags) {
-        Q_EMIT meshFlagChanged();
-    }
-}
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DMeshItemNode, LinesVisible, ImPlot3DMeshFlags_NoLines, meshFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DMeshItemNode, FillVisible, ImPlot3DMeshFlags_NoFill, meshFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DMeshItemNode, MarkersVisible, ImPlot3DMeshFlags_NoMarkers, meshFlagChanged)
 
 int QImPlot3DMeshItemNode::markerShape() const
 {
@@ -169,64 +114,168 @@ void QImPlot3DMeshItemNode::setMarkerWeight(float weight)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Returns the fill color, or invalid QColor if not set
+ * @details When no fill color has been explicitly set, returns an invalid QColor().
+ *          After the first render, unset colors capture the ImPlot3D default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回填充颜色，若未设置则返回无效QColor
+ * @details 当未显式设置填充颜色时，返回无效的QColor()。
+ *          首次渲染后，未设置的颜色会捕获ImPlot3D默认值。
+ * \endif
+ */
 QColor QImPlot3DMeshItemNode::fillColor() const
 {
     QIM_DC(d);
-    return d->fillColor;
+    return (d->fillColor.has_value()) ? toQColor(d->fillColor->value()) : QColor();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the fill color and emits fillColorChanged
+ * @param[in] color The new fill color
+ * @details Stores the color as QImOptional3DColor for lazy initialization.
+ *          Always emits fillColorChanged to satisfy Q_PROPERTY NOTIFY.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置填充颜色并发射fillColorChanged信号
+ * @param[in] color 新的填充颜色
+ * @details 将颜色存储为QImOptional3DColor以支持延迟初始化。
+ *          总是发射fillColorChanged以满足Q_PROPERTY NOTIFY。
+ * \endif
+ */
 void QImPlot3DMeshItemNode::setFillColor(const QColor& color)
 {
     QIM_D(d);
-    if (d->fillColor != color) {
-        d->fillColor = color;
-        Q_EMIT fillColorChanged(color);
-    }
+    d->fillColor = toImVec4(color);
+    Q_EMIT fillColorChanged(color);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Returns the line color, or invalid QColor if not set
+ * @details When no line color has been explicitly set, returns an invalid QColor().
+ *          After the first render, unset colors capture the ImPlot3D default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回线条颜色，若未设置则返回无效QColor
+ * @details 当未显式设置线条颜色时，返回无效的QColor()。
+ *          首次渲染后，未设置的颜色会捕获ImPlot3D默认值。
+ * \endif
+ */
 QColor QImPlot3DMeshItemNode::lineColor() const
 {
     QIM_DC(d);
-    return d->lineColor;
+    return (d->lineColor.has_value()) ? toQColor(d->lineColor->value()) : QColor();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the line color and emits lineColorChanged
+ * @param[in] color The new line color
+ * @details Stores the color as QImOptional3DColor for lazy initialization.
+ *          Always emits lineColorChanged to satisfy Q_PROPERTY NOTIFY.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置线条颜色并发射lineColorChanged信号
+ * @param[in] color 新的线条颜色
+ * @details 将颜色存储为QImOptional3DColor以支持延迟初始化。
+ *          总是发射lineColorChanged以满足Q_PROPERTY NOTIFY。
+ * \endif
+ */
 void QImPlot3DMeshItemNode::setLineColor(const QColor& color)
 {
     QIM_D(d);
-    if (d->lineColor != color) {
-        d->lineColor = color;
-        Q_EMIT lineColorChanged(color);
-    }
+    d->lineColor = toImVec4(color);
+    Q_EMIT lineColorChanged(color);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Returns the marker fill color, or invalid QColor if not set
+ * @details When no marker fill color has been explicitly set, returns an invalid QColor().
+ *          After the first render, unset colors capture the ImPlot3D default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回标记填充颜色，若未设置则返回无效QColor
+ * @details 当未显式设置标记填充颜色时，返回无效的QColor()。
+ *          首次渲染后，未设置的颜色会捕获ImPlot3D默认值。
+ * \endif
+ */
 QColor QImPlot3DMeshItemNode::markerFillColor() const
 {
     QIM_DC(d);
-    return d->markerFillColor;
+    return (d->markerFillColor.has_value()) ? toQColor(d->markerFillColor->value()) : QColor();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the marker fill color and emits markerFillColorChanged
+ * @param[in] color The new marker fill color
+ * @details Stores the color as QImOptional3DColor for lazy initialization.
+ *          Always emits markerFillColorChanged to satisfy Q_PROPERTY NOTIFY.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置标记填充颜色并发射markerFillColorChanged信号
+ * @param[in] color 新的标记填充颜色
+ * @details 将颜色存储为QImOptional3DColor以支持延迟初始化。
+ *          总是发射markerFillColorChanged以满足Q_PROPERTY NOTIFY。
+ * \endif
+ */
 void QImPlot3DMeshItemNode::setMarkerFillColor(const QColor& color)
 {
     QIM_D(d);
-    if (d->markerFillColor != color) {
-        d->markerFillColor = color;
-        Q_EMIT markerFillColorChanged(color);
-    }
+    d->markerFillColor = toImVec4(color);
+    Q_EMIT markerFillColorChanged(color);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Returns the marker outline color, or invalid QColor if not set
+ * @details When no marker outline color has been explicitly set, returns an invalid QColor().
+ *          After the first render, unset colors capture the ImPlot3D default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回标记轮廓颜色，若未设置则返回无效QColor
+ * @details 当未显式设置标记轮廓颜色时，返回无效的QColor()。
+ *          首次渲染后，未设置的颜色会捕获ImPlot3D默认值。
+ * \endif
+ */
 QColor QImPlot3DMeshItemNode::markerOutlineColor() const
 {
     QIM_DC(d);
-    return d->markerOutlineColor;
+    return (d->markerOutlineColor.has_value()) ? toQColor(d->markerOutlineColor->value()) : QColor();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the marker outline color and emits markerOutlineColorChanged
+ * @param[in] color The new marker outline color
+ * @details Stores the color as QImOptional3DColor for lazy initialization.
+ *          Always emits markerOutlineColorChanged to satisfy Q_PROPERTY NOTIFY.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置标记轮廓颜色并发射markerOutlineColorChanged信号
+ * @param[in] color 新的标记轮廓颜色
+ * @details 将颜色存储为QImOptional3DColor以支持延迟初始化。
+ *          总是发射markerOutlineColorChanged以满足Q_PROPERTY NOTIFY。
+ * \endif
+ */
 void QImPlot3DMeshItemNode::setMarkerOutlineColor(const QColor& color)
 {
     QIM_D(d);
-    if (d->markerOutlineColor != color) {
-        d->markerOutlineColor = color;
-        Q_EMIT markerOutlineColorChanged(color);
-    }
+    d->markerOutlineColor = toImVec4(color);
+    Q_EMIT markerOutlineColorChanged(color);
 }
 
 float QImPlot3DMeshItemNode::lineWidth() const
@@ -247,14 +296,14 @@ void QImPlot3DMeshItemNode::setLineWidth(float width)
 int QImPlot3DMeshItemNode::meshFlags() const
 {
     QIM_DC(d);
-    return d->meshFlags;
+    return d->flags;
 }
 
 void QImPlot3DMeshItemNode::setMeshFlags(int flags)
 {
     QIM_D(d);
-    if (d->meshFlags != flags) {
-        d->meshFlags = flags;
+    if (d->flags != flags) {
+        d->flags = flags;
         Q_EMIT meshFlagChanged();
     }
 }
@@ -266,17 +315,17 @@ bool QImPlot3DMeshItemNode::beginDraw()
         return false;
     }
 
-    if (d->fillColor.isValid()) {
-        ImPlot3D::SetNextFillStyle(toImVec4(d->fillColor));
+    if (d->fillColor.has_value()) {
+        ImPlot3D::SetNextFillStyle(d->fillColor->value());
     }
-    if (d->lineColor.isValid()) {
-        ImPlot3D::SetNextLineStyle(toImVec4(d->lineColor), d->lineWidth);
+    if (d->lineColor.has_value()) {
+        ImPlot3D::SetNextLineStyle(d->lineColor->value(), d->lineWidth);
     } else {
         ImPlot3D::SetNextLineStyle(IMPLOT3D_AUTO_COL, d->lineWidth);
     }
     if (d->markerShape != ImPlot3DMarker_None) {
-        const ImVec4 fill = d->markerFillColor.isValid() ? toImVec4(d->markerFillColor) : IMPLOT3D_AUTO_COL;
-        const ImVec4 outline = d->markerOutlineColor.isValid() ? toImVec4(d->markerOutlineColor) : IMPLOT3D_AUTO_COL;
+        const ImVec4 fill = d->markerFillColor.has_value() ? d->markerFillColor->value() : IMPLOT3D_AUTO_COL;
+        const ImVec4 outline = d->markerOutlineColor.has_value() ? d->markerOutlineColor->value() : IMPLOT3D_AUTO_COL;
         ImPlot3D::SetNextMarkerStyle(static_cast<ImPlot3DMarker>(d->markerShape), d->markerSize, fill, d->markerWeight, outline);
     }
 
@@ -286,8 +335,23 @@ bool QImPlot3DMeshItemNode::beginDraw()
         d->indices.data(),
         static_cast<int>(d->vertices.size()),
         static_cast<int>(d->indices.size()),
-        static_cast<ImPlot3DMeshFlags>(d->meshFlags)
+        static_cast<ImPlot3DMeshFlags>(d->flags)
     );
+
+    // Capture defaults for unset colors
+    if (!d->fillColor.has_value()) {
+        d->fillColor = captureItemColor();
+    }
+    if (!d->lineColor.has_value()) {
+        d->lineColor = captureItemColor();
+    }
+    if (!d->markerFillColor.has_value()) {
+        d->markerFillColor = captureItemColor();
+    }
+    if (!d->markerOutlineColor.has_value()) {
+        d->markerOutlineColor = captureItemColor();
+    }
+
     return false;
 }
 

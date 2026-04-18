@@ -2,8 +2,8 @@
 #define QIMPLOT3DSURFACEITEMNODE_H
 
 #include "QImPlot3DItemNode.h"
+#include "QImPlot3DDataSeries.h"
 #include <QColor>
-#include <vector>
 
 namespace QIM
 {
@@ -79,23 +79,21 @@ public:
         return Type;
     }
 
-    // setData template - inline to access header-level members (PrivateData is incomplete in header)
-    template< typename ContainerX, typename ContainerY, typename ContainerZ >
+    // setData template - creates QImVectorXYZDataSeries and delegates to non-template setData()
+    template<typename ContainerX, typename ContainerY, typename ContainerZ>
     void setData(const ContainerX& x, const ContainerY& y, const ContainerZ& z, int xCount, int yCount)
     {
-        xData_vec.assign(x.begin(), x.end());
-        yData_vec.assign(y.begin(), y.end());
-        zData_vec.assign(z.begin(), z.end());
-        xCount_val = xCount;
-        yCount_val = yCount;
-        trimDataToGrid();
+        QImAbstractXYZDataSeries* s = new QImVectorXYZDataSeries<ContainerX, ContainerY, ContainerZ>(x, y, z);
+        setData(s, xCount, yCount);
         Q_EMIT dataChanged();
         Q_EMIT gridShapeChanged();
     }
 
-    const std::vector< double >& xData() const;
-    const std::vector< double >& yData() const;
-    const std::vector< double >& zData() const;
+    // Non-template setData that takes ownership of the series
+    void setData(QImAbstractXYZDataSeries* series, int xCount, int yCount);
+
+    // Returns the current data series pointer (does not transfer ownership)
+    QImAbstractXYZDataSeries* dataSeries() const;
 
     int xCount() const;
     void setXCount(int count);
@@ -295,15 +293,7 @@ protected:
     bool beginDraw() override;
 
 private:
-    void trimDataToGrid();
-
-    // Template setData needs to access these directly because PrivateData is incomplete in header.
-    // The vectors are renamed without m_ prefix and kept in .h with public access to the class.
-    std::vector< double > xData_vec;
-    std::vector< double > yData_vec;
-    std::vector< double > zData_vec;
-    int xCount_val { 0 };
-    int yCount_val { 0 };
+    void regenerateEdgeLabels();
 };
 }  // namespace QIM
 

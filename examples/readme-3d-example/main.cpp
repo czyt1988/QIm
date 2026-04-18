@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
         scatter->setLabel("samples");
         scatter->setData(xs, ys, zs);
         scatter->setMarkerSize(4.0f);
-        scatter->setColor(QColor(217, 83, 25));
+        scatter->setMarkerFillColor(QColor(217, 83, 25));
     }
 
     if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {

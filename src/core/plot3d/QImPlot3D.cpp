@@ -1,4 +1,4 @@
-﻿#include "QImPlot3D.h"
+#include "QImPlot3D.h"
 #include "implot3d.h"
 namespace QIM
 {

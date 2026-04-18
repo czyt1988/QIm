@@ -279,8 +279,7 @@ inline QImPlot3DLineItemNode* QImPlot3DNode::addLine(const CX& x, const CY& y, c
 {
     auto* item = new QImPlot3DLineItemNode(this);
     item->setLabel(label);
-    // Note: setData method will be implemented in QImPlot3DLineItemNode
-    // item->setData(x, y, z);
+    item->setData(x, y, z);
     addPlot3DItem(item);
     return item;
 }
@@ -290,8 +289,7 @@ inline QImPlot3DScatterItemNode* QImPlot3DNode::addScatter(const CX& x, const CY
 {
     auto* item = new QImPlot3DScatterItemNode(this);
     item->setLabel(label);
-    // Note: setData method will be implemented in QImPlot3DScatterItemNode
-    // item->setData(x, y, z);
+    item->setData(x, y, z);
     addPlot3DItem(item);
     return item;
 }

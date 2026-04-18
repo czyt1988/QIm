@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         scatter->setLabel("Samples");
         scatter->setData(xs, ys, zs);
         scatter->setMarkerSize(4.0f);
-        scatter->setColor(QColor(217, 83, 25));
+        scatter->setMarkerFillColor(QColor(217, 83, 25));
     }
 
     // === Cell 2: 2D Bar Chart ===

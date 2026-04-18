@@ -2,7 +2,8 @@
 #include "QImAPI.h"
 #include "QtImGuiUtils.h"
 #include "implot3d.h"
-#include <QString>
+#include "implot3d_internal.h"
+#include <QByteArray>
 #include <algorithm>
 
 namespace QIM
@@ -19,17 +20,22 @@ class QImPlot3DSurfaceItemNode::PrivateData
 public:
     explicit PrivateData(QImPlot3DSurfaceItemNode* q) : q_ptr(q) {}
 
-    int surfaceFlags{0};
+    int flags{0};
     int markerShape{ImPlot3DMarker_None};
     float markerSize{4.0f};
     float markerWeight{1.0f};
-    QColor fillColor;
-    QColor lineColor;
-    QColor markerFillColor;
-    QColor markerOutlineColor;
+    QImOptional3DColor fillColor;
+    QImOptional3DColor lineColor;
+    QImOptional3DColor markerFillColor;
+    QImOptional3DColor markerOutlineColor;
     float lineWidth{1.0f};
     bool colormapEnabled{false};
     int colormap{ImPlot3DColormap_Viridis};
+    QImAbstractXYZDataSeries* dataSeries = nullptr;
+    int xCount = 0;
+    int yCount = 0;
+    QVector<QByteArray> edgeLabelsRow;
+    QVector<QByteArray> edgeLabelsCol;
 };
 
 // ===============================================================
@@ -44,110 +50,91 @@ QImPlot3DSurfaceItemNode::QImPlot3DSurfaceItemNode(QObject* parent)
 
 QImPlot3DSurfaceItemNode::~QImPlot3DSurfaceItemNode()
 {
+    QIM_D(d);
+    delete d->dataSeries;
 }
 
-const std::vector<double>& QImPlot3DSurfaceItemNode::xData() const
+void QImPlot3DSurfaceItemNode::setData(QImAbstractXYZDataSeries* series, int xCount, int yCount)
 {
-    return xData_vec;
+    QIM_D(d);
+    delete d->dataSeries;
+    d->dataSeries = series;
+    d->xCount = xCount;
+    d->yCount = yCount;
+    regenerateEdgeLabels();
+    Q_EMIT gridShapeChanged();
 }
 
-const std::vector<double>& QImPlot3DSurfaceItemNode::yData() const
+QImAbstractXYZDataSeries* QImPlot3DSurfaceItemNode::dataSeries() const
 {
-    return yData_vec;
-}
-
-const std::vector<double>& QImPlot3DSurfaceItemNode::zData() const
-{
-    return zData_vec;
+    QIM_DC(d);
+    return d->dataSeries;
 }
 
 int QImPlot3DSurfaceItemNode::xCount() const
 {
-    return xCount_val;
+    QIM_DC(d);
+    return d->xCount;
 }
 
 void QImPlot3DSurfaceItemNode::setXCount(int count)
 {
-    if (count > 0 && xCount_val != count) {
-        xCount_val = count;
-        trimDataToGrid();
+    QIM_D(d);
+    if (count > 0 && d->xCount != count) {
+        d->xCount = count;
+        regenerateEdgeLabels();
         Q_EMIT gridShapeChanged();
     }
 }
 
 int QImPlot3DSurfaceItemNode::yCount() const
 {
-    return yCount_val;
+    QIM_DC(d);
+    return d->yCount;
 }
 
 void QImPlot3DSurfaceItemNode::setYCount(int count)
 {
-    if (count > 0 && yCount_val != count) {
-        yCount_val = count;
-        trimDataToGrid();
+    QIM_D(d);
+    if (count > 0 && d->yCount != count) {
+        d->yCount = count;
+        regenerateEdgeLabels();
         Q_EMIT gridShapeChanged();
     }
 }
 
-bool QImPlot3DSurfaceItemNode::isLinesVisible() const
-{
-    QIM_DC(d);
-    return (d->surfaceFlags & ImPlot3DSurfaceFlags_NoLines) == 0;
-}
-
-void QImPlot3DSurfaceItemNode::setLinesVisible(bool visible)
+void QImPlot3DSurfaceItemNode::regenerateEdgeLabels()
 {
     QIM_D(d);
-    const int oldFlags = d->surfaceFlags;
-    if (visible) {
-        d->surfaceFlags &= ~ImPlot3DSurfaceFlags_NoLines;
-    } else {
-        d->surfaceFlags |= ImPlot3DSurfaceFlags_NoLines;
+    // Row edges: horizontal connections
+    d->edgeLabelsRow.clear();
+    int xMinus1 = qMax(0, d->xCount - 1);
+    d->edgeLabelsRow.reserve(d->yCount * xMinus1);
+    for (int yi = 0; yi < d->yCount; ++yi) {
+        for (int xi = 0; xi + 1 < d->xCount; ++xi) {
+            QByteArray label = QByteArray("##surface_")
+                + QByteArray::number(reinterpret_cast<quintptr>(d->q_func()), 16)
+                + "_row_" + QByteArray::number(yi) + "_" + QByteArray::number(xi);
+            d->edgeLabelsRow.append(label);
+        }
     }
-    if (d->surfaceFlags != oldFlags) {
-        Q_EMIT surfaceFlagChanged();
-    }
-}
-
-bool QImPlot3DSurfaceItemNode::isFillVisible() const
-{
-    QIM_DC(d);
-    return (d->surfaceFlags & ImPlot3DSurfaceFlags_NoFill) == 0;
-}
-
-void QImPlot3DSurfaceItemNode::setFillVisible(bool visible)
-{
-    QIM_D(d);
-    const int oldFlags = d->surfaceFlags;
-    if (visible) {
-        d->surfaceFlags &= ~ImPlot3DSurfaceFlags_NoFill;
-    } else {
-        d->surfaceFlags |= ImPlot3DSurfaceFlags_NoFill;
-    }
-    if (d->surfaceFlags != oldFlags) {
-        Q_EMIT surfaceFlagChanged();
+    // Column edges: vertical connections
+    d->edgeLabelsCol.clear();
+    int yMinus1 = qMax(0, d->yCount - 1);
+    d->edgeLabelsCol.reserve(yMinus1 * d->xCount);
+    for (int yi = 0; yi + 1 < d->yCount; ++yi) {
+        for (int xi = 0; xi < d->xCount; ++xi) {
+            QByteArray label = QByteArray("##surface_")
+                + QByteArray::number(reinterpret_cast<quintptr>(d->q_func()), 16)
+                + "_col_" + QByteArray::number(yi) + "_" + QByteArray::number(xi);
+            d->edgeLabelsCol.append(label);
+        }
     }
 }
 
-bool QImPlot3DSurfaceItemNode::isMarkersVisible() const
-{
-    QIM_DC(d);
-    return (d->surfaceFlags & ImPlot3DSurfaceFlags_NoMarkers) == 0;
-}
-
-void QImPlot3DSurfaceItemNode::setMarkersVisible(bool visible)
-{
-    QIM_D(d);
-    const int oldFlags = d->surfaceFlags;
-    if (visible) {
-        d->surfaceFlags &= ~ImPlot3DSurfaceFlags_NoMarkers;
-    } else {
-        d->surfaceFlags |= ImPlot3DSurfaceFlags_NoMarkers;
-    }
-    if (d->surfaceFlags != oldFlags) {
-        Q_EMIT surfaceFlagChanged();
-    }
-}
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DSurfaceItemNode, LinesVisible, ImPlot3DSurfaceFlags_NoLines, surfaceFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DSurfaceItemNode, FillVisible, ImPlot3DSurfaceFlags_NoFill, surfaceFlagChanged)
+QIMPLOT3D_FLAG_ENABLED_ACCESSOR(QImPlot3DSurfaceItemNode, MarkersVisible, ImPlot3DSurfaceFlags_NoMarkers, surfaceFlagChanged)
 
 int QImPlot3DSurfaceItemNode::markerShape() const
 {
@@ -197,61 +184,53 @@ void QImPlot3DSurfaceItemNode::setMarkerWeight(float weight)
 QColor QImPlot3DSurfaceItemNode::fillColor() const
 {
     QIM_DC(d);
-    return d->fillColor;
+    return (d->fillColor.has_value()) ? toQColor(d->fillColor->value()) : QColor();
 }
 
 void QImPlot3DSurfaceItemNode::setFillColor(const QColor& color)
 {
     QIM_D(d);
-    if (d->fillColor != color) {
-        d->fillColor = color;
-        Q_EMIT fillColorChanged(color);
-    }
+    d->fillColor = toImVec4(color);
+    Q_EMIT fillColorChanged(color);
 }
 
 QColor QImPlot3DSurfaceItemNode::lineColor() const
 {
     QIM_DC(d);
-    return d->lineColor;
+    return (d->lineColor.has_value()) ? toQColor(d->lineColor->value()) : QColor();
 }
 
 void QImPlot3DSurfaceItemNode::setLineColor(const QColor& color)
 {
     QIM_D(d);
-    if (d->lineColor != color) {
-        d->lineColor = color;
-        Q_EMIT lineColorChanged(color);
-    }
+    d->lineColor = toImVec4(color);
+    Q_EMIT lineColorChanged(color);
 }
 
 QColor QImPlot3DSurfaceItemNode::markerFillColor() const
 {
     QIM_DC(d);
-    return d->markerFillColor;
+    return (d->markerFillColor.has_value()) ? toQColor(d->markerFillColor->value()) : QColor();
 }
 
 void QImPlot3DSurfaceItemNode::setMarkerFillColor(const QColor& color)
 {
     QIM_D(d);
-    if (d->markerFillColor != color) {
-        d->markerFillColor = color;
-        Q_EMIT markerFillColorChanged(color);
-    }
+    d->markerFillColor = toImVec4(color);
+    Q_EMIT markerFillColorChanged(color);
 }
 
 QColor QImPlot3DSurfaceItemNode::markerOutlineColor() const
 {
     QIM_DC(d);
-    return d->markerOutlineColor;
+    return (d->markerOutlineColor.has_value()) ? toQColor(d->markerOutlineColor->value()) : QColor();
 }
 
 void QImPlot3DSurfaceItemNode::setMarkerOutlineColor(const QColor& color)
 {
     QIM_D(d);
-    if (d->markerOutlineColor != color) {
-        d->markerOutlineColor = color;
-        Q_EMIT markerOutlineColorChanged(color);
-    }
+    d->markerOutlineColor = toImVec4(color);
+    Q_EMIT markerOutlineColorChanged(color);
 }
 
 float QImPlot3DSurfaceItemNode::lineWidth() const
@@ -302,14 +281,14 @@ void QImPlot3DSurfaceItemNode::setColormap(int colormap)
 int QImPlot3DSurfaceItemNode::surfaceFlags() const
 {
     QIM_DC(d);
-    return d->surfaceFlags;
+    return d->flags;
 }
 
 void QImPlot3DSurfaceItemNode::setSurfaceFlags(int flags)
 {
     QIM_D(d);
-    if (d->surfaceFlags != flags) {
-        d->surfaceFlags = flags;
+    if (d->flags != flags) {
+        d->flags = flags;
         Q_EMIT surfaceFlagChanged();
     }
 }
@@ -317,11 +296,14 @@ void QImPlot3DSurfaceItemNode::setSurfaceFlags(int flags)
 bool QImPlot3DSurfaceItemNode::beginDraw()
 {
     QIM_D(d);
-    const int expectedCount = xCount_val * yCount_val;
-    if (xCount_val < 2 || yCount_val < 2 || expectedCount <= 0) {
+    if (!d->dataSeries || !d->dataSeries->isValid()) {
         return false;
     }
-    if (static_cast<int>(std::min({xData_vec.size(), yData_vec.size(), zData_vec.size()})) < expectedCount) {
+    const int expectedCount = d->xCount * d->yCount;
+    if (d->xCount < 2 || d->yCount < 2 || expectedCount <= 0) {
+        return false;
+    }
+    if (d->dataSeries->size() < expectedCount) {
         return false;
     }
 
@@ -329,10 +311,11 @@ bool QImPlot3DSurfaceItemNode::beginDraw()
         d->colormapEnabled &&
         !isFillVisible() &&
         isLinesVisible() &&
-        !d->lineColor.isValid();
+        !d->lineColor.has_value();
 
     if (useGradientWireframe) {
-        const auto [zMinIt, zMaxIt] = std::minmax_element(zData_vec.begin(), zData_vec.begin() + expectedCount);
+        const double* zData = d->dataSeries->zRawData();
+        const auto [zMinIt, zMaxIt] = std::minmax_element(zData, zData + expectedCount);
         const double zMin = *zMinIt;
         const double zMax = *zMaxIt;
         const double zRange = std::max(1e-12, zMax - zMin);
@@ -342,33 +325,39 @@ bool QImPlot3DSurfaceItemNode::beginDraw()
             return ImPlot3D::SampleColormap(t, static_cast<ImPlot3DColormap>(d->colormap));
         };
 
+        const double* xData = d->dataSeries->xRawData();
+        const double* yData = d->dataSeries->yRawData();
+        const int xCount = d->xCount;
+        const int yCount = d->yCount;
+
         // Draw each grid edge independently so wireframe colors track local height
         // distribution instead of using one averaged color per row/column.
-        for (int yi = 0; yi < yCount_val; ++yi) {
-            for (int xi = 0; xi + 1 < xCount_val; ++xi) {
-                const int idx0 = yi * xCount_val + xi;
+        // Use pre-generated edge label cache for performance (no per-frame QString allocation).
+        int labelIdx = 0;
+        for (int yi = 0; yi < yCount; ++yi) {
+            for (int xi = 0; xi + 1 < xCount; ++xi) {
+                const int idx0 = yi * xCount + xi;
                 const int idx1 = idx0 + 1;
-                const double edgeZ = 0.5 * (zData_vec[idx0] + zData_vec[idx1]);
-                const double xs[2] = {xData_vec[idx0], xData_vec[idx1]};
-                const double ys[2] = {yData_vec[idx0], yData_vec[idx1]};
-                const double zs[2] = {zData_vec[idx0], zData_vec[idx1]};
-                const QByteArray edgeLabel =
-                    QString("##surface_%1_row_%2_%3").arg(reinterpret_cast<quintptr>(this), 0, 16).arg(yi).arg(xi).toUtf8();
+                const double edgeZ = 0.5 * (zData[idx0] + zData[idx1]);
+                const double xs[2] = {xData[idx0], xData[idx1]};
+                const double ys[2] = {yData[idx0], yData[idx1]};
+                const double zs[2] = {zData[idx0], zData[idx1]};
+                const QByteArray& edgeLabel = d->edgeLabelsRow[labelIdx++];
                 ImPlot3D::SetNextLineStyle(sampleColor(edgeZ), d->lineWidth);
                 ImPlot3D::PlotLine(edgeLabel.constData(), xs, ys, zs, 2);
             }
         }
 
-        for (int yi = 0; yi + 1 < yCount_val; ++yi) {
-            for (int xi = 0; xi < xCount_val; ++xi) {
-                const int idx0 = yi * xCount_val + xi;
-                const int idx1 = idx0 + xCount_val;
-                const double edgeZ = 0.5 * (zData_vec[idx0] + zData_vec[idx1]);
-                const double xs[2] = {xData_vec[idx0], xData_vec[idx1]};
-                const double ys[2] = {yData_vec[idx0], yData_vec[idx1]};
-                const double zs[2] = {zData_vec[idx0], zData_vec[idx1]};
-                const QByteArray edgeLabel =
-                    QString("##surface_%1_col_%2_%3").arg(reinterpret_cast<quintptr>(this), 0, 16).arg(yi).arg(xi).toUtf8();
+        labelIdx = 0;
+        for (int yi = 0; yi + 1 < yCount; ++yi) {
+            for (int xi = 0; xi < xCount; ++xi) {
+                const int idx0 = yi * xCount + xi;
+                const int idx1 = idx0 + xCount;
+                const double edgeZ = 0.5 * (zData[idx0] + zData[idx1]);
+                const double xs[2] = {xData[idx0], xData[idx1]};
+                const double ys[2] = {yData[idx0], yData[idx1]};
+                const double zs[2] = {zData[idx0], zData[idx1]};
+                const QByteArray& edgeLabel = d->edgeLabelsCol[labelIdx++];
                 ImPlot3D::SetNextLineStyle(sampleColor(edgeZ), d->lineWidth);
                 ImPlot3D::PlotLine(edgeLabel.constData(), xs, ys, zs, 2);
             }
@@ -376,50 +365,54 @@ bool QImPlot3DSurfaceItemNode::beginDraw()
         return false;
     }
 
-    const bool useColormap = d->colormapEnabled && !d->fillColor.isValid();
+    const bool useColormap = d->colormapEnabled && !d->fillColor.has_value();
     if (useColormap) {
         ImPlot3D::PushColormap(static_cast<ImPlot3DColormap>(d->colormap));
     }
-    if (d->fillColor.isValid()) {
-        ImPlot3D::SetNextFillStyle(toImVec4(d->fillColor));
+    if (d->fillColor.has_value()) {
+        ImPlot3D::SetNextFillStyle(d->fillColor->value());
     }
-    if (d->lineColor.isValid()) {
-        ImPlot3D::SetNextLineStyle(toImVec4(d->lineColor), d->lineWidth);
+    if (d->lineColor.has_value()) {
+        ImPlot3D::SetNextLineStyle(d->lineColor->value(), d->lineWidth);
     } else {
         ImPlot3D::SetNextLineStyle(IMPLOT3D_AUTO_COL, d->lineWidth);
     }
     if (d->markerShape != ImPlot3DMarker_None) {
-        const ImVec4 fill = d->markerFillColor.isValid() ? toImVec4(d->markerFillColor) : IMPLOT3D_AUTO_COL;
-        const ImVec4 outline = d->markerOutlineColor.isValid() ? toImVec4(d->markerOutlineColor) : IMPLOT3D_AUTO_COL;
+        const ImVec4 fill = d->markerFillColor.has_value() ? d->markerFillColor->value() : IMPLOT3D_AUTO_COL;
+        const ImVec4 outline = d->markerOutlineColor.has_value() ? d->markerOutlineColor->value() : IMPLOT3D_AUTO_COL;
         ImPlot3D::SetNextMarkerStyle(static_cast<ImPlot3DMarker>(d->markerShape), d->markerSize, fill, d->markerWeight, outline);
     }
 
     ImPlot3D::PlotSurface(
         labelConstData(),
-        xData_vec.data(),
-        yData_vec.data(),
-        zData_vec.data(),
-        xCount_val,
-        yCount_val,
+        d->dataSeries->xRawData(),
+        d->dataSeries->yRawData(),
+        d->dataSeries->zRawData(),
+        d->xCount,
+        d->yCount,
         0.0,
         0.0,
-        static_cast<ImPlot3DSurfaceFlags>(d->surfaceFlags)
+        static_cast<ImPlot3DSurfaceFlags>(d->flags)
     );
     if (useColormap) {
         ImPlot3D::PopColormap();
     }
-    return false;
-}
 
-void QImPlot3DSurfaceItemNode::trimDataToGrid()
-{
-    const std::size_t commonSize = std::min({xData_vec.size(), yData_vec.size(), zData_vec.size()});
-    const std::size_t gridSize = (xCount_val > 0 && yCount_val > 0) ? static_cast<std::size_t>(xCount_val) * static_cast<std::size_t>(yCount_val)
-                                                                 : commonSize;
-    const std::size_t finalSize = std::min(commonSize, gridSize);
-    xData_vec.resize(finalSize);
-    yData_vec.resize(finalSize);
-    zData_vec.resize(finalSize);
+    // Capture defaults for unset colors
+    if (!d->fillColor.has_value()) {
+        d->fillColor = captureItemColor();
+    }
+    if (!d->lineColor.has_value()) {
+        d->lineColor = captureItemColor();
+    }
+    if (!d->markerFillColor.has_value()) {
+        d->markerFillColor = captureItemColor();
+    }
+    if (!d->markerOutlineColor.has_value()) {
+        d->markerOutlineColor = captureItemColor();
+    }
+
+    return false;
 }
 
 }  // namespace QIM
