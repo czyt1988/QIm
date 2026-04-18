@@ -1,4 +1,4 @@
-﻿#ifndef PERFORMANCETESTWIDGET_H
+#ifndef PERFORMANCETESTWIDGET_H
 #define PERFORMANCETESTWIDGET_H
 
 #include <QWidget>
@@ -27,6 +27,7 @@ protected:
 private slots:
     void onStartButtonClicked();
     void onFullBenchmarkClicked();  // 完整基准测试
+    void onFullBenchmarkProgress(int currentConfig, int totalConfigs, int currentPointCount);
     void onShowReportClicked();
     void onTestStarted(const QString& libraryName, int pointCount);
     void onProgressChanged(int current, int total);
@@ -35,6 +36,7 @@ private slots:
 private:
     void setupModel();
     void populateTable(const QVector< TestResult >& results);
+    void showReportDialog(const QVector< TestResult >& results);
     QVector< int > parsePointCounts(const QString& text) const;
     Ui::PerformanceTestWidget* ui;
     QStandardItemModel* model;
@@ -42,6 +44,7 @@ private:
     QVector< TestResult > allTestResults;
     PerformanceTestController::TestConfig m_currentTestConfig;
     PerformanceTestReportDialog* reportDialog;
+    bool m_isFullBenchmark = false;
 };
 
 #endif  // PERFORMANCETESTWIDGET_H

@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QLabel>
+#include <QCoreApplication>
 #include "PerformanceTestReportDialog.h"
 #include "SystemInfoCollector.h"
 #include "qcustomplot.h"
@@ -114,16 +115,63 @@ void PerformanceTestWidget::onStartButtonClicked()
 
 void PerformanceTestWidget::onFullBenchmarkClicked()
 {
-    QMessageBox::information(
-        this,
-        "Full Benchmark",
-        "Full benchmark will run 4 configurations:\n"
-        "1. Baseline (no optimizations)\n"
-        "2. OpenGL only\n"
-        "3. Downsampling only\n"
-        "4. OpenGL + Downsampling\n\n"
-        "This may take several minutes. Results will be shown in a comprehensive report."
-    );
+    m_isFullBenchmark = true;
+
+    // Collect config from current UI settings
+    TestConfig config;
+    config.pointCounts     = parsePointCounts(ui->lineEdit->text());
+    config.testFrames      = ui->spinBoxTestFrames->value();
+    config.warmupFrames    = 10;
+    config.useDownsampling = ui->checkBoxDownsampling->isChecked();
+    config.useOpenGL       = ui->checkBoxUseOpenGL->isChecked();
+
+    if (config.pointCounts.isEmpty()) {
+        QMessageBox::warning(this, tr("Input Error"),
+                             tr("Please enter valid point counts (comma separated numbers)"));
+        m_isFullBenchmark = false;
+        return;
+    }
+
+    // Clear previous results
+    model->removeRows(0, model->rowCount());
+    allTestResults.clear();
+
+    // Disable UI during long operation
+    ui->pushButtonRunOne->setEnabled(false);
+    ui->pushButtonRunAll->setEnabled(false);
+    ui->progressBar->setVisible(true);
+    ui->progressBar->setValue(0);
+    ui->progressBar->setMaximum(4); // 4 configs
+    ui->labelInfo->setText(tr("Running full benchmark..."));
+
+    // Connect progress signal
+    QMetaObject::Connection conn = connect(controller, &PerformanceTestController::testProgressUpdate,
+                                           this, &PerformanceTestWidget::onFullBenchmarkProgress);
+
+    // Run full benchmark (synchronous, but processEvents keeps UI responsive)
+    QVector< TestResult > allResults = controller->runFullBenchmark(config);
+
+    // Disconnect progress signal
+    disconnect(conn);
+
+    // Re-enable UI
+    ui->pushButtonRunOne->setEnabled(true);
+    ui->pushButtonRunAll->setEnabled(true);
+    ui->labelInfo->setText(tr("Full benchmark complete"));
+
+    m_isFullBenchmark = false;
+    m_currentTestConfig = config;
+
+    // Show report with all results
+    showReportDialog(allResults);
+}
+
+void PerformanceTestWidget::onFullBenchmarkProgress(int currentConfig, int totalConfigs, int currentPointCount)
+{
+    ui->progressBar->setValue(currentConfig);
+    ui->labelInfo->setText(tr("Config %1/%2 — Point count: %3")
+        .arg(currentConfig).arg(totalConfigs).arg(currentPointCount));
+    QCoreApplication::processEvents(); // Keep UI responsive
 }
 
 void PerformanceTestWidget::onShowReportClicked()
@@ -221,4 +269,22 @@ void PerformanceTestWidget::populateTable(const QVector< TestResult >& results)
 
         model->appendRow(row);
     }
+}
+
+void PerformanceTestWidget::showReportDialog(const QVector< TestResult >& results)
+{
+    // Collect system information
+    SystemInfo sysInfo = SystemInfoCollector::collectSystemInfo();
+    SystemInfoCollector::collectGPUInfo(sysInfo);
+
+    // Configure report settings from UI
+    reportDialog->setReportLanguage(
+        ui->comboBoxLanguage->currentIndex() == 0
+            ? PerformanceTestReportDialog::English
+            : PerformanceTestReportDialog::Chinese
+    );
+    reportDialog->setIncludeMermaid(ui->checkBoxIncludeMermaid->isChecked());
+    reportDialog->setTestResults(results, m_currentTestConfig, true);
+    reportDialog->setSystemInfo(sysInfo);
+    reportDialog->show();
 }

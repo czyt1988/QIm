@@ -156,6 +156,13 @@ PerformanceTestController::PerformanceTestController(QObject* parent) : QObject(
 void PerformanceTestController::runTests(const TestConfig& config)
 {
     m_config = config;
+    QVector< TestResult > allResults = runTestsInternal(config);
+    emit allTestsCompleted(allResults);
+}
+
+QVector< TestResult > PerformanceTestController::runTestsInternal(const TestConfig& config)
+{
+    m_config = config;
 
     // 计算需要的最大数据点数
     int maxPointCount = *std::max_element(config.pointCounts.begin(), config.pointCounts.end());
@@ -208,7 +215,43 @@ void PerformanceTestController::runTests(const TestConfig& config)
         cleanupMemory();
     }
 
-    emit allTestsCompleted(allResults);
+    return allResults;
+}
+
+QVector< TestResult > PerformanceTestController::runFullBenchmark(const TestConfig& baseConfig)
+{
+    QVector< TestResult > allResults;
+    QList< TestConfig > configs;
+
+    // Config 1: Baseline (no downsampling, no OpenGL)
+    TestConfig config1 = baseConfig;
+    config1.useDownsampling = false;
+    config1.useOpenGL       = false;
+
+    // Config 2: OpenGL only
+    TestConfig config2 = baseConfig;
+    config2.useDownsampling = false;
+    config2.useOpenGL       = true;
+
+    // Config 3: Downsampling only
+    TestConfig config3 = baseConfig;
+    config3.useDownsampling = true;
+    config3.useOpenGL       = false;
+
+    // Config 4: Both
+    TestConfig config4 = baseConfig;
+    config4.useDownsampling = true;
+    config4.useOpenGL       = true;
+
+    configs = {config1, config2, config3, config4};
+
+    for (int i = 0; i < configs.size(); ++i) {
+        Q_EMIT testProgressUpdate(i + 1, configs.size(), 0);
+        QVector< TestResult > configResults = runTestsInternal(configs[ i ]);
+        allResults.append(configResults);
+    }
+
+    return allResults;
 }
 
 TestResult PerformanceTestController::testQImPlot(int pointCount)

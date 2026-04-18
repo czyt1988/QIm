@@ -36,6 +36,7 @@ public:
 
     explicit PerformanceTestController(QObject* parent = nullptr);
     void cleanupMemory();
+    QVector< TestResult > runFullBenchmark(const TestConfig& baseConfig);
 public slots:
     void runTests(const PerformanceTestController::TestConfig& config);
 
@@ -44,6 +45,7 @@ signals:
     void progressChanged(int current, int total);
     void testResultReady(const TestResult& result);
     void allTestsCompleted(const QVector< TestResult >& allResults);
+    void testProgressUpdate(int currentConfig, int totalConfigs, int currentPointCount);
 
 private:
     TestResult testQImPlot(int pointCount);
@@ -60,6 +62,7 @@ private:
 #endif
 
     void generateTestData(int totalPoints);
+    QVector< TestResult > runTestsInternal(const TestConfig& config);
 
 private:
     TestConfig m_config;
