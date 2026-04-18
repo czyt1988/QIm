@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include "PerformanceTestReportDialog.h"
+#include "SystemInfoCollector.h"
 #include "qcustomplot.h"
 PerformanceTestWidget::PerformanceTestWidget(QWidget* parent)
     : QWidget(parent)
@@ -171,12 +172,19 @@ void PerformanceTestWidget::onAllTestsCompleted(const QVector< TestResult >& all
     ui->labelInfo->setText(QString("All tests completed! Total: %1 results").arg(allResults.size()));
 
 
+    // 收集系统信息
+    SystemInfo sysInfo = SystemInfoCollector::collectSystemInfo();
+    // GPU info collection requires active GL context - collect after widget is shown
+    // Note: The QIm plot widget should already have an active GL context at this point
+    SystemInfoCollector::collectGPUInfo(sysInfo);
+
     // 显示报告对话框
     reportDialog->setReportLanguage(
         ui->comboBoxLanguage->currentIndex() == 0 ? PerformanceTestReportDialog::English : PerformanceTestReportDialog::Chinese
     );
     reportDialog->setIncludeMermaid(ui->checkBoxIncludeMermaid->isChecked());
     reportDialog->setTestResults(allResults, m_currentTestConfig, false);
+    reportDialog->setSystemInfo(sysInfo);
     reportDialog->show();
 }
 

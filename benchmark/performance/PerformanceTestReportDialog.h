@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <QVector>
 #include "PerformanceTestController.h"
+#include "SystemInfoCollector.h"
 
 namespace Ui
 {
@@ -29,6 +30,14 @@ public:
     void setTestResults(
         const QVector< TestResult >& results, const PerformanceTestController::TestConfig& config, bool isFullBenchmark = false
     );
+
+    // \if ENGLISH
+    /// \brief Set the system information for the report
+    // \endif
+    // \if CHINESE
+    /// \brief 设置报告的系统信息
+    // \endif
+    void setSystemInfo(const SystemInfo& info);
 
     // \if ENGLISH
     /// \brief Generate full Markdown report
@@ -80,6 +89,7 @@ private:
     Ui::PerformanceTestReportDialog* ui;
     QVector< TestResult > m_results;
     PerformanceTestController::TestConfig m_config;
+    SystemInfo m_systemInfo;
     bool m_isFullBenchmark;
     QString m_reportTitle;
     QString m_reportMarkdown;

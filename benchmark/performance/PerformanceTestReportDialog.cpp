@@ -66,6 +66,11 @@ void PerformanceTestReportDialog::changeEvent(QEvent* e)
     }
 }
 
+void PerformanceTestReportDialog::setSystemInfo(const SystemInfo& info)
+{
+    m_systemInfo = info;
+}
+
 void PerformanceTestReportDialog::setTestResults(
     const QVector< TestResult >& results, const PerformanceTestController::TestConfig& config, bool isFullBenchmark
 )
@@ -100,13 +105,43 @@ QString PerformanceTestReportDialog::generateReportMarkdown() const
         md += "# Performance Benchmark Report\n\n";
     }
 
-    // --- System Information (placeholder) ---
+    // --- System Information ---
     if (chinese) {
         md += "## 系统信息\n\n";
-        md += "*待补充*\n\n";
+        md += "| 项目 | 值 |\n";
+        md += "|---|---|\n";
+        md += "| 操作系统 | " + m_systemInfo.osName + " |\n";
+        md += "| CPU | " + m_systemInfo.cpuModel + " (" + QString::number(m_systemInfo.cpuCoreCount) + " 核) |\n";
+        md += "| 内存 | " + QString::number(m_systemInfo.ramTotalMB, 'f', 0) + " MB |\n";
+        md += "| GPU | " + m_systemInfo.gpuName + " |\n";
+        md += "| 显存 | " + (m_systemInfo.gpuVramMB > 0 ? QString::number(m_systemInfo.gpuVramMB, 'f', 0) + " MB" : "未知") + " |\n";
+        md += "| OpenGL | " + m_systemInfo.openglVersion + " |\n";
+        md += "| 屏幕 | " + m_systemInfo.screenResolution + " |\n";
+        md += "| 磁盘 | " + m_systemInfo.diskType + " |\n";
+        md += "| Qt | " + m_systemInfo.qtVersion + " |\n";
+        md += "| 编译器 | " + m_systemInfo.compilerInfo + " |\n";
+        if (m_systemInfo.isSoftwareOpenGL) {
+            md += "\n> ⚠️ **检测到软件OpenGL** (" + m_systemInfo.openglRenderer + ") — 测试结果可能不代表硬件加速性能。\n";
+        }
+        md += "\n";
     } else {
         md += "## System Information\n\n";
-        md += "*Placeholder*\n\n";
+        md += "| Item | Value |\n";
+        md += "|---|---|\n";
+        md += "| OS | " + m_systemInfo.osName + " |\n";
+        md += "| CPU | " + m_systemInfo.cpuModel + " (" + QString::number(m_systemInfo.cpuCoreCount) + " cores) |\n";
+        md += "| RAM | " + QString::number(m_systemInfo.ramTotalMB, 'f', 0) + " MB |\n";
+        md += "| GPU | " + m_systemInfo.gpuName + " |\n";
+        md += "| VRAM | " + (m_systemInfo.gpuVramMB > 0 ? QString::number(m_systemInfo.gpuVramMB, 'f', 0) + " MB" : "Unknown") + " |\n";
+        md += "| OpenGL | " + m_systemInfo.openglVersion + " |\n";
+        md += "| Screen | " + m_systemInfo.screenResolution + " |\n";
+        md += "| Disk | " + m_systemInfo.diskType + " |\n";
+        md += "| Qt | " + m_systemInfo.qtVersion + " |\n";
+        md += "| Compiler | " + m_systemInfo.compilerInfo + " |\n";
+        if (m_systemInfo.isSoftwareOpenGL) {
+            md += "\n> ⚠️ **Software OpenGL detected** (" + m_systemInfo.openglRenderer + ") — results may not reflect hardware-accelerated performance.\n";
+        }
+        md += "\n";
     }
 
     // --- Test Configuration ---
