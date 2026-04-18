@@ -1,12 +1,9 @@
 #include "QImPlotScatterItemNode.h"
-#include <optional>
 #include "QImPlotDataSeries.h"
 #include "QImLTTBDownsampler.h"
 #include "QImMinMaxLTTBDownsampler.h"
 #include "implot.h"
 #include "implot_internal.h"
-#include "QImTrackedValue.hpp"
-#include "QtImGuiUtils.h"
 #include <QDebug>
 
 namespace QIM
@@ -35,7 +32,7 @@ public:
     int downsampleThreshold { 20000 };
     QImTrackedValue< int > markerShape { ImPlotMarker_Circle };                      ///< 标记形状
     bool markerFill { true };
-    std::optional< QImTrackedValue< ImVec4, ImVecComparator< ImVec4 > > > color;  ///< 颜色
+    QImOptionalColor color;  ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
     QImTrackedValue< float > markerSize { 4.0f };                                 ///< 标记大小
     ImPlotScatterFlags scatterFlags { ImPlotScatterFlags_None };                   ///< 散点图标志位
     bool isPlotItemVisible;

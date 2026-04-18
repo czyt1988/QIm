@@ -2,10 +2,36 @@
 #define QIMPLOTITEMNODE_H
 #include "QImAbstractNode.h"
 #include "QImPlot.h"
+#include <optional>
+#include "QImTrackedValue.hpp"
+#include "QtImGuiUtils.h"
 
 struct ImPlotItem;
+struct ImVec4;
+
 namespace QIM
 {
+
+// ============================================================
+// 类型别名定义 - 用于简化 Plot Item 颜色属性的声明
+// ============================================================
+
+/**
+ * @brief 带脏标记跟踪的 ImVec4 颜色值
+ * @details 封装 ImVec4 并提供变化检测功能，用于需要跟踪颜色变化并触发信号的场景
+ */
+using QImTrackedColor = QImTrackedValue<ImVec4, ImVecComparator<ImVec4>>;
+
+/**
+ * @brief 可选的跟踪颜色值
+ * @details 用于 Plot Item 的颜色属性：
+ *          - std::nullopt: 用户未设置颜色，使用 ImPlot 默认颜色
+ *          - 有值: 用户已设置颜色，或已从 ImPlot 捕获默认颜色
+ *          配合 beginDraw() 中的延迟初始化模式使用
+ */
+using QImOptionalColor = std::optional<QImTrackedColor>;
+
+
 class QImPlotNode;
 /**
  * @brief PlotItem对应的基类

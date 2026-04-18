@@ -1,12 +1,9 @@
 ﻿#include "QImPlotLineItemNode.h"
-#include <optional>
 #include "QImPlotDataSeries.h"
 #include "QImLTTBDownsampler.h"
 #include "QImMinMaxLTTBDownsampler.h"
 #include "implot.h"
 #include "implot_internal.h"
-#include "QImTrackedValue.hpp"
-#include "QtImGuiUtils.h"
 #include <QDebug>
 namespace QIM
 {
@@ -33,7 +30,7 @@ public:
     bool isAdaptiveSampling { true };
     int downsampleThreshold { 20000 };
     ImPlotLineFlags lineFlags { ImPlotLineFlags_None };
-    std::optional< QImTrackedValue< ImVec4, ImVecComparator< ImVec4 > > > color;  ///< 颜色
+    QImOptionalColor color;  ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
     QImTrackedValue< float > lineWidth { 1.0f };                                  ///< 线宽
     bool isPlotItemVisible;
 };
@@ -80,7 +77,6 @@ void QImPlotLineItemNode::setData(QImAbstractXYDataSeries* series)
         d->resetDownSamplerData();
     }
 }
-
 
 QImAbstractXYDataSeries* QImPlotLineItemNode::data() const
 {
@@ -184,7 +180,6 @@ void QImPlotLineItemNode::setLineFlags(int flags)
         emit lineFlagChanged();
     }
 }
-
 
 /**
  * \if ENGLISH
@@ -385,45 +380,38 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
     if (series->isContiguous()) {
         if (series->xRawData()) {
             // 有x指针，说明不是yonly
-            ImPlot::PlotLine(
-                labelConstData(),
-                series->xRawData(),
-                series->yRawData(),
-                series->size(),
-                d->lineFlags,
-                series->offset(),
-                series->stride()
-            );
+            ImPlot::PlotLine(labelConstData(),
+                             series->xRawData(),
+                             series->yRawData(),
+                             series->size(),
+                             d->lineFlags,
+                             series->offset(),
+                             series->stride());
         } else {
             // x指针没有说明是yonly
-            ImPlot::PlotLine(
-                labelConstData(),
-                series->yRawData(),
-                series->size(),
-                series->xScale(),
-                series->xStart(),
-                d->lineFlags,
-                series->offset(),
-                series->stride()
-            );
+            ImPlot::PlotLine(labelConstData(),
+                             series->yRawData(),
+                             series->size(),
+                             series->xScale(),
+                             series->xStart(),
+                             d->lineFlags,
+                             series->offset(),
+                             series->stride());
         }
     } else {
         // TODO:非连续内存
     }
     // 更新item的状态
-    ImPlotContext* ct    = ImPlot::GetCurrentContext();
-    if (!ct) {
-        return false;
-    }
-    ImPlotItem* plotItem = ct->PreviousItem;  // 通过源码，PlotLine结束后，ImPlotItem就是PreviousItem
-    if (!plotItem) {
-        return false;
-    }
-    setImPlotItem(plotItem);
-    if (plotItem->Show != QImAbstractNode::isVisible()) {
-        // 状态发生了变化，这种情况是label点击，设置了show状态和QImAbstractNode记录的状态不一致
-        // 这时要同步状态
-        QImAbstractNode::setVisible(plotItem->Show);  // 此函数会触发信号
+    if (!imPlotItem()) {
+        if (ImPlotContext* ct = ImPlot::GetCurrentContext()) {
+            ImPlotItem* plotItem = ct->PreviousItem;
+            setImPlotItem(plotItem);
+            if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
+                // 状态发生了变化，这种情况是label点击，设置了show状态和QImAbstractNode记录的状态不一致
+                // 这时要同步状态
+                QImAbstractNode::setVisible(plotItem->Show);
+            }
+        }
     }
     if (!d->color) {
         // 一般是首次渲染，且没设定颜色，这时是implot给的默认颜色，把这个默认颜色获取到
@@ -433,6 +421,5 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
 
     return false;
 }
-
 
 }  // end namespace QIM
