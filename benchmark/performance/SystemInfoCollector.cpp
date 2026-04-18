@@ -6,7 +6,9 @@
 #include <QDebug>
 
 // Platform-specific headers for CPU model, RAM, disk detection
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_WIN)
+#include "SystemInfoCollector_win.h"
+#elif defined(Q_OS_LINUX)
 #include <unistd.h>
 #include <sys/sysinfo.h>
 #include <fstream>
@@ -60,10 +62,11 @@ SystemInfo SystemInfoCollector::collectSystemInfo()
 
     // ── Platform-specific: CPU model, RAM, disk type ──
 #if defined(Q_OS_WIN)
-    // Windows: Use QSysInfo for basic info, registry/WinAPI avoided
-    // to prevent windows.h macro pollution that corrupts Qt headers.
-    info.cpuModel = QSysInfo::machineHostName();
-    info.ramTotalMB = 0.0;
+    // Windows: CPU model from registry, RAM from GlobalMemoryStatusEx
+    // Implementation isolated in SystemInfoCollector_win.cpp to avoid
+    // windows.h macro pollution that corrupts Qt headers.
+    info.cpuModel = qimGetCpuModel();
+    info.ramTotalMB = qimGetRamTotalMB();
     info.diskType = "Unknown";
 
 #elif defined(Q_OS_LINUX)

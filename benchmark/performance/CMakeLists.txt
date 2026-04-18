@@ -42,6 +42,13 @@ list(APPEND APP_SOURCE_FILES
     SystemInfoCollector.cpp
 )
 
+if(WIN32)
+    list(APPEND APP_SOURCE_FILES
+        SystemInfoCollector_win.h
+        SystemInfoCollector_win.cpp
+    )
+endif()
+
 message(STATUS "APP_SOURCE_FILES=${APP_SOURCE_FILES}")
 if(ANDROID)
     add_library(PlotPerformance SHARED
