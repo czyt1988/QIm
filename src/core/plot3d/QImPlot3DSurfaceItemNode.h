@@ -2,7 +2,6 @@
 #define QIMPLOT3DSURFACEITEMNODE_H
 
 #include "QImPlot3DItemNode.h"
-#include "implot3d.h"
 #include <QColor>
 #include <vector>
 
@@ -11,24 +10,32 @@ namespace QIM
 class QIM_CORE_API QImPlot3DSurfaceItemNode : public QImPlot3DItemNode
 {
     Q_OBJECT
+    QIM_DECLARE_PRIVATE(QImPlot3DSurfaceItemNode)
 
+    // Surface grid dimensions
     Q_PROPERTY(int xCount READ xCount WRITE setXCount NOTIFY gridShapeChanged)
     Q_PROPERTY(int yCount READ yCount WRITE setYCount NOTIFY gridShapeChanged)
+    // Surface visibility flags
     Q_PROPERTY(bool linesVisible READ isLinesVisible WRITE setLinesVisible NOTIFY surfaceFlagChanged)
     Q_PROPERTY(bool fillVisible READ isFillVisible WRITE setFillVisible NOTIFY surfaceFlagChanged)
     Q_PROPERTY(bool markersVisible READ isMarkersVisible WRITE setMarkersVisible NOTIFY surfaceFlagChanged)
+    // Marker style
     Q_PROPERTY(int markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
     Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerStyleChanged)
     Q_PROPERTY(float markerWeight READ markerWeight WRITE setMarkerWeight NOTIFY markerStyleChanged)
+    // Colors
     Q_PROPERTY(QColor fillColor READ fillColor WRITE setFillColor NOTIFY fillColorChanged)
     Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor NOTIFY lineColorChanged)
     Q_PROPERTY(QColor markerFillColor READ markerFillColor WRITE setMarkerFillColor NOTIFY markerFillColorChanged)
     Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
+    // Line width
     Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth NOTIFY lineWidthChanged)
+    // Colormap
     Q_PROPERTY(bool colormapEnabled READ isColormapEnabled WRITE setColormapEnabled NOTIFY colormapChanged)
     Q_PROPERTY(int colormap READ colormap WRITE setColormap NOTIFY colormapChanged)
 
 public:
+    // Surface item type = InnerType3D + 3
     enum
     {
         Type = InnerType3D + 3
@@ -42,14 +49,15 @@ public:
         return Type;
     }
 
+    // setData template - inline to access header-level members (PrivateData is incomplete in header)
     template< typename ContainerX, typename ContainerY, typename ContainerZ >
     void setData(const ContainerX& x, const ContainerY& y, const ContainerZ& z, int xCount, int yCount)
     {
-        m_xData = toVector(x);
-        m_yData = toVector(y);
-        m_zData = toVector(z);
-        m_xCount = xCount;
-        m_yCount = yCount;
+        xData_vec.assign(x.begin(), x.end());
+        yData_vec.assign(y.begin(), y.end());
+        zData_vec.assign(z.begin(), z.end());
+        xCount_val = xCount;
+        yCount_val = yCount;
         trimDataToGrid();
         Q_EMIT dataChanged();
         Q_EMIT gridShapeChanged();
@@ -124,31 +132,15 @@ protected:
     bool beginDraw() override;
 
 private:
-    template< typename Container >
-    static std::vector< double > toVector(const Container& container)
-    {
-        return std::vector< double >(container.begin(), container.end());
-    }
-
     void trimDataToGrid();
 
-private:
-    std::vector< double > m_xData;
-    std::vector< double > m_yData;
-    std::vector< double > m_zData;
-    int m_xCount { 0 };
-    int m_yCount { 0 };
-    int m_surfaceFlags { 0 };
-    int m_markerShape { ImPlot3DMarker_None };
-    float m_markerSize { 4.0f };
-    float m_markerWeight { 1.0f };
-    QColor m_fillColor;
-    QColor m_lineColor;
-    QColor m_markerFillColor;
-    QColor m_markerOutlineColor;
-    float m_lineWidth { 1.0f };
-    bool m_colormapEnabled { false };
-    int m_colormap { ImPlot3DColormap_Viridis };
+    // Template setData needs to access these directly because PrivateData is incomplete in header.
+    // The vectors are renamed without m_ prefix and kept in .h with public access to the class.
+    std::vector< double > xData_vec;
+    std::vector< double > yData_vec;
+    std::vector< double > zData_vec;
+    int xCount_val { 0 };
+    int yCount_val { 0 };
 };
 }  // namespace QIM
 

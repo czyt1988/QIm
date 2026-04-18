@@ -5,6 +5,7 @@
 #include "plot/QImPlotHistogramItemNode.h"
 #include "plot3d/QImPlot3DLineItemNode.h"
 #include "plot3d/QImPlot3DNode.h"
+#include "implot3d.h"
 #include "plot3d/QImPlot3DScatterItemNode.h"
 #include "plot3d/QImPlot3DSurfaceItemNode.h"
 #include "plot3d/QImPlot3DTriangleItemNode.h"

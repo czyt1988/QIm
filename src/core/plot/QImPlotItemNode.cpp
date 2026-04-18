@@ -1,4 +1,4 @@
-﻿#include "QImPlotItemNode.h"
+#include "QImPlotItemNode.h"
 #include "implot.h"
 #include "implot_internal.h"
 #include "QtImGuiUtils.h"
@@ -49,40 +49,48 @@ void QImPlotItemNode::setLabel(const QString& name)
 
 QString QImPlotItemNode::label() const
 {
-    return QString::fromUtf8(d_ptr->utf8Label);
+    QIM_DC(d);
+    return QString::fromUtf8(d->utf8Label);
 }
 
 const char* QImPlotItemNode::labelConstData() const
 {
-    return (d_ptr->utf8Label.isEmpty() ? "##plotItem" : d_ptr->utf8Label.constData());
+    QIM_DC(d);
+    return (d->utf8Label.isEmpty() ? "##plotItem" : d->utf8Label.constData());
 }
 
 void QImPlotItemNode::bindAxis(QImPlotAxisId x, QImPlotAxisId y)
 {
+    QIM_D(d);
     if (isXAxisId(x) && isYAxisId(y)) {
-        d_ptr->xAxisId = toImAxis(x);
-        d_ptr->yAxisId = toImAxis(y);
+        d->xAxisId = toImAxis(x);
+        d->yAxisId = toImAxis(y);
     }
 }
 
 QPointF QImPlotItemNode::pixelsToPlot(const float& screenX, const float& screenY)
 {
-    return toQPointF(ImPlot::PixelsToPlot(screenX, screenY, d_ptr->xAxisId, d_ptr->yAxisId));
+    QIM_D(d);
+    return toQPointF(ImPlot::PixelsToPlot(screenX, screenY, d->xAxisId, d->yAxisId));
 }
 
 QPointF QImPlotItemNode::plotToPixels(const double& doubleX, const double& doubleY)
 {
-    return toQPointF(ImPlot::PlotToPixels(doubleX, doubleY, d_ptr->xAxisId, d_ptr->yAxisId));
+    QIM_D(d);
+    return toQPointF(ImPlot::PlotToPixels(doubleX, doubleY, d->xAxisId, d->yAxisId));
 }
+
 
 QImPlotAxisId QImPlotItemNode::xAxisId() const
 {
-    return toQImPlotAxisId(d_ptr->xAxisId);
+    QIM_DC(d);
+    return toQImPlotAxisId(d->xAxisId);
 }
 
 QImPlotAxisId QImPlotItemNode::yAxisId() const
 {
-    return toQImPlotAxisId(d_ptr->yAxisId);
+    QIM_DC(d);
+    return toQImPlotAxisId(d->yAxisId);
 }
 
 /**
@@ -125,20 +133,20 @@ bool QImPlotItemNode::isLegendHovered() const
 
 bool QImPlotItemNode::isVisible() const
 {
-    ImPlotItem* plotItem = d_ptr->plotItem;
-    if (plotItem) {
+    QIM_DC(d);
+    if (d->plotItem) {
         // 渲染后返回 ImPlot 的实际状态
-        return plotItem->Show;
+        return d->plotItem->Show;
     }
     return false;
 }
 
 void QImPlotItemNode::setVisible(bool visible)
 {
-    ImPlotItem* plotItem = d_ptr->plotItem;
-    if (plotItem) {
+    QIM_D(d);
+    if (d->plotItem) {
         // 渲染后同步到 ImPlotItem
-        plotItem->Show = visible;
+        d->plotItem->Show = visible;
         // 此函数同步根节点的可见性状态，同时会触发信号
         QImAbstractNode::setVisible(visible);
     }
@@ -150,7 +158,8 @@ void QImPlotItemNode::endDraw()
 
 ImPlotItem* QImPlotItemNode::imPlotItem() const
 {
-    return d_ptr->plotItem;
+    QIM_DC(d);
+    return d->plotItem;
 }
 
 /**
@@ -161,10 +170,11 @@ ImPlotItem* QImPlotItemNode::imPlotItem() const
  */
 void QImPlotItemNode::setImPlotItem(ImPlotItem* item)
 {
-    if (d_ptr->plotItem == item) {
+    QIM_D(d);
+    if (d->plotItem == item) {
         return;
     }
-    d_ptr->plotItem = item;
+    d->plotItem = item;
 }
 
 }  // end namespace QIM

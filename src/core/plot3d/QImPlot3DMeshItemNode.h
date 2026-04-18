@@ -11,20 +11,26 @@ namespace QIM
 class QIM_CORE_API QImPlot3DMeshItemNode : public QImPlot3DItemNode
 {
     Q_OBJECT
+    QIM_DECLARE_PRIVATE(QImPlot3DMeshItemNode)
 
+    // Mesh visibility flags
     Q_PROPERTY(bool linesVisible READ isLinesVisible WRITE setLinesVisible NOTIFY meshFlagChanged)
     Q_PROPERTY(bool fillVisible READ isFillVisible WRITE setFillVisible NOTIFY meshFlagChanged)
     Q_PROPERTY(bool markersVisible READ isMarkersVisible WRITE setMarkersVisible NOTIFY meshFlagChanged)
+    // Marker style
     Q_PROPERTY(int markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
     Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerStyleChanged)
     Q_PROPERTY(float markerWeight READ markerWeight WRITE setMarkerWeight NOTIFY markerStyleChanged)
+    // Colors
     Q_PROPERTY(QColor fillColor READ fillColor WRITE setFillColor NOTIFY fillColorChanged)
     Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor NOTIFY lineColorChanged)
     Q_PROPERTY(QColor markerFillColor READ markerFillColor WRITE setMarkerFillColor NOTIFY markerFillColorChanged)
     Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
+    // Line width
     Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth NOTIFY lineWidthChanged)
 
 public:
+    // Mesh item type = InnerType3D + 4
     enum
     {
         Type = InnerType3D + 4
@@ -92,19 +98,6 @@ Q_SIGNALS:
 
 protected:
     bool beginDraw() override;
-
-private:
-    std::vector< ImPlot3DPoint > m_vertices;
-    std::vector< unsigned int > m_indices;
-    int m_meshFlags { 0 };
-    int m_markerShape { ImPlot3DMarker_None };
-    float m_markerSize { 4.0f };
-    float m_markerWeight { 1.0f };
-    QColor m_fillColor;
-    QColor m_lineColor;
-    QColor m_markerFillColor;
-    QColor m_markerOutlineColor;
-    float m_lineWidth { 1.0f };
 };
 }  // namespace QIM
 

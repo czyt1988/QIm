@@ -13,6 +13,7 @@ class QImPlot3DNode;
 class QIM_CORE_API QImSubplots3DNode : public QImAbstractNode
 {
     Q_OBJECT
+    QIM_DECLARE_PRIVATE(QImSubplots3DNode)
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(int rows READ rows WRITE setRows NOTIFY gridInfoChanged)
@@ -58,14 +59,6 @@ private:
     CellNode* createCellNode();
     QPoint cellPosition(int index) const;
     QSizeF cellSize() const;
-
-private:
-    QByteArray m_titleUtf8;
-    int m_rows { 1 };
-    int m_cols { 1 };
-    QSizeF m_size { -1.0, -1.0 };
-    QPointF m_origin { 0.0, 0.0 };
-    QSizeF m_availableSize { 0.0, 0.0 };
 };
 }  // namespace QIM
 

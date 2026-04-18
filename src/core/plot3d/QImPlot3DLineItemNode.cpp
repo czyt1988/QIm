@@ -50,7 +50,8 @@ void QImPlot3DLineItemNode::setData(QImAbstractXYZDataSeries* series)
 
 QImAbstractXYZDataSeries* QImPlot3DLineItemNode::data() const
 {
-    return d_ptr->dataSeries.get();
+    QIM_DC(d);
+    return d->dataSeries.get();
 }
 
 //----------------------------------------------------
@@ -81,7 +82,8 @@ void QImPlot3DLineItemNode::setColor(const QColor& c)
 
 QColor QImPlot3DLineItemNode::color() const
 {
-    const ImVec4& v = d_ptr->colorVec4;
+    QIM_DC(d);
+    const ImVec4& v = d->colorVec4;
     // Check if auto color (alpha == -1)
     if (v.w < 0) {
         return QColor();
@@ -100,7 +102,8 @@ void QImPlot3DLineItemNode::setLineWeight(float weight)
 
 float QImPlot3DLineItemNode::lineWeight() const
 {
-    return d_ptr->lineWeightVal;
+    QIM_DC(d);
+    return d->lineWeightVal;
 }
 
 //----------------------------------------------------

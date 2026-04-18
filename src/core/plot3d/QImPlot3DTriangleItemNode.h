@@ -2,7 +2,6 @@
 #define QIMPLOT3DTRIANGLEITEMNODE_H
 
 #include "QImPlot3DItemNode.h"
-#include "implot3d.h"
 #include <QColor>
 #include <vector>
 
@@ -11,20 +10,26 @@ namespace QIM
 class QIM_CORE_API QImPlot3DTriangleItemNode : public QImPlot3DItemNode
 {
     Q_OBJECT
+    QIM_DECLARE_PRIVATE(QImPlot3DTriangleItemNode)
 
+    // Triangle visibility flags
     Q_PROPERTY(bool linesVisible READ isLinesVisible WRITE setLinesVisible NOTIFY triangleFlagChanged)
     Q_PROPERTY(bool fillVisible READ isFillVisible WRITE setFillVisible NOTIFY triangleFlagChanged)
     Q_PROPERTY(bool markersVisible READ isMarkersVisible WRITE setMarkersVisible NOTIFY triangleFlagChanged)
+    // Marker style
     Q_PROPERTY(int markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
     Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerStyleChanged)
     Q_PROPERTY(float markerWeight READ markerWeight WRITE setMarkerWeight NOTIFY markerStyleChanged)
+    // Colors
     Q_PROPERTY(QColor fillColor READ fillColor WRITE setFillColor NOTIFY fillColorChanged)
     Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor NOTIFY lineColorChanged)
     Q_PROPERTY(QColor markerFillColor READ markerFillColor WRITE setMarkerFillColor NOTIFY markerFillColorChanged)
     Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
+    // Line width
     Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth NOTIFY lineWidthChanged)
 
 public:
+    // Triangle item type = InnerType3D + 5
     enum
     {
         Type = InnerType3D + 5
@@ -38,12 +43,13 @@ public:
         return Type;
     }
 
+    // setData template - inline to access header-level members (PrivateData is incomplete in header)
     template< typename ContainerX, typename ContainerY, typename ContainerZ >
     void setData(const ContainerX& x, const ContainerY& y, const ContainerZ& z)
     {
-        m_xData = toVector(x);
-        m_yData = toVector(y);
-        m_zData = toVector(z);
+        xData_vec.assign(x.begin(), x.end());
+        yData_vec.assign(y.begin(), y.end());
+        zData_vec.assign(z.begin(), z.end());
         trimDataToCommonSize();
         Q_EMIT dataChanged();
     }
@@ -103,27 +109,12 @@ protected:
     bool beginDraw() override;
 
 private:
-    template< typename Container >
-    static std::vector< double > toVector(const Container& container)
-    {
-        return std::vector< double >(container.begin(), container.end());
-    }
-
     void trimDataToCommonSize();
 
-private:
-    std::vector< double > m_xData;
-    std::vector< double > m_yData;
-    std::vector< double > m_zData;
-    int m_triangleFlags { 0 };
-    int m_markerShape { ImPlot3DMarker_None };
-    float m_markerSize { 4.0f };
-    float m_markerWeight { 1.0f };
-    QColor m_fillColor;
-    QColor m_lineColor;
-    QColor m_markerFillColor;
-    QColor m_markerOutlineColor;
-    float m_lineWidth { 1.0f };
+    // Template setData needs to access these directly because PrivateData is incomplete in header.
+    std::vector< double > xData_vec;
+    std::vector< double > yData_vec;
+    std::vector< double > zData_vec;
 };
 }  // namespace QIM
 
