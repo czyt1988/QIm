@@ -68,7 +68,7 @@ void QImPlotErrorBarsItemNode::setData(QImAbstractErrorDataSeries* errorDataSeri
 {
     QIM_D(d);
     d->data.reset(errorDataSeries);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -125,8 +125,8 @@ void QImPlotErrorBarsItemNode::setHorizontal(bool horizontal)
         d->flags &= ~ImPlotErrorBarsFlags_Horizontal;
     }
     if (d->flags != oldFlags) {
-        emit orientationChanged(horizontal);
-        emit errorBarsFlagChanged();
+        Q_EMIT orientationChanged(horizontal);
+        Q_EMIT errorBarsFlagChanged();
     }
 }
 
@@ -166,7 +166,7 @@ void QImPlotErrorBarsItemNode::setColor(const QColor& c)
         d_ptr->color.emplace(imColor);
         d_ptr->color->mark_dirty();  // Mark dirty for new color
     }
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -202,7 +202,7 @@ void QImPlotErrorBarsItemNode::setErrorBarsFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast<ImPlotErrorBarsFlags>(flags);
-        emit errorBarsFlagChanged();
+        Q_EMIT errorBarsFlagChanged();
     }
 }
 

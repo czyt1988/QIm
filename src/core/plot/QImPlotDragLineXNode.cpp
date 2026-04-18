@@ -98,7 +98,7 @@ void QImPlotDragLineXNode::setValue(double value)
     QIM_D(d);
     if (d->x != value) {
         d->x = value;
-        emit valueChanged(value);
+        Q_EMIT valueChanged(value);
     }
 }
 
@@ -132,7 +132,7 @@ QColor QImPlotDragLineXNode::color() const
 void QImPlotDragLineXNode::setColor(const QColor& c)
 {
     d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -166,7 +166,7 @@ void QImPlotDragLineXNode::setThickness(float thickness)
 {
     if (d_ptr->thickness != thickness) {
         d_ptr->thickness = thickness;
-        emit thicknessChanged(thickness);
+        Q_EMIT thicknessChanged(thickness);
     }
 }
 
@@ -201,7 +201,7 @@ void QImPlotDragLineXNode::setId(int id)
 {
     if (d_ptr->id != id) {
         d_ptr->id = id;
-        emit idChanged(id);
+        Q_EMIT idChanged(id);
     }
 }
 
@@ -236,7 +236,7 @@ void QImPlotDragLineXNode::setFlags(int flags)
 {
     if (d_ptr->flags != flags) {
         d_ptr->flags = static_cast<ImPlotDragToolFlags>(flags);
-        emit flagsChanged(flags);
+        Q_EMIT flagsChanged(flags);
     }
 }
 
@@ -429,7 +429,7 @@ bool QImPlotDragLineXNode::beginDraw()
     // Emit signals if position changed
     if (modified) {
         if (d->x != prevX) {
-            emit valueChanged(d->x);
+            Q_EMIT valueChanged(d->x);
         }
     }
     

@@ -90,7 +90,7 @@ void QImPlotImageItemNode::setTextureId(quintptr id)
     QIM_D(d);
     if (d->textureId != id) {
         d->textureId = id;
-        emit textureIdChanged(id);
+        Q_EMIT textureIdChanged(id);
     }
 }
 
@@ -127,7 +127,7 @@ void QImPlotImageItemNode::setBoundsMin(const QPointF& min)
     QIM_D(d);
     if (d->boundsMin != min) {
         d->boundsMin = min;
-        emit boundsMinChanged(min);
+        Q_EMIT boundsMinChanged(min);
     }
 }
 
@@ -164,7 +164,7 @@ void QImPlotImageItemNode::setBoundsMax(const QPointF& max)
     QIM_D(d);
     if (d->boundsMax != max) {
         d->boundsMax = max;
-        emit boundsMaxChanged(max);
+        Q_EMIT boundsMaxChanged(max);
     }
 }
 
@@ -201,7 +201,7 @@ void QImPlotImageItemNode::setUv0(const QPointF& uv)
     QIM_D(d);
     if (d->uv0 != uv) {
         d->uv0 = uv;
-        emit uv0Changed(uv);
+        Q_EMIT uv0Changed(uv);
     }
 }
 
@@ -238,7 +238,7 @@ void QImPlotImageItemNode::setUv1(const QPointF& uv)
     QIM_D(d);
     if (d->uv1 != uv) {
         d->uv1 = uv;
-        emit uv1Changed(uv);
+        Q_EMIT uv1Changed(uv);
     }
 }
 
@@ -275,7 +275,7 @@ void QImPlotImageItemNode::setTintColor(const QColor& color)
     QIM_D(d);
     if (d->tintColor != color) {
         d->tintColor = color;
-        emit tintColorChanged(color);
+        Q_EMIT tintColorChanged(color);
     }
 }
 
@@ -312,7 +312,7 @@ void QImPlotImageItemNode::setImageFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast<ImPlotImageFlags>(flags);
-        emit imageFlagChanged();
+        Q_EMIT imageFlagChanged();
     }
 }
 

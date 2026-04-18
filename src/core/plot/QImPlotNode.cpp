@@ -1,4 +1,4 @@
-﻿#include "QImPlotNode.h"
+#include "QImPlotNode.h"
 #include <cmath>
 #include <vector>
 #include <array>
@@ -166,33 +166,41 @@ QImPlotAxisInfo* QImPlotNode::axisInfo(QImPlotAxisId aid) const
 
 QImPlotAxisInfo* QImPlotNode::x1Axis() const
 {
-    return d_ptr->axisInfo[ static_cast< int >(QImPlotAxisId::X1) ];
+    QIM_DC(d);
+    return d->axisInfo[ static_cast< int >(QImPlotAxisId::X1) ];
 }
 
 QImPlotAxisInfo* QImPlotNode::y1Axis() const
 {
-    return d_ptr->axisInfo[ static_cast< int >(QImPlotAxisId::Y1) ];
+    QIM_DC(d);
+    return d->axisInfo[ static_cast< int >(QImPlotAxisId::Y1) ];
 }
 
 QImPlotAxisInfo* QImPlotNode::x2Axis() const
 {
-    return d_ptr->axisInfo[ static_cast< int >(QImPlotAxisId::X2) ];
+    QIM_DC(d);
+    return d->axisInfo[ static_cast< int >(QImPlotAxisId::X2) ];
 }
 
 QImPlotAxisInfo* QImPlotNode::y2Axis() const
 {
-    return d_ptr->axisInfo[ static_cast< int >(QImPlotAxisId::Y2) ];
+    QIM_DC(d);
+    return d->axisInfo[ static_cast< int >(QImPlotAxisId::Y2) ];
 }
 
 QImPlotAxisInfo* QImPlotNode::x3Axis() const
 {
-    return d_ptr->axisInfo[ static_cast< int >(QImPlotAxisId::X3) ];
+    QIM_DC(d);
+    return d->axisInfo[ static_cast< int >(QImPlotAxisId::X3) ];
 }
 
 QImPlotAxisInfo* QImPlotNode::y3Axis() const
 {
-    return d_ptr->axisInfo[ static_cast< int >(QImPlotAxisId::Y3) ];
+    QIM_DC(d);
+    return d->axisInfo[ static_cast< int >(QImPlotAxisId::Y3) ];
 }
+
+/*duplicate-removed*/
 
 bool QImPlotNode::isAxisEnabled(QImPlotAxisId aid) const
 {
@@ -259,7 +267,7 @@ void QImPlotNode::setAxisEnabled(QImPlotAxisId aid, bool on)
  * @see setTitleEnabled()
  * \endif
  *
- * \if
+* \if CHINESE
  * @fn QImPlotNode::isTitleEnabled
  * @brief 检查绘图标题是否可见
  * @return true 表示标题启用（未设置 ImPlotFlags_NoTitle）
@@ -624,7 +632,7 @@ void QImPlotNode::setImPlotFlags(int flags)
     QIM_D(d);
     if (d->plotFlags != flags) {
         d->plotFlags = flags;
-        emit plotFlagChanged();
+        Q_EMIT plotFlagChanged();
     }
 }
 
@@ -645,31 +653,35 @@ void QImPlotNode::addLine(QImPlotLineItemNode* lineItem)
 
 QImPlotLegendNode* QImPlotNode::legendNode() const
 {
-    return d_ptr->legendNode.get();
+    QIM_DC(d);
+    return d->legendNode.get();
 }
 
 bool QImPlotNode::isPlotHovered() const
 {
-    return d_ptr->plot && d_ptr->plot->Hovered;
+    QIM_DC(d);
+    return d->plot && d->plot->Hovered;
 }
 
 QPointF QImPlotNode::pixelsToPlot(const float& screenX, const float& screenY)
 {
-    if (!d_ptr->plot) {
+    QIM_D(d);
+    if (!d->plot) {
         return QPointF();
     }
-    ImPlotAxis& x_axis = d_ptr->plot->Axes[ d_ptr->plot->CurrentX ];
-    ImPlotAxis& y_axis = d_ptr->plot->Axes[ d_ptr->plot->CurrentY ];
+    ImPlotAxis& x_axis = d->plot->Axes[ d->plot->CurrentX ];
+    ImPlotAxis& y_axis = d->plot->Axes[ d->plot->CurrentY ];
     return QPointF(x_axis.PixelsToPlot(screenX), y_axis.PixelsToPlot(screenY));
 }
 
 QPointF QImPlotNode::plotToPixels(const double& doubleX, const double& doubleY)
 {
-    if (!d_ptr->plot) {
+    QIM_D(d);
+    if (!d->plot) {
         return QPointF();
     }
-    ImPlotAxis& x_axis = d_ptr->plot->Axes[ d_ptr->plot->CurrentX ];
-    ImPlotAxis& y_axis = d_ptr->plot->Axes[ d_ptr->plot->CurrentY ];
+    ImPlotAxis& x_axis = d->plot->Axes[ d->plot->CurrentX ];
+    ImPlotAxis& y_axis = d->plot->Axes[ d->plot->CurrentY ];
     return QPointF(x_axis.PlotToPixels(doubleX), y_axis.PlotToPixels(doubleY));
 }
 
@@ -699,12 +711,14 @@ std::string QImPlotNode::axisValueText(double val, QImPlotAxisId xAxisId) const
 
 void QImPlotNode::rescaleAxes()
 {
-    d_ptr->axesToFit = true;
+    QIM_D(d);
+    d->axesToFit = true;
 }
 
 void QImPlotNode::setAxesToFit()
 {
-    d_ptr->axesToFit = true;
+    QIM_D(d);
+    d->axesToFit = true;
 }
 
 bool QImPlotNode::beginDraw()

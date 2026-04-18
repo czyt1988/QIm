@@ -74,7 +74,8 @@ QImPlotAnnotationNode::~QImPlotAnnotationNode()
  */
 QPointF QImPlotAnnotationNode::position() const
 {
-    return QPointF(d_ptr->x, d_ptr->y);
+    QIM_DC(d);
+    return QPointF(d->x, d->y);
 }
 
 /**
@@ -112,7 +113,7 @@ void QImPlotAnnotationNode::setPosition(double x, double y)
     if (d->x != x || d->y != y) {
         d->x = x;
         d->y = y;
-        emit positionChanged(QPointF(x, y));
+        Q_EMIT positionChanged(QPointF(x, y));
     }
 }
 
@@ -129,7 +130,8 @@ void QImPlotAnnotationNode::setPosition(double x, double y)
  */
 QString QImPlotAnnotationNode::text() const
 {
-    return QString::fromUtf8(d_ptr->textUtf8);
+    QIM_DC(d);
+    return QString::fromUtf8(d->textUtf8);
 }
 
 /**
@@ -149,7 +151,7 @@ void QImPlotAnnotationNode::setText(const QString& text)
     QByteArray utf8 = text.toUtf8();
     if (d->textUtf8 != utf8) {
         d->textUtf8 = utf8;
-        emit textChanged(text);
+        Q_EMIT textChanged(text);
     }
 }
 
@@ -207,7 +209,7 @@ QColor QImPlotAnnotationNode::color() const
 void QImPlotAnnotationNode::setColor(const QColor& c)
 {
     d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -260,7 +262,7 @@ void QImPlotAnnotationNode::setPixelOffset(double x, double y)
     QIM_D(d);
     if (d->pixelOffset.x != x || d->pixelOffset.y != y) {
         d->pixelOffset = ImVec2(static_cast< float >(x), static_cast< float >(y));
-        emit pixelOffsetChanged(QPointF(x, y));
+        Q_EMIT pixelOffsetChanged(QPointF(x, y));
     }
 }
 
@@ -296,7 +298,7 @@ void QImPlotAnnotationNode::setClamp(bool clamp)
     QIM_D(d);
     if (d->clamp != clamp) {
         d->clamp = clamp;
-        emit clampChanged(clamp);
+        Q_EMIT clampChanged(clamp);
     }
 }
 
@@ -332,7 +334,7 @@ void QImPlotAnnotationNode::setRound(bool round)
     QIM_D(d);
     if (d->round != round) {
         d->round = round;
-        emit roundChanged(round);
+        Q_EMIT roundChanged(round);
     }
 }
 

@@ -81,7 +81,7 @@ QColor QImPlotDummyItemNode::color() const
 void QImPlotDummyItemNode::setColor(const QColor& c)
 {
     d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**

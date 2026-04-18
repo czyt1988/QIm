@@ -75,7 +75,7 @@ void QImPlotShadedItemNode::setData(QImAbstractXYDataSeries* series)
     QIM_D(d);
     d->data.reset(series);
     d->data2.reset();  // Clear secondary data for two-line mode
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -100,7 +100,7 @@ void QImPlotShadedItemNode::setData(QImAbstractXYDataSeries* series1, QImAbstrac
     QIM_D(d);
     d->data.reset(series1);
     d->data2.reset(series2);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -224,7 +224,7 @@ void QImPlotShadedItemNode::setReferenceValue(double value)
     QIM_D(d);
     if (d->referenceValue != value) {
         d->referenceValue = value;
-        emit referenceValueChanged(value);
+        Q_EMIT referenceValueChanged(value);
     }
 }
 
@@ -264,7 +264,7 @@ void QImPlotShadedItemNode::setColor(const QColor& c)
         d_ptr->color.emplace(imColor);
         d_ptr->color->mark_dirty();  // Mark dirty for new color
     }
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -300,7 +300,7 @@ void QImPlotShadedItemNode::setShadedFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotShadedFlags >(flags);
-        emit shadedFlagChanged();
+        Q_EMIT shadedFlagChanged();
     }
 }
 

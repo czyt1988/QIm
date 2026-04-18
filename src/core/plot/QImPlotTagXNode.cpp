@@ -85,7 +85,7 @@ void QImPlotTagXNode::setValue(double value)
     QIM_D(d);
     if (d->value != value) {
         d->value = value;
-        emit valueChanged(value);
+        Q_EMIT valueChanged(value);
     }
 }
 
@@ -122,7 +122,7 @@ void QImPlotTagXNode::setText(const QString& text)
     QByteArray utf8 = text.toUtf8();
     if (d->textUtf8 != utf8) {
         d->textUtf8 = utf8;
-        emit textChanged(text);
+        Q_EMIT textChanged(text);
     }
 }
 
@@ -154,7 +154,7 @@ void QImPlotTagXNode::setText(const char* fmt, ...)
     QByteArray utf8 = text.toUtf8();
     if (d->textUtf8 != utf8) {
         d->textUtf8 = utf8;
-        emit textChanged(text);
+        Q_EMIT textChanged(text);
     }
 }
 
@@ -190,7 +190,7 @@ void QImPlotTagXNode::setColor(const QColor& c)
     QIM_D(d);
     if (d->color != c) {
         d->color = c;
-        emit colorChanged(c);
+        Q_EMIT colorChanged(c);
     }
 }
 
@@ -226,7 +226,7 @@ void QImPlotTagXNode::setRound(bool round)
     QIM_D(d);
     if (d->round != round) {
         d->round = round;
-        emit roundChanged(round);
+        Q_EMIT roundChanged(round);
     }
 }
 

@@ -1,4 +1,4 @@
-﻿#include "QImPlotLineItemNode.h"
+#include "QImPlotLineItemNode.h"
 #include "QImPlotDataSeries.h"
 #include "QImLTTBDownsampler.h"
 #include "QImMinMaxLTTBDownsampler.h"
@@ -80,7 +80,8 @@ void QImPlotLineItemNode::setData(QImAbstractXYDataSeries* series)
 
 QImAbstractXYDataSeries* QImPlotLineItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 // ===== 在 CPP 文件顶部添加辅助宏定义 =====
@@ -177,7 +178,7 @@ void QImPlotLineItemNode::setLineFlags(int flags)
     QIM_D(d);
     if (d->lineFlags != flags) {
         d->lineFlags = flags;
-        emit lineFlagChanged();
+        Q_EMIT lineFlagChanged();
     }
 }
 
@@ -199,12 +200,14 @@ void QImPlotLineItemNode::setLineFlags(int flags)
  */
 void QImPlotLineItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
 }
 
 QColor QImPlotLineItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 void QImPlotLineItemNode::setAdaptivesSampling(bool on)
@@ -353,11 +356,20 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
     // clang-format on
     // clang-format on
 
-    /**
-     * @brief 绘图
-     * @return  这里直接返回false，避免调用endDraw
-     */
-    bool QImPlotLineItemNode::beginDraw()
+/**
+ * \if ENGLISH
+ * @brief Renders the line plot with pre-converted data
+ * @return true if beginDraw succeeded, false if no valid data
+ * @details Calls ImPlot::PlotLine with XY data. All conversions done in setters.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用预转换数据渲染线图
+ * @return true 表示 beginDraw 成功，false 表示无有效数据
+ * @details 调用 ImPlot::PlotLine 处理 XY 数据。所有转换在 setter 中完成。
+ * \endif
+ */
+bool QImPlotLineItemNode::beginDraw()
 {
     QIM_D(d);
     if (!d->data) {

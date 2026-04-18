@@ -131,7 +131,7 @@ void QImPlotDragRectNode::setRect(double x1, double y1, double x2, double y2)
         d->y1 = y1;
         d->x2 = x2;
         d->y2 = y2;
-        emit rectChanged(QRectF(x1, y1, x2 - x1, y2 - y1));
+        Q_EMIT rectChanged(QRectF(x1, y1, x2 - x1, y2 - y1));
     }
 }
 
@@ -165,7 +165,7 @@ QColor QImPlotDragRectNode::color() const
 void QImPlotDragRectNode::setColor(const QColor& c)
 {
     d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -199,7 +199,7 @@ void QImPlotDragRectNode::setId(int id)
 {
     if (d_ptr->id != id) {
         d_ptr->id = id;
-        emit idChanged(id);
+        Q_EMIT idChanged(id);
     }
 }
 
@@ -234,7 +234,7 @@ void QImPlotDragRectNode::setFlags(int flags)
 {
     if (d_ptr->flags != flags) {
         d_ptr->flags = static_cast<ImPlotDragToolFlags>(flags);
-        emit flagsChanged(flags);
+        Q_EMIT flagsChanged(flags);
     }
 }
 
@@ -411,7 +411,7 @@ bool QImPlotDragRectNode::beginDraw()
             // Ensure consistent ordering
             if (d->x1 > d->x2) std::swap(d->x1, d->x2);
             if (d->y1 > d->y2) std::swap(d->y1, d->y2);
-            emit rectChanged(QRectF(d->x1, d->y1, d->x2 - d->x1, d->y2 - d->y1));
+            Q_EMIT rectChanged(QRectF(d->x1, d->y1, d->x2 - d->x1, d->y2 - d->y1));
         }
     }
     

@@ -79,7 +79,7 @@ void QImPlotScatterItemNode::setData(QImAbstractXYDataSeries* series)
     if (d->isAdaptiveSampling) {
         d->resetDownSamplerData();
     }
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 QImAbstractXYDataSeries* QImPlotScatterItemNode::data() const
@@ -137,7 +137,7 @@ void QImPlotScatterItemNode::setMarkerSize(float size)
     QIM_D(d);
     d->markerSize = size;
     if (d->markerSize.is_dirty()) {
-        emit markerSizeChanged(size);
+        Q_EMIT markerSizeChanged(size);
     }
 }
 
@@ -190,7 +190,7 @@ void QImPlotScatterItemNode::setMarkerShape(int shape)
     QIM_D(d);
     d->markerShape = shape;
     if (d->markerShape.is_dirty()) {
-        emit markerShapeChanged(shape);
+        Q_EMIT markerShapeChanged(shape);
     }
 }
 
@@ -241,7 +241,7 @@ void QImPlotScatterItemNode::setMarkerFill(bool fill)
     QIM_D(d);
     if (d->markerFill != fill) {
         d->markerFill = fill;
-        emit markerFillChanged(fill);
+        Q_EMIT markerFillChanged(fill);
     }
 }
 
@@ -293,7 +293,7 @@ void QImPlotScatterItemNode::setAdaptiveSampling(bool enabled)
     if (d->isAdaptiveSampling != enabled) {
         d->isAdaptiveSampling = enabled;
         d->resetDownSamplerData();
-        emit adaptiveSamplingChanged(enabled);
+        Q_EMIT adaptiveSamplingChanged(enabled);
     }
 }
 
@@ -347,7 +347,7 @@ void QImPlotScatterItemNode::setDownsampleThreshold(int threshold)
     if (d->downsampleThreshold != threshold && threshold > 0) {
         d->downsampleThreshold = threshold;
         d->resetDownSamplerData();
-        emit downsampleThresholdChanged(threshold);
+        Q_EMIT downsampleThresholdChanged(threshold);
     }
 }
 
@@ -397,7 +397,7 @@ QColor QImPlotScatterItemNode::color() const
 void QImPlotScatterItemNode::setColor(const QColor& c)
 {
     d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -506,8 +506,19 @@ void QImPlotScatterItemNode::setScatterFlags(int flags)
 }
 
 /**
- * @brief 绘图
- * @return  这里直接返回false，避免调用endDraw
+ * \if ENGLISH
+ * @brief Renders the scatter plot with pre-converted data
+ * @return false (no endDraw needed)
+ * @details Calls ImPlot::PlotScatter with XY data. All conversions done in setters.
+ *          Uses adaptive sampling (LTTB) when enabled for large datasets.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用预转换数据渲染散点图
+ * @return false（无需调用endDraw）
+ * @details 调用 ImPlot::PlotScatter 处理 XY 数据。所有转换在 setter 中完成。
+ *          启用自适应采样时对大数据集使用 LTTB 算法。
+ * \endif
  */
 bool QImPlotScatterItemNode::beginDraw()
 {

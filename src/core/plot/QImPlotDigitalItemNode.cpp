@@ -68,7 +68,7 @@ void QImPlotDigitalItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -117,7 +117,7 @@ QColor QImPlotDigitalItemNode::color() const
 void QImPlotDigitalItemNode::setColor(const QColor& c)
 {
     d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -153,7 +153,7 @@ void QImPlotDigitalItemNode::setDigitalFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast<ImPlotDigitalFlags>(flags);
-        emit digitalFlagChanged();
+        Q_EMIT digitalFlagChanged();
     }
 }
 

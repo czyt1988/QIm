@@ -69,7 +69,7 @@ void QImPlotStemsItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -121,7 +121,7 @@ void QImPlotStemsItemNode::setReferenceValue(double value)
     QIM_D(d);
     if (d->referenceValue != value) {
         d->referenceValue = value;
-        emit referenceValueChanged(value);
+        Q_EMIT referenceValueChanged(value);
     }
 }
 
@@ -163,8 +163,8 @@ void QImPlotStemsItemNode::setHorizontal(bool horizontal)
         d->flags &= ~ImPlotStemsFlags_Horizontal;
     }
     if (d->flags != oldFlags) {
-        emit orientationChanged(horizontal);
-        emit stemsFlagChanged();
+        Q_EMIT orientationChanged(horizontal);
+        Q_EMIT stemsFlagChanged();
     }
 }
 
@@ -198,7 +198,7 @@ QColor QImPlotStemsItemNode::color() const
 void QImPlotStemsItemNode::setColor(const QColor& c)
 {
     d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -234,7 +234,7 @@ void QImPlotStemsItemNode::setStemsFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast<ImPlotStemsFlags>(flags);
-        emit stemsFlagChanged();
+        Q_EMIT stemsFlagChanged();
     }
 }
 

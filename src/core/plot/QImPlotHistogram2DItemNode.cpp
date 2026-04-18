@@ -75,7 +75,7 @@ void QImPlotHistogram2DItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -127,7 +127,7 @@ void QImPlotHistogram2DItemNode::setXBins(int bins)
     QIM_D(d);
     if (d->xBins != bins) {
         d->xBins = bins;
-        emit xBinsChanged(bins);
+        Q_EMIT xBinsChanged(bins);
     }
 }
 
@@ -164,7 +164,7 @@ void QImPlotHistogram2DItemNode::setYBins(int bins)
     QIM_D(d);
     if (d->yBins != bins) {
         d->yBins = bins;
-        emit yBinsChanged(bins);
+        Q_EMIT yBinsChanged(bins);
     }
 }
 
@@ -201,7 +201,7 @@ void QImPlotHistogram2DItemNode::setXRangeMin(double min)
     QIM_D(d);
     if (d->xRangeMin != min) {
         d->xRangeMin = min;
-        emit xRangeChanged();
+        Q_EMIT xRangeChanged();
     }
 }
 
@@ -238,7 +238,7 @@ void QImPlotHistogram2DItemNode::setXRangeMax(double max)
     QIM_D(d);
     if (d->xRangeMax != max) {
         d->xRangeMax = max;
-        emit xRangeChanged();
+        Q_EMIT xRangeChanged();
     }
 }
 
@@ -275,7 +275,7 @@ void QImPlotHistogram2DItemNode::setYRangeMin(double min)
     QIM_D(d);
     if (d->yRangeMin != min) {
         d->yRangeMin = min;
-        emit yRangeChanged();
+        Q_EMIT yRangeChanged();
     }
 }
 
@@ -312,7 +312,7 @@ void QImPlotHistogram2DItemNode::setYRangeMax(double max)
     QIM_D(d);
     if (d->yRangeMax != max) {
         d->yRangeMax = max;
-        emit yRangeChanged();
+        Q_EMIT yRangeChanged();
     }
 }
 
@@ -354,8 +354,8 @@ void QImPlotHistogram2DItemNode::setDensity(bool density)
         d->flags &= ~ImPlotHistogramFlags_Density;
     }
     if (d->flags != oldFlags) {
-        emit densityChanged(density);
-        emit histogramFlagChanged();
+        Q_EMIT densityChanged(density);
+        Q_EMIT histogramFlagChanged();
     }
 }
 
@@ -397,8 +397,8 @@ void QImPlotHistogram2DItemNode::setNoOutliers(bool noOutliers)
         d->flags &= ~ImPlotHistogramFlags_NoOutliers;
     }
     if (d->flags != oldFlags) {
-        emit noOutliersChanged(noOutliers);
-        emit histogramFlagChanged();
+        Q_EMIT noOutliersChanged(noOutliers);
+        Q_EMIT histogramFlagChanged();
     }
 }
 
@@ -440,8 +440,8 @@ void QImPlotHistogram2DItemNode::setColMajor(bool colMajor)
         d->flags &= ~ImPlotHistogramFlags_ColMajor;
     }
     if (d->flags != oldFlags) {
-        emit colMajorChanged(colMajor);
-        emit histogramFlagChanged();
+        Q_EMIT colMajorChanged(colMajor);
+        Q_EMIT histogramFlagChanged();
     }
 }
 
@@ -478,7 +478,7 @@ void QImPlotHistogram2DItemNode::setHistogramFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotHistogramFlags >(flags);
-        emit histogramFlagChanged();
+        Q_EMIT histogramFlagChanged();
     }
 }
 

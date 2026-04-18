@@ -74,7 +74,7 @@ void QImPlotHeatmapItemNode::setData(QImAbstractHeatmapDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -126,7 +126,7 @@ void QImPlotHeatmapItemNode::setScaleMin(double min)
     QIM_D(d);
     if (d->scaleMin != min) {
         d->scaleMin = min;
-        emit scaleMinChanged(min);
+        Q_EMIT scaleMinChanged(min);
     }
 }
 
@@ -163,7 +163,7 @@ void QImPlotHeatmapItemNode::setScaleMax(double max)
     QIM_D(d);
     if (d->scaleMax != max) {
         d->scaleMax = max;
-        emit scaleMaxChanged(max);
+        Q_EMIT scaleMaxChanged(max);
     }
 }
 
@@ -201,7 +201,7 @@ void QImPlotHeatmapItemNode::setLabelFormat(const QString& format)
     QByteArray utf8 = format.toUtf8();
     if (d->labelFormatUtf8 != utf8) {
         d->labelFormatUtf8 = utf8;
-        emit labelFormatChanged(format);
+        Q_EMIT labelFormatChanged(format);
     }
 }
 
@@ -238,7 +238,7 @@ void QImPlotHeatmapItemNode::setBoundsMin(const QPointF& min)
     QIM_D(d);
     if (d->boundsMin != min) {
         d->boundsMin = min;
-        emit boundsMinChanged(min);
+        Q_EMIT boundsMinChanged(min);
     }
 }
 
@@ -275,7 +275,7 @@ void QImPlotHeatmapItemNode::setBoundsMax(const QPointF& max)
     QIM_D(d);
     if (d->boundsMax != max) {
         d->boundsMax = max;
-        emit boundsMaxChanged(max);
+        Q_EMIT boundsMaxChanged(max);
     }
 }
 
@@ -317,8 +317,8 @@ void QImPlotHeatmapItemNode::setColMajor(bool colMajor)
         d->flags &= ~ImPlotHeatmapFlags_ColMajor;
     }
     if (d->flags != oldFlags) {
-        emit colMajorChanged(colMajor);
-        emit heatmapFlagChanged();
+        Q_EMIT colMajorChanged(colMajor);
+        Q_EMIT heatmapFlagChanged();
     }
 }
 
@@ -355,7 +355,7 @@ void QImPlotHeatmapItemNode::setHeatmapFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotHeatmapFlags >(flags);
-        emit heatmapFlagChanged();
+        Q_EMIT heatmapFlagChanged();
     }
 }
 

@@ -123,7 +123,7 @@ void QImPlotStairsItemNode::setShaded(bool on)
         d->flags &= ~ImPlotStairsFlags_Shaded;
     }
     if (d->flags != oldFlags) {
-        emit stairsFlagChanged();
+        Q_EMIT stairsFlagChanged();
     }
 }
 
@@ -218,7 +218,7 @@ void QImPlotStairsItemNode::setStairsFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotStairsFlags >(flags);
-        emit stairsFlagChanged();
+        Q_EMIT stairsFlagChanged();
     }
 }
 
