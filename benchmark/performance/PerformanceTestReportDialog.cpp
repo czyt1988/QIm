@@ -1,4 +1,4 @@
-﻿#include "PerformanceTestReportDialog.h"
+#include "PerformanceTestReportDialog.h"
 #include "ui_PerformanceTestReportDialog.h"
 #include "qcustomplot.h"
 #include <QPixmap>
@@ -64,12 +64,7 @@ void PerformanceTestReportDialog::setTestResults(
     }
 
     // 生成并显示报告
-    QString reportHtml = generateReportHtml();
-    QFile file("./report.html");
-    if (file.open(QIODevice::ReadWrite)) {
-        file.write(reportHtml.toUtf8());
-    }
-    ui->textBrowser->setHtml(reportHtml);
+    ui->textBrowser->setHtml(generateReportHtml());
 }
 
 QString PerformanceTestReportDialog::generateReportHtml() const

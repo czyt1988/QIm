@@ -1,4 +1,4 @@
-﻿#ifndef PERFORMANCETESTREPORTDIALOG_H
+#ifndef PERFORMANCETESTREPORTDIALOG_H
 #define PERFORMANCETESTREPORTDIALOG_H
 #include <QDialog>
 #include <QVector>
@@ -42,7 +42,6 @@ private:
     QString pixmapToBase64(const QPixmap& pixmap) const;
 
     // 报告内容生成
-    QString generateExecutiveSummary() const;
     QString generateDetailedResultsTable() const;
     QString generateRecommendations() const;
     QString getPerformanceClass(double fps) const;
