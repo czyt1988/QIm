@@ -33,7 +33,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>  test Frames</string>
+        <string>Test Frames</string>
        </property>
       </widget>
      </item>
@@ -166,7 +166,7 @@
      <item>
       <widget class="QPushButton" name="pushButtonRunAll">
        <property name="text">
-        <string>Run All Test</string>
+        <string>Run Full Benchmark</string>
        </property>
       </widget>
      </item>
