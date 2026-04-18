@@ -273,6 +273,12 @@ TestResult PerformanceTestController::testQImPlot(int pointCount)
     figure->show();
     QCoreApplication::processEvents();
 
+    // Collect GPU info while QIm's GL context is active (only once)
+    if (m_systemInfo.openglVersion.isEmpty()) {
+        m_systemInfo = SystemInfoCollector::collectSystemInfo();
+        SystemInfoCollector::collectGPUInfo(m_systemInfo);
+    }
+
     // 计算滑动步长
     int step = (m_totalDataSize - pointCount) / (m_config.testFrames - 1);
     if (step <= 0)

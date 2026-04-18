@@ -224,9 +224,13 @@ void PerformanceTestWidget::onAllTestsCompleted(const QVector< TestResult >& all
 
     // 收集系统信息
     SystemInfo sysInfo = SystemInfoCollector::collectSystemInfo();
-    // GPU info collection requires active GL context - collect after widget is shown
-    // Note: The QIm plot widget should already have an active GL context at this point
-    SystemInfoCollector::collectGPUInfo(sysInfo);
+    // GPU info already collected during testQImPlot (when GL context was active)
+    const SystemInfo& cachedSysInfo = controller->systemInfo();
+    sysInfo.openglVersion = cachedSysInfo.openglVersion;
+    sysInfo.openglRenderer = cachedSysInfo.openglRenderer;
+    sysInfo.gpuName = cachedSysInfo.gpuName;
+    sysInfo.gpuVramMB = cachedSysInfo.gpuVramMB;
+    sysInfo.isSoftwareOpenGL = cachedSysInfo.isSoftwareOpenGL;
 
     // 显示报告对话框
     reportDialog->setReportLanguage(
@@ -277,7 +281,13 @@ void PerformanceTestWidget::showReportDialog(const QVector< TestResult >& result
 {
     // Collect system information
     SystemInfo sysInfo = SystemInfoCollector::collectSystemInfo();
-    SystemInfoCollector::collectGPUInfo(sysInfo);
+    // GPU info already collected during testQImPlot (when GL context was active)
+    const SystemInfo& cachedSysInfo = controller->systemInfo();
+    sysInfo.openglVersion = cachedSysInfo.openglVersion;
+    sysInfo.openglRenderer = cachedSysInfo.openglRenderer;
+    sysInfo.gpuName = cachedSysInfo.gpuName;
+    sysInfo.gpuVramMB = cachedSysInfo.gpuVramMB;
+    sysInfo.isSoftwareOpenGL = cachedSysInfo.isSoftwareOpenGL;
 
     // Configure report settings from UI
     reportDialog->setReportLanguage(

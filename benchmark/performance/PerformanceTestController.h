@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QElapsedTimer>
 #include <QString>
+#include "SystemInfoCollector.h"
 
 struct TestResult
 {
@@ -37,6 +38,7 @@ public:
     explicit PerformanceTestController(QObject* parent = nullptr);
     void cleanupMemory();
     QVector< TestResult > runFullBenchmark(const TestConfig& baseConfig);
+    SystemInfo systemInfo() const { return m_systemInfo; }
 public slots:
     void runTests(const PerformanceTestController::TestConfig& config);
 
@@ -69,6 +71,7 @@ private:
     QVector< double > m_testDataX;
     QVector< double > m_testDataY;
     int m_totalDataSize = 0;  // 实际生成的数据总点数（totalPoints * 1.3）
+    SystemInfo m_systemInfo;  // Cached system/GPU info collected during QIm test (when GL context is active)
 };
 Q_DECLARE_METATYPE(PerformanceTestController::TestConfig)
 #endif  // PERFORMANCETESTCONTROLLER_H

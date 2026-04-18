@@ -152,64 +152,56 @@ SystemInfo SystemInfoCollector::collectSystemInfo()
 void SystemInfoCollector::collectGPUInfo(SystemInfo& info)
 {
     // ── OpenGL version and renderer (via Qt's QOpenGLFunctions) ──
-    try {
-        QOpenGLFunctions f(QOpenGLContext::currentContext());
-        const GLubyte* versionStr  = f.glGetString(GL_VERSION);
-        const GLubyte* rendererStr = f.glGetString(GL_RENDERER);
+    QOpenGLContext* ctx = QOpenGLContext::currentContext();
+    if (!ctx) {
+        // No active GL context — cannot collect GPU info
+        // Leave fields as defaults (empty strings, 0.0)
+        qWarning() << "SystemInfoCollector: No active OpenGL context, GPU info not available";
+        return;
+    }
 
-        if (versionStr) {
-            info.openglVersion = QString::fromUtf8(reinterpret_cast<const char*>(versionStr));
-        }
-        if (rendererStr) {
-            info.openglRenderer = QString::fromUtf8(reinterpret_cast<const char*>(rendererStr));
-            info.gpuName        = info.openglRenderer;
-        }
-    } catch (...) {
-        info.openglVersion  = QString();
-        info.openglRenderer = QString();
-        info.gpuName        = QString();
+    QOpenGLFunctions* f = ctx->functions();
+    if (!f) {
+        qWarning() << "SystemInfoCollector: Cannot get OpenGL functions";
+        return;
+    }
+
+    const GLubyte* versionStr  = f->glGetString(GL_VERSION);
+    const GLubyte* rendererStr = f->glGetString(GL_RENDERER);
+
+    if (versionStr) {
+        info.openglVersion = QString::fromUtf8(reinterpret_cast<const char*>(versionStr));
+    }
+    if (rendererStr) {
+        info.openglRenderer = QString::fromUtf8(reinterpret_cast<const char*>(rendererStr));
+        info.gpuName        = info.openglRenderer;
     }
 
     // ── Software OpenGL detection ──
-    try {
-        QString rendererLower = info.openglRenderer.toLower();
-        if (rendererLower.contains("llvmpipe") ||
-            rendererLower.contains("swrast") ||
-            rendererLower.contains("softpipe")) {
-            info.isSoftwareOpenGL = true;
-        }
-    } catch (...) {
-        info.isSoftwareOpenGL = false;
+    QString rendererLower = info.openglRenderer.toLower();
+    if (rendererLower.contains("llvmpipe") ||
+        rendererLower.contains("swrast") ||
+        rendererLower.contains("softpipe")) {
+        info.isSoftwareOpenGL = true;
     }
 
     // ── VRAM detection (best-effort, platform-specific) ──
 #if defined(Q_OS_WIN)
     // Windows: VRAM detection via registry is unreliable; best-effort fallback to 0.0
-    try {
-        // Attempt to read from registry HKLM\SYSTEM\CurrentControlSet\Control\Video
-        // This is unreliable as GPU VRAM is not consistently stored in registry
-        // Fallback: 0.0
-        info.gpuVramMB = 0.0;
-    } catch (...) {
-        info.gpuVramMB = 0.0;
-    }
+    info.gpuVramMB = 0.0;
 
 #elif defined(Q_OS_LINUX)
     // Linux: Try AMD VRAM from sysfs, then NVIDIA via nvidia-smi subprocess
-    try {
-        std::ifstream vramFile("/sys/class/drm/card0/device/mem_info_vram_total");
-        if (vramFile.is_open()) {
-            long long vramBytes = 0;
-            vramFile >> vramBytes;
-            if (vramBytes > 0) {
-                info.gpuVramMB = static_cast<double>(vramBytes) / (1024.0 * 1024.0);
-            }
-        } else {
-            // Try NVIDIA: read nvidia-smi output
-            // Best-effort: subprocess may not be available; fallback to 0.0
-            info.gpuVramMB = 0.0;
+    std::ifstream vramFile("/sys/class/drm/card0/device/mem_info_vram_total");
+    if (vramFile.is_open()) {
+        long long vramBytes = 0;
+        vramFile >> vramBytes;
+        if (vramBytes > 0) {
+            info.gpuVramMB = static_cast<double>(vramBytes) / (1024.0 * 1024.0);
         }
-    } catch (...) {
+    } else {
+        // Try NVIDIA: read nvidia-smi output
+        // Best-effort: subprocess may not be available; fallback to 0.0
         info.gpuVramMB = 0.0;
     }
 
