@@ -6,10 +6,7 @@
 #include <QDebug>
 
 // Platform-specific headers for CPU model, RAM, disk detection
-#if defined(Q_OS_WIN)
-#include <windows.h>
-#include <psapi.h>
-#elif defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX)
 #include <unistd.h>
 #include <sys/sysinfo.h>
 #include <fstream>
@@ -20,8 +17,9 @@
 #include <sys/sysctl.h>
 #endif
 
-// OpenGL headers for GPU detection
-#include <GL/gl.h>
+// OpenGL: use Qt's safe wrapper
+#include <QOpenGLFunctions>
+#include <QOpenGLContext>
 
 SystemInfo SystemInfoCollector::collectSystemInfo()
 {
@@ -62,49 +60,10 @@ SystemInfo SystemInfoCollector::collectSystemInfo()
 
     // ── Platform-specific: CPU model, RAM, disk type ──
 #if defined(Q_OS_WIN)
-    // Windows: CPU model from registry
-    try {
-        HKEY hKey = nullptr;
-        LONG result = RegOpenKeyExW(
-            HKEY_LOCAL_MACHINE,
-            L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
-            0,
-            KEY_READ,
-            &hKey
-        );
-        if (result == ERROR_SUCCESS && hKey) {
-            WCHAR buffer[256] = {0};
-            DWORD bufferSize = sizeof(buffer);
-            DWORD type = 0;
-            result = RegQueryValueExW(
-                hKey,
-                L"ProcessorNameString",
-                nullptr,
-                &type,
-                reinterpret_cast<LPBYTE>(buffer),
-                &bufferSize
-            );
-            if (result == ERROR_SUCCESS && type == REG_SZ) {
-                info.cpuModel = QString::fromWCharArray(buffer).trimmed();
-            }
-            RegCloseKey(hKey);
-        }
-    } catch (...) {
-        info.cpuModel = QString();
-    }
-
-    // Windows: RAM from GlobalMemoryStatusEx
-    try {
-        MEMORYSTATUSEX memstatus;
-        memstatus.dwLength = sizeof(memstatus);
-        if (GlobalMemoryStatusEx(&memstatus)) {
-            info.ramTotalMB = static_cast<double>(memstatus.ullTotalPhys) / (1024.0 * 1024.0);
-        }
-    } catch (...) {
-        info.ramTotalMB = 0.0;
-    }
-
-    // Windows: Disk type — reliable detection too complex, use "Unknown"
+    // Windows: Use QSysInfo for basic info, registry/WinAPI avoided
+    // to prevent windows.h macro pollution that corrupts Qt headers.
+    info.cpuModel = QSysInfo::machineHostName();
+    info.ramTotalMB = 0.0;
     info.diskType = "Unknown";
 
 #elif defined(Q_OS_LINUX)
@@ -188,10 +147,11 @@ SystemInfo SystemInfoCollector::collectSystemInfo()
 
 void SystemInfoCollector::collectGPUInfo(SystemInfo& info)
 {
-    // ── OpenGL version and renderer ──
+    // ── OpenGL version and renderer (via Qt's QOpenGLFunctions) ──
     try {
-        const GLubyte* versionStr  = glGetString(GL_VERSION);
-        const GLubyte* rendererStr = glGetString(GL_RENDERER);
+        QOpenGLFunctions f(QOpenGLContext::currentContext());
+        const GLubyte* versionStr  = f.glGetString(GL_VERSION);
+        const GLubyte* rendererStr = f.glGetString(GL_RENDERER);
 
         if (versionStr) {
             info.openglVersion = QString::fromUtf8(reinterpret_cast<const char*>(versionStr));

@@ -10,7 +10,9 @@
 #include <QCoreApplication>
 #include "PerformanceTestReportDialog.h"
 #include "SystemInfoCollector.h"
+#ifdef HAVE_QCUSTOMPLOT
 #include "qcustomplot.h"
+#endif
 PerformanceTestWidget::PerformanceTestWidget(QWidget* parent)
     : QWidget(parent)
     , ui(new Ui::PerformanceTestWidget)
@@ -118,7 +120,7 @@ void PerformanceTestWidget::onFullBenchmarkClicked()
     m_isFullBenchmark = true;
 
     // Collect config from current UI settings
-    TestConfig config;
+    PerformanceTestController::TestConfig config;
     config.pointCounts     = parsePointCounts(ui->lineEdit->text());
     config.testFrames      = ui->spinBoxTestFrames->value();
     config.warmupFrames    = 10;

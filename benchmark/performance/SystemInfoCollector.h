@@ -57,6 +57,5 @@ public:
     static void collectGPUInfo(SystemInfo& info);
 };
 
-Q_DECLARE_METATYPE(SystemInfo)
 
 #endif // SYSTEMINFOCOLLECTOR_H
