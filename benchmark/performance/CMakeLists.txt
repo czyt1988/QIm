@@ -1,4 +1,4 @@
-﻿# CMakeLists.txt
+# CMakeLists.txt
 cmake_minimum_required(VERSION 3.16)
 project(PlotPerformance VERSION 0.1 LANGUAGES CXX)
 
@@ -38,6 +38,8 @@ list(APPEND APP_SOURCE_FILES
     PerformanceTestReportDialog.h
     PerformanceTestReportDialog.cpp
     PerformanceTestReportDialog.ui
+    SystemInfoCollector.h
+    SystemInfoCollector.cpp
 )
 
 message(STATUS "APP_SOURCE_FILES=${APP_SOURCE_FILES}")
@@ -105,6 +107,13 @@ if(ENABLE_QWT)
         Qt${QT_VERSION_MAJOR}::Concurrent
     )
 endif()
+# OpenGL is required for SystemInfoCollector (collectGPUInfo uses GL headers)
+find_package(OpenGL REQUIRED)
+target_link_libraries(PlotPerformance PRIVATE
+    OpenGL::GL     # opengl32.lib
+    OpenGL::GLU    # glu32.lib
+)
+
 if(ENABLE_QCUSTOMPLOT)
     target_compile_definitions(PlotPerformance PUBLIC
         HAVE_QCUSTOMPLOT
@@ -112,13 +121,6 @@ if(ENABLE_QCUSTOMPLOT)
     )
     target_include_directories(PlotPerformance PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/qcustomplot
-    )
-    # 查找 OpenGL 包
-    find_package(OpenGL REQUIRED)
-    # 链接 OpenGL 和 GLU 库
-    target_link_libraries(PlotPerformance PRIVATE
-        OpenGL::GL     # opengl32.lib
-        OpenGL::GLU    # glu32.lib
     )
 endif()
 if(ENABLE_QTCHARTS)
