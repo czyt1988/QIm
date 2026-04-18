@@ -43,10 +43,6 @@ QIm使用PIMPL模式，将实现细节封装在`private`成员中。PIMPL模式�
 // 在 PrivateData 中声明颜色属性
 class QImPlotLineItemNode::PrivateData
 {
-    // 改进前：冗长的类型声明
-    // std::optional<QImTrackedValue<ImVec4, ImVecComparator<ImVec4>>> color;
-    
-    // 改进后：清晰的类型别名
     QImOptionalColor color;  ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
 };
 
@@ -307,3 +303,5 @@ examples/qimfigure-test/functions/
 3. **枚举语义转换规范**: `docs\zh\dev\flag-mapping.md`
 
 这些文档你可以通过**开发规范索引**了解详情: `docs\zh\dev\index.md`
+
+你如果要编译和构建，必须阅读`build.md`

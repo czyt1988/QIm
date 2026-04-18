@@ -16,6 +16,8 @@
 - **Qt**: 安装到 `C:\Qt\6.x.x\msvc2019_64`（当前环境：`C:\Qt\6.7.3\msvc2019_64`）
 - **Visual Studio 2019**: 安装 MSVC v142 生成工具（当前环境：VS2019 Community）
 
+如果未确认，首先需要了解当前环境有哪些`Qt`和对应匹配的`Visual Studio`，`Qt`版本一定要和`Visual Studio`编译器的版本对应，否则会异常
+
 ### 方法一：Visual Studio 生成器（推荐）
 
 **这是最可靠的方式**，CMake 的 VS 生成器会自动检测 MSVC 编译器，无需手动配置环境变量。
@@ -41,26 +43,6 @@ cmake --build build --config Release
 cmake -S . -B build -G Ninja -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64" -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
-
-### 方法三：使用 build.cmd 脚本
-
-项目根目录有 `build.cmd` 脚本，会自动检测 Qt 和生成器：
-
-```cmd
-:: 首次构建（自动配置 + 编译）
-build.cmd
-
-:: 重新配置
-build.cmd reconfig
-
-:: Debug 构建
-build.cmd debug
-
-:: 清理
-build.cmd clean
-```
-
-> **注意**：`build.cmd` 是 Windows 批处理脚本，需在 CMD 中运行，不支持 PowerShell 直接调用。
 
 ## 常见构建问题
 

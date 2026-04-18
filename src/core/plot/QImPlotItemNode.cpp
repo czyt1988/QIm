@@ -123,7 +123,6 @@ bool QImPlotItemNode::isLegendHovered() const
     return false;
 }
 
-
 bool QImPlotItemNode::isVisible() const
 {
     ImPlotItem* plotItem = d_ptr->plotItem;
@@ -131,25 +130,18 @@ bool QImPlotItemNode::isVisible() const
         // 渲染后返回 ImPlot 的实际状态
         return plotItem->Show;
     }
-    // 首次渲染前返回用户设置的预期状态
-    return d_ptr->userVisible;
+    return false;
 }
 
 void QImPlotItemNode::setVisible(bool visible)
 {
-    // 记录用户的可见性设置（用于首次渲染）
-    if (d_ptr->userVisible != visible) {
-        d_ptr->userVisible = visible;
-    }
-    
     ImPlotItem* plotItem = d_ptr->plotItem;
     if (plotItem) {
         // 渲染后同步到 ImPlotItem
         plotItem->Show = visible;
+        // 此函数同步根节点的可见性状态，同时会触发信号
+        QImAbstractNode::setVisible(visible);
     }
-    
-    // 触发信号（无论 plotItem 是否存在）
-    QImAbstractNode::setVisible(visible);
 }
 
 void QImPlotItemNode::endDraw()
@@ -161,13 +153,18 @@ ImPlotItem* QImPlotItemNode::imPlotItem() const
     return d_ptr->plotItem;
 }
 
+/**
+ * @brief 记录绘图节点
+ *
+ * 记录的过程会把当前节点的可见性状态同步到绘图节点
+ * @param item
+ */
 void QImPlotItemNode::setImPlotItem(ImPlotItem* item)
 {
-    d_ptr->plotItem = item;
-    // 首次设置 plotItem 时，应用用户设置的可见性状态
-    if (item && item->Show != d_ptr->userVisible) {
-        item->Show = d_ptr->userVisible;
+    if (d_ptr->plotItem == item) {
+        return;
     }
+    d_ptr->plotItem = item;
 }
 
 }  // end namespace QIM
