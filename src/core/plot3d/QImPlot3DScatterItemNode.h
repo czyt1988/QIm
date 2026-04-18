@@ -58,73 +58,13 @@ class QIM_CORE_API QImPlot3DScatterItemNode : public QImPlot3DItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlot3DScatterItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DScatterItemNode::color
-     * @brief Color of scatter plot markers
-     *
-     * @details Defines the primary color for scatter plot markers.
-     *          When not set, uses ImPlot3D's default color sequence.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DScatterItemNode::color
-     * @brief 散点图标记的颜色
-     *
-     * @details 定义散点图标记的主要颜色。
-     *          未设置时，使用ImPlot3D的默认颜色序列。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
+    // Color of scatter plot markers
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DScatterItemNode::markerSize
-     * @brief Size of scatter plot markers in pixels
-     *
-     * @details Controls the visual size of markers in the scatter plot.
-     *          Value is in pixels and affects all markers uniformly.
-     *          Default value is IMPLOT3D_AUTO (auto-sized).
-     * @accessors READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DScatterItemNode::markerSize
-     * @brief 散点图标记的大小（像素）
-     *
-     * @details 控制散点图中标记的视觉大小。
-     *          值为像素，统一影响所有标记。
-     *          默认值为IMPLOT3D_AUTO（自动大小）。
-     * @accessors READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged
-     * \endif
-     */
+    // Size of scatter plot markers in pixels
     Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DScatterItemNode::markerShape
-     * @brief Shape of scatter plot markers
-     *
-     * @details Defines the geometric shape used for scatter plot markers.
-     *          Supported shapes include circle, square, diamond, triangles, etc.
-     *          Value corresponds to QImPlot3DMarkerShape enumeration.
-     *          Default shape is QImPlot3DMarkerShape::Circle.
-     * @accessors READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DScatterItemNode::markerShape
-     * @brief 散点图标记的形状
-     *
-     * @details 定义散点图标记使用的几何形状。
-     *          支持的形状包括圆形、正方形、菱形、三角形等。
-     *          值对应QImPlot3DMarkerShape枚举。
-     *          默认形状为QImPlot3DMarkerShape::Circle。
-     * @accessors READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged
-     * \endif
-     */
+    // Shape of scatter plot markers
     Q_PROPERTY(int markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
 
 public:
@@ -144,212 +84,61 @@ public:
         Type = InnerType3D + 1
     };
 
-    /**
-     * \if ENGLISH
-     * @brief Returns the type identifier of this plot item
-     * @return Type value (InnerType3D + 1)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 返回此绘图元素的类型标识符
-     * @return 类型值（InnerType3D + 1）
-     * \endif
-     */
     virtual int type() const override
     {
         return Type;
     }
 
-    /**
-     * \if ENGLISH
-     * @brief Constructs a QImPlot3DScatterItemNode with optional parent
-     * @param parent Parent QObject (typically a QImPlot3DNode)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 构造QImPlot3DScatterItemNode
-     * @param parent 父QObject对象（通常是QImPlot3DNode）
-     * \endif
-     */
+    // Constructs a QImPlot3DScatterItemNode with optional parent
     explicit QImPlot3DScatterItemNode(QObject* parent = nullptr);
 
-    /**
-     * \if ENGLISH
-     * @brief Destructor
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 析构函数
-     * \endif
-     */
+    // Destructor
     ~QImPlot3DScatterItemNode() override;
 
     //----------------------------------------------------
     // Data setting interface
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the XYZ data series for the scatter plot
-     * @param series Pointer to QImAbstractXYZDataSeries (ownership transferred)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置散点图的XYZ数据系列
-     * @param series QImAbstractXYZDataSeries指针（所有权转移）
-     * \endif
-     */
+    // Sets the XYZ data series for the scatter plot
     void setData(QImAbstractXYZDataSeries* series);
 
-    /**
-     * \if ENGLISH
-     * @brief Sets scatter plot data from X, Y, and Z containers
-     * @tparam CX Container type for X coordinates (must store double)
-     * @tparam CY Container type for Y coordinates (must store double)
-     * @tparam CZ Container type for Z coordinates (must store double)
-     * @param x X coordinate container
-     * @param y Y coordinate container
-     * @param z Z coordinate container
-     * @return Pointer to the created data series
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 从X、Y、Z容器设置散点图数据
-     * @tparam CX X坐标容器类型（必须存储double）
-     * @tparam CY Y坐标容器类型（必须存储double）
-     * @tparam CZ Z坐标容器类型（必须存储double）
-     * @param x X坐标容器
-     * @param y Y坐标容器
-     * @param z Z坐标容器
-     * @return 创建的数据系列指针
-     * \endif
-     */
+    // Sets scatter plot data from X, Y, and Z containers
     template<typename CX, typename CY, typename CZ>
     QImAbstractXYZDataSeries* setData(const CX& x, const CY& y, const CZ& z);
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the current XYZ data series
-     * @return Pointer to the data series, or nullptr if not set
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取当前XYZ数据系列
-     * @return 数据系列指针，若未设置则返回nullptr
-     * \endif
-     */
+    // Gets the current XYZ data series
     QImAbstractXYZDataSeries* data() const;
 
     //----------------------------------------------------
     // Style property accessors
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the marker color
-     * @return Current marker color as QColor
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取标记颜色
-     * @return 当前标记颜色（QColor）
-     * \endif
-     */
+    // Gets the marker color
     QColor color() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the marker color
-     * @param c New marker color
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置标记颜色
-     * @param c 新标记颜色
-     * \endif
-     */
+    // Sets the marker color
     void setColor(const QColor& c);
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the marker size in pixels
-     * @return Current marker size, IMPLOT3D_AUTO (-1) means auto-sized
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取标记大小（像素）
-     * @return 当前标记大小，IMPLOT3D_AUTO (-1) 表示自动大小
-     * \endif
-     */
+    // Gets the marker size in pixels
     float markerSize() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the marker size in pixels
-     * @param size New marker size, use IMPLOT3D_AUTO (-1) for auto-size
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置标记大小（像素）
-     * @param size 新标记大小，使用IMPLOT3D_AUTO (-1) 表示自动大小
-     * \endif
-     */
+    // Sets the marker size in pixels
     void setMarkerSize(float size);
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the marker shape
-     * @return Current marker shape as int (corresponds to QImPlot3DMarkerShape)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取标记形状
-     * @return 当前标记形状（int，对应QImPlot3DMarkerShape）
-     * \endif
-     */
+    // Gets the marker shape
     int markerShape() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the marker shape
-     * @param shape New marker shape (QImPlot3DMarkerShape enum value)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置标记形状
-     * @param shape 新标记形状（QImPlot3DMarkerShape枚举值）
-     * \endif
-     */
+    // Sets the marker shape
     void setMarkerShape(int shape);
 
     //----------------------------------------------------
     // ImPlot3DScatterFlags
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the raw ImPlot3DScatterFlags
-     * @return Current scatter flags value
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取原始ImPlot3DScatterFlags
-     * @return 当前散点图标志值
-     * \endif
-     */
+    // Gets the raw ImPlot3DScatterFlags
     int scatterFlags() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the raw ImPlot3DScatterFlags
-     * @param flags New scatter flags value
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置原始ImPlot3DScatterFlags
-     * @param flags 新散点图标志值
-     * \endif
-     */
+    // Sets the raw ImPlot3DScatterFlags
     void setScatterFlags(int flags);
 
 Q_SIGNALS:
@@ -415,21 +204,7 @@ Q_SIGNALS:
     void dataChanged();
 
 protected:
-    /**
-     * \if ENGLISH
-     * @brief Begins drawing the scatter plot
-     * @return true if drawing succeeded, false if no valid data
-     * @details Calls SetNextMarkerStyle and PlotScatter with XYZ data.
-     *          All conversions are done in setters for minimal beginDraw overhead.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 开始绘制散点图
-     * @return true表示绘制成功，false表示无有效数据
-     * @details 调用SetNextMarkerStyle和PlotScatter绘制XYZ数据。
-     *          所有转换都在setter中完成，以最小化beginDraw开销。
-     * \endif
-     */
+    // Begins drawing the scatter plot
     virtual bool beginDraw() override;
 };
 

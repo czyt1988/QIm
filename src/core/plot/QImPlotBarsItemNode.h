@@ -59,69 +59,13 @@ class QIM_CORE_API QImPlotBarsItemNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotBarsItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotBarsItemNode::barWidth
-     * @brief Width of bars in plot units
-     *
-     * @details Controls the visual width of bars in the bar chart.
-     *          Value is in plot units (not pixels).
-     *          Default value is 0.67.
-     * @accessors READ barWidth WRITE setBarWidth NOTIFY barWidthChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotBarsItemNode::barWidth
-     * @brief 柱子的宽度（绘图单位）
-     *
-     * @details 控制柱状图中柱子的视觉宽度。
-     *          值为绘图单位（非像素）。
-     *          默认值为0.67。
-     * @accessors READ barWidth WRITE setBarWidth NOTIFY barWidthChanged
-     * \endif
-     */
+    // Width of bars in plot units (READ barWidth WRITE setBarWidth NOTIFY barWidthChanged)
     Q_PROPERTY(double barWidth READ barWidth WRITE setBarWidth NOTIFY barWidthChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotBarsItemNode::horizontal
-     * @brief Horizontal orientation flag
-     *
-     * @details When true, bars are rendered horizontally on the current y-axis.
-     *          When false, bars are rendered vertically (default).
-     * @accessors READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotBarsItemNode::horizontal
-     * @brief 水平方向标志
-     *
-     * @details 为true时，柱子沿当前y轴水平渲染。
-     *          为false时，柱子垂直渲染（默认）。
-     * @accessors READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged
-     * \endif
-     */
+    // Horizontal orientation flag (READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged)
     Q_PROPERTY(bool horizontal READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotBarsItemNode::color
-     * @brief Color of bars
-     *
-     * @details Defines the primary color for bar chart bars.
-     *          When not set, uses ImPlot's default color sequence.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotBarsItemNode::color
-     * @brief 柱子的颜色
-     *
-     * @details 定义柱状图柱子的主要颜色。
-     *          未设置时，使用ImPlot的默认颜色序列。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
+    // Color of bars (READ color WRITE setColor NOTIFY colorChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:

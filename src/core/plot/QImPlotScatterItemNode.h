@@ -58,174 +58,25 @@ class QIM_CORE_API QImPlotScatterItemNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotScatterItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotScatterItemNode::markerSize
-     * @brief Size of scatter plot markers in pixels
-     *
-     * @details Controls the visual size of markers in the scatter plot.
-     *          Value is in pixels and affects all markers uniformly.
-     *          Default value is 4.0 pixels.
-     * @accessors READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotScatterItemNode::markerSize
-     * @brief 散点图标记的大小（像素）
-     *
-     * @details 控制散点图中标记的视觉大小。
-     *          值为像素，统一影响所有标记。
-     *          默认值为4.0像素。
-     * @accessors READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged
-     * \endif
-     */
+    // Size of scatter plot markers in pixels (READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged)
     Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotScatterItemNode::markerShape
-     * @brief Shape of scatter plot markers
-     *
-     * @details Defines the geometric shape used for scatter plot markers.
-     *          Supported shapes include circle, square, diamond, triangles, etc.
-     *          Value corresponds to ImPlotMarker enumeration.
-     *          Default shape is ImPlotMarker_Circle.
-     * @accessors READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotScatterItemNode::markerShape
-     * @brief 散点图标记的形状
-     *
-     * @details 定义散点图标记使用的几何形状。
-     *          支持的形状包括圆形、正方形、菱形、三角形等。
-     *          值对应ImPlotMarker枚举。
-     *          默认形状为ImPlotMarker_Circle。
-     * @accessors READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged
-     * \endif
-     */
+    // Shape of scatter plot markers, corresponds to ImPlotMarker enum (READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
     Q_PROPERTY(int markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotScatterItemNode::markerFill
-     * @brief Fill style for scatter plot markers
-     *
-     * @details Controls whether markers are filled or outlined only.
-     *          When true, markers are filled with color.
-     *          When false, only marker outlines are drawn.
-     *          Default value is true (filled markers).
-     * @accessors READ isMarkerFill WRITE setMarkerFill NOTIFY markerFillChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotScatterItemNode::markerFill
-     * @brief 散点图标记的填充样式
-     *
-     * @details 控制标记是填充还是仅轮廓。
-     *          为true时，标记用颜色填充。
-     *          为false时，仅绘制标记轮廓。
-     *          默认值为true（填充标记）。
-     * @accessors READ isMarkerFill WRITE setMarkerFill NOTIFY markerFillChanged
-     * \endif
-     */
+    // Fill style for markers, true=filled false=outline only (READ isMarkerFill WRITE setMarkerFill NOTIFY markerFillChanged)
     Q_PROPERTY(bool markerFill READ isMarkerFill WRITE setMarkerFill NOTIFY markerFillChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotScatterItemNode::adaptiveSampling
-     * @brief Enable/disable adaptive sampling for large datasets
-     *
-     * @details When enabled, applies downsampling algorithms (LTTB/MinMaxLTTB)
-     *          to reduce rendering load for datasets exceeding downsampleThreshold.
-     *          Preserves visual characteristics while improving performance.
-     *          Default value is true (adaptive sampling enabled).
-     * @accessors READ isAdaptiveSampling WRITE setAdaptiveSampling NOTIFY adaptiveSamplingChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotScatterItemNode::adaptiveSampling
-     * @brief 启用/禁用大数据集的自适应采样
-     *
-     * @details 启用时，对超过downsampleThreshold的数据集应用降采样算法（LTTB/MinMaxLTTB），
-     *          以减少渲染负载。在提高性能的同时保留视觉特征。
-     *          默认值为true（启用自适应采样）。
-     * @accessors READ isAdaptiveSampling WRITE setAdaptiveSampling NOTIFY adaptiveSamplingChanged
-     * \endif
-     */
+    // Enable/disable adaptive sampling for large datasets (READ isAdaptiveSampling WRITE setAdaptiveSampling NOTIFY adaptiveSamplingChanged)
     Q_PROPERTY(bool adaptiveSampling READ isAdaptiveSampling WRITE setAdaptiveSampling NOTIFY adaptiveSamplingChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotScatterItemNode::downsampleThreshold
-     * @brief Dataset size threshold for triggering adaptive sampling
-     *
-     * @details When dataset size exceeds this value and adaptive sampling is enabled,
-     *          downsampling algorithms are applied to reduce data points.
-     *          Value represents number of data points.
-     *          Default value is 20000 points.
-     * @accessors READ downsampleThreshold WRITE setDownsampleThreshold NOTIFY downsampleThresholdChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotScatterItemNode::downsampleThreshold
-     * @brief 触发自适应采样的数据集大小阈值
-     *
-     * @details 当数据集大小超过此值且自适应采样启用时，
-     *          应用降采样算法以减少数据点。
-     *          值表示数据点数量。
-     *          默认值为20000点。
-     * @accessors READ downsampleThreshold WRITE setDownsampleThreshold NOTIFY downsampleThresholdChanged
-     * \endif
-     */
+    // Dataset size threshold for triggering adaptive sampling (READ downsampleThreshold WRITE setDownsampleThreshold NOTIFY downsampleThresholdChanged)
     Q_PROPERTY(int downsampleThreshold READ downsampleThreshold WRITE setDownsampleThreshold NOTIFY downsampleThresholdChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotScatterItemNode::color
-     * @brief Color of scatter plot markers
-     *
-     * @details Defines the primary color for scatter plot markers.
-     *          Affects both fill and outline colors based on markerFill setting.
-     *          When not set, uses ImPlot's default color sequence.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotScatterItemNode::color
-     * @brief 散点图标记的颜色
-     *
-     * @details 定义散点图标记的主要颜色。
-     *          根据markerFill设置影响填充和轮廓颜色。
-     *          未设置时，使用ImPlot的默认颜色序列。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
+    // Color of scatter plot markers (READ color WRITE setColor NOTIFY colorChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotScatterItemNode::clippingEnabled
-     * @brief Enable/disable clipping of markers at plot edges
-     *
-     * @details When true, markers at the edge of a plot will be clipped.
-     *          When false, markers on the edge will not be clipped (may extend beyond plot area).
-     *          Corresponds to negated ImPlotScatterFlags_NoClip.
-     *          Default value is true (clipping enabled, NoClip not set).
-     * @accessors READ isClippingEnabled WRITE setClippingEnabled NOTIFY scatterFlagChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotScatterItemNode::clippingEnabled
-     * @brief 启用/禁用绘图边缘标记裁剪
-     *
-     * @details 为true时，绘图边缘的标记将被裁剪。
-     *          为false时，边缘标记不会被裁剪（可能超出绘图区域）。
-     *          对应于反转的 ImPlotScatterFlags_NoClip。
-     *          默认值为true（启用裁剪，NoClip未设置）。
-     * @accessors READ isClippingEnabled WRITE setClippingEnabled NOTIFY scatterFlagChanged
-     * \endif
-     */
+    // Enable/disable clipping of markers at plot edges, corresponds to negated ImPlotScatterFlags_NoClip (READ isClippingEnabled WRITE setClippingEnabled NOTIFY scatterFlagChanged)
     Q_PROPERTY(bool clippingEnabled READ isClippingEnabled WRITE setClippingEnabled NOTIFY scatterFlagChanged)
 
 public:
@@ -248,7 +99,7 @@ public:
     ~QImPlotScatterItemNode();
 
     //----------------------------------------------------
-    // 数据设置接口
+    // Data setting interface
     //----------------------------------------------------
 
     // Sets the data series for the scatter plot
@@ -266,7 +117,7 @@ public:
     QImAbstractXYDataSeries* data() const;
 
     //----------------------------------------------------
-    // 样式属性访问器
+    // Style property accessors
     //----------------------------------------------------
 
     // Gets the marker size in pixels
@@ -459,7 +310,7 @@ protected:
     virtual bool beginDraw() override;
 };
 
-// 模板函数实现
+// Template function implementations
 template< typename ContainerX, typename ContainerY >
 inline QImAbstractXYDataSeries* QImPlotScatterItemNode::setData(const ContainerX& x, const ContainerY& y)
 {

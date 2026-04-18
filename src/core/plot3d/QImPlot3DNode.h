@@ -74,187 +74,55 @@ class QIM_CORE_API QImPlot3DNode : public QImAbstractNode
     Q_DISABLE_COPY(QImPlot3DNode)
 
 public:
-    /**
-     * \if ENGLISH
-     * @brief Constructor with optional parent
-     * @param parent Parent QObject for memory management
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 构造函数，可选父对象
-     * @param parent 用于内存管理的父 QObject
-     * \endif
-     */
+    // Constructor with optional parent
     explicit QImPlot3DNode(QObject* parent = nullptr);
 
-    /**
-     * \if ENGLISH
-     * @brief Constructor with title and optional parent
-     * @param title Plot title text
-     * @param parent Parent QObject for memory management
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 构造函数，带标题和可选父对象
-     * @param title 绘图标题文本
-     * @param parent 用于内存管理的父 QObject
-     * \endif
-     */
+    // Constructor with title and optional parent
     explicit QImPlot3DNode(const QString& title, QObject* parent = nullptr);
 
-    /**
-     * \if ENGLISH
-     * @brief Destructor
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 析构函数
-     * \endif
-     */
+    // Destructor
     ~QImPlot3DNode() override;
 
     //----------------------------------------------------
     // Title
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the plot title text
-     * @return Current title as QString
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取绘图标题文本
-     * @return 当前标题，QString 格式
-     * \endif
-     */
+    // Gets the plot title text
     QString title() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the plot title text
-     * @param title New title text
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置绘图标题文本
-     * @param title 新标题文本
-     * \endif
-     */
+    // Sets the plot title text
     void setTitle(const QString& title);
 
     //----------------------------------------------------
     // Size
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the plot frame size
-     * @return Current size as QSizeF
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取绘图框架尺寸
-     * @return 当前尺寸，QSizeF 格式
-     * \endif
-     */
+    // Gets the plot frame size
     QSizeF size() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the plot frame size
-     * @param size New size (QSizeF(-1,-1) for auto-size)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置绘图框架尺寸
-     * @param size 新尺寸（QSizeF(-1,-1) 表示自动尺寸）
-     * \endif
-     */
+    // Sets the plot frame size
     void setSize(const QSizeF& size);
 
-    /**
-     * \if ENGLISH
-     * @brief Checks if auto-size mode is enabled
-     * @return true if plot uses auto-fill size, false if using explicit size
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查是否启用自动尺寸模式
-     * @return true 表示使用自动填充尺寸，false 表示使用显式尺寸
-     * \endif
-     */
+    // Checks if auto-size mode is enabled
     bool isAutoSize() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Enables or disables auto-size mode
-     * @param enabled true for auto-fill, false for explicit size
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 启用或禁用自动尺寸模式
-     * @param enabled true 表示自动填充，false 表示显式尺寸
-     * \endif
-     */
+    // Enables or disables auto-size mode
     void setAutoSize(bool enabled);
 
     //----------------------------------------------------
     // Axis management (3 axes: X, Y, Z)
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Gets axis info by axis ID
-     * @param aid Axis identifier (X1, Y1, or Z1)
-     * @return Pointer to QImPlot3DAxisInfo, nullptr if invalid
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 根据轴 ID 获取坐标轴信息
-     * @param aid 轴标识符（X1、Y1 或 Z1）
-     * @return QImPlot3DAxisInfo 指针，无效则返回 nullptr
-     * \endif
-     */
+    // Gets axis info by axis ID
     QImPlot3DAxisInfo* axisInfo(QImPlot3DAxisId aid) const;
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the X axis info
-     * @return Pointer to X-axis QImPlot3DAxisInfo
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取 X 轴信息
-     * @return X 轴 QImPlot3DAxisInfo 指针
-     * \endif
-     */
+    // Gets the X axis info
     QImPlot3DAxisInfo* xAxis() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the Y axis info
-     * @return Pointer to Y-axis QImPlot3DAxisInfo
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取 Y 轴信息
-     * @return Y 轴 QImPlot3DAxisInfo 指针
-     * \endif
-     */
+    // Gets the Y axis info
     QImPlot3DAxisInfo* yAxis() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the Z axis info
-     * @return Pointer to Z-axis QImPlot3DAxisInfo
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取 Z 轴信息
-     * @return Z 轴 QImPlot3DAxisInfo 指针
-     * \endif
-     */
+    // Gets the Z axis info
     QImPlot3DAxisInfo* zAxis() const;
 
     //----------------------------------------------------
@@ -305,144 +173,34 @@ public:
     // 3D rotation and scale
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the plot box rotation angles
-     * @param elevation Elevation angle in degrees
-     * @param azimuth Azimuth angle in degrees
-     * @param animate Whether to animate rotation (default false)
-     * @param cond Application condition (default Once)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置绘图盒子旋转角度
-     * @param elevation 仰角（度）
-     * @param azimuth 方位角（度）
-     * @param animate 是否动画旋转（默认 false）
-     * @param cond 应用条件（默认 Once）
-     * \endif
-     */
+    // Sets the plot box rotation angles
     void setBoxRotation(double elevation, double azimuth, bool animate = false, QImPlot3DCondition cond = QImPlot3DCondition::Once);
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the plot box initial rotation (for double-click reset)
-     * @param elevation Initial elevation angle in degrees
-     * @param azimuth Initial azimuth angle in degrees
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置绘图盒子初始旋转（用于双击重置）
-     * @param elevation 初始仰角（度）
-     * @param azimuth 初始方位角（度）
-     * \endif
-     */
+    // Sets the plot box initial rotation (for double-click reset)
     void setBoxInitialRotation(double elevation, double azimuth);
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the plot box scale factors
-     * @param x X-axis scale factor (default 1.0)
-     * @param y Y-axis scale factor (default 1.0)
-     * @param z Z-axis scale factor (default 1.0)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置绘图盒子缩放因子
-     * @param x X 轴缩放因子（默认 1.0）
-     * @param y Y 轴缩放因子（默认 1.0）
-     * @param z Z 轴缩放因子（默认 1.0）
-     * \endif
-     */
+    // Sets the plot box scale factors
     void setBoxScale(double x, double y, double z);
 
     //----------------------------------------------------
     // Item management
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Adds a 3D plot item as child
-     * @param item Pointer to QImPlot3DItemNode to add
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 添加 3D 绘图元素作为子节点
-     * @param item 要添加的 QImPlot3DItemNode 指针
-     * \endif
-     */
+    // Adds a 3D plot item as child
     void addPlot3DItem(QImPlot3DItemNode* item);
 
-    /**
-     * \if ENGLISH
-     * @brief Gets all 3D plot item children
-     * @return List of QImPlot3DItemNode pointers
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取所有 3D 绘图元素子节点
-     * @return QImPlot3DItemNode 指针列表
-     * \endif
-     */
+    // Gets all 3D plot item children
     QList<QImPlot3DItemNode*> plot3DItemNodes() const;
 
     //----------------------------------------------------
     // Quick add template methods
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Quick add a line plot item
-     * @tparam CX Container type for X coordinates
-     * @tparam CY Container type for Y coordinates
-     * @tparam CZ Container type for Z coordinates
-     * @param x X coordinate data
-     * @param y Y coordinate data
-     * @param z Z coordinate data
-     * @param label Item label for legend
-     * @return Pointer to created QImPlot3DLineItemNode
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 快速添加线条绘图元素
-     * @tparam CX X 坐标容器类型
-     * @tparam CY Y 坐标容器类型
-     * @tparam CZ Z 坐标容器类型
-     * @param x X 坐标数据
-     * @param y Y 坐标数据
-     * @param z Z 坐标数据
-     * @param label 图例中的元素标签
-     * @return 创建的 QImPlot3DLineItemNode 指针
-     * \endif
-     */
+    // Quick add a line plot item
     template<typename CX, typename CY, typename CZ>
     QImPlot3DLineItemNode* addLine(const CX& x, const CY& y, const CZ& z, const QString& label);
 
-    /**
-     * \if ENGLISH
-     * @brief Quick add a scatter plot item
-     * @tparam CX Container type for X coordinates
-     * @tparam CY Container type for Y coordinates
-     * @tparam CZ Container type for Z coordinates
-     * @param x X coordinate data
-     * @param y Y coordinate data
-     * @param z Z coordinate data
-     * @param label Item label for legend
-     * @return Pointer to created QImPlot3DScatterItemNode
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 快速添加散点绘图元素
-     * @tparam CX X 坐标容器类型
-     * @tparam CY Y 坐标容器类型
-     * @tparam CZ Z 坐标容器类型
-     * @param x X 坐标数据
-     * @param y Y 坐标数据
-     * @param z Z 坐标数据
-     * @param label 图例中的元素标签
-     * @return 创建的 QImPlot3DScatterItemNode 指针
-     * \endif
-     */
+    // Quick add a scatter plot item
     template<typename CX, typename CY, typename CZ>
     QImPlot3DScatterItemNode* addScatter(const CX& x, const CY& y, const CZ& z, const QString& label);
 
@@ -450,19 +208,7 @@ public:
     // Interaction query
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Checks if plot is hovered by mouse
-     * @return true if mouse is over plot area
-     * @note Must be called inside beginDraw/endDraw block
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查鼠标是否悬停在绘图上
-     * @return true 表示鼠标在绘图区域上方
-     * @note 必须在 beginDraw/endDraw 块内调用
-     * \endif
-     */
+    // Checks if plot is hovered by mouse
     bool isPlot3DHovered() const;
 
 Q_SIGNALS:
@@ -517,32 +263,10 @@ Q_SIGNALS:
     void plot3DFlagChanged();
 
 protected:
-    /**
-     * \if ENGLISH
-     * @brief Begins the 3D plot rendering scope
-     * @return true if BeginPlot succeeded, false otherwise
-     * @details Calls ImPlot3D::BeginPlot, then applies axis setup, rotation, and scale
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 开始 3D 绘图渲染作用域
-     * @return true 表示 BeginPlot 成功，false 表示失败
-     * @details 调用 ImPlot3D::BeginPlot，然后应用坐标轴设置、旋转和缩放
-     * \endif
-     */
+    // Begins the 3D plot rendering scope
     bool beginDraw() override;
 
-    /**
-     * \if ENGLISH
-     * @brief Ends the 3D plot rendering scope
-     * @details Calls ImPlot3D::EndPlot
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 结束 3D 绘图渲染作用域
-     * @details 调用 ImPlot3D::EndPlot
-     * \endif
-     */
+    // Ends the 3D plot rendering scope
     void endDraw() override;
 };
 
