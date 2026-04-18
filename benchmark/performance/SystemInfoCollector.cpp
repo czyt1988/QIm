@@ -4,6 +4,7 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QDebug>
+#include <QCoreApplication>
 
 // Platform-specific headers for CPU model, RAM, disk detection
 #if defined(Q_OS_WIN)
