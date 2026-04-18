@@ -409,6 +409,20 @@ Q_SIGNALS:
      * \endif
      */
     void xRangeChanged();
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when Y range changes
+     * @details Triggered by setYRangeMin() or setYRangeMax() when value actually changes.
+     *          Connect to update UI elements or perform related actions.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief Y范围更改时触发
+     * @details 当值实际更改时由setYRangeMin()或setYRangeMax()触发。
+     *          连接到更新UI元素或执行相关操作。
+     * \endif
+     */
     void yRangeChanged();
 
     /**

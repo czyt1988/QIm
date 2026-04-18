@@ -119,7 +119,8 @@ void QImSubplotsNode::setColumns(int c)
 
 std::vector<float> QImSubplotsNode::rowRatios() const
 {
-    return d_ptr->rowRatios;
+    QIM_DC(d);
+    return d->rowRatios;
 }
 
 void QImSubplotsNode::setRowRatios(const std::vector<float>& row_ratios)
@@ -134,7 +135,8 @@ void QImSubplotsNode::setRowRatios(const std::vector<float>& row_ratios)
 
 std::vector<float> QImSubplotsNode::columnRatios() const
 {
-    return d_ptr->columnRatios;
+    QIM_DC(d);
+    return d->columnRatios;
 }
 
 void QImSubplotsNode::setColumnRatios(const std::vector<float>& col_ratios)
@@ -415,7 +417,8 @@ void QImSubplotsNode::setLinkAllY(bool on)
 
 int QImSubplotsNode::gridCount() const
 {
-    return (d_ptr->cols * d_ptr->rows);
+    QIM_DC(d);
+    return (d->cols * d->rows);
 }
 
 // === Layout direction ===
@@ -525,12 +528,14 @@ void QImSubplotsNode::removePlotNode(QImPlotNode* plot)
 
 bool QImSubplotsNode::isTrackGridRatiosEnabled() const
 {
-    return d_ptr->trackGridRatios;
+    QIM_DC(d);
+    return d->trackGridRatios;
 }
 
 void QImSubplotsNode::setTrackGridRatiosEnabled(bool on)
 {
-    d_ptr->trackGridRatios = on;
+    QIM_D(d);
+    d->trackGridRatios = on;
 }
 
 QImPlotNode* QImSubplotsNode::createPlotNode()

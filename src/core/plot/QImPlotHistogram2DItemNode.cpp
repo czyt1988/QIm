@@ -91,7 +91,8 @@ void QImPlotHistogram2DItemNode::setData(QImAbstractXYDataSeries* series)
  */
 QImAbstractXYDataSeries* QImPlotHistogram2DItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**

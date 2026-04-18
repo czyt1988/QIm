@@ -64,14 +64,47 @@ void QImPlotScatterItemNode::PrivateData::resetDownSamplerData()
 //----------------------------------------------------
 // QImPlotScatterItemNode
 //----------------------------------------------------
+/**
+ * \if ENGLISH
+ * @brief Constructs a QImPlotScatterItemNode with optional parent
+ * @param[in] par Parent QObject (typically a QImPlotNode)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造 QImPlotScatterItemNode，可选指定父对象
+ * @param[in] par 父 QObject（通常为 QImPlotNode）
+ * \endif
+ */
 QImPlotScatterItemNode::QImPlotScatterItemNode(QObject* par) : QImPlotItemNode(par), QIM_PIMPL_CONSTRUCT
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for QImPlotScatterItemNode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief QImPlotScatterItemNode 的析构函数
+ * \endif
+ */
 QImPlotScatterItemNode::~QImPlotScatterItemNode()
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the data series for the scatter plot
+ * @param[in] series Pointer to QImAbstractXYDataSeries (ownership transferred)
+ * @details Stores the series, triggers adaptive sampling if enabled, and emits dataChanged() signal.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置散点图的数据系列
+ * @param[in] series QImAbstractXYDataSeries 指针（所有权转移）
+ * @details 存储数据系列，如果启用自适应采样则触发降采样，并触发 dataChanged() 信号。
+ * \endif
+ */
 void QImPlotScatterItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
@@ -82,9 +115,21 @@ void QImPlotScatterItemNode::setData(QImAbstractXYDataSeries* series)
     Q_EMIT dataChanged();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the current data series
+ * @return Pointer to QImAbstractXYDataSeries, nullptr if no data set
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取当前数据系列
+ * @return QImAbstractXYDataSeries 指针，无数据时返回 nullptr
+ * \endif
+ */
 QImAbstractXYDataSeries* QImPlotScatterItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 
@@ -370,7 +415,8 @@ void QImPlotScatterItemNode::setDownsampleThreshold(int threshold)
  */
 QColor QImPlotScatterItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -396,7 +442,8 @@ QColor QImPlotScatterItemNode::color() const
  */
 void QImPlotScatterItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
     Q_EMIT colorChanged(c);
 }
 

@@ -88,7 +88,8 @@ void QImPlotPieChartItemNode::setData(QImAbstractPieChartDataSeries* series)
  */
 QImAbstractPieChartDataSeries* QImPlotPieChartItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**

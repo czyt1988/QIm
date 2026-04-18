@@ -68,7 +68,8 @@ QImPlotTextItemNode::~QImPlotTextItemNode()
  */
 QString QImPlotTextItemNode::text() const
 {
-    return QString::fromUtf8(d_ptr->textUtf8);
+    QIM_DC(d);
+    return QString::fromUtf8(d->textUtf8);
 }
 
 /**
@@ -84,9 +85,10 @@ QString QImPlotTextItemNode::text() const
  */
 void QImPlotTextItemNode::setText(const QString& text)
 {
+    QIM_D(d);
     QByteArray utf8 = text.toUtf8();
-    if (d_ptr->textUtf8 != utf8) {
-        d_ptr->textUtf8 = utf8;
+    if (d->textUtf8 != utf8) {
+        d->textUtf8 = utf8;
         Q_EMIT textChanged(text);
     }
 }
@@ -104,7 +106,8 @@ void QImPlotTextItemNode::setText(const QString& text)
  */
 QPointF QImPlotTextItemNode::position() const
 {
-    return QPointF(d_ptr->position.x, d_ptr->position.y);
+    QIM_DC(d);
+    return QPointF(d->position.x, d->position.y);
 }
 
 /**
@@ -138,9 +141,10 @@ void QImPlotTextItemNode::setPosition(const QPointF& pos)
  */
 void QImPlotTextItemNode::setPosition(double x, double y)
 {
-    if (d_ptr->position.x != x || d_ptr->position.y != y) {
-        d_ptr->position.x = x;
-        d_ptr->position.y = y;
+    QIM_D(d);
+    if (d->position.x != x || d->position.y != y) {
+        d->position.x = x;
+        d->position.y = y;
         Q_EMIT positionChanged(QPointF(x, y));
     }
 }
@@ -158,7 +162,8 @@ void QImPlotTextItemNode::setPosition(double x, double y)
  */
 QPointF QImPlotTextItemNode::pixelOffset() const
 {
-    return QPointF(d_ptr->pixelOffset.x, d_ptr->pixelOffset.y);
+    QIM_DC(d);
+    return QPointF(d->pixelOffset.x, d->pixelOffset.y);
 }
 
 /**
@@ -192,9 +197,10 @@ void QImPlotTextItemNode::setPixelOffset(const QPointF& offset)
  */
 void QImPlotTextItemNode::setPixelOffset(float dx, float dy)
 {
-    if (d_ptr->pixelOffset.x != dx || d_ptr->pixelOffset.y != dy) {
-        d_ptr->pixelOffset.x = dx;
-        d_ptr->pixelOffset.y = dy;
+    QIM_D(d);
+    if (d->pixelOffset.x != dx || d->pixelOffset.y != dy) {
+        d->pixelOffset.x = dx;
+        d->pixelOffset.y = dy;
         Q_EMIT pixelOffsetChanged(QPointF(dx, dy));
     }
 }
@@ -212,7 +218,8 @@ void QImPlotTextItemNode::setPixelOffset(float dx, float dy)
  */
 bool QImPlotTextItemNode::isVertical() const
 {
-    return d_ptr->flags & ImPlotTextFlags_Vertical;
+    QIM_DC(d);
+    return d->flags & ImPlotTextFlags_Vertical;
 }
 
 /**
@@ -251,7 +258,8 @@ void QImPlotTextItemNode::setVertical(bool vertical)
  */
 QColor QImPlotTextItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -267,7 +275,8 @@ QColor QImPlotTextItemNode::color() const
  */
 void QImPlotTextItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
     Q_EMIT colorChanged(c);
 }
 

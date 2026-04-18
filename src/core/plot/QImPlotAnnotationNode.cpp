@@ -1,4 +1,4 @@
-﻿#include "QImPlotAnnotationNode.h"
+#include "QImPlotAnnotationNode.h"
 #include <optional>
 #include <cstdarg>
 #include "implot.h"
@@ -192,7 +192,8 @@ void QImPlotAnnotationNode::setText(const char* fmt, ...)
  */
 QColor QImPlotAnnotationNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -208,7 +209,8 @@ QColor QImPlotAnnotationNode::color() const
  */
 void QImPlotAnnotationNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
     Q_EMIT colorChanged(c);
 }
 
@@ -225,7 +227,8 @@ void QImPlotAnnotationNode::setColor(const QColor& c)
  */
 QPointF QImPlotAnnotationNode::pixelOffset() const
 {
-    return QPointF(d_ptr->pixelOffset.x, d_ptr->pixelOffset.y);
+    QIM_DC(d);
+    return QPointF(d->pixelOffset.x, d->pixelOffset.y);
 }
 
 /**
@@ -279,7 +282,8 @@ void QImPlotAnnotationNode::setPixelOffset(double x, double y)
  */
 bool QImPlotAnnotationNode::clamp() const
 {
-    return d_ptr->clamp;
+    QIM_DC(d);
+    return d->clamp;
 }
 
 /**
@@ -315,7 +319,8 @@ void QImPlotAnnotationNode::setClamp(bool clamp)
  */
 bool QImPlotAnnotationNode::round() const
 {
-    return d_ptr->round;
+    QIM_DC(d);
+    return d->round;
 }
 
 /**

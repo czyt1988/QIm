@@ -90,7 +90,8 @@ void QImPlotHeatmapItemNode::setData(QImAbstractHeatmapDataSeries* series)
  */
 QImAbstractHeatmapDataSeries* QImPlotHeatmapItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**

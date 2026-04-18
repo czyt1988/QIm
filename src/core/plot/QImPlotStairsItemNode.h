@@ -27,7 +27,7 @@ class QIM_CORE_API QImPlotStairsItemNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotStairsItemNode)
 
-    // 阶梯图标志属性（全部采用肯定语义）
+    // Stairs plot flags (affirmative semantics)
     Q_PROPERTY(bool shaded READ isShaded WRITE setShaded NOTIFY stairsFlagChanged)
 
     /**
@@ -66,7 +66,7 @@ public:
         return Type;
     }
     //----------------------------------------------------
-    // 数据设置
+    // Data setting
     //----------------------------------------------------
     // Set data series for the stairs plot
     void setData(QImAbstractXYDataSeries* series);
@@ -81,7 +81,7 @@ public:
     //----------------------------------------------------
     // ImPlotStairsFlags
     //----------------------------------------------------
-    // 标志访问器（肯定语义）
+    // Flag accessors (affirmative semantics)
     // Check if shaded mode is enabled
     bool isShaded() const;
     // Set shaded mode
@@ -91,7 +91,7 @@ public:
     // Set pre-step mode
     void setPreStep(bool on);
 
-    // 原始标志访问
+    // Raw flag access
     // Get raw ImPlotStairsFlags
     int stairsFlags() const;
     // Set raw ImPlotStairsFlags

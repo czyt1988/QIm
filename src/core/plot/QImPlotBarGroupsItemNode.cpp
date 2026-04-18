@@ -87,7 +87,8 @@ void QImPlotBarGroupsItemNode::setData(QImAbstractBarGroupsDataSeries* series)
  */
 QImAbstractBarGroupsDataSeries* QImPlotBarGroupsItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**
@@ -263,12 +264,13 @@ void QImPlotBarGroupsItemNode::setShift(double shift)
  */
 void QImPlotBarGroupsItemNode::setColor(const QColor& c)
 {
+    QIM_D(d);
     ImVec4 imColor = toImVec4(c);
-    if (d_ptr->color.has_value()) {
-        d_ptr->color->operator=(imColor);
+    if (d->color.has_value()) {
+        d->color->operator=(imColor);
     } else {
-        d_ptr->color.emplace(imColor);
-        d_ptr->color->mark_dirty();
+        d->color.emplace(imColor);
+        d->color->mark_dirty();
     }
     Q_EMIT colorChanged(c);
 }
@@ -286,7 +288,8 @@ void QImPlotBarGroupsItemNode::setColor(const QColor& c)
  */
 QColor QImPlotBarGroupsItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**

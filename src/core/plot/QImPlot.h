@@ -1,11 +1,17 @@
-﻿#ifndef QIMPLOT_H
+#ifndef QIMPLOT_H
 #define QIMPLOT_H
 #include <QMetaType>
 #include "QImAPI.h"
 namespace QIM
 {
 /**
+ * \if ENGLISH
+ * @brief Corresponds to ImAxis
+ * \endif
+ *
+ * \if CHINESE
  * @brief 对应ImAxis
+ * \endif
  */
 enum class QImPlotAxisId
 {
@@ -20,7 +26,20 @@ enum class QImPlotAxisId
 };
 
 /**
- * @brief 对应ImPlotScale
+ * \if ENGLISH
+ * @brief Qt-style wrapper enum for ImPlot scale types
+ * @details Maps ImPlot's ImPlotScale enumeration to Qt-compatible enum class values.
+ *          Defines axis scale transformation modes: Linear (default), Time (date/time axis),
+ *          Log10 (base-10 logarithmic, requires positive values), and SymLog (symmetric
+ *          logarithmic that handles negative values near zero).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief ImPlot刻度类型的Qt风格封装枚举
+ * @details 将ImPlot的ImPlotScale枚举映射为Qt兼容的enum class值。
+ *          定义坐标轴刻度变换模式：Linear（默认线性）、Time（日期/时间轴）、
+ *          Log10（以10为底的对数，要求正值）和SymLog（对称对数，可处理零附近的负值）。
+ * \endif
  */
 enum class QImPlotScaleType
 {
@@ -31,7 +50,23 @@ enum class QImPlotScaleType
 };
 
 /**
- * @brief 对应ImPlotCond
+ * \if ENGLISH
+ * @brief Qt-style wrapper enum for ImPlot condition types
+ * @details Maps ImPlot's ImPlotCond enumeration to Qt-compatible enum class values.
+ *          Controls how axis limits and constraints are applied:
+ *          - None: No constraint applied
+ *          - Always: Constraint applied every frame
+ *          - Once: Constraint applied only on the first frame
+ * \endif
+ *
+ * \if CHINESE
+ * @brief ImPlot条件类型的Qt风格封装枚举
+ * @details 将ImPlot的ImPlotCond枚举映射为Qt兼容的enum class值。
+ *          控制坐标轴限制和约束的应用方式：
+ *          - None：不应用约束
+ *          - Always：每帧都应用约束
+ *          - Once：仅在首帧应用约束
+ * \endif
  */
 enum class QImPlotCondition
 {
@@ -41,25 +76,40 @@ enum class QImPlotCondition
 };
 
 /**
- * @brief ImPlot 图例位置枚举
- * @details 对应 ImPlotLocation 枚举，用于设置图例在绘图区域中的位置
+ * \if ENGLISH
+ * @brief Qt-style wrapper enum for ImPlot legend location
+ * @details Maps ImPlot's ImPlotLocation enumeration to Qt-compatible enum class values
+ *          with bitwise flag semantics. Defines where the legend is positioned within
+ *          the plot area: North/South/West/East edges, corner combinations (NorthWest,
+ *          NorthEast, SouthWest, SouthEast), and Center placement.
+ *          Values are bit flags that can be combined for custom positioning.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief ImPlot图例位置的Qt风格封装枚举
+ * @details 将ImPlot的ImPlotLocation枚举映射为Qt兼容的enum class值，
+ *          采用位标志语义。定义图例在绘图区域中的位置：
+ *          North/South/West/East边缘、角落组合（NorthWest、NorthEast、
+ *          SouthWest、SouthEast）和Center居中放置。
+ *          值为位标志，可组合使用实现自定义定位。
+ * \endif
  */
 enum class QImPlotLegendLocation
 {
-    North     = 1 << 0,  ///< 顶部居中
-    South     = 1 << 1,  ///< 底部居中
-    West      = 1 << 2,  ///< 左侧居中
-    East      = 1 << 3,  ///< 右侧居中
-    NorthWest = 1 << 4,  ///< 左上角
-    NorthEast = 1 << 5,  ///< 右上角
-    SouthWest = 1 << 6,  ///< 左下角
-    SouthEast = 1 << 7,  ///< 右下角
-    Center    = 1 << 8   ///< 居中（自定义扩展）
+    North     = 1 << 0,  ///< Top center
+    South     = 1 << 1,  ///< Bottom center
+    West      = 1 << 2,  ///< Left center
+    East      = 1 << 3,  ///< Right center
+    NorthWest = 1 << 4,  ///< Top-left corner
+    NorthEast = 1 << 5,  ///< Top-right corner
+    SouthWest = 1 << 6,  ///< Bottom-left corner
+    SouthEast = 1 << 7,  ///< Bottom-right corner
+    Center    = 1 << 8   ///< Center (custom extension)
 };
 
-// 判断是否为x轴
+// Check if axis ID is X
 QIM_CORE_API bool isXAxisId(QImPlotAxisId id);
-// 判断是否为y轴
+// Check if axis ID is Y
 QIM_CORE_API bool isYAxisId(QImPlotAxisId id);
 
 // Converts QImPlotAxisId enumeration to ImPlot's ImAxis enumeration value
@@ -88,7 +138,7 @@ Q_DECLARE_METATYPE(QIM::QImPlotScaleType)
 Q_DECLARE_METATYPE(QIM::QImPlotCondition)
 Q_DECLARE_METATYPE(QIM::QImPlotLegendLocation)
 
-// ===== 辅助宏定义=====
+// ===== Helper macros =====
 #ifndef QIMPLOT_FLAG_ACCESSOR
 #define QIMPLOT_FLAG_ACCESSOR(ClassName, FlagName, FlagEnum, emitFunName)                                              \
     bool ClassName::is##FlagName() const                                                                               \
@@ -109,7 +159,7 @@ Q_DECLARE_METATYPE(QIM::QImPlotLegendLocation)
         }                                                                                                              \
     }
 #endif
-// 这个针对 NOXXFlag 进行设置，反转为肯定语义
+// Inverts NoXxx flags to affirmative semantics
 #ifndef QIMPLOT_FLAG_ENABLED_ACCESSOR
 #define QIMPLOT_FLAG_ENABLED_ACCESSOR(ClassName, PropName, FlagEnum, emitFunName)                                      \
     bool ClassName::is##PropName() const                                                                               \

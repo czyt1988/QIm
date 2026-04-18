@@ -83,7 +83,8 @@ QImPlotDragRectNode::~QImPlotDragRectNode()
  */
 QRectF QImPlotDragRectNode::rect() const
 {
-    return QRectF(d_ptr->x1, d_ptr->y1, d_ptr->x2 - d_ptr->x1, d_ptr->y2 - d_ptr->y1);
+    QIM_DC(d);
+    return QRectF(d->x1, d->y1, d->x2 - d->x1, d->y2 - d->y1);
 }
 
 /**
@@ -148,7 +149,8 @@ void QImPlotDragRectNode::setRect(double x1, double y1, double x2, double y2)
  */
 QColor QImPlotDragRectNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -164,7 +166,8 @@ QColor QImPlotDragRectNode::color() const
  */
 void QImPlotDragRectNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
     Q_EMIT colorChanged(c);
 }
 
@@ -181,7 +184,8 @@ void QImPlotDragRectNode::setColor(const QColor& c)
  */
 int QImPlotDragRectNode::id() const
 {
-    return d_ptr->id;
+    QIM_DC(d);
+    return d->id;
 }
 
 /**
@@ -197,8 +201,9 @@ int QImPlotDragRectNode::id() const
  */
 void QImPlotDragRectNode::setId(int id)
 {
-    if (d_ptr->id != id) {
-        d_ptr->id = id;
+    QIM_D(d);
+    if (d->id != id) {
+        d->id = id;
         Q_EMIT idChanged(id);
     }
 }
@@ -216,7 +221,8 @@ void QImPlotDragRectNode::setId(int id)
  */
 int QImPlotDragRectNode::flags() const
 {
-    return d_ptr->flags;
+    QIM_DC(d);
+    return d->flags;
 }
 
 /**
@@ -232,8 +238,9 @@ int QImPlotDragRectNode::flags() const
  */
 void QImPlotDragRectNode::setFlags(int flags)
 {
-    if (d_ptr->flags != flags) {
-        d_ptr->flags = static_cast<ImPlotDragToolFlags>(flags);
+    QIM_D(d);
+    if (d->flags != flags) {
+        d->flags = static_cast<ImPlotDragToolFlags>(flags);
         Q_EMIT flagsChanged(flags);
     }
 }
@@ -307,7 +314,8 @@ void QImPlotDragRectNode::setDelayed(bool on)
  */
 bool QImPlotDragRectNode::clicked() const
 {
-    return d_ptr->clicked;
+    QIM_DC(d);
+    return d->clicked;
 }
 
 /**
@@ -323,7 +331,8 @@ bool QImPlotDragRectNode::clicked() const
  */
 bool QImPlotDragRectNode::hovered() const
 {
-    return d_ptr->hovered;
+    QIM_DC(d);
+    return d->hovered;
 }
 
 /**
@@ -339,7 +348,8 @@ bool QImPlotDragRectNode::hovered() const
  */
 bool QImPlotDragRectNode::held() const
 {
-    return d_ptr->held;
+    QIM_DC(d);
+    return d->held;
 }
 
 /**
@@ -355,7 +365,8 @@ bool QImPlotDragRectNode::held() const
  */
 bool QImPlotDragRectNode::wasModified() const
 {
-    return d_ptr->wasModified;
+    QIM_DC(d);
+    return d->wasModified;
 }
 
 /**

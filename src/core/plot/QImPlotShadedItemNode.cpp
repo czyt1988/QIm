@@ -166,7 +166,8 @@ void QImPlotShadedItemNode::setData(ContainerX&& x, ContainerY1&& y1, ContainerY
  */
 QImAbstractXYDataSeries* QImPlotShadedItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**
@@ -182,7 +183,8 @@ QImAbstractXYDataSeries* QImPlotShadedItemNode::data() const
  */
 QImAbstractXYDataSeries* QImPlotShadedItemNode::data2() const
 {
-    return d_ptr->data2.get();
+    QIM_DC(d);
+    return d->data2.get();
 }
 
 /**
@@ -241,7 +243,8 @@ void QImPlotShadedItemNode::setReferenceValue(double value)
  */
 QColor QImPlotShadedItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -257,12 +260,13 @@ QColor QImPlotShadedItemNode::color() const
  */
 void QImPlotShadedItemNode::setColor(const QColor& c)
 {
+    QIM_D(d);
     ImVec4 imColor = toImVec4(c);
-    if (d_ptr->color.has_value()) {
-        d_ptr->color->operator=(imColor);  // Trigger dirty flag via assignment
+    if (d->color.has_value()) {
+        d->color->operator=(imColor);  // Trigger dirty flag via assignment
     } else {
-        d_ptr->color.emplace(imColor);
-        d_ptr->color->mark_dirty();  // Mark dirty for new color
+        d->color.emplace(imColor);
+        d->color->mark_dirty();  // Mark dirty for new color
     }
     Q_EMIT colorChanged(c);
 }

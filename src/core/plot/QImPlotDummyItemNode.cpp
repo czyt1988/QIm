@@ -64,7 +64,8 @@ QImPlotDummyItemNode::~QImPlotDummyItemNode()
  */
 QColor QImPlotDummyItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -80,7 +81,8 @@ QColor QImPlotDummyItemNode::color() const
  */
 void QImPlotDummyItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
     Q_EMIT colorChanged(c);
 }
 

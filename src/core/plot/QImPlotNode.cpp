@@ -86,27 +86,102 @@ ImPlotAxis* QImPlotNode::PrivateData::imPlotAxis(QImPlotAxisId axisId) const
 
 // ==================== 公共接口实现 ====================
 
+/**
+ * \if ENGLISH
+ * @brief Constructs a QImPlotNode with optional parent
+ * @param[in] parent Parent QObject for ownership management
+ * @details Creates a plot node with default title "##Plot" and auto-size enabled.
+ *          Initializes 6 axes (X1-X3, Y1-Y3) with X1 and Y1 enabled by default.
+ *          Also creates an internal legend node.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造 QImPlotNode，可选指定父对象
+ * @param[in] parent 用于所有权管理的父 QObject
+ * @details 创建标题默认为 "##Plot" 且自动大小启用的绘图节点。
+ *          初始化 6 个坐标轴（X1-X3, Y1-Y3），默认启用 X1 和 Y1。
+ *          同时创建内部图例节点。
+ * \endif
+ */
 QImPlotNode::QImPlotNode(QObject* parent) : QImAbstractNode(parent), QIM_PIMPL_CONSTRUCT
 {
     setObjectName(QStringLiteral("PlotNode"));
 }
 
+/**
+ * \if ENGLISH
+ * @brief Constructs a QImPlotNode with specified title and optional parent
+ * @param[in] title Plot title string (supports ImGui double-hash prefix "##" for hidden titles)
+ * @param[in] parent Parent QObject for ownership management
+ * @details Convenience constructor that sets the plot title immediately after creation.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造 QImPlotNode，指定标题和可选父对象
+ * @param[in] title 绘图标题字符串（支持 ImGui 双井号前缀 "##" 隐藏标题）
+ * @param[in] parent 用于所有权管理的父 QObject
+ * @details 便捷构造函数，创建后立即设置绘图标题。
+ * \endif
+ */
 QImPlotNode::QImPlotNode(const QString& title, QObject* parent) : QImPlotNode(parent)
 {
     setTitle(title);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for QImPlotNode
+ * @details Destroys the plot node and all associated resources.
+ *          Child nodes (axes, items) are automatically destroyed via QObject ownership.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief QImPlotNode 的析构函数
+ * @details 销毁绘图节点及所有关联资源。
+ *          子节点（坐标轴、图形项）通过 QObject 所有权机制自动销毁。
+ * \endif
+ */
 QImPlotNode::~QImPlotNode()
 {
 }
 
 // === 标题 ===
+/**
+ * \if ENGLISH
+ * @brief Gets the plot title text
+ * @return Current title string
+ * @details Returns the UTF-8 decoded title string.
+ *          Titles prefixed with "##" (ImGui convention) are hidden but used as unique identifiers.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取绘图标题文本
+ * @return 当前标题字符串
+ * @details 返回 UTF-8 解码后的标题字符串。
+ *          以 "##" 前缀的标题（ImGui 规范）会被隐藏但用作唯一标识符。
+ * \endif
+ */
 QString QImPlotNode::title() const
 {
     QIM_DC(d);
     return QString::fromUtf8(d->titleUtf8.value());
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the plot title text
+ * @param[in] title New title string (supports "##" prefix for hidden unique IDs)
+ * @details Stores the title as UTF-8 QByteArray internally (render-minimization principle).
+ *          Emits titleChanged() signal only when the value actually changes.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置绘图标题文本
+ * @param[in] title 新标题字符串（支持 "##" 前缀作为隐藏的唯一 ID）
+ * @details 内部将标题存储为 UTF-8 QByteArray（遵循渲染最小化原则）。
+ *          仅在值实际改变时触发 titleChanged() 信号。
+ * \endif
+ */
 void QImPlotNode::setTitle(const QString& title)
 {
     QIM_D(d);
@@ -117,12 +192,44 @@ void QImPlotNode::setTitle(const QString& title)
 }
 
 // === 尺寸 ===
+/**
+ * \if ENGLISH
+ * @brief Gets the plot size in floating-point pixels
+ * @return Current plot size as QSizeF
+ * @details Returns the actual size of the plot area.
+ *          QSizeF(-1,-1) indicates auto-size mode where plot fills available space.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取绘图尺寸（浮点像素）
+ * @return 当前绘图尺寸，以 QSizeF 返回
+ * @details 返回绘图区域的实际大小。
+ *          QSizeF(-1,-1) 表示自动大小模式，绘图将填充可用空间。
+ * \endif
+ */
 QSizeF QImPlotNode::size() const
 {
     QIM_DC(d);
     return toQSizeF(d->size);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the plot size in floating-point pixels
+ * @param[in] size New plot size; QSizeF(-1,-1) enables auto-size mode
+ * @details Converts QSizeF to internal ImVec2 storage. Negative values indicate auto-size.
+ *          Emits sizeChanged() signal only when the size actually changes.
+ *          Also updates autoSize flag based on whether both dimensions are -1.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置绘图尺寸（浮点像素）
+ * @param[in] size 新绘图尺寸；QSizeF(-1,-1) 启用自动大小模式
+ * @details 将 QSizeF 转换为内部 ImVec2 存储。负值表示自动大小。
+ *          仅在尺寸实际改变时触发 sizeChanged() 信号。
+ *          同时根据两个维度是否均为 -1 更新 autoSize 标志。
+ * \endif
+ */
 void QImPlotNode::setSize(const QSizeF& size)
 {
     QIM_D(d);
@@ -141,12 +248,42 @@ void QImPlotNode::setSize(const QSizeF& size)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Checks if auto-size mode is enabled
+ * @return true if plot automatically fills available space
+ * @details Auto-size mode uses ImVec2(-1,-1), making the plot expand to fill parent area.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查自动大小模式是否启用
+ * @return true 表示绘图自动填充可用空间
+ * @details 自动大小模式使用 ImVec2(-1,-1)，使绘图扩展以填充父区域。
+ * \endif
+ */
 bool QImPlotNode::isAutoSize() const
 {
     QIM_DC(d);
     return d->autoSize;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Enables or disables auto-size mode
+ * @param[in] autoSize true to enable auto-size (fills parent), false for fixed size (0,0 default)
+ * @details When enabling auto-size, internal size is set to ImVec2(-1,-1).
+ *          When disabling, size is set to ImVec2(0,0) as default fixed size.
+ *          Emits autoSizeChanged() and sizeChanged() signals on change.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用或禁用自动大小模式
+ * @param[in] autoSize true 启用自动大小（填充父区域），false 固定大小（0,0 默认）
+ * @details 启用自动大小时，内部尺寸设为 ImVec2(-1,-1)。
+ *          禁用时，尺寸设为 ImVec2(0,0) 作为默认固定大小。
+ *          值改变时触发 autoSizeChanged() 和 sizeChanged() 信号。
+ * \endif
+ */
 void QImPlotNode::setAutoSize(bool autoSize)
 {
     QIM_D(d);
@@ -158,42 +295,135 @@ void QImPlotNode::setAutoSize(bool autoSize)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets axis info object for specified axis ID
+ * @param[in] aid QImPlotAxisId identifying which axis (X1-X3, Y1-Y3)
+ * @return Pointer to QImPlotAxisInfo for the specified axis
+ * @details Returns the axis info object that controls axis properties (limits, flags, label, etc.).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取指定轴 ID 的坐标轴信息对象
+ * @param[in] aid QImPlotAxisId 标识哪个轴（X1-X3, Y1-Y3）
+ * @return 指定轴的 QImPlotAxisInfo 指针
+ * @details 返回控制轴属性（范围、标志、标签等）的坐标轴信息对象。
+ * \endif
+ */
 QImPlotAxisInfo* QImPlotNode::axisInfo(QImPlotAxisId aid) const
 {
     QIM_DC(d);
     return d->axisInfo[ static_cast< int >(aid) ];
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the primary X-axis (X1) info object
+ * @return Pointer to QImPlotAxisInfo for X1 axis
+ * @details Convenience accessor for the bottom X-axis, which is enabled by default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取主 X 轴（X1）信息对象
+ * @return X1 轴的 QImPlotAxisInfo 指针
+ * @details 底部 X 轴的便捷访问器，默认启用。
+ * \endif
+ */
 QImPlotAxisInfo* QImPlotNode::x1Axis() const
 {
     QIM_DC(d);
     return d->axisInfo[ static_cast< int >(QImPlotAxisId::X1) ];
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the primary Y-axis (Y1) info object
+ * @return Pointer to QImPlotAxisInfo for Y1 axis
+ * @details Convenience accessor for the left Y-axis, which is enabled by default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取主 Y 轴（Y1）信息对象
+ * @return Y1 轴的 QImPlotAxisInfo 指针
+ * @details 左侧 Y 轴的便捷访问器，默认启用。
+ * \endif
+ */
 QImPlotAxisInfo* QImPlotNode::y1Axis() const
 {
     QIM_DC(d);
     return d->axisInfo[ static_cast< int >(QImPlotAxisId::Y1) ];
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the secondary X-axis (X2) info object
+ * @return Pointer to QImPlotAxisInfo for X2 axis
+ * @details Convenience accessor for the top X-axis, disabled by default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取次级 X 轴（X2）信息对象
+ * @return X2 轴的 QImPlotAxisInfo 指针
+ * @details 顶部 X 轴的便捷访问器，默认禁用。
+ * \endif
+ */
 QImPlotAxisInfo* QImPlotNode::x2Axis() const
 {
     QIM_DC(d);
     return d->axisInfo[ static_cast< int >(QImPlotAxisId::X2) ];
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the secondary Y-axis (Y2) info object
+ * @return Pointer to QImPlotAxisInfo for Y2 axis
+ * @details Convenience accessor for the right Y-axis, disabled by default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取次级 Y 轴（Y2）信息对象
+ * @return Y2 轴的 QImPlotAxisInfo 指针
+ * @details 右侧 Y 轴的便捷访问器，默认禁用。
+ * \endif
+ */
 QImPlotAxisInfo* QImPlotNode::y2Axis() const
 {
     QIM_DC(d);
     return d->axisInfo[ static_cast< int >(QImPlotAxisId::Y2) ];
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the third X-axis (X3) info object
+ * @return Pointer to QImPlotAxisInfo for X3 axis
+ * @details Convenience accessor for an additional X-axis, disabled by default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取第三 X 轴（X3）信息对象
+ * @return X3 轴的 QImPlotAxisInfo 指针
+ * @details 附加 X 轴的便捷访问器，默认禁用。
+ * \endif
+ */
 QImPlotAxisInfo* QImPlotNode::x3Axis() const
 {
     QIM_DC(d);
     return d->axisInfo[ static_cast< int >(QImPlotAxisId::X3) ];
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the third Y-axis (Y3) info object
+ * @return Pointer to QImPlotAxisInfo for Y3 axis
+ * @details Convenience accessor for an additional Y-axis, disabled by default.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取第三 Y 轴（Y3）信息对象
+ * @return Y3 轴的 QImPlotAxisInfo 指针
+ * @details 附加 Y 轴的便捷访问器，默认禁用。
+ * \endif
+ */
 QImPlotAxisInfo* QImPlotNode::y3Axis() const
 {
     QIM_DC(d);
@@ -202,11 +432,41 @@ QImPlotAxisInfo* QImPlotNode::y3Axis() const
 
 /*duplicate-removed*/
 
+/**
+ * \if ENGLISH
+ * @brief Checks if a specific axis is enabled
+ * @param[in] aid QImPlotAxisId identifying which axis
+ * @return true if the axis info object exists (always true for all 6 axes)
+ * @details Checks axis existence; use axisInfo(aid)->setEnabled() to actually enable/disable.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查指定坐标轴是否启用
+ * @param[in] aid QImPlotAxisId 标识哪个轴
+ * @return true 表示轴信息对象存在（6 个轴始终存在）
+ * @details 检查轴是否存在；使用 axisInfo(aid)->setEnabled() 来实际启用/禁用。
+ * \endif
+ */
 bool QImPlotNode::isAxisEnabled(QImPlotAxisId aid) const
 {
     return (axisInfo(aid) != nullptr);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Enables or disables a specific axis
+ * @param[in] aid QImPlotAxisId identifying which axis
+ * @param[in] on true to enable the axis, false to disable
+ * @details Delegates to QImPlotAxisInfo::setEnabled() for the specified axis.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用或禁用指定坐标轴
+ * @param[in] aid QImPlotAxisId 标识哪个轴
+ * @param[in] on true 启用轴，false 禁用
+ * @details 委托给 QImPlotAxisInfo::setEnabled() 处理指定轴。
+ * \endif
+ */
 void QImPlotNode::setAxisEnabled(QImPlotAxisId aid, bool on)
 {
     if (auto axis = axisInfo(aid)) {
@@ -636,33 +896,115 @@ void QImPlotNode::setImPlotFlags(int flags)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Adds a plot item node as child of this plot
+ * @param[in] item Pointer to QImPlotItemNode to add
+ * @details Convenience method that delegates to addChildNode(). The item becomes a child
+ *          of this plot node and will be rendered within the plot area.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加绘图项节点为此绘图的子节点
+ * @param[in] item 要添加的 QImPlotItemNode 指针
+ * @details 便捷方法，委托给 addChildNode()。该项成为此绘图节点的子节点，
+ *          并将在绘图区域内渲染。
+ * \endif
+ */
 void QImPlotNode::addPlotItem(QImPlotItemNode* item)
 {
     addChildNode(item);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets all plot item child nodes
+ * @return List of QImPlotItemNode pointers that are children of this plot
+ * @details Finds all direct and indirect child nodes that are QImPlotItemNode type.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取所有绘图项子节点
+ * @return 此绘图子节点的 QImPlotItemNode 指针列表
+ * @details 查找所有直接和间接的 QImPlotItemNode 类型子节点。
+ * \endif
+ */
 QList< QImPlotItemNode* > QImPlotNode::plotItemNodes() const
 {
     return findChildrenNodes< QImPlotItemNode* >();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Adds a line item node to this plot
+ * @param[in] lineItem Pointer to QImPlotLineItemNode to add
+ * @details Convenience method that delegates to addPlotItem().
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加线图项节点到此绘图
+ * @param[in] lineItem 要添加的 QImPlotLineItemNode 指针
+ * @details 便捷方法，委托给 addPlotItem()。
+ * \endif
+ */
 void QImPlotNode::addLine(QImPlotLineItemNode* lineItem)
 {
     addPlotItem(lineItem);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the internal legend node
+ * @return Pointer to QImPlotLegendNode that controls legend appearance and behavior
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取内部图例节点
+ * @return 控制图例外观和行为的 QImPlotLegendNode 指针
+ * \endif
+ */
 QImPlotLegendNode* QImPlotNode::legendNode() const
 {
     QIM_DC(d);
     return d->legendNode.get();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Checks if the mouse cursor is hovering over the plot area
+ * @return true if the plot area is currently hovered
+ * @details Requires valid ImPlot context (after beginDraw). Returns false if plot pointer is null.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查鼠标光标是否悬停在绘图区域上方
+ * @return true 表示绘图区域当前被悬停
+ * @details 需要有效的 ImPlot 上下文（beginDraw 之后）。如果 plot 指针为空则返回 false。
+ * \endif
+ */
 bool QImPlotNode::isPlotHovered() const
 {
     QIM_DC(d);
     return d->plot && d->plot->Hovered;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Converts screen pixel coordinates to plot data coordinates
+ * @param[in] screenX X coordinate in screen pixels
+ * @param[in] screenY Y coordinate in screen pixels
+ * @return QPointF containing plot data coordinates, or empty QPointF if no valid plot context
+ * @details Uses the current X/Y axis pair for conversion. Requires valid ImPlot context.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将屏幕像素坐标转换为绘图数据坐标
+ * @param[in] screenX 屏幕像素中的 X 坐标
+ * @param[in] screenY 屏幕像素中的 Y 坐标
+ * @return 包含绘图数据坐标的 QPointF，无有效绘图上下文时返回空 QPointF
+ * @details 使用当前 X/Y 轴对进行转换。需要有效的 ImPlot 上下文。
+ * \endif
+ */
 QPointF QImPlotNode::pixelsToPlot(const float& screenX, const float& screenY)
 {
     QIM_D(d);
@@ -674,6 +1016,23 @@ QPointF QImPlotNode::pixelsToPlot(const float& screenX, const float& screenY)
     return QPointF(x_axis.PixelsToPlot(screenX), y_axis.PixelsToPlot(screenY));
 }
 
+/**
+ * \if ENGLISH
+ * @brief Converts plot data coordinates to screen pixel coordinates
+ * @param[in] doubleX X coordinate in plot data space
+ * @param[in] doubleY Y coordinate in plot data space
+ * @return QPointF containing screen pixel coordinates, or empty QPointF if no valid plot context
+ * @details Uses the current X/Y axis pair for conversion. Requires valid ImPlot context.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将绘图数据坐标转换为屏幕像素坐标
+ * @param[in] doubleX 绘图数据空间中的 X 坐标
+ * @param[in] doubleY 绘图数据空间中的 Y 坐标
+ * @return 包含屏幕像素坐标的 QPointF，无有效绘图上下文时返回空 QPointF
+ * @details 使用当前 X/Y 轴对进行转换。需要有效的 ImPlot 上下文。
+ * \endif
+ */
 QPointF QImPlotNode::plotToPixels(const double& doubleX, const double& doubleY)
 {
     QIM_D(d);
@@ -685,6 +1044,23 @@ QPointF QImPlotNode::plotToPixels(const double& doubleX, const double& doubleY)
     return QPointF(x_axis.PlotToPixels(doubleX), y_axis.PlotToPixels(doubleY));
 }
 
+/**
+ * \if ENGLISH
+ * @brief Formats a value using the axis tick format
+ * @param[in] val Value to format
+ * @param[in] xAxisId Axis ID whose format to use (Auto uses current axis)
+ * @return Formatted string for the value
+ * @details Uses ImPlot's internal axis formatting. Falls back to std::to_string if no valid context.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用坐标轴刻度格式格式化数值
+ * @param[in] val 要格式化的值
+ * @param[in] xAxisId 使用哪个轴的格式（Auto 使用当前轴）
+ * @return 数值的格式化字符串
+ * @details 使用 ImPlot 内部坐标轴格式化。无有效上下文时回退为 std::to_string。
+ * \endif
+ */
 std::string QImPlotNode::axisValueText(double val, QImPlotAxisId xAxisId) const
 {
     QIM_DC(d);
@@ -709,18 +1085,55 @@ std::string QImPlotNode::axisValueText(double val, QImPlotAxisId xAxisId) const
     return std::string(buffer);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Requests axes to auto-fit to data on next render
+ * @details Sets the axesToFit flag which triggers ImPlot::SetNextAxesToFit() during the next beginDraw().
+ *          The flag is consumed after one render frame.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 请求坐标轴在下次渲染时自动适配数据
+ * @details 设置 axesToFit 标志，在下一次 beginDraw() 时触发 ImPlot::SetNextAxesToFit()。
+ *          标志在渲染一帧后即被消耗。
+ * \endif
+ */
 void QImPlotNode::rescaleAxes()
 {
     QIM_D(d);
     d->axesToFit = true;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Alias for rescaleAxes() - requests axes to auto-fit on next render
+ * \endif
+ *
+ * \if CHINESE
+ * @brief rescaleAxes() 的别名 - 请求坐标轴在下次渲染时自动适配
+ * \endif
+ */
 void QImPlotNode::setAxesToFit()
 {
     QIM_D(d);
     d->axesToFit = true;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Begins plot rendering by calling ImPlot::BeginPlot()
+ * @return true (always returns true to allow style cleanup even on failure)
+ * @details Handles auto-fit request, sets title/size/flags, renders all axes, and configures legend.
+ *          The UTF-8 title is passed directly to ImPlot to avoid per-frame string conversion.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 通过调用 ImPlot::BeginPlot() 开始绘图渲染
+ * @return true（始终返回 true 以允许样式清理，即使失败时）
+ * @details 处理自动适配请求，设置标题/尺寸/标志，渲染所有坐标轴，并配置图例。
+ *          UTF-8 标题直接传递给 ImPlot 以避免每帧字符串转换。
+ * \endif
+ */
 bool QImPlotNode::beginDraw()
 {
     QIM_D(d);
@@ -743,9 +1156,21 @@ bool QImPlotNode::beginDraw()
     return true;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Ends plot rendering by calling ImPlot::EndPlot()
+ * @details Only calls EndPlot() if beginPlot() was successful (beginPlotSuccess flag is true).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 通过调用 ImPlot::EndPlot() 结束绘图渲染
+ * @details 仅在 beginPlot() 成功时（beginPlotSuccess 标志为 true）调用 EndPlot()。
+ * \endif
+ */
 void QImPlotNode::endDraw()
 {
-    if (d_ptr->beginPlotSuccess) {
+    QIM_D(d);
+    if (d->beginPlotSuccess) {
         ImPlot::EndPlot();
     }
 }

@@ -85,7 +85,8 @@ void QImPlotStemsItemNode::setData(QImAbstractXYDataSeries* series)
  */
 QImAbstractXYDataSeries* QImPlotStemsItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**
@@ -181,7 +182,8 @@ void QImPlotStemsItemNode::setHorizontal(bool horizontal)
  */
 QColor QImPlotStemsItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -197,7 +199,8 @@ QColor QImPlotStemsItemNode::color() const
  */
 void QImPlotStemsItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
     Q_EMIT colorChanged(c);
 }
 
