@@ -4,6 +4,8 @@ build*
 # 但是，不要忽略 docs 目录下任何以 build 开头的内容
 !docs/**/build*/
 !docs/**/build*
+# 不忽略根目录的 build.md 构建指南
+!build.md
 *.user
 *.autosave
 *.dll
@@ -15,6 +17,8 @@ build*
 #drawio的临时文件
 *.drawio.bkp
 .$*
+# 不忽略 .trae 目录（Agent 规则配置）
+!.trae/
 # 顶层的临时文件夹不追踪
 tmp
 ~
@@ -25,6 +29,9 @@ opencode.md
 #翻译文件暂时不追踪
 *.qm
 nul
+# AI IDE
+.qoder
+.kilo
 
 # 忽略MkDocs生成的文件
 site
