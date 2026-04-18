@@ -17,11 +17,11 @@ public:
     PrivateData(QImPlotImageItemNode* p);
 
     quintptr textureId { 0 };
-    QPointF boundsMin { 0.0, 0.0 };
-    QPointF boundsMax { 10.0, 10.0 };
-    QPointF uv0 { 0.0, 0.0 };
-    QPointF uv1 { 1.0, 1.0 };
-    QColor tintColor { Qt::white };
+    ImPlotPoint boundsMin { 0.0, 0.0 };
+    ImPlotPoint boundsMax { 10.0, 10.0 };
+    ImVec2 uv0 { 0.0f, 0.0f };
+    ImVec2 uv1 { 1.0f, 1.0f };
+    QImOptionalColor tintColor;
     ImPlotImageFlags flags { ImPlotImageFlags_None };
 };
 
@@ -108,7 +108,7 @@ void QImPlotImageItemNode::setTextureId(quintptr id)
 QPointF QImPlotImageItemNode::boundsMin() const
 {
     QIM_DC(d);
-    return d->boundsMin;
+    return toQPointF(d->boundsMin);
 }
 
 /**
@@ -125,8 +125,9 @@ QPointF QImPlotImageItemNode::boundsMin() const
 void QImPlotImageItemNode::setBoundsMin(const QPointF& min)
 {
     QIM_D(d);
-    if (d->boundsMin != min) {
-        d->boundsMin = min;
+    const ImPlotPoint newMin = toImPlotPoint(min);
+    if (d->boundsMin.x != newMin.x || d->boundsMin.y != newMin.y) {
+        d->boundsMin = newMin;
         Q_EMIT boundsMinChanged(min);
     }
 }
@@ -145,7 +146,7 @@ void QImPlotImageItemNode::setBoundsMin(const QPointF& min)
 QPointF QImPlotImageItemNode::boundsMax() const
 {
     QIM_DC(d);
-    return d->boundsMax;
+    return toQPointF(d->boundsMax);
 }
 
 /**
@@ -162,8 +163,9 @@ QPointF QImPlotImageItemNode::boundsMax() const
 void QImPlotImageItemNode::setBoundsMax(const QPointF& max)
 {
     QIM_D(d);
-    if (d->boundsMax != max) {
-        d->boundsMax = max;
+    const ImPlotPoint newMax = toImPlotPoint(max);
+    if (d->boundsMax.x != newMax.x || d->boundsMax.y != newMax.y) {
+        d->boundsMax = newMax;
         Q_EMIT boundsMaxChanged(max);
     }
 }
@@ -182,7 +184,7 @@ void QImPlotImageItemNode::setBoundsMax(const QPointF& max)
 QPointF QImPlotImageItemNode::uv0() const
 {
     QIM_DC(d);
-    return d->uv0;
+    return toQPointF(d->uv0);
 }
 
 /**
@@ -199,8 +201,9 @@ QPointF QImPlotImageItemNode::uv0() const
 void QImPlotImageItemNode::setUv0(const QPointF& uv)
 {
     QIM_D(d);
-    if (d->uv0 != uv) {
-        d->uv0 = uv;
+    const ImVec2 newUv = toImVec2(uv);
+    if (!fuzzyEqual(d->uv0.x, newUv.x) || !fuzzyEqual(d->uv0.y, newUv.y)) {
+        d->uv0 = newUv;
         Q_EMIT uv0Changed(uv);
     }
 }
@@ -219,7 +222,7 @@ void QImPlotImageItemNode::setUv0(const QPointF& uv)
 QPointF QImPlotImageItemNode::uv1() const
 {
     QIM_DC(d);
-    return d->uv1;
+    return toQPointF(d->uv1);
 }
 
 /**
@@ -236,8 +239,9 @@ QPointF QImPlotImageItemNode::uv1() const
 void QImPlotImageItemNode::setUv1(const QPointF& uv)
 {
     QIM_D(d);
-    if (d->uv1 != uv) {
-        d->uv1 = uv;
+    const ImVec2 newUv = toImVec2(uv);
+    if (!fuzzyEqual(d->uv1.x, newUv.x) || !fuzzyEqual(d->uv1.y, newUv.y)) {
+        d->uv1 = newUv;
         Q_EMIT uv1Changed(uv);
     }
 }
@@ -256,7 +260,7 @@ void QImPlotImageItemNode::setUv1(const QPointF& uv)
 QColor QImPlotImageItemNode::tintColor() const
 {
     QIM_DC(d);
-    return d->tintColor;
+    return (d->tintColor.has_value()) ? toQColor(d->tintColor->value()) : QColor(255, 255, 255);
 }
 
 /**
@@ -273,10 +277,14 @@ QColor QImPlotImageItemNode::tintColor() const
 void QImPlotImageItemNode::setTintColor(const QColor& color)
 {
     QIM_D(d);
-    if (d->tintColor != color) {
-        d->tintColor = color;
-        Q_EMIT tintColorChanged(color);
+    ImVec4 imColor = toImVec4(color);
+    if (d->tintColor.has_value()) {
+        d->tintColor->operator=(imColor);
+    } else {
+        d->tintColor.emplace(imColor);
+        d->tintColor->mark_dirty();
     }
+    Q_EMIT tintColorChanged(color);
 }
 
 /**
@@ -335,22 +343,18 @@ bool QImPlotImageItemNode::beginDraw()
         return false;
     }
 
-    // Convert Qt types to ImPlot types
+    // Use pre-converted data directly
     ImTextureID texRef = (ImTextureID)d->textureId;
-    ImPlotPoint bounds_min = toImPlotPoint(d->boundsMin);
-    ImPlotPoint bounds_max = toImPlotPoint(d->boundsMax);
-    ImVec2 uv0 = toImVec2(d->uv0);
-    ImVec2 uv1 = toImVec2(d->uv1);
-    ImVec4 tint_col = toImVec4(d->tintColor);
+    const ImVec4 tint_col = d->tintColor.has_value() ? d->tintColor->value() : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
     // Call ImPlot API
     ImPlot::PlotImage(
         labelConstData(),
         texRef,
-        bounds_min,
-        bounds_max,
-        uv0,
-        uv1,
+        d->boundsMin,
+        d->boundsMax,
+        d->uv0,
+        d->uv1,
         tint_col,
         d->flags
     );

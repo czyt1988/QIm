@@ -15,7 +15,7 @@ public:
     double value { 0.0 };
     
     // Style and configuration
-    QColor color { Qt::white };  ///< Tag line color
+    QImOptionalColor color;  ///< Tag line color (optional tracked ImVec4)
     QByteArray textUtf8;         ///< Text label (UTF8, used directly by ImGui)
     bool round { false };        ///< Round position to integer pixels
 };
@@ -66,7 +66,8 @@ QImPlotTagXNode::~QImPlotTagXNode()
  */
 double QImPlotTagXNode::value() const
 {
-    return d_ptr->value;
+    QIM_DC(d);
+    return d->value;
 }
 
 /**
@@ -102,7 +103,8 @@ void QImPlotTagXNode::setValue(double value)
  */
 QString QImPlotTagXNode::text() const
 {
-    return QString::fromUtf8(d_ptr->textUtf8);
+    QIM_DC(d);
+    return QString::fromUtf8(d->textUtf8);
 }
 
 /**
@@ -171,7 +173,8 @@ void QImPlotTagXNode::setText(const char* fmt, ...)
  */
 QColor QImPlotTagXNode::color() const
 {
-    return d_ptr->color;
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -188,10 +191,14 @@ QColor QImPlotTagXNode::color() const
 void QImPlotTagXNode::setColor(const QColor& c)
 {
     QIM_D(d);
-    if (d->color != c) {
-        d->color = c;
-        Q_EMIT colorChanged(c);
+    ImVec4 imColor = toImVec4(c);
+    if (d->color.has_value()) {
+        d->color->operator=(imColor);
+    } else {
+        d->color.emplace(imColor);
+        d->color->mark_dirty();
     }
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -207,7 +214,8 @@ void QImPlotTagXNode::setColor(const QColor& c)
  */
 bool QImPlotTagXNode::round() const
 {
-    return d_ptr->round;
+    QIM_DC(d);
+    return d->round;
 }
 
 /**
@@ -249,10 +257,10 @@ void QImPlotTagXNode::setRound(bool round)
  */
 bool QImPlotTagXNode::beginDraw()
 {
-    QIM_DC(d);
+QIM_DC(d);
     
-    // Convert color to ImVec4
-    ImVec4 colorVec = toImVec4(d->color);
+    // Use stored ImVec4 directly (no conversion in beginDraw)
+    ImVec4 colorVec = d->color.has_value() ? d->color->value() : ImVec4(1, 1, 1, 1);
     
     // Call ImPlot TagX API
     if (d->textUtf8.isEmpty()) {

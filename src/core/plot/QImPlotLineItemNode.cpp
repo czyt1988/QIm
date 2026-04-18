@@ -61,14 +61,47 @@ void QImPlotLineItemNode::PrivateData::resetDownSamplerData()
 //----------------------------------------------------
 // QImPlotLineItemNode
 //----------------------------------------------------
+/**
+ * \if ENGLISH
+ * @brief Constructs a QImPlotLineItemNode with optional parent
+ * @param[in] par Parent QObject (typically a QImPlotNode)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造 QImPlotLineItemNode，可选指定父对象
+ * @param[in] par 父 QObject（通常为 QImPlotNode）
+ * \endif
+ */
 QImPlotLineItemNode::QImPlotLineItemNode(QObject* par) : QImPlotItemNode(par), QIM_PIMPL_CONSTRUCT
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for QImPlotLineItemNode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief QImPlotLineItemNode 的析构函数
+ * \endif
+ */
 QImPlotLineItemNode::~QImPlotLineItemNode()
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the data series for the line plot
+ * @param[in] series Pointer to QImAbstractXYDataSeries (ownership transferred)
+ * @details Stores the series and triggers adaptive sampling (LTTB) if enabled and data size exceeds threshold.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置线图的数据系列
+ * @param[in] series QImAbstractXYDataSeries 指针（所有权转移）
+ * @details 存储数据系列，如果启用自适应采样且数据量超过阈值，则触发 LTTB 降采样。
+ * \endif
+ */
 void QImPlotLineItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
@@ -78,6 +111,17 @@ void QImPlotLineItemNode::setData(QImAbstractXYDataSeries* series)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the current data series
+ * @return Pointer to QImAbstractXYDataSeries, nullptr if no data set
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取当前数据系列
+ * @return QImAbstractXYDataSeries 指针，无数据时返回 nullptr
+ * \endif
+ */
 QImAbstractXYDataSeries* QImPlotLineItemNode::data() const
 {
     QIM_DC(d);
@@ -101,7 +145,7 @@ QImAbstractXYDataSeries* QImPlotLineItemNode::data() const
         else                                                                                                           \
             d->lineFlags &= ~FlagEnum;                                                                                 \
         if (d->lineFlags != oldFlags)                                                                                  \
-            emit lineFlagChanged();                                                                                    \
+            Q_EMIT lineFlagChanged();                                                                                    \
     }
 #endif
 #ifndef QImPlotLineItemNode_ENABLED_ACCESSOR
@@ -120,7 +164,7 @@ QImAbstractXYDataSeries* QImPlotLineItemNode::data() const
         else                                                                                                           \
             d->lineFlags |= FlagEnum;                                                                                  \
         if (d->lineFlags != oldFlags)                                                                                  \
-            emit lineFlagChanged();                                                                                    \
+            Q_EMIT lineFlagChanged();                                                                                    \
     }
 #endif
 
@@ -204,21 +248,66 @@ void QImPlotLineItemNode::setColor(const QColor& c)
     d->color = toImVec4(c);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the line color
+ * @return Current color as QColor, or invalid QColor() if using ImPlot default
+ * @details Returns the explicit color if set, otherwise returns default QColor().
+ *          On first render without explicit color, ImPlot's default color is captured.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取线条颜色
+ * @return 当前颜色（QColor），使用 ImPlot 默认颜色时返回无效 QColor()
+ * @details 如果设置了显式颜色则返回该颜色，否则返回默认 QColor()。
+ *          首次渲染时未设置显式颜色，会捕获 ImPlot 的默认颜色。
+ * \endif
+ */
 QColor QImPlotLineItemNode::color() const
 {
     QIM_DC(d);
     return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Enables or disables adaptive sampling (LTTB downsampling)
+ * @param[in] on true to enable adaptive sampling, false to disable
+ * @details When enabled, large datasets are automatically downsampled using LTTB/MinMaxLTTB
+ *          algorithm when size exceeds downsampleThreshold. Regenerates downsampled data on change.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用或禁用自适应采样（LTTB 降采样）
+ * @param[in] on true 启用自适应采样，false 禁用
+ * @details 启用时，大数据集在超过降采样阈值后自动使用 LTTB/MinMaxLTTB 算法降采样。
+ *          值改变时重新生成降采样数据。
+ * \endif
+ */
 void QImPlotLineItemNode::setAdaptivesSampling(bool on)
 {
-    d_ptr->isAdaptiveSampling = on;
-    d_ptr->resetDownSamplerData();
+    QIM_D(d);
+    d->isAdaptiveSampling = on;
+    d->resetDownSamplerData();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Checks if adaptive sampling is enabled
+ * @return true if adaptive sampling is enabled
+ * @details Default is true (enabled). Adaptive sampling uses LTTB/MinMaxLTTB for large datasets.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查自适应采样是否启用
+ * @return true 表示自适应采样启用
+ * @details 默认为 true（启用）。自适应采样使用 LTTB/MinMaxLTTB 处理大数据集。
+ * \endif
+ */
 bool QImPlotLineItemNode::isAdaptiveSampling() const
 {
-    return d_ptr->isAdaptiveSampling;
+    QIM_DC(d);
+    return d->isAdaptiveSampling;
 }
 
 // ===== 标志访问器实现（带 Doxygen 注释）=====
