@@ -1,4 +1,4 @@
-﻿#include "PerformanceTestWidget.h"
+#include "PerformanceTestWidget.h"
 #include "ui_PerformanceTestWidget.h"
 #include <QStandardItem>
 #include <QMessageBox>
@@ -31,6 +31,8 @@ PerformanceTestWidget::PerformanceTestWidget(QWidget* parent)
     connect(controller, &PerformanceTestController::allTestsCompleted, this, &PerformanceTestWidget::onAllTestsCompleted);
 
     // 初始化UI状态
+    ui->comboBoxLanguage->setCurrentIndex(0);
+    ui->checkBoxIncludeMermaid->setChecked(false);
     ui->progressBar->setVisible(false);
     ui->labelInfo->setText("Ready to start performance test");
 
@@ -170,6 +172,10 @@ void PerformanceTestWidget::onAllTestsCompleted(const QVector< TestResult >& all
 
 
     // 显示报告对话框
+    reportDialog->setReportLanguage(
+        ui->comboBoxLanguage->currentIndex() == 0 ? PerformanceTestReportDialog::English : PerformanceTestReportDialog::Chinese
+    );
+    reportDialog->setIncludeMermaid(ui->checkBoxIncludeMermaid->isChecked());
     reportDialog->setTestResults(allResults, m_currentTestConfig, false);
     reportDialog->show();
 }
