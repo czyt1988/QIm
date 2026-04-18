@@ -535,17 +535,10 @@ void PerformanceTestController::cleanupMemory()
     // Windows：强制工作集修剪
     SetProcessWorkingSetSize(GetCurrentProcess(), (SIZE_T)-1, (SIZE_T)-1);
 #elif defined(Q_OS_LINUX)
-    // Linux：触发内存页回写并释放
-    std::ofstream ofs("/proc/sys/vm/drop_caches");
-    if (ofs.is_open()) {
-        ofs << "3" << std::endl;  // 释放页缓存、目录项、inodes
-        ofs.close();
-    }
-    // 触发进程堆整理
-    mallopt(M_TRIM_THRESHOLD, 0);
+    // Linux：用户态堆内存整理（无需 root 权限）
+    malloc_trim(0);
 #elif defined(Q_OS_MACOS)
-    // macOS：触发内存压缩/回收
-    vm_deallocate(mach_task_self(), vm_address_t(0), vm_size_t(0));
+    // macOS relies on system memory management; malloc_trim not available
 #endif
 
     // 3. 短暂等待系统回收（给系统100ms时间处理）
