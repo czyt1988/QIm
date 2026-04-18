@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
+#include <QFile>
 #include <QPageSize>
 #include <algorithm>
 
@@ -39,6 +40,7 @@ PerformanceTestReportDialog::PerformanceTestReportDialog(QWidget* parent)
 
     // 连接按钮信号
     connect(ui->pushButtonCopy, &QPushButton::clicked, this, &PerformanceTestReportDialog::onPushButtonCopy_clicked);
+    connect(ui->pushButtonSaveMarkdown, &QPushButton::clicked, this, &PerformanceTestReportDialog::onPushButtonSaveMarkdown_clicked);
     connect(ui->pushButtonExportToPdf, &QPushButton::clicked, this, &PerformanceTestReportDialog::onPushButtonExportToPdf_clicked);
 
     // 美化 QTextBrowser
@@ -450,6 +452,33 @@ void PerformanceTestReportDialog::onPushButtonCopy_clicked()
         QMessageBox::information(this, "Copied", QString(" 已复制 Markdown 报告到剪贴板"));
     } else {
         QMessageBox::information(this, "Copied", QString("Markdown report copied to clipboard"));
+    }
+}
+
+void PerformanceTestReportDialog::onPushButtonSaveMarkdown_clicked()
+{
+    if (m_reportMarkdown.isEmpty()) {
+        QMessageBox::warning(this, "Warning", "No report to save");
+        return;
+    }
+
+    const bool chinese = (m_reportLanguage == Chinese);
+    QString defaultName = chinese ? "benchmark_report.md" : "benchmark_report.md";
+    QString filePath = QFileDialog::getSaveFileName(this,
+        chinese ? tr("保存 Markdown 报告") : tr("Save Markdown Report"),
+        defaultName,
+        tr("Markdown Files (*.md);;All Files (*)"));
+    if (filePath.isEmpty()) return;
+
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        file.write(m_reportMarkdown.toUtf8());
+        file.close();
+        QMessageBox::information(this, chinese ? "成功" : "Success",
+            chinese ? QString("报告已保存到:\n%1").arg(filePath) : QString("Report saved to:\n%1").arg(filePath));
+    } else {
+        QMessageBox::warning(this, chinese ? "错误" : "Error",
+            chinese ? QString("无法保存文件:\n%1").arg(filePath) : QString("Failed to save file:\n%1").arg(filePath));
     }
 }
 

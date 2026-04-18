@@ -59,6 +59,7 @@ protected:
 
 private Q_SLOTS:
     void onPushButtonCopy_clicked();
+    void onPushButtonSaveMarkdown_clicked();
     void onPushButtonExportToPdf_clicked();
 
 private:
