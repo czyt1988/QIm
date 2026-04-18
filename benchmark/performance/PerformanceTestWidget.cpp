@@ -237,8 +237,8 @@ void PerformanceTestWidget::onAllTestsCompleted(const QVector< TestResult >& all
         ui->comboBoxLanguage->currentIndex() == 0 ? PerformanceTestReportDialog::English : PerformanceTestReportDialog::Chinese
     );
     reportDialog->setIncludeMermaid(ui->checkBoxIncludeMermaid->isChecked());
-    reportDialog->setTestResults(allResults, m_currentTestConfig, false);
     reportDialog->setSystemInfo(sysInfo);
+    reportDialog->setTestResults(allResults, m_currentTestConfig, false);
     reportDialog->show();
 }
 
@@ -296,7 +296,7 @@ void PerformanceTestWidget::showReportDialog(const QVector< TestResult >& result
             : PerformanceTestReportDialog::Chinese
     );
     reportDialog->setIncludeMermaid(ui->checkBoxIncludeMermaid->isChecked());
-    reportDialog->setTestResults(results, m_currentTestConfig, true);
     reportDialog->setSystemInfo(sysInfo);
+    reportDialog->setTestResults(results, m_currentTestConfig, true);
     reportDialog->show();
 }
