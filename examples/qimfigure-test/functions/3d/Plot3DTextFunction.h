@@ -4,6 +4,7 @@
 #include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
+#include <QPointer>
 
 namespace QIM {
 class QImFigureWidget;
@@ -117,6 +118,17 @@ public:
      * \endif
      */
     void createPlot(QIM::QImFigureWidget* figure) override;
+    
+    /**
+     * \if ENGLISH
+     * @brief Cleanup plot nodes before deletion
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 删除前清理绘图节点
+     * \endif
+     */
+    void cleanupPlot() override;
     
     // Title property accessors
     QString title() const { return m_title; }
@@ -301,8 +313,8 @@ private:
     double m_pixelOffsetY = 0.0;
     QColor m_color = Qt::red;
     
-    QIM::QImPlot3DNode* m_plot3DNode = nullptr;
-    QIM::QImPlot3DTextItemNode* m_text3DNode = nullptr;
+    QPointer<QIM::QImPlot3DNode> m_plot3DNode = nullptr;
+    QPointer<QIM::QImPlot3DTextItemNode> m_text3DNode = nullptr;
 };
 
 #endif // PLOT3DTEXTFUNCTION_H

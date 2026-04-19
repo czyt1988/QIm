@@ -408,3 +408,10 @@ void Plot3DTriangleFunction::setMarkersVisible(bool visible)
         }
     }
 }
+
+void Plot3DTriangleFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode = nullptr;
+    m_triangle3DNode = nullptr;
+}

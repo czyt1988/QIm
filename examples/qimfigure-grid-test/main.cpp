@@ -1,3 +1,8 @@
+// MSVC requires _USE_MATH_DEFINES for M_PI
+#ifndef _USE_MATH_DEFINES
+#    define _USE_MATH_DEFINES
+#endif
+
 #include "QImFigureWidget.h"
 #include "QImGridNode.h"
 #include "plot/QImPlotNode.h"

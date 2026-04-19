@@ -293,3 +293,18 @@ void Plot3DSubplotsFunction::setTitle4(const QString& title)
         }
     }
 }
+
+void Plot3DSubplotsFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode1 = nullptr;
+    m_plot3DNode2 = nullptr;
+    m_plot3DNode3 = nullptr;
+    m_plot3DNode4 = nullptr;
+    m_lineItem = nullptr;
+    m_scatterItem = nullptr;
+    m_surfaceItem = nullptr;
+    m_dummyItem1 = nullptr;
+    m_dummyItem2 = nullptr;
+    m_dummyItem3 = nullptr;
+}

@@ -377,3 +377,10 @@ void Plot3DMeshFunction::setMarkersVisible(bool visible)
         }
     }
 }
+
+void Plot3DMeshFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode = nullptr;
+    m_mesh3DNode = nullptr;
+}

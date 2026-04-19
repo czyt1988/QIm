@@ -3,6 +3,7 @@
 #include "plot3d/QImPlot3DNode.h"
 #include "plot3d/QImPlot3DAxisInfo.h"
 #include "plot3d/QImPlot3DImageItemNode.h"
+#include "imgui.h"
 
 /**
  * \if ENGLISH
@@ -392,11 +393,12 @@ void Plot3DImageFunction::createPlot(QIM::QImFigureWidget* figure)
     // Create 3D image item node
     m_image3DNode = new QIM::QImPlot3DImageItemNode(m_plot3DNode);
     
-    // Note: texture ID must be a valid ImTextureID obtained from the rendering backend.
-    // The ImGui font texture is not yet available when createPlot() is called,
-    // so we set textureId to 0 initially. Users can set a valid texture ID at runtime
-    // via the property panel after the ImGui context is initialized.
-    m_image3DNode->setTextureId(static_cast<quintptr>(0));
+    // Use ImGui font atlas texture as the image source.
+    // By the time createPlot() is called (from onFunctionSelected after initial render),
+    // the ImGui context and font atlas are already initialized.
+    // ImGui 1.92+: TexID is now ImTextureRef, use TexRef.GetTexID() to get ImTextureID.
+    ImTextureID fontTexId = ImGui::GetIO().Fonts->TexRef.GetTexID();
+    m_image3DNode->setTextureId(static_cast<quintptr>(fontTexId));
     
     // Set default properties
     m_image3DNode->setCenterX(m_centerX);
@@ -615,4 +617,11 @@ void Plot3DImageFunction::setUv1Y(double y)
             m_image3DNode->setUv1Y(y);
         }
     }
+}
+
+void Plot3DImageFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode = nullptr;
+    m_image3DNode = nullptr;
 }

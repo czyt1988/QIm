@@ -268,3 +268,10 @@ void Plot3DLineFunction::setLineWeight(float weight)
         }
     }
 }
+
+void Plot3DLineFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode = nullptr;
+    m_line3DNode = nullptr;
+}

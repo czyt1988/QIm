@@ -1,9 +1,15 @@
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+
 #include "Plot3DDummyFunction.h"
 #include "QImFigureWidget.h"
 #include "plot3d/QImPlot3DNode.h"
 #include "plot3d/QImPlot3DAxisInfo.h"
 #include "plot3d/QImPlot3DDummyItemNode.h"
+#include "plot3d/QImPlot3DLineItemNode.h"
 #include <QVector>
+#include <cmath>
 
 /**
  * \if ENGLISH
@@ -201,6 +207,24 @@ void Plot3DDummyFunction::createPlot(QIM::QImFigureWidget* figure)
     m_dummy3Node = new QIM::QImPlot3DDummyItemNode(m_plot3DNode);
     m_dummy3Node->setLabel(QStringLiteral("Sensor C"));
     m_dummy3Node->setColor(m_dummy3Color);
+    
+    // Add visible helix line for 3D geometry demonstration
+    const int numLinePoints = 200;
+    std::vector<double> xsLine, ysLine, zsLine;
+    xsLine.reserve(numLinePoints);
+    ysLine.reserve(numLinePoints);
+    zsLine.reserve(numLinePoints);
+    for (int i = 0; i < numLinePoints; ++i) {
+        double t = i * 0.05 * M_PI;
+        xsLine.push_back(std::cos(t));
+        ysLine.push_back(std::sin(t));
+        zsLine.push_back(t * 0.1);
+    }
+    m_lineNode = new QIM::QImPlot3DLineItemNode(m_plot3DNode);
+    m_lineNode->setData(xsLine, ysLine, zsLine);
+    m_lineNode->setColor(QColor(0, 114, 189));
+    m_lineNode->setLineWeight(2.0f);
+    m_lineNode->setLabel(QStringLiteral("Helix"));
 }
 
 void Plot3DDummyFunction::setTitle(const QString& title)
@@ -278,4 +302,14 @@ void Plot3DDummyFunction::setDummy3Color(const QColor& color)
             m_dummy3Node->setColor(color);
         }
     }
+}
+
+void Plot3DDummyFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode = nullptr;
+    m_dummy1Node = nullptr;
+    m_dummy2Node = nullptr;
+    m_dummy3Node = nullptr;
+    m_lineNode = nullptr;
 }

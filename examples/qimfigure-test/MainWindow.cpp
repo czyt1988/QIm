@@ -186,6 +186,7 @@ void MainWindow::onFunctionSelected(const QString& functionId)
     // This also destroys any 2D plots under the subplot
     // If the new function needs subplot, it will call setSubplotGrid()
     m_figureWidget->clearSubplotGrid();
+    m_figureWidget->clearSubplot3DGrid();
     
     // Create new plot for the selected function
     function->createPlot(m_figureWidget);

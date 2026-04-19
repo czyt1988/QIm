@@ -4,11 +4,13 @@
 #include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
+#include <QPointer>
 
 namespace QIM {
 class QImFigureWidget;
 class QImPlot3DNode;
 class QImPlot3DDummyItemNode;
+class QImPlot3DLineItemNode;
 }
 
 /**
@@ -111,6 +113,17 @@ public:
      * \endif
      */
     void createPlot(QIM::QImFigureWidget* figure) override;
+    
+    /**
+     * \if ENGLISH
+     * @brief Cleanup plot nodes before deletion
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 删除前清理绘图节点
+     * \endif
+     */
+    void cleanupPlot() override;
     
     // Title property accessors
     QString title() const { return m_title; }
@@ -241,10 +254,11 @@ private:
     QColor m_dummy2Color = Qt::green;
     QColor m_dummy3Color = Qt::blue;
     
-    QIM::QImPlot3DNode* m_plot3DNode = nullptr;
-    QIM::QImPlot3DDummyItemNode* m_dummy1Node = nullptr;
-    QIM::QImPlot3DDummyItemNode* m_dummy2Node = nullptr;
-    QIM::QImPlot3DDummyItemNode* m_dummy3Node = nullptr;
+    QPointer<QIM::QImPlot3DNode> m_plot3DNode = nullptr;
+    QPointer<QIM::QImPlot3DDummyItemNode> m_dummy1Node = nullptr;
+    QPointer<QIM::QImPlot3DDummyItemNode> m_dummy2Node = nullptr;
+    QPointer<QIM::QImPlot3DDummyItemNode> m_dummy3Node = nullptr;
+    QPointer<QIM::QImPlot3DLineItemNode> m_lineNode = nullptr;
 };
 
 #endif // PLOT3DDUMMYFUNCTION_H

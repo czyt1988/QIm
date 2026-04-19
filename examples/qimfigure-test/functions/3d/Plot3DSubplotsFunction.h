@@ -4,6 +4,7 @@
 #include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
+#include <QPointer>
 
 namespace QIM {
 class QImFigureWidget;
@@ -101,11 +102,22 @@ public:
      * \endif
      * 
      * \if CHINESE
-     * @brief 在指定的图表控件中创建 2x2 3D子图网格
+     * @brief 在指定的图表控件中创建 2x2 3D 子图网格
      * @param figure 将要创建绘图的图表控件指针
      * \endif
      */
     void createPlot(QIM::QImFigureWidget* figure) override;
+    
+    /**
+     * \if ENGLISH
+     * @brief Cleanup plot nodes before deletion
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 删除前清理绘图节点
+     * \endif
+     */
+    void cleanupPlot() override;
     
     // Title property accessors
     QString title1() const { return m_title1; }
@@ -179,17 +191,17 @@ private:
     QString m_title3 = QStringLiteral("3D Surface");
     QString m_title4 = QStringLiteral("3D Legend");
     
-    QIM::QImPlot3DNode* m_plot3DNode1 = nullptr;
-    QIM::QImPlot3DNode* m_plot3DNode2 = nullptr;
-    QIM::QImPlot3DNode* m_plot3DNode3 = nullptr;
-    QIM::QImPlot3DNode* m_plot3DNode4 = nullptr;
+    QPointer<QIM::QImPlot3DNode> m_plot3DNode1 = nullptr;
+    QPointer<QIM::QImPlot3DNode> m_plot3DNode2 = nullptr;
+    QPointer<QIM::QImPlot3DNode> m_plot3DNode3 = nullptr;
+    QPointer<QIM::QImPlot3DNode> m_plot3DNode4 = nullptr;
     
-    QIM::QImPlot3DLineItemNode* m_lineItem = nullptr;
-    QIM::QImPlot3DScatterItemNode* m_scatterItem = nullptr;
-    QIM::QImPlot3DSurfaceItemNode* m_surfaceItem = nullptr;
-    QIM::QImPlot3DDummyItemNode* m_dummyItem1 = nullptr;
-    QIM::QImPlot3DDummyItemNode* m_dummyItem2 = nullptr;
-    QIM::QImPlot3DDummyItemNode* m_dummyItem3 = nullptr;
+    QPointer<QIM::QImPlot3DLineItemNode> m_lineItem = nullptr;
+    QPointer<QIM::QImPlot3DScatterItemNode> m_scatterItem = nullptr;
+    QPointer<QIM::QImPlot3DSurfaceItemNode> m_surfaceItem = nullptr;
+    QPointer<QIM::QImPlot3DDummyItemNode> m_dummyItem1 = nullptr;
+    QPointer<QIM::QImPlot3DDummyItemNode> m_dummyItem2 = nullptr;
+    QPointer<QIM::QImPlot3DDummyItemNode> m_dummyItem3 = nullptr;
 };
 
 #endif // PLOT3DSUBPLOTSFUNCTION_H

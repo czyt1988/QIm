@@ -302,3 +302,10 @@ void Plot3DScatterFunction::setMarkerColor(const QColor& color)
         }
     }
 }
+
+void Plot3DScatterFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode = nullptr;
+    m_scatter3DNode = nullptr;
+}

@@ -409,3 +409,10 @@ void Plot3DSurfaceFunction::setColormapEnabled(bool enabled)
         }
     }
 }
+
+void Plot3DSurfaceFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode = nullptr;
+    m_surface3DNode = nullptr;
+}

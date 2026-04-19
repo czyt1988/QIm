@@ -395,3 +395,10 @@ void Plot3DQuadFunction::setMarkersVisible(bool visible)
         }
     }
 }
+
+void Plot3DQuadFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode = nullptr;
+    m_quad3DNode = nullptr;
+}

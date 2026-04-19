@@ -407,3 +407,10 @@ void Plot3DTextFunction::setColor(const QColor& color)
         }
     }
 }
+
+void Plot3DTextFunction::cleanupPlot()
+{
+    TestFunction::cleanupPlot();
+    m_plot3DNode = nullptr;
+    m_text3DNode = nullptr;
+}
