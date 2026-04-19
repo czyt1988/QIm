@@ -192,6 +192,9 @@ void Plot3DScatterFunction::createPlot(QIM::QImFigureWidget* figure)
     m_plot3DNode->setTitle(m_title);
     m_plot3DNode->setLegendEnabled(true);
     
+    // Set default isometric view for better 3D visualization
+    m_plot3DNode->setBoxRotation(-35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
+    
     // Generate 1000 random XYZ scatter points (helix/spiral pattern)
     const int numPoints = 1000;
     std::vector<double> xData(numPoints);

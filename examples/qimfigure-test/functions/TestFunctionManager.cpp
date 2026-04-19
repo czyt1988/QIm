@@ -25,6 +25,14 @@
 #include "layout/SubplotsFunction.h"
 #include "3d/Plot3DScatterFunction.h"
 #include "3d/Plot3DLineFunction.h"
+#include "3d/Plot3DQuadFunction.h"
+#include "3d/Plot3DImageFunction.h"
+#include "3d/Plot3DTextFunction.h"
+#include "3d/Plot3DDummyFunction.h"
+#include "3d/Plot3DSurfaceFunction.h"
+#include "3d/Plot3DTriangleFunction.h"
+#include "3d/Plot3DMeshFunction.h"
+// Note: Plot3DSubplotsFunction is not registered - 3D subplots are not supported yet
 
 /**
  * \if ENGLISH
@@ -440,4 +448,83 @@ void TestFunctionManager::create3DFunctions()
         m_metadataList.append(meta);
         m_functions[meta.functionId] = new Plot3DLineFunction(this);
     }
+    
+    // 3D Quad
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Quad");
+        meta.displayName = tr("Cube Faces");
+        meta.functionId = "3d_quad_cube";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DQuadFunction(this);
+    }
+    
+    // 3D Image
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Image");
+        meta.displayName = tr("Font Texture");
+        meta.functionId = "3d_image_font_texture";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DImageFunction(this);
+    }
+    
+    // 3D Text
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Text");
+        meta.displayName = tr("Label");
+        meta.functionId = "3d_text_label";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DTextFunction(this);
+    }
+    
+    // 3D Dummy
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Dummy");
+        meta.displayName = tr("Legend Items");
+        meta.functionId = "3d_dummy_legend";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DDummyFunction(this);
+    }
+    
+    // 3D Surface
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Surface");
+        meta.displayName = tr("Sin-Cos Surface");
+        meta.functionId = "3d_surface_sincos";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DSurfaceFunction(this);
+    }
+    
+    // 3D Triangle
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Triangle");
+        meta.displayName = tr("Tetrahedron");
+        meta.functionId = "3d_triangle_tetrahedron";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DTriangleFunction(this);
+    }
+    
+    // 3D Mesh
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Mesh");
+        meta.displayName = tr("Cube Mesh");
+        meta.functionId = "3d_mesh_cube";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DMeshFunction(this);
+    }
+    
+    // Note: 3D Subplots test is not registered - QImFigureWidget doesn't support multiple 3D plots in subplots yet
 }
