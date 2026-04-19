@@ -1,3 +1,8 @@
+// MSVC requires _USE_MATH_DEFINES for M_PI
+#ifndef _USE_MATH_DEFINES
+#    define _USE_MATH_DEFINES
+#endif
+
 #include "QImPlot3DTextItemNode.h"
 #include <cmath>
 #include "implot3d.h"
@@ -70,7 +75,7 @@ QImPlot3DTextItemNode::~QImPlot3DTextItemNode()
 QString QImPlot3DTextItemNode::text() const
 {
     QIM_DC(d);
-    return QString::fromUtf8(d->textUtf8);
+    return QString::fromUtf8(d->textUtf8.constData(), d->textUtf8.size());
 }
 
 /**

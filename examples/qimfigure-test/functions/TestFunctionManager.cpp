@@ -32,7 +32,7 @@
 #include "3d/Plot3DSurfaceFunction.h"
 #include "3d/Plot3DTriangleFunction.h"
 #include "3d/Plot3DMeshFunction.h"
-// Note: Plot3DSubplotsFunction is not registered - 3D subplots are not supported yet
+#include "3d/Plot3DSubplotsFunction.h"
 
 /**
  * \if ENGLISH
@@ -526,5 +526,14 @@ void TestFunctionManager::create3DFunctions()
         m_functions[meta.functionId] = new Plot3DMeshFunction(this);
     }
     
-    // Note: 3D Subplots test is not registered - QImFigureWidget doesn't support multiple 3D plots in subplots yet
+    // 3D Subplots
+    {
+        FunctionMetadata meta;
+        meta.category = tr("3D");
+        meta.subcategory = tr("Layout");
+        meta.displayName = tr("Subplots");
+        meta.functionId = "3d_layout_subplots";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new Plot3DSubplotsFunction(this);
+    }
 }

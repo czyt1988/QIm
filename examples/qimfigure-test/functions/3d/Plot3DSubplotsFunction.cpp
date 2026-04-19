@@ -133,8 +133,8 @@ void Plot3DSubplotsFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
-    // Set 2x2 subplot grid
-    figure->setSubplotGrid(2, 2);
+    // Set 2x2 subplot grid for 3D plots
+    figure->setSubplot3DGrid(2, 2);
     
     // --------------------------
     // Subplot 1: 3D Line (Helix)
