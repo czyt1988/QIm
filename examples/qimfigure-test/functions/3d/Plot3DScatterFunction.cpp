@@ -179,6 +179,9 @@ void Plot3DScatterFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
+    // Reset to single-plot mode to clear any previous subplot configuration
+    figure->setSubplot3DGrid(1, 1);
+    
     // Create 3D plot node as a top-level render node via QImFigureWidget API
     m_plot3DNode = figure->createPlot3DNode();
     if (!m_plot3DNode) {
