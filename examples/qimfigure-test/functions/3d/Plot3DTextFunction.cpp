@@ -265,7 +265,7 @@ void Plot3DTextFunction::createPlot(QIM::QImFigureWidget* figure)
     m_plot3DNode->setTitle(m_title);
     
     // Set default isometric view for better 3D visualization
-    m_plot3DNode->setBoxRotation(-35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
+    m_plot3DNode->setBoxRotation(35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
     
     // Create 3D text item node and set properties
     m_text3DNode = new QIM::QImPlot3DTextItemNode(m_plot3DNode);

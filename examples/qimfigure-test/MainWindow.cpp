@@ -99,7 +99,7 @@ void MainWindow::createDockWidgets()
 void MainWindow::createCentralWidget()
 {
     m_figureWidget = new QIM::QImFigureWidget(this);
-    m_figureWidget->setRenderMode(QIM::QImWidget::RenderOnDemand);
+    m_figureWidget->setRenderMode(QIM::QImWidget::RenderAdaptive);
     setCentralWidget(m_figureWidget);
 }
 

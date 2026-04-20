@@ -180,7 +180,7 @@ void Plot3DLineFunction::createPlot(QIM::QImFigureWidget* figure)
     m_plot3DNode->setTitle(m_title);
     
     // Set default isometric view for better 3D visualization
-    m_plot3DNode->setBoxRotation(-35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
+    m_plot3DNode->setBoxRotation(35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
     
     // Generate 3D spiral data: x = cos(t), y = sin(t), z = t/10 for t in [0, 10π]
     const int numPoints = 1000;

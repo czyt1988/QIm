@@ -37,13 +37,13 @@ public:
     QImPlot3DAxisInfo* zAxisInfo {nullptr};
 
     // 3D rotation parameters
-    double elevation {0};              ///< Elevation angle in degrees
-    double azimuth {0};                ///< Azimuth angle in degrees
+    double elevation {35.264};              ///< Elevation angle in degrees
+    double azimuth {45.0};                ///< Azimuth angle in degrees
     bool animateRotation {false};      ///< Whether to animate rotation
     ImPlot3DCond rotationCond {ImPlot3DCond_Once};  ///< Rotation condition
     bool initialRotationSet {false};   ///< Whether initial rotation is set
-    double initialElevation {0};       ///< Initial elevation for double-click reset
-    double initialAzimuth {0};         ///< Initial azimuth for double-click reset
+    double initialElevation {35.264};       ///< Initial elevation for double-click reset
+    double initialAzimuth {45.0};         ///< Initial azimuth for double-click reset
 
     // Box scale parameters
     double boxScaleX {1.0};            ///< X-axis box scale

@@ -237,7 +237,7 @@ void Plot3DQuadFunction::createPlot(QIM::QImFigureWidget* figure)
     m_plot3DNode->setTitle(m_title);
     
     // Set default isometric view for better 3D visualization
-    m_plot3DNode->setBoxRotation(-35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
+    m_plot3DNode->setBoxRotation(35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
     
     // Generate unit cube data: 6 faces × 4 vertices = 24 points
     QVector<double> xs, ys, zs;
