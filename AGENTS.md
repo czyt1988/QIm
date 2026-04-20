@@ -42,7 +42,13 @@
 - **字符串存储**：节点只存储 `QByteArray`（UTF8格式），不存储 `QString`
 - **渲染最小化**：`beginDraw()` 只做API调用，所有数据转换在setter中完成
 - **枚举语义**：ImPlot否定语义(`NoXxx`) → Qt肯定语义(`xxxEnabled`)
-- **注释规范**：源文件双语Doxygen，头文件单行英文，类和信号在头文件中双语
+- **注释规范（强制）**：
+    - ❌ **头文件 public 函数**：禁止双语 Doxygen，只能用单行英文 `//`
+    - ❌ **Q_PROPERTY**：禁止加任何 Doxygen 注释
+    - ❌ **类注释**：禁止使用 `@param`、`@class`、`@ingroup`，仅允许 `@brief`/`@details`/`@note`/`@see`
+    - ✅ **源文件(.cpp)**：必须使用双语 Doxygen（`\if ENGLISH`/`\if CHINESE`）
+    - ✅ **类和信号**：在头文件中必须使用双语 Doxygen
+    - ⚠️ 详细规范见 [coding-standards.md](docs/zh/dev/coding-standards.md)，**务必在开始编码前阅读**
 
 ## QIm对象树管理理念
 

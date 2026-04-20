@@ -33,6 +33,105 @@
 
 所有新增代码必须使用 **Doxygen 格式**，并区分中英文。
 
+### 禁止模式（强制）
+
+以下模式**禁止**出现在任何新增代码中。AI 生成代码尤其容易违反这些规则，务必逐条检查。
+
+#### 1. ❌ 头文件 public 函数双语 Doxygen → ✅ 单行英文注释
+
+```cpp
+// ❌ 禁止：头文件 public 函数加双语 Doxygen 块
+/**
+ * \if ENGLISH
+ * @brief Gets the heatmap scale minimum value
+ * @return The minimum scale value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取热力图缩放最小值
+ * @return 最小缩放值
+ * \endif
+ */
+double scaleMin() const;
+
+// ✅ 正确：头文件 public 函数仅用单行英文注释
+// Gets the minimum scale value
+double scaleMin() const;
+```
+
+#### 2. ❌ Q_PROPERTY 加双语 Doxygen 注释 → ✅ 不加任何注释
+
+```cpp
+// ❌ 禁止：Q_PROPERTY 上方加双语 Doxygen 注释
+/**
+ * \if ENGLISH
+ * @property QImPlotHeatmapItemNode::scaleMin
+ * @brief Minimum value for color scaling
+ * @details Defines the lower bound of the color scale.
+ * @accessors READ scaleMin WRITE setScaleMin NOTIFY scaleMinChanged
+ * \endif
+ *
+ * \if CHINESE
+ * @property QImPlotHeatmapItemNode::scaleMin
+ * @brief 颜色缩放的最小值
+ * @details 定义颜色尺度的下限。
+ * @accessors READ scaleMin WRITE setScaleMin NOTIFY scaleMinChanged
+ * \endif
+ */
+Q_PROPERTY(double scaleMin READ scaleMin WRITE setScaleMin NOTIFY scaleMinChanged)
+
+// ✅ 正确：Q_PROPERTY 不加任何注释，仅可用分组注释（如 // == Title properties ==）
+// == Title properties ==
+Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+Q_PROPERTY(bool titleEnabled READ isTitleEnabled WRITE setTitleEnabled NOTIFY plotFlagChanged)
+```
+
+#### 3. ❌ 类注释中使用 @param、@class、@ingroup → ✅ 仅用 @brief/@details/@note/@see
+
+```cpp
+// ❌ 禁止：类注释包含 @param、@class、@ingroup
+/**
+ * \if ENGLISH
+ * @brief Qt-style wrapper for ImPlot heatmap visualization
+ * @class QImPlotHeatmapItemNode
+ * @ingroup plot_items
+ * @details Provides Qt-style retained mode encapsulation...
+ * @param[in] parent Parent QObject (optional)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief ImPlot热力图可视化的Qt风格封装
+ * @class QImPlotHeatmapItemNode
+ * @ingroup plot_items
+ * @details 为ImPlot热力图提供Qt风格的保留模式封装...
+ * @param[in] parent 父QObject对象（可选）
+ * \endif
+ */
+
+// ✅ 正确：类注释仅使用 @brief/@details/@note/@see，禁止 @param/@class/@ingroup
+/**
+ * \if ENGLISH
+ * @brief ImPlot plot area node
+ * @details Manages the lifecycle, axis configuration, and rendering context
+ *          for a single ImPlot plot area within the QIm object tree.
+ * @note Uses the PIMPL pattern via QIM_DECLARE_PRIVATE for encapsulation.
+ * @see QImPlotItemNode, QImPlotAxisInfo, QImPlotLegendNode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief ImPlot 绘图区域节点
+ * @details 在QIm对象树中管理单个ImPlot绘图区域的生命周期、坐标轴配置和渲染上下文。
+ * @note 通过QIM_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * @see QImPlotItemNode, QImPlotAxisInfo, QImPlotLegendNode
+ * \endif
+ */
+```
+
+!!! danger "强制规则"
+    - ❌ **头文件 public 函数**：禁止双语 Doxygen，只能用单行英文 `//`
+    - ❌ **Q_PROPERTY**：禁止加任何注释（包括 Doxygen 块）
+    - ❌ **类注释**：禁止 `@param`、`@class`、`@ingroup`，仅允许 `@brief`/`@details`/`@note`/`@see`
+
 ### 源文件（.cpp）注释规范
 
 源文件中的函数实现必须使用完整的中英文双块 Doxygen 注释：
@@ -63,41 +162,93 @@
 头文件中的注释遵循以下规则：
 
 1. **`public` 函数声明**：仅添加**单行英文简要注释**（使用 `//` 或简洁的 `/** */`）
-2. **不要**在头文件的类成员函数中写入详细的双语 Doxygen 块
+2. **禁止**在头文件的类成员函数中写入双语 Doxygen 块
 3. **特例**：Qt 信号（`Q_SIGNALS` 区域下的函数）和类的注释需在头文件中使用双语 Doxygen
 
 ```cpp
-// 类的注释规范见下一节
-class MyClass {
-public:
-    // Constructor for MyClass (English only)
-    MyClass(); 
+// 以下为真实节点类的注释模板，基于 QImPlotNode（参见 src/core/plot/QImPlotNode.h）
+/**
+ * \if ENGLISH
+ * @brief ImPlot plot area node
+ * @details Manages the lifecycle, axis configuration, and rendering context
+ *          for a single ImPlot plot area within the QIm object tree.
+ * @note Uses the PIMPL pattern via QIM_DECLARE_PRIVATE for encapsulation.
+ * @see QImPlotItemNode, QImPlotAxisInfo, QImPlotLegendNode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief ImPlot 绘图区域节点
+ * @details 在QIm对象树中管理单个ImPlot绘图区域的生命周期、坐标轴配置和渲染上下文。
+ * @note 通过QIM_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * @see QImPlotItemNode, QImPlotAxisInfo, QImPlotLegendNode
+ * \endif
+ */
+class QImPlotNode : public QImAbstractNode
+{
+    Q_OBJECT
+    QIM_DECLARE_PRIVATE(QImPlotNode)
 
-    // Get the color property (English only)
-    QColor color() const;
+    // Q_PROPERTY 不加注释！
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    Q_PROPERTY(bool titleEnabled READ isTitleEnabled WRITE setTitleEnabled NOTIFY plotFlagChanged)
+
+public:
+    // Constructs a QImPlotNode with optional parent (English only!)
+    QImPlotNode(QObject* parent = nullptr);
+
+    // Gets the plot title (English only!)
+    QString title() const;
+
+Q_SIGNALS:
+    /**
+     * \if ENGLISH
+     * @brief Emitted when the title property changes
+     * @param[in] title The new title value
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 标题属性变更时发射
+     * @param[in] title 新的标题值
+     * \endif
+     */
+    void titleChanged(const QString& title);
 };
 ```
 
-**再次强调不要**在头文件的**类成员函数**中写入详细的双语 Doxygen 块
+**再次强调：**禁止在头文件的**类成员函数**中写入双语 Doxygen 块
 
 ### 类的 doxygen 注释规范
 
-类的 doxygen 注释需要在**头文件**中按双语要求添加：
+类的 doxygen 注释需要在**头文件**中按双语要求添加，**仅允许** `@brief`/`@details`/`@note`/`@see`，禁止 `@param`/`@class`/`@ingroup`：
 
 ```cpp
 /**
  * \if ENGLISH
- * @brief [English description of the class]
+ * @brief ImPlot plot area node
+ * @details Manages the lifecycle, axis configuration, and rendering context
+ *          for a single ImPlot plot area within the QIm object tree.
+ * @note Uses the PIMPL pattern via QIM_DECLARE_PRIVATE for encapsulation.
+ * @see QImPlotItemNode, QImPlotAxisInfo, QImPlotLegendNode
  * \endif
  *
  * \if CHINESE
- * @brief [中文类说明]
+ * @brief ImPlot 绘图区域节点
+ * @details 在QIm对象树中管理单个ImPlot绘图区域的生命周期、坐标轴配置和渲染上下文。
+ * @note 通过QIM_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * @see QImPlotItemNode, QImPlotAxisInfo, QImPlotLegendNode
  * \endif
  */
-class MyClass {
+class QImPlotNode : public QImAbstractNode
+{
+    Q_OBJECT
+    QIM_DECLARE_PRIVATE(QImPlotNode)
+
+    // Q_PROPERTY 不加注释！
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+
 public:
-    // Constructor for MyClass (English only)
-    MyClass(); 
+    // Constructs a QImPlotNode with optional parent (English only!)
+    QImPlotNode(QObject* parent = nullptr);
 };
 ```
 
@@ -130,8 +281,9 @@ Q_SIGNALS:
 |----------|------|------|
 | 函数详细注释 | `.cpp` | 双语 Doxygen 块 |
 | public 函数简要注释 | `.h` | 单行英文 `//` |
-| 类注释 | `.h` | 双语 Doxygen 块 |
+| 类注释 | `.h` | 双语 Doxygen 块（仅 @brief/@details/@note/@see） |
 | 信号注释 | `.h` | 双语 Doxygen 块 |
+| **Q_PROPERTY 注释** | **禁止** | **不加任何注释** |
 
 ## Git 提交规范
 
