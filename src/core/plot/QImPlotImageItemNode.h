@@ -15,9 +15,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot image visualization
  *
- * @class QImPlotImageItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot image rendering.
  *          Supports rendering an image texture within specified plot coordinate bounds.
  *          Inherits from QImPlotItemNode and follows the same PIMPL design pattern
@@ -27,8 +24,6 @@ namespace QIM
  *       Useful for overlaying icons, logos, or pre-rendered graphics on plots.
  * @warning Texture ID must be a valid ImTextureID obtained from the rendering backend.
  *
- * @param[in] parent Parent QObject (optional)
- *
  * @see QImPlotItemNode
  * @see QImPlotHeatmapItemNode
  * @see QImPlotNode
@@ -37,9 +32,6 @@ namespace QIM
  * \if CHINESE
  * @brief ImPlot图像可视化的Qt风格封装
  *
- * @class QImPlotImageItemNode
- * @ingroup plot_items
- *
  * @details 为ImPlot图像渲染提供Qt风格的保留模式封装。
  *          支持在指定的绘图坐标边界内渲染图像纹理。
  *          继承自QImPlotItemNode，并遵循与QImPlotHeatmapItemNode相同的PIMPL设计模式以保持一致性。
@@ -47,8 +39,6 @@ namespace QIM
  * @note 图像作为轴对齐矩形渲染，具有纹理坐标。
  *       适用于在图表上叠加图标、徽标或预渲染图形。
  * @warning 纹理ID必须是来自渲染后端的有效ImTextureID。
- *
- * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotHeatmapItemNode
@@ -60,136 +50,16 @@ class QIM_CORE_API QImPlotImageItemNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotImageItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotImageItemNode::textureId
-     * @brief Texture identifier for the image
-     *
-     * @details Holds the ImTextureID value that references the image texture in the graphics backend.
-     *          Must be a valid texture ID obtained from the rendering system (e.g., via ImGui image loading).
-     *          Default is 0 (null texture). Setting to 0 will result in no image being drawn.
-     * @accessors READ textureId WRITE setTextureId NOTIFY textureIdChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotImageItemNode::textureId
-     * @brief 图像的纹理标识符
-     *
-     * @details 保存引用图形后端中图像纹理的 ImTextureID 值。
-     *          必须是从渲染系统获得的有效纹理 ID（例如通过 ImGui 图像加载）。
-     *          默认值为 0（空纹理）。设置为 0 将导致不绘制图像。
-     * @accessors READ textureId WRITE setTextureId NOTIFY textureIdChanged
-     * \endif
-     */
     Q_PROPERTY(quintptr textureId READ textureId WRITE setTextureId NOTIFY textureIdChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotImageItemNode::boundsMin
-     * @brief Lower-left corner position of image in plot coordinates
-     *
-     * @details Defines the plot coordinates of the lower-left corner
-     *          of the image rectangle. Default is (0, 0).
-     * @accessors READ boundsMin WRITE setBoundsMin NOTIFY boundsMinChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotImageItemNode::boundsMin
-     * @brief 图像左下角在绘图坐标中的位置
-     *
-     * @details 定义图像矩形左下角的绘图坐标。
-     *          默认为 (0, 0)。
-     * @accessors READ boundsMin WRITE setBoundsMin NOTIFY boundsMinChanged
-     * \endif
-     */
     Q_PROPERTY(QPointF boundsMin READ boundsMin WRITE setBoundsMin NOTIFY boundsMinChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotImageItemNode::boundsMax
-     * @brief Upper-right corner position of image in plot coordinates
-     *
-     * @details Defines the plot coordinates of the upper-right corner
-     *          of the image rectangle. Default is (10, 10).
-     * @accessors READ boundsMax WRITE setBoundsMax NOTIFY boundsMaxChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotImageItemNode::boundsMax
-     * @brief 图像右上角在绘图坐标中的位置
-     *
-     * @details 定义图像矩形右上角的绘图坐标。
-     *          默认为 (10, 10)。
-     * @accessors READ boundsMax WRITE setBoundsMax NOTIFY boundsMaxChanged
-     * \endif
-     */
     Q_PROPERTY(QPointF boundsMax READ boundsMax WRITE setBoundsMax NOTIFY boundsMaxChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotImageItemNode::uv0
-     * @brief Lower-left texture coordinate (UV0)
-     *
-     * @details Defines the texture coordinate for the lower-left corner of the image.
-     *          Default is (0, 0) representing the top-left corner of the texture
-     *          (ImGui texture coordinates: y-down).
-     * @accessors READ uv0 WRITE setUv0 NOTIFY uv0Changed
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotImageItemNode::uv0
-     * @brief 左下角纹理坐标 (UV0)
-     *
-     * @details 定义图像左下角的纹理坐标。
-     *          默认为 (0, 0)，表示纹理的左上角（ImGui 纹理坐标：y 向下）。
-     * @accessors READ uv0 WRITE setUv0 NOTIFY uv0Changed
-     * \endif
-     */
     Q_PROPERTY(QPointF uv0 READ uv0 WRITE setUv0 NOTIFY uv0Changed)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotImageItemNode::uv1
-     * @brief Upper-right texture coordinate (UV1)
-     *
-     * @details Defines the texture coordinate for the upper-right corner of the image.
-     *          Default is (1, 1) representing the bottom-right corner of the texture
-     *          (ImGui texture coordinates: y-down).
-     * @accessors READ uv1 WRITE setUv1 NOTIFY uv1Changed
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotImageItemNode::uv1
-     * @brief 右上角纹理坐标 (UV1)
-     *
-     * @details 定义图像右上角的纹理坐标。
-     *          默认为 (1, 1)，表示纹理的右下角（ImGui 纹理坐标：y 向下）。
-     * @accessors READ uv1 WRITE setUv1 NOTIFY uv1Changed
-     * \endif
-     */
     Q_PROPERTY(QPointF uv1 READ uv1 WRITE setUv1 NOTIFY uv1Changed)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotImageItemNode::tintColor
-     * @brief Tint color applied to the image
-     *
-     * @details Defines the color multiplier applied to the image texture.
-     *          Default is white (1,1,1,1) which renders the image unchanged.
-     *          Use alpha component to control transparency.
-     * @accessors READ tintColor WRITE setTintColor NOTIFY tintColorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotImageItemNode::tintColor
-     * @brief 应用于图像的色调颜色
-     *
-     * @details 定义应用于图像纹理的颜色乘数。
-     *          默认为白色 (1,1,1,1)，图像保持不变。
-     *          使用 alpha 分量控制透明度。
-     * @accessors READ tintColor WRITE setTintColor NOTIFY tintColorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor tintColor READ tintColor WRITE setTintColor NOTIFY tintColorChanged)
 
 public:

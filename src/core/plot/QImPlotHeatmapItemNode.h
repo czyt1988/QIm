@@ -15,9 +15,6 @@ class QImAbstractHeatmapDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot heatmap visualization
  *
- * @class QImPlotHeatmapItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot heatmap charts.
  *          Supports 2D matrix data with configurable color scaling, bounds,
  *          label formatting, and column-major data layout.
@@ -28,8 +25,6 @@ class QImAbstractHeatmapDataSeries;
  *       correlation matrices, and 2D density plots.
  * @warning Large heatmaps (>1000x1000) may impact performance.
  *
- * @param[in] parent Parent QObject (optional)
- *
  * @see QImPlotItemNode
  * @see QImPlotBarsItemNode
  * @see QImPlotNode
@@ -38,17 +33,12 @@ class QImAbstractHeatmapDataSeries;
  * \if CHINESE
  * @brief ImPlot热力图可视化的Qt风格封装
  *
- * @class QImPlotHeatmapItemNode
- * @ingroup plot_items
- *
  * @details 为ImPlot热力图提供Qt风格的保留模式封装。
  *          支持具有可配置颜色缩放、边界、标签格式和列主序数据布局的二维矩阵数据。
  *          继承自QImPlotItemNode，并遵循与QImPlotBarsItemNode相同的PIMPL设计模式以保持一致性。
  *
  * @note 热力图将二维数据可视化为颜色网格，适用于矩阵数据、相关矩阵和二维密度图。
  * @warning 大型热力图（>1000x1000）可能影响性能。
- *
- * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotBarsItemNode
@@ -60,138 +50,16 @@ class QIM_CORE_API QImPlotHeatmapItemNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotHeatmapItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHeatmapItemNode::scaleMin
-     * @brief Minimum value for color scaling
-     *
-     * @details Defines the lower bound of the color scale.
-     *          If set to 0 together with scaleMax = 0 (default),
-     *          automatic scaling based on data min/max is used.
-     * @accessors READ scaleMin WRITE setScaleMin NOTIFY scaleMinChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHeatmapItemNode::scaleMin
-     * @brief 颜色缩放的最小值
-     *
-     * @details 定义颜色尺度的下限。
-     *          如果与 scaleMax = 0 一起设置为 0（默认），
-     *          则使用基于数据最小/最大值的自动缩放。
-     * @accessors READ scaleMin WRITE setScaleMin NOTIFY scaleMinChanged
-     * \endif
-     */
     Q_PROPERTY(double scaleMin READ scaleMin WRITE setScaleMin NOTIFY scaleMinChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHeatmapItemNode::scaleMax
-     * @brief Maximum value for color scaling
-     *
-     * @details Defines the upper bound of the color scale.
-     *          If set to 0 together with scaleMin = 0 (default),
-     *          automatic scaling based on data min/max is used.
-     * @accessors READ scaleMax WRITE setScaleMax NOTIFY scaleMaxChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHeatmapItemNode::scaleMax
-     * @brief 颜色缩放的最大值
-     *
-     * @details 定义颜色尺度的上限。
-     *          如果与 scaleMin = 0 一起设置为 0（默认），
-     *          则使用基于数据最小/最大值的自动缩放。
-     * @accessors READ scaleMax WRITE setScaleMax NOTIFY scaleMaxChanged
-     * \endif
-     */
     Q_PROPERTY(double scaleMax READ scaleMax WRITE setScaleMax NOTIFY scaleMaxChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHeatmapItemNode::labelFormat
-     * @brief Format string for value labels
-     *
-     * @details Controls the display format of value labels on the heatmap.
-     *          Uses standard printf-style formatting (e.g., "%.1f", "%.2e").
-     *          Set to empty string to disable labels.
-     *          Default is "%.1f".
-     * @accessors READ labelFormat WRITE setLabelFormat NOTIFY labelFormatChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHeatmapItemNode::labelFormat
-     * @brief 值标签的格式字符串
-     *
-     * @details 控制热力图上值标签的显示格式。
-     *          使用标准的 printf 风格格式化（例如 "%.1f"、"%.2e"）。
-     *          设置为空字符串以禁用标签。
-     *          默认为 "%.1f"。
-     * @accessors READ labelFormat WRITE setLabelFormat NOTIFY labelFormatChanged
-     * \endif
-     */
     Q_PROPERTY(QString labelFormat READ labelFormat WRITE setLabelFormat NOTIFY labelFormatChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHeatmapItemNode::boundsMin
-     * @brief Lower-left corner position of heatmap in plot coordinates
-     *
-     * @details Defines the plot coordinates of the lower-left corner
-     *          of the heatmap rectangle. Default is (0, 0).
-     * @accessors READ boundsMin WRITE setBoundsMin NOTIFY boundsMinChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHeatmapItemNode::boundsMin
-     * @brief 热力图左下角在绘图坐标中的位置
-     *
-     * @details 定义热力图矩形左下角的绘图坐标。
-     *          默认为 (0, 0)。
-     * @accessors READ boundsMin WRITE setBoundsMin NOTIFY boundsMinChanged
-     * \endif
-     */
     Q_PROPERTY(QPointF boundsMin READ boundsMin WRITE setBoundsMin NOTIFY boundsMinChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHeatmapItemNode::boundsMax
-     * @brief Upper-right corner position of heatmap in plot coordinates
-     *
-     * @details Defines the plot coordinates of the upper-right corner
-     *          of the heatmap rectangle. Default is (1, 1).
-     * @accessors READ boundsMax WRITE setBoundsMax NOTIFY boundsMaxChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHeatmapItemNode::boundsMax
-     * @brief 热力图右上角在绘图坐标中的位置
-     *
-     * @details 定义热力图矩形右上角的绘图坐标。
-     *          默认为 (1, 1)。
-     * @accessors READ boundsMax WRITE setBoundsMax NOTIFY boundsMaxChanged
-     * \endif
-     */
     Q_PROPERTY(QPointF boundsMax READ boundsMax WRITE setBoundsMax NOTIFY boundsMaxChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHeatmapItemNode::colMajor
-     * @brief Column-major data layout flag
-     *
-     * @details When true, data is assumed to be stored in column-major order.
-     *          When false, data is assumed to be row-major (default).
-     * @accessors READ isColMajor WRITE setColMajor NOTIFY colMajorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHeatmapItemNode::colMajor
-     * @brief 列主序数据布局标志
-     *
-     * @details 为 true 时，假定数据按列主序存储。
-     *          为 false 时，假定数据按行主序存储（默认）。
-     * @accessors READ isColMajor WRITE setColMajor NOTIFY colMajorChanged
-     * \endif
-     */
     Q_PROPERTY(bool colMajor READ isColMajor WRITE setColMajor NOTIFY colMajorChanged)
 
 public:
