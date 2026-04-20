@@ -1,0 +1,215 @@
+// SystemInfoCollector.cpp
+#include "SystemInfoCollector.h"
+
+#include <QGuiApplication>
+#include <QScreen>
+#include <QDebug>
+#include <QCoreApplication>
+
+// Platform-specific headers for CPU model, RAM, disk detection
+#if defined(Q_OS_WIN)
+#include "SystemInfoCollector_win.h"
+#elif defined(Q_OS_LINUX)
+#include <unistd.h>
+#include <sys/sysinfo.h>
+#include <fstream>
+#include <string>
+#include <malloc.h>
+#elif defined(Q_OS_MACOS)
+#include <mach/mach.h>
+#include <sys/sysctl.h>
+#endif
+
+// OpenGL: use Qt's safe wrapper
+#include <QOpenGLFunctions>
+#include <QOpenGLContext>
+
+SystemInfo SystemInfoCollector::collectSystemInfo()
+{
+    SystemInfo info;
+
+    // ── OS ──
+    info.osName    = QSysInfo::prettyProductName();
+    info.osVersion = QSysInfo::productVersion();
+
+    // ── CPU cores ──
+    info.cpuCoreCount = static_cast<int>(std::thread::hardware_concurrency());
+
+    // ── Screen resolution ──
+    try {
+        if (QGuiApplication::primaryScreen()) {
+            QSize screenSize = QGuiApplication::primaryScreen()->size();
+            info.screenResolution = QString("%1x%2")
+                .arg(screenSize.width())
+                .arg(screenSize.height());
+        }
+    } catch (...) {
+        info.screenResolution = QString();
+    }
+
+    // ── Qt version ──
+    info.qtVersion = QString(QT_VERSION_STR) + " (runtime: " + qVersion() + ")";
+
+    // ── Compiler info ──
+#if defined(_MSC_VER)
+    info.compilerInfo = "MSVC " + QString::number(_MSC_VER);
+#elif defined(__GNUC__)
+    info.compilerInfo = "GCC " + QString::number(__GNUC__) + "." + QString::number(__GNUC_MINOR__);
+#elif defined(__clang__)
+    info.compilerInfo = "Clang " + QString::number(__clang_major__) + "." + QString::number(__clang_minor__);
+#else
+    info.compilerInfo = "Unknown";
+#endif
+
+    // ── Platform-specific: CPU model, RAM, disk type ──
+#if defined(Q_OS_WIN)
+    // Windows: CPU model from registry, RAM from GlobalMemoryStatusEx
+    // Implementation isolated in SystemInfoCollector_win.cpp to avoid
+    // windows.h macro pollution that corrupts Qt headers.
+    info.cpuModel = qimGetCpuModel();
+    info.ramTotalMB = qimGetRamTotalMB();
+    info.diskType = "Unknown";
+
+#elif defined(Q_OS_LINUX)
+    // Linux: CPU model from /proc/cpuinfo
+    try {
+        std::ifstream cpuinfo("/proc/cpuinfo");
+        if (cpuinfo.is_open()) {
+            std::string line;
+            while (std::getline(cpuinfo, line)) {
+                if (line.find("model name") == 0) {
+                    size_t colonPos = line.find(':');
+                    if (colonPos != std::string::npos && colonPos + 1 < line.size()) {
+                        info.cpuModel = QString::fromStdString(line.substr(colonPos + 1)).trimmed();
+                    }
+                    break;
+                }
+            }
+        }
+    } catch (...) {
+        info.cpuModel = QString();
+    }
+
+    // Linux: RAM from sysinfo
+    try {
+        struct sysinfo si;
+        if (sysinfo(&si) == 0) {
+            info.ramTotalMB = static_cast<double>(si.totalram) * static_cast<double>(si.mem_unit) / (1024.0 * 1024.0);
+        }
+    } catch (...) {
+        info.ramTotalMB = 0.0;
+    }
+
+    // Linux: Disk type from /sys/block/sda/queue/rotational
+    try {
+        std::ifstream rotational("/sys/block/sda/queue/rotational");
+        if (rotational.is_open()) {
+            int value = 1;
+            rotational >> value;
+            info.diskType = (value == 0) ? "SSD" : "HDD";
+        } else {
+            info.diskType = "Unknown";
+        }
+    } catch (...) {
+        info.diskType = "Unknown";
+    }
+
+#elif defined(Q_OS_MACOS)
+    // macOS: CPU model from sysctlbyname
+    try {
+        char buffer[256] = {0};
+        size_t size = sizeof(buffer);
+        if (sysctlbyname("machdep.cpu.brand_string", buffer, &size, nullptr, 0) == 0) {
+            info.cpuModel = QString::fromUtf8(buffer).trimmed();
+        }
+    } catch (...) {
+        info.cpuModel = QString();
+    }
+
+    // macOS: RAM from sysctlbyname hw.memsize
+    try {
+        int64_t value = 0;
+        size_t size = sizeof(value);
+        if (sysctlbyname("hw.memsize", &value, &size, nullptr, 0) == 0) {
+            info.ramTotalMB = static_cast<double>(value) / (1024.0 * 1024.0);
+        }
+    } catch (...) {
+        info.ramTotalMB = 0.0;
+    }
+
+    // macOS: Disk type — reliable detection too complex
+    info.diskType = "Unknown";
+
+#else
+    info.cpuModel   = QString();
+    info.ramTotalMB = 0.0;
+    info.diskType   = "Unknown";
+#endif
+
+    return info;
+}
+
+void SystemInfoCollector::collectGPUInfo(SystemInfo& info)
+{
+    // ── OpenGL version and renderer (via Qt's QOpenGLFunctions) ──
+    QOpenGLContext* ctx = QOpenGLContext::currentContext();
+    if (!ctx) {
+        // No active GL context — cannot collect GPU info
+        // Leave fields as defaults (empty strings, 0.0)
+        qWarning() << "SystemInfoCollector: No active OpenGL context, GPU info not available";
+        return;
+    }
+
+    QOpenGLFunctions* f = ctx->functions();
+    if (!f) {
+        qWarning() << "SystemInfoCollector: Cannot get OpenGL functions";
+        return;
+    }
+
+    const GLubyte* versionStr  = f->glGetString(GL_VERSION);
+    const GLubyte* rendererStr = f->glGetString(GL_RENDERER);
+
+    if (versionStr) {
+        info.openglVersion = QString::fromUtf8(reinterpret_cast<const char*>(versionStr));
+    }
+    if (rendererStr) {
+        info.openglRenderer = QString::fromUtf8(reinterpret_cast<const char*>(rendererStr));
+        info.gpuName        = info.openglRenderer;
+    }
+
+    // ── Software OpenGL detection ──
+    QString rendererLower = info.openglRenderer.toLower();
+    if (rendererLower.contains("llvmpipe") ||
+        rendererLower.contains("swrast") ||
+        rendererLower.contains("softpipe")) {
+        info.isSoftwareOpenGL = true;
+    }
+
+    // ── VRAM detection (best-effort, platform-specific) ──
+#if defined(Q_OS_WIN)
+    // Windows: VRAM detection via registry is unreliable; best-effort fallback to 0.0
+    info.gpuVramMB = 0.0;
+
+#elif defined(Q_OS_LINUX)
+    // Linux: Try AMD VRAM from sysfs, then NVIDIA via nvidia-smi subprocess
+    std::ifstream vramFile("/sys/class/drm/card0/device/mem_info_vram_total");
+    if (vramFile.is_open()) {
+        long long vramBytes = 0;
+        vramFile >> vramBytes;
+        if (vramBytes > 0) {
+            info.gpuVramMB = static_cast<double>(vramBytes) / (1024.0 * 1024.0);
+        }
+    } else {
+        // Try NVIDIA: read nvidia-smi output
+        // Best-effort: subprocess may not be available; fallback to 0.0
+        info.gpuVramMB = 0.0;
+    }
+
+#elif defined(Q_OS_MACOS)
+    // macOS: VRAM detection not easily available; fallback to 0.0
+    info.gpuVramMB = 0.0;
+
+#else
+    info.gpuVramMB = 0.0;
+#endif
+}

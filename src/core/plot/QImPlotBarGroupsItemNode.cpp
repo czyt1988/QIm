@@ -71,7 +71,7 @@ void QImPlotBarGroupsItemNode::setData(QImAbstractBarGroupsDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -87,7 +87,8 @@ void QImPlotBarGroupsItemNode::setData(QImAbstractBarGroupsDataSeries* series)
  */
 QImAbstractBarGroupsDataSeries* QImPlotBarGroupsItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**
@@ -123,7 +124,7 @@ void QImPlotBarGroupsItemNode::setGroupWidth(double width)
     QIM_D(d);
     if (d->groupWidth != width) {
         d->groupWidth = width;
-        emit groupWidthChanged(width);
+        Q_EMIT groupWidthChanged(width);
     }
 }
 
@@ -165,8 +166,8 @@ void QImPlotBarGroupsItemNode::setHorizontal(bool horizontal)
         d->flags &= ~ImPlotBarGroupsFlags_Horizontal;
     }
     if (d->flags != oldFlags) {
-        emit orientationChanged(horizontal);
-        emit barGroupsFlagChanged();
+        Q_EMIT orientationChanged(horizontal);
+        Q_EMIT barGroupsFlagChanged();
     }
 }
 
@@ -208,8 +209,8 @@ void QImPlotBarGroupsItemNode::setStacked(bool stacked)
         d->flags &= ~ImPlotBarGroupsFlags_Stacked;
     }
     if (d->flags != oldFlags) {
-        emit stackedChanged(stacked);
-        emit barGroupsFlagChanged();
+        Q_EMIT stackedChanged(stacked);
+        Q_EMIT barGroupsFlagChanged();
     }
 }
 
@@ -246,7 +247,7 @@ void QImPlotBarGroupsItemNode::setShift(double shift)
     QIM_D(d);
     if (d->shift != shift) {
         d->shift = shift;
-        emit shiftChanged(shift);
+        Q_EMIT shiftChanged(shift);
     }
 }
 
@@ -263,24 +264,15 @@ void QImPlotBarGroupsItemNode::setShift(double shift)
  */
 void QImPlotBarGroupsItemNode::setColor(const QColor& c)
 {
-    qDebug() << "[BarGroupsItemNode] setColor called with:" << c;
-    
+    QIM_D(d);
     ImVec4 imColor = toImVec4(c);
-    
-    if (d_ptr->color.has_value()) {
-        qDebug() << "[BarGroupsItemNode] color optional has value, current dirty=" << d_ptr->color->is_dirty();
-        qDebug() << "[BarGroupsItemNode] current color value:" << toQColor(d_ptr->color->value());
-        d_ptr->color->operator=(imColor);  // Explicitly call assignment to trigger dirty
-        qDebug() << "[BarGroupsItemNode] after assignment, dirty=" << d_ptr->color->is_dirty();
+    if (d->color.has_value()) {
+        d->color->operator=(imColor);
     } else {
-        qDebug() << "[BarGroupsItemNode] color optional has NO value, creating new QImTrackedValue";
-        // Create with value and then mark dirty
-        d_ptr->color.emplace(imColor);
-        d_ptr->color->mark_dirty();  // Force dirty because this is a new color being set
-        qDebug() << "[BarGroupsItemNode] after emplace+mark_dirty, dirty=" << d_ptr->color->is_dirty();
+        d->color.emplace(imColor);
+        d->color->mark_dirty();
     }
-    
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -296,7 +288,8 @@ void QImPlotBarGroupsItemNode::setColor(const QColor& c)
  */
 QColor QImPlotBarGroupsItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -332,7 +325,7 @@ void QImPlotBarGroupsItemNode::setBarGroupsFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotBarGroupsFlags >(flags);
-        emit barGroupsFlagChanged();
+        Q_EMIT barGroupsFlagChanged();
     }
 }
 
@@ -354,20 +347,10 @@ bool QImPlotBarGroupsItemNode::beginDraw()
         return false;
     }
 
-    // Debug: Check color state before applying style
-    qDebug() << "[BarGroupsItemNode] beginDraw - color has_value:" << d->color.has_value();
-    if (d->color.has_value()) {
-        qDebug() << "[BarGroupsItemNode] beginDraw - color is_dirty:" << d->color->is_dirty();
-        qDebug() << "[BarGroupsItemNode] beginDraw - color value:" << toQColor(d->color->value());
-    }
-
     // Apply style - use SetNextFillStyle for bars (not SetNextLineStyle)
     if (d->color.has_value() && d->color->is_dirty()) {
-        qDebug() << "[BarGroupsItemNode] beginDraw - calling SetNextFillStyle with color:" << toQColor(d->color->value());
         ImPlot::SetNextFillStyle(d->color->value());
         d->color->clear();  // Clear dirty flag after applying
-    } else {
-        qDebug() << "[BarGroupsItemNode] beginDraw - NOT calling SetNextFillStyle (color not dirty or no value)";
     }
 
     // Prepare label pointers

@@ -408,6 +408,19 @@ Q_SIGNALS:
  */
     void flagsChanged(int flags);
 
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any drag tool flag changes
+     * @details Triggered by any flag property setter (setCursorsEnabled, setFitEnabled,
+     *          setInputsEnabled, setDelayed) when value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 拖拽工具标志更改时触发
+     * @details 任何标志属性setter（setCursorsEnabled、setFitEnabled、
+     *          setInputsEnabled、setDelayed）当值实际更改时触发。
+     * \endif
+     */
     void dragToolFlagChanged();
 
     /**

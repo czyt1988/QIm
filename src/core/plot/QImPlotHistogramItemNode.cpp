@@ -4,7 +4,6 @@
 #include "implot_internal.h"
 #include "QImTrackedValue.hpp"
 #include "QtImGuiUtils.h"
-#include <QDebug>
 
 namespace QIM
 {
@@ -88,7 +87,8 @@ void QImPlotHistogramItemNode::setData(QImAbstractXYDataSeries* series)
  */
 QImAbstractXYDataSeries* QImPlotHistogramItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**
@@ -478,7 +478,8 @@ void QImPlotHistogramItemNode::setColMajor(bool on)
  */
 QColor QImPlotHistogramItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -494,23 +495,14 @@ QColor QImPlotHistogramItemNode::color() const
  */
 void QImPlotHistogramItemNode::setColor(const QColor& c)
 {
-    qDebug() << "[HistogramItemNode] setColor called with:" << c;
-    
+    QIM_D(d);
     ImVec4 imColor = toImVec4(c);
-    
-    if (d_ptr->color.has_value()) {
-        qDebug() << "[HistogramItemNode] color optional has value, current dirty=" << d_ptr->color->is_dirty();
-        qDebug() << "[HistogramItemNode] current color value:" << toQColor(d_ptr->color->value());
-        d_ptr->color->operator=(imColor);  // Explicitly call assignment to trigger dirty
-        qDebug() << "[HistogramItemNode] after assignment, dirty=" << d_ptr->color->is_dirty();
+    if (d->color.has_value()) {
+        d->color->operator=(imColor);
     } else {
-        qDebug() << "[HistogramItemNode] color optional has NO value, creating new QImTrackedValue";
-        // Create with value and then mark dirty
-        d_ptr->color.emplace(imColor);
-        d_ptr->color->mark_dirty();  // Force dirty because this is a new color being set
-        qDebug() << "[HistogramItemNode] after emplace+mark_dirty, dirty=" << d_ptr->color->is_dirty();
+        d->color.emplace(imColor);
+        d->color->mark_dirty();
     }
-    
     Q_EMIT colorChanged(c);
 }
 
@@ -569,20 +561,10 @@ bool QImPlotHistogramItemNode::beginDraw()
         return false;
     }
 
-    // Debug: Check color state before applying style
-    qDebug() << "[HistogramItemNode] beginDraw - color has_value:" << d->color.has_value();
-    if (d->color.has_value()) {
-        qDebug() << "[HistogramItemNode] beginDraw - color is_dirty:" << d->color->is_dirty();
-        qDebug() << "[HistogramItemNode] beginDraw - color value:" << toQColor(d->color->value());
-    }
-
     // Apply style - use SetNextFillStyle for histogram bars
     if (d->color.has_value() && d->color->is_dirty()) {
-        qDebug() << "[HistogramItemNode] beginDraw - calling SetNextFillStyle with color:" << toQColor(d->color->value());
         ImPlot::SetNextFillStyle(d->color->value());
         d->color->clear();  // Clear dirty flag after applying
-    } else {
-        qDebug() << "[HistogramItemNode] beginDraw - NOT calling SetNextFillStyle (color not dirty or no value)";
     }
 
     // Prepare ImPlotRange

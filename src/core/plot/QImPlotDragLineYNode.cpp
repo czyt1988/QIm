@@ -79,7 +79,8 @@ QImPlotDragLineYNode::~QImPlotDragLineYNode()
  */
 double QImPlotDragLineYNode::value() const
 {
-    return d_ptr->y;
+    QIM_DC(d);
+    return d->y;
 }
 
 /**
@@ -98,7 +99,7 @@ void QImPlotDragLineYNode::setValue(double value)
     QIM_D(d);
     if (d->y != value) {
         d->y = value;
-        emit valueChanged(value);
+        Q_EMIT valueChanged(value);
     }
 }
 
@@ -115,7 +116,8 @@ void QImPlotDragLineYNode::setValue(double value)
  */
 QColor QImPlotDragLineYNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -131,8 +133,9 @@ QColor QImPlotDragLineYNode::color() const
  */
 void QImPlotDragLineYNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -148,7 +151,8 @@ void QImPlotDragLineYNode::setColor(const QColor& c)
  */
 float QImPlotDragLineYNode::thickness() const
 {
-    return d_ptr->thickness;
+    QIM_DC(d);
+    return d->thickness;
 }
 
 /**
@@ -164,9 +168,10 @@ float QImPlotDragLineYNode::thickness() const
  */
 void QImPlotDragLineYNode::setThickness(float thickness)
 {
-    if (d_ptr->thickness != thickness) {
-        d_ptr->thickness = thickness;
-        emit thicknessChanged(thickness);
+    QIM_D(d);
+    if (d->thickness != thickness) {
+        d->thickness = thickness;
+        Q_EMIT thicknessChanged(thickness);
     }
 }
 
@@ -183,7 +188,8 @@ void QImPlotDragLineYNode::setThickness(float thickness)
  */
 int QImPlotDragLineYNode::id() const
 {
-    return d_ptr->id;
+    QIM_DC(d);
+    return d->id;
 }
 
 /**
@@ -199,9 +205,10 @@ int QImPlotDragLineYNode::id() const
  */
 void QImPlotDragLineYNode::setId(int id)
 {
-    if (d_ptr->id != id) {
-        d_ptr->id = id;
-        emit idChanged(id);
+    QIM_D(d);
+    if (d->id != id) {
+        d->id = id;
+        Q_EMIT idChanged(id);
     }
 }
 
@@ -218,7 +225,8 @@ void QImPlotDragLineYNode::setId(int id)
  */
 int QImPlotDragLineYNode::flags() const
 {
-    return d_ptr->flags;
+    QIM_DC(d);
+    return d->flags;
 }
 
 /**
@@ -234,9 +242,10 @@ int QImPlotDragLineYNode::flags() const
  */
 void QImPlotDragLineYNode::setFlags(int flags)
 {
-    if (d_ptr->flags != flags) {
-        d_ptr->flags = static_cast<ImPlotDragToolFlags>(flags);
-        emit flagsChanged(flags);
+    QIM_D(d);
+    if (d->flags != flags) {
+        d->flags = static_cast<ImPlotDragToolFlags>(flags);
+        Q_EMIT flagsChanged(flags);
     }
 }
 
@@ -309,7 +318,8 @@ void QImPlotDragLineYNode::setDelayed(bool on)
  */
 bool QImPlotDragLineYNode::clicked() const
 {
-    return d_ptr->clicked;
+    QIM_DC(d);
+    return d->clicked;
 }
 
 /**
@@ -325,7 +335,8 @@ bool QImPlotDragLineYNode::clicked() const
  */
 bool QImPlotDragLineYNode::hovered() const
 {
-    return d_ptr->hovered;
+    QIM_DC(d);
+    return d->hovered;
 }
 
 /**
@@ -341,7 +352,8 @@ bool QImPlotDragLineYNode::hovered() const
  */
 bool QImPlotDragLineYNode::held() const
 {
-    return d_ptr->held;
+    QIM_DC(d);
+    return d->held;
 }
 
 /**
@@ -357,7 +369,8 @@ bool QImPlotDragLineYNode::held() const
  */
 bool QImPlotDragLineYNode::wasModified() const
 {
-    return d_ptr->wasModified;
+    QIM_DC(d);
+    return d->wasModified;
 }
 
 /**
@@ -405,7 +418,7 @@ bool QImPlotDragLineYNode::beginDraw()
     // Emit signals if position changed
     if (modified) {
         if (d->y != prevY) {
-            emit valueChanged(d->y);
+            Q_EMIT valueChanged(d->y);
         }
     }
     

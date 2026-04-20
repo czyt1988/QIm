@@ -1,4 +1,4 @@
-﻿#ifndef QIMPLOTDATASERIES_H
+#ifndef QIMPLOTDATASERIES_H
 #define QIMPLOTDATASERIES_H
 #include "QImAPI.h"
 #include <algorithm>
@@ -8,7 +8,25 @@
 
 namespace QIM
 {
-// 通用数据访问接口类
+/**
+ * \if ENGLISH
+ * @brief Abstract base class for plot data series access
+ * @details Provides a generic data access interface for all plot data series types.
+ *          Uses a built-in DataType enumeration to enable fast type identification
+ *          without dynamic_cast overhead. Subclasses must implement type(), size(),
+ *          and data access methods specific to their data layout.
+ * @see QImAbstractXYDataSeries, QImVectorXYDataSeries
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 绘图数据系列的抽象基类
+ * @details 为所有绘图数据系列类型提供通用数据访问接口。
+ *          使用内置的DataType枚举实现快速类型识别，
+ *          避免dynamic_cast开销。子类必须实现type()、size()
+ *          及其特定数据布局的数据访问方法。
+ * @see QImAbstractXYDataSeries, QImVectorXYDataSeries
+ * \endif
+ */
 class QIM_CORE_API QImAbstractPlotDataSeries
 {
 public:
@@ -39,7 +57,26 @@ public:
 };
 
 /**
+ * \if ENGLISH
+ * @brief Abstract data series for XY plot data
+ * @details Provides a specialized data accessor for two-dimensional XY data used by
+ *          line plots, scatter plots, and other XY-based visualizations. Supports two
+ *          data modes: full XY mode (explicit X array via xRawData()) and Y-only mode
+ *          (implicit X computed from xStart/xScale). Includes binary search capability
+ *          (yValueAtX()) for value tracking and cursor inspection.
+ * @note Requires X data to be monotonically increasing for binary search operations.
+ * @see QImVectorXYDataSeries, QImPlotLineItemNode
+ * \endif
+ *
+ * \if CHINESE
  * @brief 针对XY数据的数据获取器
+ * @details 为折线图、散点图及其他基于XY的可视化提供专用的二维XY数据访问器。
+ *          支持两种数据模式：完整XY模式（通过xRawData()提供显式X数组）和
+ *          Y-only模式（通过xStart/xScale隐式计算X）。包含二分查找功能
+ *          （yValueAtX()）用于值追踪和光标检测。
+ * @note 二分查找操作要求X数据单调递增。
+ * @see QImVectorXYDataSeries, QImPlotLineItemNode
+ * \endif
  */
 class QIM_CORE_API QImAbstractXYDataSeries : public QImAbstractPlotDataSeries
 {

@@ -33,7 +33,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>  test Frames</string>
+        <string>Test Frames</string>
        </property>
       </widget>
      </item>
@@ -64,26 +64,47 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="checkBoxUseOpenGL">
-       <property name="text">
-        <string>Use OpenGL</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
+<item>
+       <widget class="QCheckBox" name="checkBoxUseOpenGL">
+        <property name="text">
+         <string>Use OpenGL</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBoxLanguage">
+        <item>
+         <property name="text">
+          <string>English</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>中文</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxIncludeMermaid">
+        <property name="text">
+         <string>Mermaid Charts</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      <item>
       <widget class="QPushButton" name="pushButtonRunOne">
        <property name="text">
@@ -145,7 +166,7 @@
      <item>
       <widget class="QPushButton" name="pushButtonRunAll">
        <property name="text">
-        <string>Run All Test</string>
+        <string>Run Full Benchmark</string>
        </property>
       </widget>
      </item>

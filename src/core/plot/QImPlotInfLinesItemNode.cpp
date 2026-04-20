@@ -69,7 +69,7 @@ void QImPlotInfLinesItemNode::setValue(double value)
     QIM_D(d);
     d->values.clear();
     d->values.push_back(value);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -89,7 +89,7 @@ void QImPlotInfLinesItemNode::setValues(const double* values, int count)
 {
     QIM_D(d);
     d->values.assign(values, values + count);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -107,7 +107,7 @@ void QImPlotInfLinesItemNode::setValues(std::initializer_list< double > values)
 {
     QIM_D(d);
     d->values.assign(values);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -125,7 +125,7 @@ void QImPlotInfLinesItemNode::setValues(std::vector< double >&& values)
 {
     QIM_D(d);
     d->values = std::move(values);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -141,7 +141,8 @@ void QImPlotInfLinesItemNode::setValues(std::vector< double >&& values)
  */
 int QImPlotInfLinesItemNode::count() const
 {
-    return static_cast< int >(d_ptr->values.size());
+    QIM_DC(d);
+    return static_cast< int >(d->values.size());
 }
 
 /**
@@ -159,7 +160,8 @@ int QImPlotInfLinesItemNode::count() const
  */
 double QImPlotInfLinesItemNode::value(int index) const
 {
-    return d_ptr->values.at(index);
+    QIM_DC(d);
+    return d->values.at(index);
 }
 
 /**
@@ -200,8 +202,8 @@ void QImPlotInfLinesItemNode::setHorizontal(bool horizontal)
         d->flags &= ~ImPlotInfLinesFlags_Horizontal;
     }
     if (d->flags != oldFlags) {
-        emit orientationChanged(horizontal);
-        emit infLinesFlagChanged();
+        Q_EMIT orientationChanged(horizontal);
+        Q_EMIT infLinesFlagChanged();
     }
 }
 
@@ -218,7 +220,8 @@ void QImPlotInfLinesItemNode::setHorizontal(bool horizontal)
  */
 QColor QImPlotInfLinesItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -234,8 +237,9 @@ QColor QImPlotInfLinesItemNode::color() const
  */
 void QImPlotInfLinesItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -271,7 +275,7 @@ void QImPlotInfLinesItemNode::setInfLinesFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotInfLinesFlags >(flags);
-        emit infLinesFlagChanged();
+        Q_EMIT infLinesFlagChanged();
     }
 }
 

@@ -1,12 +1,9 @@
 #include "QImPlotScatterItemNode.h"
-#include <optional>
 #include "QImPlotDataSeries.h"
 #include "QImLTTBDownsampler.h"
 #include "QImMinMaxLTTBDownsampler.h"
 #include "implot.h"
 #include "implot_internal.h"
-#include "QImTrackedValue.hpp"
-#include "QtImGuiUtils.h"
 #include <QDebug>
 
 namespace QIM
@@ -35,7 +32,7 @@ public:
     int downsampleThreshold { 20000 };
     QImTrackedValue< int > markerShape { ImPlotMarker_Circle };                      ///< 标记形状
     bool markerFill { true };
-    std::optional< QImTrackedValue< ImVec4, ImVecComparator< ImVec4 > > > color;  ///< 颜色
+    QImOptionalColor color;  ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
     QImTrackedValue< float > markerSize { 4.0f };                                 ///< 标记大小
     ImPlotScatterFlags scatterFlags { ImPlotScatterFlags_None };                   ///< 散点图标志位
     bool isPlotItemVisible;
@@ -67,14 +64,47 @@ void QImPlotScatterItemNode::PrivateData::resetDownSamplerData()
 //----------------------------------------------------
 // QImPlotScatterItemNode
 //----------------------------------------------------
+/**
+ * \if ENGLISH
+ * @brief Constructs a QImPlotScatterItemNode with optional parent
+ * @param[in] par Parent QObject (typically a QImPlotNode)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造 QImPlotScatterItemNode，可选指定父对象
+ * @param[in] par 父 QObject（通常为 QImPlotNode）
+ * \endif
+ */
 QImPlotScatterItemNode::QImPlotScatterItemNode(QObject* par) : QImPlotItemNode(par), QIM_PIMPL_CONSTRUCT
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for QImPlotScatterItemNode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief QImPlotScatterItemNode 的析构函数
+ * \endif
+ */
 QImPlotScatterItemNode::~QImPlotScatterItemNode()
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the data series for the scatter plot
+ * @param[in] series Pointer to QImAbstractXYDataSeries (ownership transferred)
+ * @details Stores the series, triggers adaptive sampling if enabled, and emits dataChanged() signal.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置散点图的数据系列
+ * @param[in] series QImAbstractXYDataSeries 指针（所有权转移）
+ * @details 存储数据系列，如果启用自适应采样则触发降采样，并触发 dataChanged() 信号。
+ * \endif
+ */
 void QImPlotScatterItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
@@ -82,12 +112,24 @@ void QImPlotScatterItemNode::setData(QImAbstractXYDataSeries* series)
     if (d->isAdaptiveSampling) {
         d->resetDownSamplerData();
     }
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the current data series
+ * @return Pointer to QImAbstractXYDataSeries, nullptr if no data set
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取当前数据系列
+ * @return QImAbstractXYDataSeries 指针，无数据时返回 nullptr
+ * \endif
+ */
 QImAbstractXYDataSeries* QImPlotScatterItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 
@@ -140,7 +182,7 @@ void QImPlotScatterItemNode::setMarkerSize(float size)
     QIM_D(d);
     d->markerSize = size;
     if (d->markerSize.is_dirty()) {
-        emit markerSizeChanged(size);
+        Q_EMIT markerSizeChanged(size);
     }
 }
 
@@ -193,7 +235,7 @@ void QImPlotScatterItemNode::setMarkerShape(int shape)
     QIM_D(d);
     d->markerShape = shape;
     if (d->markerShape.is_dirty()) {
-        emit markerShapeChanged(shape);
+        Q_EMIT markerShapeChanged(shape);
     }
 }
 
@@ -244,7 +286,7 @@ void QImPlotScatterItemNode::setMarkerFill(bool fill)
     QIM_D(d);
     if (d->markerFill != fill) {
         d->markerFill = fill;
-        emit markerFillChanged(fill);
+        Q_EMIT markerFillChanged(fill);
     }
 }
 
@@ -296,7 +338,7 @@ void QImPlotScatterItemNode::setAdaptiveSampling(bool enabled)
     if (d->isAdaptiveSampling != enabled) {
         d->isAdaptiveSampling = enabled;
         d->resetDownSamplerData();
-        emit adaptiveSamplingChanged(enabled);
+        Q_EMIT adaptiveSamplingChanged(enabled);
     }
 }
 
@@ -350,7 +392,7 @@ void QImPlotScatterItemNode::setDownsampleThreshold(int threshold)
     if (d->downsampleThreshold != threshold && threshold > 0) {
         d->downsampleThreshold = threshold;
         d->resetDownSamplerData();
-        emit downsampleThresholdChanged(threshold);
+        Q_EMIT downsampleThresholdChanged(threshold);
     }
 }
 
@@ -373,7 +415,8 @@ void QImPlotScatterItemNode::setDownsampleThreshold(int threshold)
  */
 QColor QImPlotScatterItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -399,8 +442,9 @@ QColor QImPlotScatterItemNode::color() const
  */
 void QImPlotScatterItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -509,8 +553,19 @@ void QImPlotScatterItemNode::setScatterFlags(int flags)
 }
 
 /**
- * @brief 绘图
- * @return  这里直接返回false，避免调用endDraw
+ * \if ENGLISH
+ * @brief Renders the scatter plot with pre-converted data
+ * @return false (no endDraw needed)
+ * @details Calls ImPlot::PlotScatter with XY data. All conversions done in setters.
+ *          Uses adaptive sampling (LTTB) when enabled for large datasets.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用预转换数据渲染散点图
+ * @return false（无需调用endDraw）
+ * @details 调用 ImPlot::PlotScatter 处理 XY 数据。所有转换在 setter 中完成。
+ *          启用自适应采样时对大数据集使用 LTTB 算法。
+ * \endif
  */
 bool QImPlotScatterItemNode::beginDraw()
 {

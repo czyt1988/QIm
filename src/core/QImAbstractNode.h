@@ -1,4 +1,4 @@
-﻿#ifndef QIMABSTRACTNODE_H
+#ifndef QIMABSTRACTNODE_H
 #define QIMABSTRACTNODE_H
 #include <QObject>
 #include <QPointer>
@@ -6,9 +6,64 @@
 namespace QIM
 {
 /**
+ * \if ENGLISH
+ * @brief Abstract base class for ImGui drawing nodes
+ *
+ * @class QImAbstractNode
+ * @ingroup core
+ *
+ * @details Design philosophy:
+ * - Each node should correspond to an ImGui scope (Begin/End pair, some may have no End)
+ * - Supports nested hierarchical structure with automatic ID stack handling
+ * - Controls rendering behavior via visible/enabled properties
+ * - Subclasses only need to focus on their own Begin/End logic
+ * - Automatically manages ImGui IDs
+ *
+ * Solves these ImGui problems:
+ * - Scope nesting chaos (indentation hell)
+ * - Difficult state management (window positions, fold states, etc.)
+ * - Poor code reuse (repetitive Begin/End template code)
+ *
+ * Makes code more Qt-like. For native ImGui code like this:
+ *
+ * ```cpp
+ * // Traditional ImGui (procedural)
+ * if (ImGui::Begin("Window")) {
+ *    if (ImPlot::BeginPlot("Plot")) {
+ *        ImPlot::PlotLine(...);
+ *        ImPlot::EndPlot();
+ *    }
+ *    ImGui::End();
+ * }
+ * ```
+ *
+ * Using QImAbstractNode, it becomes:
+ *
+ * ```cpp
+ * auto window = new QImWindowNode(root);
+ * window->setTitle("Window");
+ *
+ * auto plot = new QImPlotNode(window);  // auto-nesting
+ * plot->setTitle("Plot");
+ *
+ * auto line = new QImPlotLineNode(plot); // auto child of Plot
+ * line->setData(...);
+ * ```
+ *
+ * > **Core idea**: Each UI element = one object, UI structure = object tree, rendering = recursive tree traversal
+ *
+ * @see QImWindowNode
+ * @see QImPlotNode
+ * @see QImPlotLineNode
+ * \endif
+ *
+ * \if CHINESE
  * @brief ImGui 绘图节点的抽象基类
  *
- * 设计理念：
+ * @class QImAbstractNode
+ * @ingroup core
+ *
+ * @details 设计理念：
  * - 每个节点理论应该对应一个ImGui作用域（Begin/End对,某些可以没有end）
  * - 支持嵌套层次结构，自动处理ID栈
  * - 通过visible/enabled属性控制渲染行为
@@ -24,7 +79,7 @@ namespace QIM
  * 对于原生ImGui的如下代码：
  *
  * ```cpp
- * 传统 ImGui（过程式）
+ * // 传统 ImGui（过程式）
  * if (ImGui::Begin("Window")) {
  *    if (ImPlot::BeginPlot("Plot")) {
  *        ImPlot::PlotLine(...);
@@ -48,6 +103,11 @@ namespace QIM
  * ```
  *
  * > **核心思想**：每个 UI 元素 = 一个对象，UI 结构 = 对象树，渲染 = 递归遍历树
+ *
+ * @see QImWindowNode
+ * @see QImPlotNode
+ * @see QImPlotLineNode
+ * \endif
  */
 class QIM_CORE_API QImAbstractNode : public QObject
 {
@@ -57,28 +117,27 @@ class QIM_CORE_API QImAbstractNode : public QObject
 public:
     enum RenderOption
     {
-        RenderIgnoreVisible = 1 << 0,  ///< render函数不考虑isVisible状态
-        RenderNotAutoID     = 1 << 1   ///< 不自动推入id
+        RenderIgnoreVisible = 1 << 0,  ///< Render ignores isVisible state
+        RenderNotAutoID     = 1 << 1   ///< Do not auto-push ID
     };
     Q_DECLARE_FLAGS(RenderOptionFlags, RenderOption)
     Q_FLAG(RenderOptionFlags)
 public:
     explicit QImAbstractNode(QObject* parent = nullptr);
     ~QImAbstractNode() override;
-    // === 状态控制 ===
+    // === State control ===
     virtual bool isVisible() const;
     virtual void setVisible(bool visible);
 
     virtual bool isEnabled() const;
     virtual void setEnabled(bool enabled);
 
-    // === 子节点管理 (O(1) 访问，无类型转换) ===
+    // === Child node management (O(1) access, no type conversion) ===
     void addChildNode(QImAbstractNode* child);
     void insertChildNode(int index, QImAbstractNode* child);
     void removeChildNode(QImAbstractNode* child);
-    bool takeChildNode(QImAbstractNode* child);  // 移除并返回所有权
+    bool takeChildNode(QImAbstractNode* child);  // Remove and return ownership
     void clearChildrenNodes();
-    // 查找子节点的索引
     int indexOfChildNode(QImAbstractNode* child) const;
     const QList< QImAbstractNode* >& childrenNodes() const;
     const QList< QImAbstractNode* >& childrenNodesZOrdered() const;
@@ -95,79 +154,152 @@ public:
     //----------------------------------------------------
     template< typename T >
     QList< T > findChildrenNodes() const;
-    // 核心渲染入口 - 由QImWidget调用
+    // Core render entry point - called by QImWidget
     void render();
-    // 设置渲染属性
+    // Set render option flags
     void setRenderOptionFlags(RenderOptionFlags f);
     RenderOptionFlags renderOptionFlags() const;
     void setRenderOption(RenderOption f, bool on);
     bool testRenderOption(RenderOption f) const;
 Q_SIGNALS:
+    /**
+     * \if ENGLISH
+     * @brief Emitted when node visibility changes
+     * @param[in] visible New visibility state
+     * @details Triggered by setVisible() when value actually changes.
+     *          Connect to update UI elements or perform related actions.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 节点可见性更改时触发
+     * @param[in] visible 新的可见性状态
+     * @details 当值实际更改时由setVisible()触发。
+     *          连接到更新UI元素或执行相关操作。
+     * \endif
+     */
     void visibleChanged(bool visible);
+    /**
+     * \if ENGLISH
+     * @brief Emitted when node enabled state changes
+     * @param[in] enabled New enabled state
+     * @details Triggered by setEnabled() when value actually changes.
+     *          Connect to update UI elements or perform related actions.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 节点启用状态更改时触发
+     * @param[in] enabled 新的启用状态
+     * @details 当值实际更改时由setEnabled()触发。
+     *          连接到更新UI元素或执行相关操作。
+     * \endif
+     */
     void enabledChanged(bool enabled);
     /**
-     * @brief 节点删除信号
+     * \if ENGLISH
+     * @brief Emitted when a child node is removed
+     * @param[in] c The removed child node
+     * @details Triggered when a child node is removed via removeChildNode() or takeChildNode().
+     * @note The node has not been destroyed yet; qobject_cast is still valid.
+     * \endif
      *
+     * \if CHINESE
+     * @brief 子节点移除信号
+     * @param[in] c 移除的子节点
+     * @details 通过removeChildNode()或takeChildNode()移除子节点时触发。
      * @note 此时节点还未销毁，可以调用qobject_cast
-     * @param c 删除的节点
+     * \endif
      */
     void childNodeRemoved(QIM::QImAbstractNode* c);
+    /**
+     * \if ENGLISH
+     * @brief Emitted when a child node is added
+     * @param[in] c The added child node
+     * @details Triggered when a child node is added via addChildNode() or insertChildNode().
+     *          Connect to perform initialization or UI updates for the new child.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 子节点添加信号
+     * @param[in] c 添加的子节点
+     * @details 通过addChildNode()或insertChildNode()添加子节点时触发。
+     *          连接到执行初始化或UI更新。
+     * \endif
+     */
     void childNodeAdded(QIM::QImAbstractNode* c);
 
 protected:
     /**
-     * @brief 子类实现具体ImGui渲染逻辑
+     * \if ENGLISH
+     * @brief Subclass implements specific ImGui rendering begin logic
      *
-     * 典型实现模式：
+     * @details Typical implementation pattern:
      * @code
      * bool QImPlotSectionNode::beginDraw()
      * {
      *     return ImPlot::BeginPlot(title.toUtf8().constData());
      * }
+     * @endcode
      *
-     * void QImPlotSectionNode::endDraw()
+     * @return true if section is open and children should be rendered
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 子类实现具体ImGui渲染逻辑
+     *
+     * @details 典型实现模式：
+     * @code
+     * bool QImPlotSectionNode::beginDraw()
      * {
-     *     ImPlot::EndPlot();
+     *     return ImPlot::BeginPlot(title.toUtf8().constData());
      * }
      * @endcode
      *
      * @return true if section is open and children should be rendered
+     * \endif
      */
     virtual bool beginDraw() = 0;
 
     /**
-     * @brief 子类实现具体ImGui渲染结束逻辑
-     * 典型实现模式：
-     * @code
-     * bool QImPlotSectionNode::beginDraw()
-     * {
-     *     return ImPlot::BeginPlot(title.toUtf8().constData());
-     * }
+     * \if ENGLISH
+     * @brief Subclass implements specific ImGui rendering end logic
      *
+     * @details Typical implementation pattern:
+     * @code
      * void QImPlotSectionNode::endDraw()
      * {
      *     ImPlot::EndPlot();
      * }
      * @endcode
+     * \endif
      *
-     * @return true if section is open and children should be rendered
+     * \if CHINESE
+     * @brief 子类实现具体ImGui渲染结束逻辑
+     *
+     * @details 典型实现模式：
+     * @code
+     * void QImPlotSectionNode::endDraw()
+     * {
+     *     ImPlot::EndPlot();
+     * }
+     * @endcode
+     * \endif
      */
     virtual void endDraw();
 
 
 private:
-    // 仅移除子列表引用（不改变 QObject 父子关系），供析构函数使用
+    // Remove child list reference only (does not change QObject parent-child); used by destructor
     void removeFromParentList();
-    // 更新 z-order 排序列表
+    // Update z-order sorted list
     void updateZOrderedList();
 
 private:
     bool m_visible { true };
     bool m_enabled { true };
-    int m_zOrder { 0 };  // z-order值
+    int m_zOrder { 0 };  // z-order value
     QList< QImAbstractNode* > m_children;
-    QList< QImAbstractNode* > m_childrenZordered;  // 按 z-order 预排序的子节点列表
-    QPointer< QImAbstractNode > m_parent;          // 逻辑父节点（弱引用，避免循环）
+    QList< QImAbstractNode* > m_childrenZordered;  // Pre-sorted child node list by z-order
+    QPointer< QImAbstractNode > m_parent;          // Logical parent node (weak reference, avoid circular)
     RenderOptionFlags m_renderFlags;
 };
 

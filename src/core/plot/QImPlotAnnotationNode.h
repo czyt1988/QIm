@@ -1,4 +1,4 @@
-﻿#ifndef QIMPLOTANNOTATIONNODE_H
+#ifndef QIMPLOTANNOTATIONNODE_H
 #define QIMPLOTANNOTATIONNODE_H
 
 #include "../../QImAPI.h"
@@ -59,138 +59,22 @@ class QIM_CORE_API QImPlotAnnotationNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotAnnotationNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotAnnotationNode::position
-     * @brief Position of the annotation in plot coordinates
-     *
-     * @details Defines the (x, y) position where the annotation will be rendered.
-     *          Coordinates are in plot space.
-     * @accessors READ position WRITE setPosition NOTIFY positionChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotAnnotationNode::position
-     * @brief 注释在绘图坐标中的位置
-     *
-     * @details 定义注释将渲染的 (x, y) 位置。
-     *          坐标在绘图空间中。
-     * @accessors READ position WRITE setPosition NOTIFY positionChanged
-     * \endif
-     */
+    // Position of the annotation in plot coordinates (READ position WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(QPointF position READ position WRITE setPosition NOTIFY positionChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotAnnotationNode::color
-     * @brief Text color of the annotation
-     *
-     * @details Defines the color for the annotation text.
-     *          When not set, uses a default color from ImPlot.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotAnnotationNode::color
-     * @brief 注释文本的颜色
-     *
-     * @details 定义注释文本的颜色。
-     *          未设置时，使用ImPlot的默认颜色。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
+    // Text color of the annotation (READ color WRITE setColor NOTIFY colorChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotAnnotationNode::text
-     * @brief Text content of the annotation
-     *
-     * @details Defines the text label displayed by the annotation.
-     *          Supports printf-style formatting when using setText() with arguments.
-     *          Default is empty string (no text displayed).
-     * @accessors READ text WRITE setText NOTIFY textChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotAnnotationNode::text
-     * @brief 注释的文本内容
-     *
-     * @details 定义注释显示的文本标签。
-     *          使用带参数的setText()时支持printf风格格式化。
-     *          默认为空字符串（不显示文本）。
-     * @accessors READ text WRITE setText NOTIFY textChanged
-     * \endif
-     */
+    // Text content of the annotation, supports printf-style formatting (READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotAnnotationNode::pixelOffset
-     * @brief Pixel offset from the plot position
-     *
-     * @details Defines the offset in pixels from the plot coordinates.
-     *          Positive values move the annotation right/down, negative values left/up.
-     *          Default is (0, 0).
-     * @accessors READ pixelOffset WRITE setPixelOffset NOTIFY pixelOffsetChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotAnnotationNode::pixelOffset
-     * @brief 相对于绘图位置的像素偏移
-     *
-     * @details 定义相对于绘图坐标的像素偏移。
-     *          正值将注释向右/下移动，负值向左/上移动。
-     *          默认值为 (0, 0)。
-     * @accessors READ pixelOffset WRITE setPixelOffset NOTIFY pixelOffsetChanged
-     * \endif
-     */
+    // Pixel offset from the plot position (READ pixelOffset WRITE setPixelOffset NOTIFY pixelOffsetChanged)
     Q_PROPERTY(QPointF pixelOffset READ pixelOffset WRITE setPixelOffset NOTIFY pixelOffsetChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotAnnotationNode::clamp
-     * @brief Whether to clamp the annotation within plot area
-     *
-     * @details When true, the annotation will be clamped to stay within the plot area.
-     *          When false, the annotation can be positioned outside the plot area.
-     *          Default is false.
-     * @accessors READ clamp WRITE setClamp NOTIFY clampChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotAnnotationNode::clamp
-     * @brief 是否将注释钳位在绘图区域内
-     *
-     * @details 为true时，注释将被钳位以保持在绘图区域内。
-     *          为false时，注释可以定位在绘图区域外。
-     *          默认值为false。
-     * @accessors READ clamp WRITE setClamp NOTIFY clampChanged
-     * \endif
-     */
+    // Whether to clamp the annotation within plot area (READ clamp WRITE setClamp NOTIFY clampChanged)
     Q_PROPERTY(bool clamp READ clamp WRITE setClamp NOTIFY clampChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotAnnotationNode::round
-     * @brief Whether to round the annotation position to integer pixels
-     *
-     * @details When true, the annotation position will be rounded to integer pixel coordinates.
-     *          This can improve text rendering sharpness.
-     *          Default is false.
-     * @accessors READ round WRITE setRound NOTIFY roundChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotAnnotationNode::round
-     * @brief 是否将注释位置舍入为整数像素
-     *
-     * @details 为true时，注释位置将舍入为整数像素坐标。
-     *          这可以提高文本渲染的清晰度。
-     *          默认值为false。
-     * @accessors READ round WRITE setRound NOTIFY roundChanged
-     * \endif
-     */
+    // Whether to round the annotation position to integer pixels (READ round WRITE setRound NOTIFY roundChanged)
     Q_PROPERTY(bool round READ round WRITE setRound NOTIFY roundChanged)
 
 public:

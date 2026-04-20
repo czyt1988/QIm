@@ -1,16 +1,35 @@
-﻿#include "PerformanceTestReportDialog.h"
+#include "PerformanceTestReportDialog.h"
 #include "ui_PerformanceTestReportDialog.h"
-#include "qcustomplot.h"
-#include <QPixmap>
-#include <QBuffer>
 #include <QDateTime>
-#include <QFile>
 #include <QTextDocument>
 #include <QPrinter>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QPainter>
-#include <QDebug>
+#include <QApplication>
+#include <QClipboard>
+#include <QFile>
+#include <QPageSize>
+#include <algorithm>
+
+// Helper for formatting point count labels
+static QString formatPointCount(int pointCount, bool chinese = false)
+{
+    if (pointCount >= 1000000) {
+        int million = pointCount / 1000000;
+        if (chinese) {
+            return QString("%1M（%2万）").arg(million).arg(pointCount / 10000);
+        }
+        return QString("%1M").arg(million);
+    }
+    if (pointCount >= 1000) {
+        int k = pointCount / 1000;
+        if (chinese) {
+            return QString("%1K（%2万）").arg(k).arg(pointCount / 10000);
+        }
+        return QString("%1K").arg(k);
+    }
+    return QString::number(pointCount);
+}
 
 PerformanceTestReportDialog::PerformanceTestReportDialog(QWidget* parent)
     : QDialog(parent), ui(new Ui::PerformanceTestReportDialog)
@@ -21,6 +40,7 @@ PerformanceTestReportDialog::PerformanceTestReportDialog(QWidget* parent)
 
     // 连接按钮信号
     connect(ui->pushButtonCopy, &QPushButton::clicked, this, &PerformanceTestReportDialog::onPushButtonCopy_clicked);
+    connect(ui->pushButtonSaveMarkdown, &QPushButton::clicked, this, &PerformanceTestReportDialog::onPushButtonSaveMarkdown_clicked);
     connect(ui->pushButtonExportToPdf, &QPushButton::clicked, this, &PerformanceTestReportDialog::onPushButtonExportToPdf_clicked);
 
     // 美化 QTextBrowser
@@ -46,6 +66,11 @@ void PerformanceTestReportDialog::changeEvent(QEvent* e)
     }
 }
 
+void PerformanceTestReportDialog::setSystemInfo(const SystemInfo& info)
+{
+    m_systemInfo = info;
+}
+
 void PerformanceTestReportDialog::setTestResults(
     const QVector< TestResult >& results, const PerformanceTestController::TestConfig& config, bool isFullBenchmark
 )
@@ -63,777 +88,387 @@ void PerformanceTestReportDialog::setTestResults(
                             .arg(config.useDownsampling ? "Downsampling" : "Baseline");
     }
 
-    // 生成并显示报告
-    QString reportHtml = generateReportHtml();
-    QFile file("./report.html");
-    if (file.open(QIODevice::ReadWrite)) {
-        file.write(reportHtml.toUtf8());
-    }
-    ui->textBrowser->setHtml(reportHtml);
+    // 生成并缓存Markdown报告
+    m_reportMarkdown = generateReportMarkdown();
+    ui->textBrowser->setMarkdown(m_reportMarkdown);
 }
 
-QString PerformanceTestReportDialog::generateReportHtml() const
+QString PerformanceTestReportDialog::generateReportMarkdown() const
 {
-    QDateTime now = QDateTime::currentDateTime();
+    const bool chinese = (m_reportLanguage == Chinese);
 
-    // 生成性能图表（必须在HTML生成前完成）
-
-    QPixmap renderTimeChart  = generateCostChart(m_results);
-    QString renderTimeBase64 = pixmapToBase64(renderTimeChart);
-
-    QPixmap fpsChart       = generateFpsChart(m_results);
-    QString fpsChartBase64 = pixmapToBase64(fpsChart);
-
-    QPixmap memoryChart       = generateMemoryChart(m_results);
-    QString memoryChartBase64 = pixmapToBase64(memoryChart);
-
-    // 格式化配置标签
-    QString openglTagClass = m_config.useOpenGL ? "tag-opengl" : "tag-baseline";
-    QString openglTagText  = m_config.useOpenGL ? "OpenGL Enabled" : "OpenGL Disabled";
-
-    QString downsampleTagClass = m_config.useDownsampling ? "tag-downsample" : "tag-baseline";
-    QString downsampleTagText  = m_config.useDownsampling ? "Downsampling Enabled" : "Downsampling Disabled";
-
-    // 格式化点数列表
-    QStringList pointStrs;
-    for (int pt : m_config.pointCounts) {
-        if (pt >= 1000000)
-            pointStrs << QString("%1M").arg(pt / 1000000);
-        else if (pt >= 1000)
-            pointStrs << QString("%1k").arg(pt / 1000);
-        else
-            pointStrs << QString::number(pt);
-    }
-    QString pointsList = pointStrs.join(", ");
-
-    // 修复：拆分 arg() 调用，避免超过9参数限制
-    QString htmlTemplatePart1 = R"(
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>%1</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                padding: 20px;
-                color: #333;
-            }
-
-            .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                background: white;
-                border-radius: 15px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-                overflow: hidden;
-            }
-
-            .header {
-                background: linear-gradient(135deg, #2c3e50 0%, #4a6fa5 100%);
-                color: black;
-                padding: 30px;
-                text-align: center;
-            }
-
-            .header h1 {
-                font-size: 28px;
-                margin-bottom: 10px;
-                font-weight: 600;
-            }
-
-            .header .subtitle {
-                font-size: 14px;
-                opacity: 0.9;
-                margin-top: 5px;
-            }
-
-            .config-tags {
-                display: flex;
-                justify-content: center;
-                gap: 15px;
-                margin: 20px 0;
-                flex-wrap: wrap;
-            }
-
-            .tag {
-                padding: 6px 16px;
-                border-radius: 20px;
-                font-size: 13px;
-                font-weight: 500;
-                background: rgba(255, 255, 255, 0.2);
-                backdrop-filter: blur(10px);
-            }
-
-            .tag-opengl { background: rgba(46, 204, 113, 0.3); color: #27ae60; }
-            .tag-downsample { background: rgba(52, 152, 219, 0.3); color: #2980b9; }
-            .tag-baseline { background: rgba(155, 89, 182, 0.3); color: #8e44ad; }
-
-            .content {
-                padding: 30px;
-            }
-
-            /* ========== 图表样式 ========== */
-            .chart-section {
-                margin: 30px 0;
-                padding: 20px;
-                background: white;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            }
-
-            .chart-section h3 {
-                margin: 0 0 15px 0;
-                color: #2c3e50;
-                font-size: 18px;
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .chart-wrapper {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 10px;
-                background: #f8f9fa;
-                border-radius: 8px;
-            }
-
-            .report-chart {
-                max-width: 100%;
-                height: auto;
-                display: block;
-                border-radius: 6px;
-                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
-                transition: transform 0.3s ease;
-            }
-
-            .report-chart:hover {
-                transform: scale(1.02);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.18);
-            }
-
-            /* ========== 表格样式 ========== */
-            .point-group {
-                margin-bottom: 35px;
-                background: #f8f9fa;
-                border-radius: 10px;
-                padding: 20px;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            }
-
-            .point-group h3 {
-                margin: 0 0 15px 0;
-                color: #2c3e50;
-                font-size: 17px;
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .results-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 10px 0;
-                font-size: 13px;
-                background: white;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-            }
-
-            .results-table th {
-                background: linear-gradient(135deg, #4a6fa5 0%, #2c3e50 100%);
-                color: black;
-                padding: 12px 10px;
-                text-align: left;
-                font-weight: 600;
-                font-size: 12px;
-            }
-
-            .results-table td {
-                padding: 10px;
-                border-bottom: 1px solid #e9ecef;
-            }
-
-            .results-table tr:last-child td {
-                border-bottom: none;
-            }
-
-            .results-table tr:hover {
-                background: #f1f8ff;
-            }
-
-            tr.excellent {
-                background-color: #d4edda !important;
-                border-left: 4px solid #28a745;
-            }
-
-            tr.acceptable {
-                background-color: #fff3cd !important;
-                border-left: 4px solid #ffc107;
-            }
-
-            tr.poor {
-                background-color: #f8d7da !important;
-                border-left: 4px solid #dc3545;
-            }
-
-            /* ========== 推荐部分 ========== */
-            .recommendations {
-                background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-                padding: 20px;
-                border-radius: 10px;
-                margin: 30px 0;
-            }
-
-            .recommendations h3 {
-                color: #2c3e50;
-                margin-bottom: 15px;
-                font-size: 18px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .recommendations ul {
-                margin-left: 20px;
-                line-height: 1.8;
-            }
-
-            .recommendations li {
-                margin-bottom: 8px;
-                color: #2c3e50;
-            }
-
-            /* ========== 页脚 ========== */
-            .footer {
-                margin-top: 40px;
-                padding-top: 20px;
-                border-top: 1px solid #e9ecef;
-                text-align: center;
-                color: #6c757d;
-                font-size: 13px;
-            }
-
-            .footer small {
-                display: block;
-                margin-top: 8px;
-                color: #999;
-                font-size: 11px;
-                line-height: 1.5;
-            }
-
-            /* 响应式设计 */
-            @media (max-width: 768px) {
-                .header {
-                    padding: 20px;
-                }
-
-                .header h1 {
-                    font-size: 22px;
-                }
-
-                .content {
-                    padding: 20px;
-                }
-
-                .chart-section {
-                    padding: 15px;
-                }
-
-                .report-chart {
-                    max-width: 95%;
-                }
-
-                .results-table {
-                    font-size: 12px;
-                }
-
-                .results-table th,
-                .results-table td {
-                    padding: 8px 6px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>%1</h1>
-                <div class="subtitle">Generated: %2</div>
-
-                <div class="config-tags">
-                    <span class="tag %3">%4</span>
-                    <span class="tag %5">%6</span>
-                </div>
-
-                <div style="margin-top: 15px; font-size: 13px;">
-                    <strong>Point Counts Tested:</strong> %7<br>
-                    <strong>Total Test Frames:</strong> %8 (including %9 warmup frames)
-                </div>
-            </div>
-
-            <div class="content">
-    )";
-
-    // 第一步：替换前10个参数
-    QString htmlPart1 = htmlTemplatePart1
-                            .arg(m_reportTitle)                        // %1
-                            .arg(now.toString("yyyy-MM-dd hh:mm:ss"))  // %2
-                            .arg(openglTagClass)
-                            .arg(openglTagText)  // %3, %4
-                            .arg(downsampleTagClass)
-                            .arg(downsampleTagText)      // %5, %6
-                            .arg(pointsList)             // %7
-                            .arg(m_config.testFrames)    // %8
-                            .arg(m_config.warmupFrames)  // %9
-        ;
-    // 第二步：添加图表部分
-    QString htmlPart2 = R"(
-                <div class="chart-section">
-                    <h3>📈 Rendering Performance (Render Time vs Data Points)</h3>
-                    <div class="chart-wrapper">
-                        <img src="data:image/png;base64,%1" alt="Render Time Chart" class="report-chart">
-                    </div>
-                </div>
-
-                <div class="chart-section">
-                    <h3>📈 Rendering Performance (FPS vs Data Points)</h3>
-                    <div class="chart-wrapper">
-                        <img src="data:image/png;base64,%2" alt="FPS Chart" class="report-chart">
-                    </div>
-                </div>
-
-                <div class="chart-section">
-                    <h3>💾 Memory Consumption vs Data Points</h3>
-                    <div class="chart-wrapper">
-                        <img src="data:image/png;base64,%3" alt="Memory Chart" class="report-chart">
-                    </div>
-                </div>
-
-                %4  <!-- Detailed results tables -->
-                %5  <!-- Recommendations -->
-
-                <div class="footer">
-                    Report generated by QIm Performance Benchmark Tool • %6
-                    <br><small>Note: Performance characteristics vary by hardware, drivers, and Qt build configuration. Always validate on target deployment environment.</small>
-                </div>
-            </div>
-        </body>
-        </html>
-        )";
-
-    // 第二步替换：图表 + 详细结果 + 建议 + 年份
-    QString htmlPart2Filled = htmlPart2
-                                  .arg(renderTimeBase64)                // %1
-                                  .arg(fpsChartBase64)                  // %2
-                                  .arg(memoryChartBase64)               // %3
-                                  .arg(generateDetailedResultsTable())  // %4
-                                  .arg(generateRecommendations())       // %5
-                                  .arg(now.toString("yyyy"));           // %6
-
-    // 合并两部分
-    return htmlPart1 + htmlPart2Filled;
-}
-
-QPixmap PerformanceTestReportDialog::generateFpsChart(const QVector< TestResult >& results) const
-{
-    // 创建临时QCustomPlot用于渲染
-    QCustomPlot plot;
-    plot.resize(800, 400);
-
-    QMap< QString, QVector< QPointF > > dataMap;
-    for (const TestResult& result : results) {
-        dataMap[ result.libraryName ].append(QPointF(result.pointCount, result.fps));
+    // --- Title ---
+    QString md;
+    if (chinese) {
+        md += "# 性能基准测试报告\n\n";
+    } else {
+        md += "# Performance Benchmark Report\n\n";
     }
 
-    struct Styles
-    {
-        QColor color { Qt::black };
-        QCPScatterStyle::ScatterShape shape { QCPScatterStyle::ssCircle };
-    };
-
-    QMap< QString, Styles > style;
-    style[ "QIm" ]         = { QColor(52, 152, 219), QCPScatterStyle::ssCircle };    // 蓝色
-    style[ "Qwt" ]         = { QColor(231, 76, 60), QCPScatterStyle::ssSquare };     // 红色
-    style[ "QCustomPlot" ] = { QColor(46, 204, 113), QCPScatterStyle::ssTriangle };  // 绿色
-    style[ "Qt Charts" ]   = { QColor(155, 89, 182), QCPScatterStyle::ssDisc };      // 紫色
-
-    int graphIndex = 0;
-    for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
-        plot.addGraph();
-
-        QVector< double > keys, values;
-        for (const QPointF& p : it.value()) {
-            keys.append(p.x());
-            values.append(p.y());
+    // --- System Information ---
+    if (chinese) {
+        md += "## 系统信息\n\n";
+        md += "| 项目 | 值 |\n";
+        md += "|---|---|\n";
+        md += "| 操作系统 | " + m_systemInfo.osName + " |\n";
+        md += "| CPU | " + m_systemInfo.cpuModel + " (" + QString::number(m_systemInfo.cpuCoreCount) + " 核) |\n";
+        md += "| 内存 | " + QString::number(m_systemInfo.ramTotalMB, 'f', 0) + " MB |\n";
+        md += "| GPU | " + m_systemInfo.gpuName + " |\n";
+        md += "| 显存 | " + (m_systemInfo.gpuVramMB > 0 ? QString::number(m_systemInfo.gpuVramMB, 'f', 0) + " MB" : "未知") + " |\n";
+        md += "| OpenGL | " + m_systemInfo.openglVersion + " |\n";
+        md += "| 屏幕 | " + m_systemInfo.screenResolution + " |\n";
+        md += "| 磁盘 | " + m_systemInfo.diskType + " |\n";
+        md += "| Qt | " + m_systemInfo.qtVersion + " |\n";
+        md += "| 编译器 | " + m_systemInfo.compilerInfo + " |\n";
+        if (m_systemInfo.isSoftwareOpenGL) {
+            md += "\n> ⚠️ **检测到软件OpenGL** (" + m_systemInfo.openglRenderer + ") — 测试结果可能不代表硬件加速性能。\n";
         }
-
-        plot.graph(graphIndex)->setData(keys, values, true);
-        plot.graph(graphIndex)->setPen(QPen(style.value(it.key()).color, 3));
-        plot.graph(graphIndex)->setName(it.key());
-        plot.graph(graphIndex)->setScatterStyle(QCPScatterStyle(style.value(it.key()).shape, 9));
-        plot.graph(graphIndex)->setLineStyle(QCPGraph::lsLine);
-
-        graphIndex++;
-    }
-
-    // 配置坐标轴
-    plot.xAxis->setLabel("Number of Points");
-    // plot.xAxis->setScaleType(QCPAxis::stLogarithmic);
-    plot.xAxis->setNumberFormat("ebc");
-    plot.xAxis->setNumberPrecision(0);
-    plot.xAxis->setLabelFont(QFont("Segoe UI", 11, QFont::Bold));
-    plot.xAxis->setTickLabelFont(QFont("Segoe UI", 10));
-
-    plot.yAxis->setLabel("FPS (Frames Per Second)");
-    plot.yAxis->setLabelFont(QFont("Segoe UI", 11, QFont::Bold));
-    plot.yAxis->setTickLabelFont(QFont("Segoe UI", 10));
-
-
-    // 网格
-    plot.xAxis->grid()->setVisible(true);
-    plot.yAxis->grid()->setVisible(true);
-    plot.xAxis->grid()->setPen(QPen(QColor(200, 200, 200), 0.8));
-    plot.yAxis->grid()->setPen(QPen(QColor(200, 200, 200), 0.8));
-
-    // 图例
-    plot.legend->setVisible(true);
-    plot.legend->setFont(QFont("Segoe UI", 10));
-    plot.legend->setBrush(QColor(255, 255, 255, 230));
-    plot.legend->setBorderPen(QPen(QColor(150, 150, 150)));
-    plot.axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop | Qt::AlignRight);
-
-    // 标题
-    plot.plotLayout()->insertRow(0);
-    QCPTextElement* title =
-        new QCPTextElement(&plot, "Rendering Performance Comparison", QFont("Segoe UI", 14, QFont::Bold));
-    plot.plotLayout()->addElement(0, 0, title);
-
-    plot.rescaleAxes(true);
-    plot.xAxis->scaleRange(1.1);
-    plot.yAxis->scaleRange(1.1);
-    plot.xAxis->setRangeLower(0);
-    plot.yAxis->setRangeLower(0);
-
-    plot.replot();
-
-    // 渲染为Pixmap
-    return plot.toPixmap(plot.width(), plot.height());
-}
-
-QPixmap PerformanceTestReportDialog::generateCostChart(const QVector< TestResult >& results) const
-{
-    // 创建临时QCustomPlot用于渲染
-    QCustomPlot plot;
-    plot.resize(800, 400);
-
-    // 按库分组数据
-    QMap< QString, QVector< QPointF > > dataMap;
-    for (const TestResult& result : results) {
-        dataMap[ result.libraryName ].append(QPointF(result.pointCount, result.renderTime));
-    }
-
-    struct Styles
-    {
-        QColor color { Qt::black };
-        QCPScatterStyle::ScatterShape shape { QCPScatterStyle::ssCircle };
-    };
-    QMap< QString, Styles > style;
-    style[ "QIm" ]         = { QColor(52, 152, 219), QCPScatterStyle::ssCircle };    // 蓝色
-    style[ "Qwt" ]         = { QColor(231, 76, 60), QCPScatterStyle::ssSquare };     // 红色
-    style[ "QCustomPlot" ] = { QColor(46, 204, 113), QCPScatterStyle::ssTriangle };  // 绿色
-    style[ "Qt Charts" ]   = { QColor(155, 89, 182), QCPScatterStyle::ssDisc };      // 紫色
-
-    int graphIndex = 0;
-    for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
-        plot.addGraph();
-
-        QVector< double > keys, values;
-        for (const QPointF& p : it.value()) {
-            keys.append(p.x());
-            values.append(p.y());
+        md += "\n";
+    } else {
+        md += "## System Information\n\n";
+        md += "| Item | Value |\n";
+        md += "|---|---|\n";
+        md += "| OS | " + m_systemInfo.osName + " |\n";
+        md += "| CPU | " + m_systemInfo.cpuModel + " (" + QString::number(m_systemInfo.cpuCoreCount) + " cores) |\n";
+        md += "| RAM | " + QString::number(m_systemInfo.ramTotalMB, 'f', 0) + " MB |\n";
+        md += "| GPU | " + m_systemInfo.gpuName + " |\n";
+        md += "| VRAM | " + (m_systemInfo.gpuVramMB > 0 ? QString::number(m_systemInfo.gpuVramMB, 'f', 0) + " MB" : "Unknown") + " |\n";
+        md += "| OpenGL | " + m_systemInfo.openglVersion + " |\n";
+        md += "| Screen | " + m_systemInfo.screenResolution + " |\n";
+        md += "| Disk | " + m_systemInfo.diskType + " |\n";
+        md += "| Qt | " + m_systemInfo.qtVersion + " |\n";
+        md += "| Compiler | " + m_systemInfo.compilerInfo + " |\n";
+        if (m_systemInfo.isSoftwareOpenGL) {
+            md += "\n> ⚠️ **Software OpenGL detected** (" + m_systemInfo.openglRenderer + ") — results may not reflect hardware-accelerated performance.\n";
         }
-
-        plot.graph(graphIndex)->setData(keys, values, true);
-        plot.graph(graphIndex)->setPen(QPen(style.value(it.key()).color, 3));
-        plot.graph(graphIndex)->setName(it.key());
-        plot.graph(graphIndex)->setScatterStyle(QCPScatterStyle(style.value(it.key()).shape, 9));
-        plot.graph(graphIndex)->setLineStyle(QCPGraph::lsLine);
-
-        graphIndex++;
+        md += "\n";
     }
 
-    // 配置坐标轴
-    plot.xAxis->setLabel("Number of Points");
-    // plot.xAxis->setScaleType(QCPAxis::stLogarithmic);
-    plot.xAxis->setNumberFormat("ebc");
-    plot.xAxis->setNumberPrecision(0);
-    plot.xAxis->setLabelFont(QFont("Segoe UI", 11, QFont::Bold));
-    plot.xAxis->setTickLabelFont(QFont("Segoe UI", 10));
+    // --- Test Configuration ---
+    if (chinese) {
+        md += "## 测试配置\n\n";
+        md += QString("- 降采样: %1\n").arg(m_config.useDownsampling ? "开启" : "关闭");
+        md += QString("- OpenGL: %1\n").arg(m_config.useOpenGL ? "开启" : "关闭");
+        md += QString("- 测试点数: %1\n").arg(formatPointCountList(m_config.pointCounts, true));
+        md += QString("- 测试帧数: %1（含 %2 帧预热）\n").arg(m_config.testFrames).arg(m_config.warmupFrames);
+    } else {
+        md += "## Test Configuration\n\n";
+        md += QString("- Downsampling: %1\n").arg(m_config.useDownsampling ? "On" : "Off");
+        md += QString("- OpenGL: %1\n").arg(m_config.useOpenGL ? "On" : "Off");
+        md += QString("- Point Counts: %1\n").arg(formatPointCountList(m_config.pointCounts, false));
+        md += QString("- Test Frames: %1 (including %2 warmup frames)\n").arg(m_config.testFrames).arg(m_config.warmupFrames);
+    }
+    md += "\n";
 
-    plot.yAxis->setLabel("Render Time (ms)");
-    plot.yAxis->setLabelFont(QFont("Segoe UI", 11, QFont::Bold));
-    plot.yAxis->setTickLabelFont(QFont("Segoe UI", 10));
-
-
-    // 网格
-    plot.xAxis->grid()->setVisible(true);
-    plot.yAxis->grid()->setVisible(true);
-    plot.xAxis->grid()->setPen(QPen(QColor(200, 200, 200), 0.8));
-    plot.yAxis->grid()->setPen(QPen(QColor(200, 200, 200), 0.8));
-
-    // 图例
-    plot.legend->setVisible(true);
-    plot.legend->setFont(QFont("Segoe UI", 10));
-    plot.legend->setBrush(QColor(255, 255, 255, 230));
-    plot.legend->setBorderPen(QPen(QColor(150, 150, 150)));
-    plot.axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop | Qt::AlignRight);
-
-    // 标题
-    plot.plotLayout()->insertRow(0);
-    QCPTextElement* title =
-        new QCPTextElement(&plot, "Rendering Performance Comparison", QFont("Segoe UI", 14, QFont::Bold));
-    plot.plotLayout()->addElement(0, 0, title);
-
-    plot.rescaleAxes(true);
-    plot.xAxis->scaleRange(1.1);
-    plot.yAxis->scaleRange(1.1);
-    plot.xAxis->setRangeLower(0);
-    plot.yAxis->setRangeLower(0);
-    plot.replot();
-
-    // 渲染为Pixmap
-    return plot.toPixmap(plot.width(), plot.height());
-}
-
-QPixmap PerformanceTestReportDialog::generateMemoryChart(const QVector< TestResult >& results) const
-{
-    QCustomPlot plot;
-    plot.resize(800, 400);
-
-    // 按库分组数据
-    QMap< QString, QVector< QPointF > > dataMap;
-    for (const TestResult& result : results) {
-        dataMap[ result.libraryName ].append(QPointF(result.pointCount, result.memoryUsage));
+    // --- Results (per point-count tables) ---
+    if (chinese) {
+        md += "## 测试结果\n\n";
+    } else {
+        md += "## Results\n\n";
     }
 
-    struct Styles
-    {
-        QColor color { Qt::black };
-        QCPScatterStyle::ScatterShape shape { QCPScatterStyle::ssCircle };
-    };
-
-    QMap< QString, Styles > style;
-    style[ "QIm" ]         = { QColor(52, 152, 219), QCPScatterStyle::ssCircle };    // 蓝色
-    style[ "Qwt" ]         = { QColor(231, 76, 60), QCPScatterStyle::ssSquare };     // 红色
-    style[ "QCustomPlot" ] = { QColor(46, 204, 113), QCPScatterStyle::ssTriangle };  // 绿色
-    style[ "Qt Charts" ]   = { QColor(155, 89, 182), QCPScatterStyle::ssDisc };      // 紫色
-
-    int graphIndex = 0;
-    for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
-        plot.addGraph();
-
-        QVector< double > keys, values;
-        for (const QPointF& p : it.value()) {
-            keys.append(p.x());
-            values.append(p.y());
-        }
-
-        plot.graph(graphIndex)->setData(keys, values, true);
-        plot.graph(graphIndex)->setPen(QPen(style.value(it.key()).color, 3));
-        plot.graph(graphIndex)->setName(it.key());
-        plot.graph(graphIndex)->setScatterStyle(QCPScatterStyle(style.value(it.key()).shape, 9));
-        plot.graph(graphIndex)->setLineStyle(QCPGraph::lsLine);
-
-        graphIndex++;
-    }
-
-    // 配置坐标轴
-    plot.xAxis->setLabel("Number of Points");
-    // plot.xAxis->setScaleType(QCPAxis::stLogarithmic);
-    plot.xAxis->setNumberFormat("ebc");
-    plot.xAxis->setNumberPrecision(0);
-    plot.xAxis->setLabelFont(QFont("Segoe UI", 11, QFont::Bold));
-
-    plot.yAxis->setLabel("Memory Usage (MB)");
-    plot.yAxis->setLabelFont(QFont("Segoe UI", 11, QFont::Bold));
-
-    // 网格
-    plot.xAxis->grid()->setVisible(true);
-    plot.yAxis->grid()->setVisible(true);
-
-    // 图例
-    plot.legend->setVisible(true);
-    plot.legend->setFont(QFont("Segoe UI", 10));
-    plot.legend->setBrush(QColor(255, 255, 255, 230));
-
-    // 标题
-    plot.plotLayout()->insertRow(0);
-    QCPTextElement* title = new QCPTextElement(&plot, "Memory Consumption Comparison", QFont("Segoe UI", 14, QFont::Bold));
-    plot.plotLayout()->addElement(0, 0, title);
-
-    plot.rescaleAxes(true);
-    plot.xAxis->scaleRange(1.1);
-    plot.yAxis->scaleRange(1.1);
-    plot.xAxis->setRangeLower(0);
-    plot.yAxis->setRangeLower(0);
-    plot.replot();
-
-    return plot.toPixmap(plot.width(), plot.height());
-}
-
-QString PerformanceTestReportDialog::pixmapToBase64(const QPixmap& pixmap) const
-{
-    if (pixmap.isNull())
-        return "";
-
-    QByteArray byteArray;
-    QBuffer buffer(&byteArray);
-    buffer.open(QIODevice::WriteOnly);
-    pixmap.save(&buffer, "PNG");
-    buffer.close();
-
-    return byteArray.toBase64();
-}
-
-
-QString PerformanceTestReportDialog::generateDetailedResultsTable() const
-{
-    // 按点数分组结果
+    // Group by point count, sorted ascending
     QMap< int, QVector< TestResult > > groupedByPoints;
     for (const TestResult& r : m_results) {
         groupedByPoints[ r.pointCount ].append(r);
     }
 
-    QString tables;
+    QList< int > sortedPoints = groupedByPoints.keys();
+    std::sort(sortedPoints.begin(), sortedPoints.end());
 
-    // 为每个点数生成独立表格
-    for (auto it = groupedByPoints.begin(); it != groupedByPoints.end(); ++it) {
-        int pointCount                                = it.key();
-        const QVector< TestResult >& resultsForPoints = it.value();
+    for (int pointCount : sortedPoints) {
+        md += formatResultsTable(groupedByPoints[ pointCount ], pointCount);
+    }
 
-        // 格式化点数显示
-        QString pointsLabel;
-        if (pointCount >= 1000000)
-            pointsLabel = QString("%1 Million Points").arg(pointCount / 1000000);
-        else if (pointCount >= 1000)
-            pointsLabel = QString("%1K Points").arg(pointCount / 1000);
-        else
-            pointsLabel = QString("%1 Points").arg(pointCount);
+    // --- Recommendations ---
+    md += generateRecommendationsMarkdown();
 
-        // 表格标题
-        tables += QString(R"(
-                <div class="point-group">
-                    <h3>📊 %1 Test Results</h3>
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>Library</th>
-                                <th>Setup Time (ms)</th>
-                                <th>Render Time (ms)</th>
-                                <th>FPS</th>
-                                <th>Memory (MB)</th>
-                                <th>OpenGL</th>
-                                <th>Downsampling</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            )")
-                      .arg(pointsLabel);
+    // --- Mermaid Charts (optional) ---
+    if (m_includeMermaid) {
+        md += generateMermaidCharts();
+    }
 
-        // 按FPS排序（从高到低）以突出最佳表现
-        QVector< TestResult > sortedResults = resultsForPoints;
-        std::sort(sortedResults.begin(), sortedResults.end(), [](const TestResult& a, const TestResult& b) {
-            return a.fps > b.fps;
-        });
+    return md;
+}
 
-        // 生成表格行
-        for (const TestResult& r : sortedResults) {
-            QString rowClass = getPerformanceClass(r.fps);
+QString PerformanceTestReportDialog::formatPointCountList(const QVector<int>& pointCounts, bool chinese) const
+{
+    QStringList parts;
+    for (int pt : pointCounts) {
+        parts << formatPointCount(pt, chinese);
+    }
+    return parts.join(", ");
+}
 
-            tables += QString(R"(
-                    <tr class="%1">
-                        <td><strong>%2</strong></td>
-                        <td>%3</td>
-                        <td>%4</td>
-                        <td><strong>%5</strong></td>
-                        <td>%6</td>
-                        <td>%7</td>
-                        <td>%8</td>
-                    </tr>
-                )")
-                          .arg(rowClass)
-                          .arg(r.libraryName)
-                          .arg(r.setupTime)
-                          .arg(r.renderTime)
-                          .arg(r.fps)
-                          .arg(r.memoryUsage)
-                          .arg(r.usedOpenGL ? "✓ Yes" : "× No")
-                          .arg(r.usedDownsampling ? "✓ Yes" : "× No");
+QString PerformanceTestReportDialog::generateMermaidCharts() const
+{
+    if (m_results.isEmpty())
+        return QString();
+
+    const bool chinese = (m_reportLanguage == Chinese);
+
+    // Group data by library name
+    struct LibData {
+        QVector<int> pointCounts;
+        QVector<double> fps;
+        QVector<double> renderTime;
+        QVector<double> memory;
+    };
+    QMap<QString, LibData> libDataMap;
+
+    QVector<int> allPointCounts;
+    for (const TestResult& r : m_results) {
+        if (!allPointCounts.contains(r.pointCount)) {
+            allPointCounts.append(r.pointCount);
+        }
+    }
+    std::sort(allPointCounts.begin(), allPointCounts.end());
+
+    for (const TestResult& r : m_results) {
+        LibData& data = libDataMap[r.libraryName];
+        if (!data.pointCounts.contains(r.pointCount)) {
+            data.pointCounts.append(r.pointCount);
+        }
+    }
+
+    // Ensure all libs have data for all point counts (fill missing with 0)
+    for (auto& entry : libDataMap) {
+        for (int pt : allPointCounts) {
+            if (!entry.pointCounts.contains(pt)) {
+                entry.pointCounts.append(pt);
+                entry.fps.append(0);
+                entry.renderTime.append(0);
+                entry.memory.append(0);
+            }
+        }
+    }
+
+    // Actually populate the values
+    QMap<QString, QMap<int, TestResult>> resultMap;
+    for (const TestResult& r : m_results) {
+        resultMap[r.libraryName][r.pointCount] = r;
+    }
+
+    for (auto it = libDataMap.begin(); it != libDataMap.end(); ++it) {
+        QString libName = it.key();
+        it->pointCounts.clear();
+        it->fps.clear();
+        it->renderTime.clear();
+        it->memory.clear();
+        for (int pt : allPointCounts) {
+            it->pointCounts.append(pt);
+            if (resultMap.contains(libName) && resultMap[libName].contains(pt)) {
+                const TestResult& r = resultMap[libName][pt];
+                it->fps.append(r.fps);
+                it->renderTime.append(r.renderTime);
+                it->memory.append(r.memoryUsage);
+            } else {
+                it->fps.append(0);
+                it->renderTime.append(0);
+                it->memory.append(0);
+            }
+        }
+    }
+
+    // Sort point counts and format X-axis labels
+    QStringList xLabels;
+    for (int pt : allPointCounts) {
+        xLabels << formatPointCountLabel(pt);
+    }
+
+    // Library sort order
+    static const QStringList libOrder = { "QIm", "Qwt", "QCustomPlot", "Qt Charts" };
+    QStringList sortedLibNames = libDataMap.keys();
+    std::sort(sortedLibNames.begin(), sortedLibNames.end(), [](const QString& a, const QString& b) {
+        static const QStringList order = { "QIm", "Qwt", "QCustomPlot", "Qt Charts" };
+        int idxA = order.indexOf(a);
+        int idxB = order.indexOf(b);
+        if (idxA == -1) idxA = 999;
+        if (idxB == -1) idxB = 999;
+        return idxA < idxB;
+    });
+
+    QString mermaid;
+
+    // --- FPS Chart ---
+    mermaid += "## ";
+    mermaid += chinese ? "FPS 对比\n" : "FPS Comparison\n";
+    mermaid += "```mermaid\n";
+    mermaid += "xychart-beta\n";
+    mermaid += QString("    title \"%1\"\n").arg(chinese ? "FPS 对比" : "FPS Comparison");
+    mermaid += QString("    x-axis [%1]\n").arg(xLabels.join(", "));
+    // Calculate FPS range
+    double maxFps = 0;
+    for (const auto& lib : sortedLibNames) {
+        for (double v : libDataMap[lib].fps) {
+            if (v > maxFps) maxFps = v;
+        }
+    }
+    mermaid += QString("    y-axis \"FPS\" 0 --> %1\n").arg(maxFps * 1.1, 0, 'f', 0);
+    for (const QString& lib : sortedLibNames) {
+        mermaid += QString("    line \"%1\" [%2]\n")
+                       .arg(lib)
+                       .arg(formatNumberList(libDataMap[lib].fps, 2));
+    }
+    mermaid += "```\n\n";
+
+    // --- Render Time Chart ---
+    mermaid += "## ";
+    mermaid += chinese ? "渲染时间对比\n" : "Render Time Comparison\n";
+    mermaid += "```mermaid\n";
+    mermaid += "xychart-beta\n";
+    mermaid += QString("    title \"%1\"\n").arg(chinese ? "渲染时间对比 (ms)" : "Render Time Comparison (ms)");
+    mermaid += QString("    x-axis [%1]\n").arg(xLabels.join(", "));
+    double maxRenderTime = 0;
+    for (const auto& lib : sortedLibNames) {
+        for (double v : libDataMap[lib].renderTime) {
+            if (v > maxRenderTime) maxRenderTime = v;
+        }
+    }
+    mermaid += QString("    y-axis \"Render Time (ms)\" 0 --> %1\n").arg(maxRenderTime * 1.1, 0, 'f', 0);
+    for (const QString& lib : sortedLibNames) {
+        mermaid += QString("    line \"%1\" [%2]\n")
+                       .arg(lib)
+                       .arg(formatNumberList(libDataMap[lib].renderTime, 2));
+    }
+    mermaid += "```\n\n";
+
+    // --- Memory Chart ---
+    mermaid += "## ";
+    mermaid += chinese ? "内存消耗对比\n" : "Memory Consumption Comparison\n";
+    mermaid += "```mermaid\n";
+    mermaid += "xychart-beta\n";
+    mermaid += QString("    title \"%1\"\n").arg(chinese ? "内存消耗对比 (MB)" : "Memory Consumption Comparison (MB)");
+    mermaid += QString("    x-axis [%1]\n").arg(xLabels.join(", "));
+    double maxMemory = 0;
+    for (const auto& lib : sortedLibNames) {
+        for (double v : libDataMap[lib].memory) {
+            if (v > maxMemory) maxMemory = v;
+        }
+    }
+    mermaid += QString("    y-axis \"Memory (MB)\" 0 --> %1\n").arg(maxMemory * 1.1, 0, 'f', 0);
+    for (const QString& lib : sortedLibNames) {
+        mermaid += QString("    line \"%1\" [%2]\n")
+                       .arg(lib)
+                       .arg(formatNumberList(libDataMap[lib].memory, 2));
+    }
+    mermaid += "```\n";
+
+    return mermaid;
+}
+
+// Helpers for Mermaid generation
+QString PerformanceTestReportDialog::formatPointCountLabel(int pointCount) const
+{
+    if (pointCount >= 1000000) {
+        return QString("%1M").arg(pointCount / 1000000);
+    }
+    return QString("%1K").arg(pointCount / 1000);
+}
+
+QString PerformanceTestReportDialog::formatNumberList(const QVector<double>& values, int precision) const
+{
+    QStringList parts;
+    for (double v : values) {
+        parts << QString::number(v, 'f', precision);
+    }
+    return parts.join(", ");
+}
+
+QString PerformanceTestReportDialog::formatResultsTable(const QVector<TestResult>& results, int pointCount) const
+{
+    const bool chinese = (m_reportLanguage == Chinese);
+
+    // Library sort order: QIm, Qwt, QCustomPlot, Qt Charts
+    static const QStringList order = { "QIm", "Qwt", "QCustomPlot", "Qt Charts" };
+    QVector<TestResult> sortedResults = results;
+    std::sort(sortedResults.begin(), sortedResults.end(), [](const TestResult& a, const TestResult& b) {
+        static const QStringList libOrder = { "QIm", "Qwt", "QCustomPlot", "Qt Charts" };
+        int idxA = libOrder.indexOf(a.libraryName);
+        int idxB = libOrder.indexOf(b.libraryName);
+        if (idxA == -1) idxA = 999;
+        if (idxB == -1) idxB = 999;
+        return idxA < idxB;
+    });
+
+    QString md;
+    if (chinese) {
+        md += QString("### %1 数据点\n\n").arg(formatPointCount(pointCount, true));
+        md += "| 库 | 设置时间 (ms) | 渲染时间 (ms) | FPS | 内存 (MB) | OpenGL | 降采样 |\n";
+        md += "|:---|:---|:---|:---|:---|:---|:---|\n";
+    } else {
+        md += QString("### %1 Points\n\n").arg(formatPointCount(pointCount, false));
+        md += "| Library | Setup Time (ms) | Render Time (ms) | FPS | Memory (MB) | OpenGL | Downsampling |\n";
+        md += "|---|---|---|---|---|---|---|\n";
+    }
+
+    for (const TestResult& r : sortedResults) {
+        QString renderTime = QString::number(r.renderTime, 'f', 2);
+        QString fps = QString::number(r.fps, 'f', 4);
+        // Trim trailing zeros from FPS
+        while (fps.contains('.') && fps.endsWith('0')) { fps.chop(1); }
+        if (fps.endsWith('.')) fps.chop(1);
+
+        QString memory = QString::number(r.memoryUsage, 'f', 2);
+        if (r.memoryUsage < 10.0) {
+            memory = QString::number(r.memoryUsage, 'f', 5);
+            while (memory.contains('.') && memory.endsWith('0')) { memory.chop(1); }
+            if (memory.endsWith('.')) memory.chop(1);
         }
 
-        tables += R"(
-                        </tbody>
-                    </table>
-                </div>
-            )";
-    }
+        QString setupTime = QString::number(r.setupTime, 'f', 2);
+        QString openglStr = r.usedOpenGL ? "Yes" : "No";
+        QString downsampleStr = r.usedDownsampling ? "Yes" : "No";
 
-    return tables;
+        if (chinese) {
+            md += QString("| %1 | %2 | %3 | %4 | %5 | %6 | %7 |\n")
+                      .arg(r.libraryName).arg(setupTime).arg(renderTime).arg(fps).arg(memory)
+                      .arg(m_config.useOpenGL ? "✓" : "×")
+                      .arg(m_config.useDownsampling ? "✓" : "×");
+        } else {
+            md += QString("| %1 | %2 | %3 | %4 | %5 | %6 | %7 |\n")
+                      .arg(r.libraryName).arg(setupTime).arg(renderTime).arg(fps).arg(memory)
+                      .arg(openglStr).arg(downsampleStr);
+        }
+    }
+    md += "\n";
+    return md;
 }
 
-QString PerformanceTestReportDialog::generateRecommendations() const
+QString PerformanceTestReportDialog::generateRecommendationsMarkdown() const
 {
-    QString recommendations = R"(
-    <div class="recommendation">
-        <h2>💡 Expert Recommendations</h2>
-        <ul>
-    )";
+    const bool chinese = (m_reportLanguage == Chinese);
 
-    if (m_config.useOpenGL && m_config.useDownsampling) {
-        recommendations += "<li><strong>Production Deployment:</strong> This configuration (OpenGL + Downsampling) is "
-                           "optimal for real-time applications with large datasets (>100k points)</li>";
-    } else if (m_config.useOpenGL) {
-        recommendations += "<li><strong>Medium Datasets:</strong> OpenGL acceleration provides significant FPS boost; "
-                           "consider adding downsampling for datasets >500k points</li>";
-    } else if (m_config.useDownsampling) {
-        recommendations += "<li><strong>Legacy Hardware:</strong> Downsampling maintains usability on systems without "
-                           "GPU acceleration</li>";
+    QString md;
+    if (chinese) {
+        md += "## 建议\n\n";
+        if (m_config.useOpenGL && m_config.useDownsampling) {
+            md += "- **生产部署**: 此配置（OpenGL + 降采样）最适合大数据量（>10万点）的实时应用\n";
+        } else if (m_config.useOpenGL) {
+            md += "- **中等数据集**: OpenGL加速显著提升FPS；对于 >50万点数据建议开启降采样\n";
+        } else if (m_config.useDownsampling) {
+            md += "- **老旧硬件**: 降采样在无GPU加速的系统上仍可保持可用性\n";
+        } else {
+            md += "- **调试/小数据集**: 基础配置适合 <5万点数据，视觉保真度最高\n";
+        }
+        md += "- **内存注意**: 监控内存增长；>100万点数据可能需要流式或虚拟化技术\n";
+        md += "- **验证**: 务必在目标硬件上测试——性能因GPU/驱动差异显著\n";
     } else {
-        recommendations += "<li><strong>Debugging/Small Datasets:</strong> Baseline configuration suitable for "
-                           "datasets <50k points where visual fidelity is critical</li>";
+        md += "## Recommendations\n\n";
+        if (m_config.useOpenGL && m_config.useDownsampling) {
+            md += "- **Production Deployment**: This configuration (OpenGL + Downsampling) is optimal for real-time applications with large datasets (>100k points)\n";
+        } else if (m_config.useOpenGL) {
+            md += "- **Medium Datasets**: OpenGL acceleration provides significant FPS boost; consider adding downsampling for datasets >500k points\n";
+        } else if (m_config.useDownsampling) {
+            md += "- **Legacy Hardware**: Downsampling maintains usability on systems without GPU acceleration\n";
+        } else {
+            md += "- **Debugging/Small Datasets**: Baseline configuration suitable for datasets <50k points where visual fidelity is critical\n";
+        }
+        md += "- **Memory Consideration**: Monitor memory usage growth; datasets >1M points may require streaming or virtualization techniques\n";
+        md += "- **Validation**: Always test on target hardware - performance varies significantly across GPU/drivers\n";
     }
-
-
-    recommendations += R"(
-            <li><strong>Memory Consideration:</strong> Monitor memory usage growth; datasets >1M points may require streaming or virtualization techniques</li>
-            <li><strong>Validation:</strong> Always test on target hardware - performance varies significantly across GPU/drivers</li>
-        </ul>
-    </div>
-    )";
-
-    return recommendations;
-}
-
-QString PerformanceTestReportDialog::getPerformanceClass(double fps) const
-{
-    if (fps > 50)
-        return "excellent";
-    if (fps > 15)
-        return "acceptable";
-    return "poor";
+    md += "\n";
+    return md;
 }
 
 void PerformanceTestReportDialog::onPushButtonCopy_clicked()
@@ -843,100 +478,43 @@ void PerformanceTestReportDialog::onPushButtonCopy_clicked()
         return;
     }
 
-    // 1. 生成配置描述
-    QString openglStatus     = m_config.useOpenGL ? "开启" : "关闭";
-    QString downsampleStatus = m_config.useDownsampling ? "开启" : "关闭";
-    QString configDesc       = QString("降采样%1 + OpenGL %2").arg(downsampleStatus).arg(openglStatus);
-
-    // 2. 按点数分组结果
-    QMap< int, QVector< TestResult > > groupedByPoints;
-    for (const TestResult& result : m_results) {
-        groupedByPoints[ result.pointCount ].append(result);
-    }
-
-    // 3. 生成Markdown内容
-    QString markdown;
-    markdown += QString("### 测试：%1\n\n").arg(configDesc);
-
-    // 按点数从小到大排序处理
-    QList< int > sortedPoints = groupedByPoints.keys();
-    std::sort(sortedPoints.begin(), sortedPoints.end());
-
-    for (int pointCount : sortedPoints) {
-        const QVector< TestResult >& results = groupedByPoints[ pointCount ];
-
-        // 格式化点数描述（100K/500K/1M/5M）
-        QString pointDesc;
-        if (pointCount >= 1000000) {
-            int million = pointCount / 1000000;
-            int wan     = pointCount / 10000;
-            pointDesc   = QString("%1M（%2万）").arg(million).arg(wan);
-        } else {
-            int k     = pointCount / 1000;
-            int wan   = pointCount / 10000;
-            pointDesc = QString("%1K（%2万）").arg(k).arg(wan);
-        }
-
-        markdown += QString("%1 数据点测试结果\n\n").arg(pointDesc);
-
-        // 表格头
-        markdown += "|Library|Render Time (ms)|FPS|Memory (MB)|OpenGL|Downsampling|\n";
-        markdown += "|:------:|:------:|:------:|:------:|:------:|:------:|\n";
-
-        // 按库名排序（QImPlot -> Qwt -> QCustomPlot -> Qt Charts）
-        QVector< TestResult > sortedResults = results;
-        std::sort(sortedResults.begin(), sortedResults.end(), [](const TestResult& a, const TestResult& b) {
-            static const QStringList order = { "QIm", "Qwt", "QCustomPlot", "Qt Charts" };
-            int idxA                       = order.indexOf(a.libraryName);
-            int idxB                       = order.indexOf(b.libraryName);
-            if (idxA == -1)
-                idxA = 999;
-            if (idxB == -1)
-                idxB = 999;
-            return idxA < idxB;
-        });
-
-        // 表格行
-        for (const TestResult& r : sortedResults) {
-            // 库名缩写映射
-            QString libShort = r.libraryName;
-            // OpenGL/Downsampling 状态
-            QString openglStr     = m_config.useOpenGL ? "✓ Yes" : "× No";
-            QString downsampleStr = m_config.useDownsampling ? "✓ Yes" : "× No";
-
-            // 格式化数值（与示例一致的精度）
-            QString renderTime = QString::number(r.renderTime, 'f', 2);
-            QString fps        = QString::number(r.fps, 'f', 4);
-            // 移除FPS末尾多余的0（61.2370 -> 61.237）
-            while (fps.contains('.') && fps.endsWith('0')) {
-                fps.chop(1);
-            }
-            if (fps.endsWith('.'))
-                fps.chop(1);
-
-            QString memory = QString::number(r.memoryUsage, 'f', 2);
-            // 对于小数值保留更多精度（<10时显示5位）
-            if (r.memoryUsage < 10.0) {
-                memory = QString::number(r.memoryUsage, 'f', 5);
-                // 移除末尾0
-                while (memory.contains('.') && memory.endsWith('0')) {
-                    memory.chop(1);
-                }
-                if (memory.endsWith('.'))
-                    memory.chop(1);
-            }
-
-            markdown +=
-                QString("|%1|%2|%3|%4|%5|%6|\n").arg(libShort).arg(renderTime).arg(fps).arg(memory).arg(openglStr).arg(downsampleStr);
-        }
-        markdown += "\n";
-    }
-
-    // 4. 复制到剪贴板
+    // Use cached Markdown report
     QClipboard* clipboard = QApplication::clipboard();
-    clipboard->setText(markdown);
+    clipboard->setText(m_reportMarkdown);
 
-    QMessageBox::information(this, "Copied", QString("✅ 已复制 Markdown 报告到剪贴板"));
+    const bool chinese = (m_reportLanguage == Chinese);
+    if (chinese) {
+        QMessageBox::information(this, "Copied", QString(" 已复制 Markdown 报告到剪贴板"));
+    } else {
+        QMessageBox::information(this, "Copied", QString("Markdown report copied to clipboard"));
+    }
+}
+
+void PerformanceTestReportDialog::onPushButtonSaveMarkdown_clicked()
+{
+    if (m_reportMarkdown.isEmpty()) {
+        QMessageBox::warning(this, "Warning", "No report to save");
+        return;
+    }
+
+    const bool chinese = (m_reportLanguage == Chinese);
+    QString defaultName = chinese ? "benchmark_report.md" : "benchmark_report.md";
+    QString filePath = QFileDialog::getSaveFileName(this,
+        chinese ? tr("保存 Markdown 报告") : tr("Save Markdown Report"),
+        defaultName,
+        tr("Markdown Files (*.md);;All Files (*)"));
+    if (filePath.isEmpty()) return;
+
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        file.write(m_reportMarkdown.toUtf8());
+        file.close();
+        QMessageBox::information(this, chinese ? "成功" : "Success",
+            chinese ? QString("报告已保存到:\n%1").arg(filePath) : QString("Report saved to:\n%1").arg(filePath));
+    } else {
+        QMessageBox::warning(this, chinese ? "错误" : "Error",
+            chinese ? QString("无法保存文件:\n%1").arg(filePath) : QString("Failed to save file:\n%1").arg(filePath));
+    }
 }
 
 void PerformanceTestReportDialog::onPushButtonExportToPdf_clicked()

@@ -1,8 +1,8 @@
 #include "QImFigureWidget.h"
-#include "plot/QImPlot3DLineItemNode.h"
-#include "plot/QImPlot3DNode.h"
-#include "plot/QImPlot3DScatterItemNode.h"
-#include "plot/QImPlot3DSurfaceItemNode.h"
+#include "plot3d/QImPlot3DLineItemNode.h"
+#include "plot3d/QImPlot3DNode.h"
+#include "plot3d/QImPlot3DScatterItemNode.h"
+#include "plot3d/QImPlot3DSurfaceItemNode.h"
 
 #include "implot3d.h"
 
@@ -26,10 +26,10 @@ int main(int argc, char* argv[])
     QSurfaceFormat::setDefaultFormat(glFormat);
 
     QMainWindow window;
-    window.setWindowTitle("QIm README 3D Example");
+    window.setWindowTitle("3D Plot Example");
 
     QIM::QImFigureWidget* figure3D = new QIM::QImFigureWidget(&window);
-    figure3D->setSubplotGrid(2, 2);
+    figure3D->setSubplot3DGrid(2, 2);
     figure3D->setRenderMode(QIM::QImWidget::RenderOnDemand);
     window.setCentralWidget(figure3D);
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
         line->setLabel("helix");
         line->setData(xs, ys, zs);
         line->setColor(QColor(0, 114, 189));
-        line->setLineWidth(2.0f);
+        line->setLineWeight(2.0f);
     }
 
     if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
@@ -62,8 +62,7 @@ int main(int argc, char* argv[])
         scatter->setLabel("samples");
         scatter->setData(xs, ys, zs);
         scatter->setMarkerSize(4.0f);
-        scatter->setFillColor(QColor(217, 83, 25));
-        scatter->setOutlineColor(QColor(120, 45, 10));
+        scatter->setMarkerFillColor(QColor(217, 83, 25));
     }
 
     if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
@@ -76,11 +75,11 @@ int main(int argc, char* argv[])
         for (int r = 0; r < rows; ++r) {
             for (int c = 0; c < cols; ++c) {
                 int index = r * cols + c;
-                double x = -3.0 + 6.0 * c / static_cast< double >(cols - 1);
-                double y = -3.0 + 6.0 * r / static_cast< double >(rows - 1);
-                xs[ index ] = x;
-                ys[ index ] = y;
-                zs[ index ] = std::sin(x) * std::cos(y);
+                double x = -3.0 + 6.0 * c / (cols - 1);
+                double y = -3.0 + 6.0 * r / (rows - 1);
+                xs[index] = x;
+                ys[index] = y;
+                zs[index] = std::sin(x) * std::cos(y);
             }
         }
         auto* surface = new QIM::QImPlot3DSurfaceItemNode(plot);
@@ -100,11 +99,11 @@ int main(int argc, char* argv[])
         for (int r = 0; r < rows; ++r) {
             for (int c = 0; c < cols; ++c) {
                 int index = r * cols + c;
-                double x = -3.0 + 6.0 * c / static_cast< double >(cols - 1);
-                double y = -3.0 + 6.0 * r / static_cast< double >(rows - 1);
-                xs[ index ] = x;
-                ys[ index ] = y;
-                zs[ index ] = std::sin(x) * std::cos(y);
+                double x = -3.0 + 6.0 * c / (cols - 1);
+                double y = -3.0 + 6.0 * r / (rows - 1);
+                xs[index] = x;
+                ys[index] = y;
+                zs[index] = std::sin(x) * std::cos(y);
             }
         }
         auto* wireframe = new QIM::QImPlot3DSurfaceItemNode(plot);
@@ -117,7 +116,7 @@ int main(int argc, char* argv[])
         wireframe->setLineWidth(1.2f);
     }
 
-    window.resize(1280, 900);
+window.resize(1280, 900);
     window.show();
     return app.exec();
 }

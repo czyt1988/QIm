@@ -1,21 +1,28 @@
-﻿#ifndef PERFORMANCETESTREPORTDIALOG_H
+#ifndef PERFORMANCETESTREPORTDIALOG_H
 #define PERFORMANCETESTREPORTDIALOG_H
 #include <QDialog>
 #include <QVector>
 #include "PerformanceTestController.h"
+#include "SystemInfoCollector.h"
 
 namespace Ui
 {
 class PerformanceTestReportDialog;
 }
 
-class QCustomPlot;
-
 class PerformanceTestReportDialog : public QDialog
 {
     Q_OBJECT
 
 public:
+    // \if ENGLISH
+    /// \brief Report language option
+    // \endif
+    // \if CHINESE
+    /// \brief 报告语言选项
+    // \endif
+    enum ReportLanguage { English, Chinese };
+
     explicit PerformanceTestReportDialog(QWidget* parent = nullptr);
     ~PerformanceTestReportDialog();
 
@@ -24,34 +31,70 @@ public:
         const QVector< TestResult >& results, const PerformanceTestController::TestConfig& config, bool isFullBenchmark = false
     );
 
-    // 生成完整HTML报告（含内嵌图表）
-    QString generateReportHtml() const;
+    // \if ENGLISH
+    /// \brief Set the system information for the report
+    // \endif
+    // \if CHINESE
+    /// \brief 设置报告的系统信息
+    // \endif
+    void setSystemInfo(const SystemInfo& info);
+
+    // \if ENGLISH
+    /// \brief Generate full Markdown report
+    // \endif
+    // \if CHINESE
+    /// \brief 生成完整的Markdown报告
+    // \endif
+    QString generateReportMarkdown() const;
+
+    // \if ENGLISH
+    /// \brief Set whether to include Mermaid chart blocks in the report
+    // \endif
+    // \if CHINESE
+    /// \brief 设置是否在报告中包含Mermaid图表
+    // \endif
+    void setIncludeMermaid(bool include) { m_includeMermaid = include; }
+
+    // \if ENGLISH
+    /// \brief Set the report language
+    // \endif
+    // \if CHINESE
+    /// \brief 设置报告语言
+    // \endif
+    void setReportLanguage(ReportLanguage lang) { m_reportLanguage = lang; }
 
 protected:
     void changeEvent(QEvent* e) override;
 
-private slots:
+private Q_SLOTS:
     void onPushButtonCopy_clicked();
+    void onPushButtonSaveMarkdown_clicked();
     void onPushButtonExportToPdf_clicked();
 
 private:
-    // 图表生成辅助方法
-    QPixmap generateFpsChart(const QVector< TestResult >& results) const;
-    QPixmap generateCostChart(const QVector< TestResult >& results) const;
-    QPixmap generateMemoryChart(const QVector< TestResult >& results) const;
-    QString pixmapToBase64(const QPixmap& pixmap) const;
-
     // 报告内容生成
-    QString generateExecutiveSummary() const;
-    QString generateDetailedResultsTable() const;
-    QString generateRecommendations() const;
-    QString getPerformanceClass(double fps) const;
+    QString generateMermaidCharts() const;
+
+    // Markdown辅助方法
+    QString formatPointCountList(const QVector< int >& pointCounts, bool chinese = false) const;
+    QString formatPointCountLabel(int pointCount) const;
+    QString formatNumberList(const QVector< double >& values, int precision = 2) const;
+
+    /// \brief Format a single point-count section as a Markdown table
+    QString formatResultsTable(const QVector< TestResult >& results, int pointCount) const;
+
+    /// \brief Generate recommendations section in Markdown
+    QString generateRecommendationsMarkdown() const;
 
     Ui::PerformanceTestReportDialog* ui;
     QVector< TestResult > m_results;
     PerformanceTestController::TestConfig m_config;
+    SystemInfo m_systemInfo;
     bool m_isFullBenchmark;
     QString m_reportTitle;
+    QString m_reportMarkdown;
+    bool m_includeMermaid = false;
+    ReportLanguage m_reportLanguage = English;
 };
 
 #endif  // PERFORMANCETESTREPORTDIALOG_H

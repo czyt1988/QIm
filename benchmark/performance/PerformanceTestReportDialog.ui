@@ -19,20 +19,27 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="pushButtonCopy">
-       <property name="text">
-        <string>Copy</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonExportToPdf">
-       <property name="text">
-        <string>Export To PDF</string>
-       </property>
-      </widget>
-     </item>
+<item>
+       <widget class="QPushButton" name="pushButtonCopy">
+        <property name="text">
+         <string>Copy</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonSaveMarkdown">
+        <property name="text">
+         <string>Save Markdown</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonExportToPdf">
+        <property name="text">
+         <string>Export To PDF</string>
+        </property>
+       </widget>
+      </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">

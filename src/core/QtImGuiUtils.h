@@ -1,4 +1,4 @@
-﻿#ifndef QTIMGUIUTILS_H
+#ifndef QTIMGUIUTILS_H
 #define QTIMGUIUTILS_H
 #include <QString>
 #include <QFont>
@@ -12,7 +12,20 @@
 #include "imgui_internal.h"
 #include "implot.h"
 /**
- *@file 这个文件处理qt和imgui的一些类型转换和一些辅助工具
+ * \if ENGLISH
+ * @file QtImGuiUtils.h
+ * @brief Type conversion utilities between Qt and ImGui/ImPlot types
+ *
+ * Provides helpers for converting QColor ↔ ImVec4, QSize ↔ ImVec2,
+ * QPointF ↔ ImPlotPoint, and other Qt-ImGui type bridging functions.
+ * \endif
+ *
+ * \if CHINESE
+ * @file QtImGuiUtils.h
+ * @brief Qt与ImGui类型转换及辅助工具
+ *
+ * 这个文件处理qt和imgui的一些类型转换和一些辅助工具
+ * \endif
  */
 namespace QIM
 {

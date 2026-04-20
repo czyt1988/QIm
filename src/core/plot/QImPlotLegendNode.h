@@ -1,4 +1,4 @@
-﻿#ifndef QIMPLOTLEGENDNODE_H
+#ifndef QIMPLOTLEGENDNODE_H
 #define QIMPLOTLEGENDNODE_H
 #include "QImPlot.h"
 #include "QImAbstractNode.h"
@@ -8,14 +8,24 @@ namespace QIM
 
 
 /**
- * @brief ImPlot 图例节点类
+ * \if ENGLISH
+ * @brief ImPlot legend node class
+ * @details Wraps ImPlot::SetupLegend() to provide Qt-style property interfaces
+ *          for controlling legend position and flags within the QIm object tree.
+ *          Encapsulates legend visibility, location (North/South/West/East/corners/Center),
+ *          and orientation (horizontal/vertical) as intuitive boolean and enum properties.
+ * @note Legend configuration is applied during plot rendering via beginDraw().
+ * @see QImPlotNode, QImPlotLegendLocation
+ * \endif
  *
- * 封装 ImPlot::SetupLegend 函数，提供 Qt 风格的属性接口来控制图例的位置和标志
- * 设计理念：
- * - 将 ImPlotLegendFlags 分解为独立的布尔属性
- * - 提供类型安全的枚举来替代 ImPlotLocation
- * - 支持属性绑定和信号通知
- * - 与 QImPlotNode 无缝集成
+ * \if CHINESE
+ * @brief ImPlot 图例节点类
+ * @details 封装 ImPlot::SetupLegend 函数，在QIm对象树中提供Qt风格的属性接口
+ *          来控制图例的位置和标志。将图例可见性、位置（North/South/West/East/角落/Center）
+ *          和方向（水平/垂直）封装为直观的布尔和枚举属性。
+ * @note 图例配置在绘图渲染期间通过beginDraw()应用。
+ * @see QImPlotNode, QImPlotLegendLocation
+ * \endif
  */
 class QIM_CORE_API QImPlotLegendNode : public QImAbstractNode
 {
@@ -23,7 +33,7 @@ class QIM_CORE_API QImPlotLegendNode : public QImAbstractNode
     QIM_DECLARE_PRIVATE(QImPlotLegendNode)
 
     // === 位置属性 ===
-    Q_PROPERTY(QImPlotLegendLocation location READ location WRITE setLocation NOTIFY loactionChanged)
+    Q_PROPERTY(QImPlotLegendLocation location READ location WRITE setLocation NOTIFY locationChanged)
 
     // === 方向属性 ===
     Q_PROPERTY(Qt::Orientation orientation READ orientation WRITE setOrientation NOTIFY legendFlagChanged)
@@ -84,7 +94,36 @@ public:
     void apply() const;
 
 Q_SIGNALS:
-    void loactionChanged(QIM::QImPlotLegendLocation v);
+    /**
+     * \if ENGLISH
+     * @brief Emitted when legend location changes
+     * @param[in] v The new legend location value
+     * @details Triggered by setLocation() when value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 图例位置更改时触发
+     * @param[in] v 新图例位置值
+     * @details 当值实际更改时由setLocation()触发。
+     * \endif
+     */
+    void locationChanged(QIM::QImPlotLegendLocation v);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any legend flag changes
+     * @details Triggered by any flag property setter (setOrientation, setOutside,
+     *          setButtonEnabled, setHighlightItemEnabled, setHighlightAxisEnabled,
+     *          setSort, setReverse) when value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 图例标志更改时触发
+     * @details 任何标志属性setter（setOrientation、setOutside、
+     *          setButtonEnabled、setHighlightItemEnabled、setHighlightAxisEnabled、
+     *          setSort、setReverse）当值实际更改时触发。
+     * \endif
+     */
     void legendFlagChanged();
 
 protected:

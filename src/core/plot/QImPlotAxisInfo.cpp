@@ -1,4 +1,4 @@
-﻿#include "QImPlotAxisInfo.h"
+#include "QImPlotAxisInfo.h"
 #include <QDebug>
 #include "QImTrackedValue.hpp"
 #include "implot.h"
@@ -54,8 +54,9 @@ QImPlotAxisInfo::PrivateData::PrivateData(QImPlotAxisInfo* p) : q_ptr(p)
  */
 QImPlotAxisInfo::QImPlotAxisInfo(QImPlotAxisId axis, QImPlotNode* plot) : QObject(plot), QIM_PIMPL_CONSTRUCT
 {
-    d_ptr->plot   = plot;
-    d_ptr->axisId = toImAxis(axis);
+    QIM_D(d);
+    d->plot   = plot;
+    d->axisId = toImAxis(axis);
 }
 
 QImPlotAxisInfo::~QImPlotAxisInfo()
@@ -77,21 +78,46 @@ QImPlotAxisInfo::~QImPlotAxisInfo()
  */
 QImPlotAxisId QImPlotAxisInfo::axisId() const
 {
-    return toQImPlotAxisId(d_ptr->axisId);
+    QIM_DC(d);
+    return toQImPlotAxisId(d->axisId);
 }
 
 /**
+ * \if ENGLISH
  * @brief Returns the raw ImAxis value for direct ImPlot API usage
- * @return
+ * @return ImAxis enum value cast to int
+ * @details This value can be passed directly to ImPlot::SetupAxis() and related functions.
+ *          Use this when you need to call ImPlot API directly with the axis identifier.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回原始 ImAxis 值，用于直接调用 ImPlot API
+ * @return ImAxis 枚举值转换为 int
+ * @details 此值可直接传递给 ImPlot::SetupAxis() 及相关函数。
+ *          当需要直接使用轴标识符调用 ImPlot API 时使用此方法。
+ * \endif
  */
 int QImPlotAxisInfo::imAxis() const
 {
-    return d_ptr->axisId;
+    QIM_DC(d);
+    return d->axisId;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the parent plot node
+ * @return Pointer to QImPlotNode that owns this axis
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取父绘图节点
+ * @return 拥有此坐标轴的 QImPlotNode 指针
+ * \endif
+ */
 QImPlotNode* QImPlotAxisInfo::plotNode() const
 {
-    return d_ptr->plot;
+    QIM_DC(d);
+    return d->plot;
 }
 
 /**
@@ -107,7 +133,8 @@ QImPlotNode* QImPlotAxisInfo::plotNode() const
  */
 QString QImPlotAxisInfo::label() const
 {
-    return QString::fromUtf8(d_ptr->labelUtf8.value());
+    QIM_DC(d);
+    return QString::fromUtf8(d->labelUtf8.value());
 }
 
 /**
@@ -126,8 +153,8 @@ QString QImPlotAxisInfo::label() const
 void QImPlotAxisInfo::setLabel(const QString& label)
 {
     QIM_D(d);
-    d_ptr->labelUtf8 = label.toUtf8();
-    if (d_ptr->labelUtf8.is_dirty()) {
+    d->labelUtf8 = label.toUtf8();
+    if (d->labelUtf8.is_dirty()) {
         Q_EMIT labelChanged(label);
     }
 }
@@ -147,7 +174,8 @@ void QImPlotAxisInfo::setLabel(const QString& label)
  */
 double QImPlotAxisInfo::minLimits() const
 {
-    return d_ptr->minLimits.value();
+    QIM_DC(d);
+    return d->minLimits.value();
 }
 
 /**
@@ -190,7 +218,8 @@ void QImPlotAxisInfo::setMinLimits(double min)
  */
 double QImPlotAxisInfo::maxLimits() const
 {
-    return d_ptr->maxLimits.value();
+    QIM_DC(d);
+    return d->maxLimits.value();
 }
 
 /**
@@ -217,14 +246,46 @@ void QImPlotAxisInfo::setMaxLimits(double max)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the condition for applying axis limits
+ * @return QImPlotCondition enum value (Always or Once)
+ * @details Determines how ImPlot::SetupAxisLimits() applies the limits:
+ *          - Always: Limits are enforced every frame (prevents user panning/zooming beyond limits)
+ *          - Once: Limits are applied only on the first frame (allows subsequent user interaction)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取坐标轴范围的应用条件
+ * @return QImPlotCondition 枚举值（Always 或 Once）
+ * @details 决定 ImPlot::SetupAxisLimits() 如何应用范围：
+ *          - Always：每帧强制执行范围（防止用户平移/缩放超出范围）
+ *          - Once：仅在首帧应用范围（允许后续用户交互）
+ * \endif
+ */
 QImPlotCondition QImPlotAxisInfo::limitsCondition() const
 {
-    return toQImPlotCondition(d_ptr->limitCond);
+    QIM_DC(d);
+    return toQImPlotCondition(d->limitCond);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the condition for applying axis limits
+ * @param[in] v New QImPlotCondition value (Always or Once)
+ * @details Changes how limits are enforced during rendering. Stored internally as ImPlotCond.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置坐标轴范围的应用条件
+ * @param[in] v 新的 QImPlotCondition 值（Always 或 Once）
+ * @details 更改渲染时范围的强制方式。内部存储为 ImPlotCond。
+ * \endif
+ */
 void QImPlotAxisInfo::setLimitsCondition(QImPlotCondition v)
 {
-    d_ptr->limitCond = toImPlotCond(v);
+    QIM_D(d);
+    d->limitCond = toImPlotCond(v);
 }
 
 /**
@@ -1140,22 +1201,44 @@ void QImPlotAxisInfo::setNoDecorations(bool enabled)
 }
 
 /**
- * @brief 获取ImPlotAxisFlags值，作为int返回
- * @return ImPlotAxisFlags值，作为int返回
+ * \if ENGLISH
+ * @brief Gets the raw ImPlotAxisFlags bitmask value
+ * @return Current ImPlotAxisFlags value as int
+ * @details Returns the combined axis flags for direct ImPlot API usage.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取原始 ImPlotAxisFlags 位掩码值
+ * @return 当前 ImPlotAxisFlags 值，以 int 返回
+ * @details 返回组合坐标轴标志，供直接调用 ImPlot API 使用。
+ * \endif
  */
 int QImPlotAxisInfo::axisFlags() const
 {
-    return d_ptr->flags;
+    QIM_DC(d);
+    return d->flags;
 }
 
 /**
- * @brief 设置ImPlotAxisFlags值
- * @param flags
+ * \if ENGLISH
+ * @brief Sets the raw ImPlotAxisFlags bitmask value
+ * @param[in] flags New ImPlotAxisFlags bitmask value
+ * @details Directly replaces internal flag storage. Emits axisFlagChanged() signal only if value changes.
+ *          Prefer individual property setters for type-safe configuration.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置原始 ImPlotAxisFlags 位掩码值
+ * @param[in] flags 新的 ImPlotAxisFlags 位掩码值
+ * @details 直接替换内部标志存储。仅当值改变时触发 axisFlagChanged() 信号。
+ *          为类型安全配置，建议优先使用单独的属性设置器。
+ * \endif
  */
 void QImPlotAxisInfo::setAxisFlags(int flags)
 {
-    if (d_ptr->flags != flags) {
-        d_ptr->flags = flags;
+    QIM_D(d);
+    if (d->flags != flags) {
+        d->flags = flags;
         Q_EMIT axisFlagChanged();
     }
 }
@@ -1169,7 +1252,7 @@ void QImPlotAxisInfo::setAxisFlags(int flags)
  *          - Time:  Time-based scale with automatic formatting (requires ImPlot::SetTimeFormat())
  *          - Log10: Base-10 logarithmic scale (values must be > 0)
  *          - SymLog: Symmetric logarithmic scale (handles negative values)
- * @note This is a convenience wrapper around imPlotScaleToPlotScaleType(d_ptr->scale).
+ * @note This is a convenience wrapper around imPlotScaleToPlotScaleType(d->scale).
  *       The underlying storage is an integer matching ImPlotScale_ enumeration values.
  * @see setScaleType(), imPlotScale()
  * \endif
@@ -1182,14 +1265,15 @@ void QImPlotAxisInfo::setAxisFlags(int flags)
  *          - Time:  基于时间的刻度，带自动格式化（需配合 ImPlot::SetTimeFormat() 使用）
  *          - Log10: 以 10 为底的对数刻度（数值必须 > 0）
  *          - SymLog: 对称对数刻度（可处理负值）
- * @note 此函数是 imPlotScaleToPlotScaleType(d_ptr->scale) 的便捷包装。
+ * @note 此函数是 imPlotScaleToPlotScaleType(d->scale) 的便捷包装。
  *       底层存储为与 ImPlotScale_ 枚举值匹配的整数。
  * @see setScaleType(), imPlotScale()
  * \endif
  */
 QImPlotScaleType QImPlotAxisInfo::scaleType() const
 {
-    return toQImPlotScaleType(d_ptr->scale.value());
+    QIM_DC(d);
+    return toQImPlotScaleType(d->scale.value());
 }
 
 /**
@@ -1225,7 +1309,8 @@ QImPlotScaleType QImPlotAxisInfo::scaleType() const
  */
 void QImPlotAxisInfo::setScaleType(QImPlotScaleType t)
 {
-    d_ptr->scale = toImPlotScale(t);
+    QIM_D(d);
+    d->scale = toImPlotScale(t);
 }
 
 /**
@@ -1251,9 +1336,27 @@ void QImPlotAxisInfo::setScaleType(QImPlotScaleType t)
  */
 int QImPlotAxisInfo::imPlotScale() const
 {
-    return d_ptr->scale.value();
+    QIM_DC(d);
+    return d->scale.value();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Checks if the axis is enabled (visible and functional)
+ * @return true if axis is enabled and visible
+ * @details For X1/Y1 primary axes: disabled state is represented by NoDecorations flag
+ *          (they are always present in ImPlot but can be hidden). For secondary axes (X2/X3, Y2/Y3):
+ *          disabled means the axis is not rendered at all.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查坐标轴是否启用（可见且功能正常）
+ * @return true 表示坐标轴启用且可见
+ * @details 对于 X1/Y1 主轴：禁用状态通过 NoDecorations 标志表示
+ *          （它们始终存在于 ImPlot 但可以隐藏）。对于次级轴（X2/X3, Y2/Y3）：
+ *          禁用意味着轴完全不被渲染。
+ * \endif
+ */
 bool QImPlotAxisInfo::isEnabled() const
 {
     QIM_DC(d);
@@ -1262,9 +1365,25 @@ bool QImPlotAxisInfo::isEnabled() const
             return false;
         }
     }
-    return d_ptr->enable;
+    return d->enable;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Enables or disables the axis
+ * @param[in] on true to enable, false to disable
+ * @details For primary axes (X1/Y1): disabling sets NoDecorations flag and preserves original flags
+ *          in tempFlags for restoration; enabling restores the preserved flags.
+ *          For secondary axes: simply toggles the enable boolean.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用或禁用坐标轴
+ * @param[in] on true 启用，false 禁用
+ * @details 对于主轴（X1/Y1）：禁用设置 NoDecorations 标志并将原始标志保存在 tempFlags 中以便恢复；
+ *          启用时恢复保存的标志。对于次级轴：仅切换 enable 布尔值。
+ * \endif
+ */
 void QImPlotAxisInfo::setEnabled(bool on)
 {
     QIM_D(d);
@@ -1280,7 +1399,19 @@ void QImPlotAxisInfo::setEnabled(bool on)
 }
 
 /**
- * @brief QImPlotAxisInfo::render
+ * \if ENGLISH
+ * @brief Renders the axis by calling ImPlot setup functions
+ * @details Calls ImPlot::SetupAxis() with label and flags, then SetupAxisLimits() and
+ *          SetupAxisScale() if their tracked values are dirty (changed since last render).
+ *          Primary axes (X1/Y1) always render regardless of enable state.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 通过调用 ImPlot 设置函数渲染坐标轴
+ * @details 使用标签和标志调用 ImPlot::SetupAxis()，如果跟踪值有变化（自上次渲染后已修改），
+ *          则调用 SetupAxisLimits() 和 SetupAxisScale()。
+ *          主轴（X1/Y1）无论启用状态如何都会渲染。
+ * \endif
  */
 void QImPlotAxisInfo::render()
 {

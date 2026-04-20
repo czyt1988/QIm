@@ -1,4 +1,4 @@
-﻿// PerformanceTestController.h
+// PerformanceTestController.h
 #ifndef PERFORMANCETESTCONTROLLER_H
 #define PERFORMANCETESTCONTROLLER_H
 
@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QElapsedTimer>
 #include <QString>
+#include "SystemInfoCollector.h"
 
 struct TestResult
 {
@@ -17,6 +18,7 @@ struct TestResult
     double memoryUsage    = 0.0;    // MB
     bool usedOpenGL       = false;  // 是否使用OpenGL
     bool usedDownsampling = false;  // 是否使用降采样
+    QString qtVersion;              // Qt版本号
 };
 Q_DECLARE_METATYPE(TestResult)
 
@@ -35,6 +37,8 @@ public:
 
     explicit PerformanceTestController(QObject* parent = nullptr);
     void cleanupMemory();
+    QVector< TestResult > runFullBenchmark(const TestConfig& baseConfig);
+    SystemInfo systemInfo() const { return m_systemInfo; }
 public slots:
     void runTests(const PerformanceTestController::TestConfig& config);
 
@@ -43,6 +47,7 @@ signals:
     void progressChanged(int current, int total);
     void testResultReady(const TestResult& result);
     void allTestsCompleted(const QVector< TestResult >& allResults);
+    void testProgressUpdate(int currentConfig, int totalConfigs, int currentPointCount);
 
 private:
     TestResult testQImPlot(int pointCount);
@@ -59,12 +64,14 @@ private:
 #endif
 
     void generateTestData(int totalPoints);
+    QVector< TestResult > runTestsInternal(const TestConfig& config);
 
 private:
     TestConfig m_config;
     QVector< double > m_testDataX;
     QVector< double > m_testDataY;
     int m_totalDataSize = 0;  // 实际生成的数据总点数（totalPoints * 1.3）
+    SystemInfo m_systemInfo;  // Cached system/GPU info collected during QIm test (when GL context is active)
 };
 Q_DECLARE_METATYPE(PerformanceTestController::TestConfig)
 #endif  // PERFORMANCETESTCONTROLLER_H

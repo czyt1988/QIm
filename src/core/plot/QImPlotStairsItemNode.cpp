@@ -82,7 +82,8 @@ void QImPlotStairsItemNode::setData(QImAbstractXYDataSeries* series)
  */
 QImAbstractXYDataSeries* QImPlotStairsItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**
@@ -123,7 +124,7 @@ void QImPlotStairsItemNode::setShaded(bool on)
         d->flags &= ~ImPlotStairsFlags_Shaded;
     }
     if (d->flags != oldFlags) {
-        emit stairsFlagChanged();
+        Q_EMIT stairsFlagChanged();
     }
 }
 
@@ -218,7 +219,7 @@ void QImPlotStairsItemNode::setStairsFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotStairsFlags >(flags);
-        emit stairsFlagChanged();
+        Q_EMIT stairsFlagChanged();
     }
 }
 
@@ -235,7 +236,8 @@ void QImPlotStairsItemNode::setStairsFlags(int flags)
  */
 void QImPlotStairsItemNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
 }
 
 /**
@@ -251,7 +253,8 @@ void QImPlotStairsItemNode::setColor(const QColor& c)
  */
 QColor QImPlotStairsItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**

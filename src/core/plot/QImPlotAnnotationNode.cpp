@@ -1,4 +1,4 @@
-﻿#include "QImPlotAnnotationNode.h"
+#include "QImPlotAnnotationNode.h"
 #include <optional>
 #include <cstdarg>
 #include "implot.h"
@@ -74,7 +74,8 @@ QImPlotAnnotationNode::~QImPlotAnnotationNode()
  */
 QPointF QImPlotAnnotationNode::position() const
 {
-    return QPointF(d_ptr->x, d_ptr->y);
+    QIM_DC(d);
+    return QPointF(d->x, d->y);
 }
 
 /**
@@ -112,7 +113,7 @@ void QImPlotAnnotationNode::setPosition(double x, double y)
     if (d->x != x || d->y != y) {
         d->x = x;
         d->y = y;
-        emit positionChanged(QPointF(x, y));
+        Q_EMIT positionChanged(QPointF(x, y));
     }
 }
 
@@ -129,7 +130,8 @@ void QImPlotAnnotationNode::setPosition(double x, double y)
  */
 QString QImPlotAnnotationNode::text() const
 {
-    return QString::fromUtf8(d_ptr->textUtf8);
+    QIM_DC(d);
+    return QString::fromUtf8(d->textUtf8);
 }
 
 /**
@@ -149,7 +151,7 @@ void QImPlotAnnotationNode::setText(const QString& text)
     QByteArray utf8 = text.toUtf8();
     if (d->textUtf8 != utf8) {
         d->textUtf8 = utf8;
-        emit textChanged(text);
+        Q_EMIT textChanged(text);
     }
 }
 
@@ -190,7 +192,8 @@ void QImPlotAnnotationNode::setText(const char* fmt, ...)
  */
 QColor QImPlotAnnotationNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -206,8 +209,9 @@ QColor QImPlotAnnotationNode::color() const
  */
 void QImPlotAnnotationNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -223,7 +227,8 @@ void QImPlotAnnotationNode::setColor(const QColor& c)
  */
 QPointF QImPlotAnnotationNode::pixelOffset() const
 {
-    return QPointF(d_ptr->pixelOffset.x, d_ptr->pixelOffset.y);
+    QIM_DC(d);
+    return QPointF(d->pixelOffset.x, d->pixelOffset.y);
 }
 
 /**
@@ -260,7 +265,7 @@ void QImPlotAnnotationNode::setPixelOffset(double x, double y)
     QIM_D(d);
     if (d->pixelOffset.x != x || d->pixelOffset.y != y) {
         d->pixelOffset = ImVec2(static_cast< float >(x), static_cast< float >(y));
-        emit pixelOffsetChanged(QPointF(x, y));
+        Q_EMIT pixelOffsetChanged(QPointF(x, y));
     }
 }
 
@@ -277,7 +282,8 @@ void QImPlotAnnotationNode::setPixelOffset(double x, double y)
  */
 bool QImPlotAnnotationNode::clamp() const
 {
-    return d_ptr->clamp;
+    QIM_DC(d);
+    return d->clamp;
 }
 
 /**
@@ -296,7 +302,7 @@ void QImPlotAnnotationNode::setClamp(bool clamp)
     QIM_D(d);
     if (d->clamp != clamp) {
         d->clamp = clamp;
-        emit clampChanged(clamp);
+        Q_EMIT clampChanged(clamp);
     }
 }
 
@@ -313,7 +319,8 @@ void QImPlotAnnotationNode::setClamp(bool clamp)
  */
 bool QImPlotAnnotationNode::round() const
 {
-    return d_ptr->round;
+    QIM_DC(d);
+    return d->round;
 }
 
 /**
@@ -332,7 +339,7 @@ void QImPlotAnnotationNode::setRound(bool round)
     QIM_D(d);
     if (d->round != round) {
         d->round = round;
-        emit roundChanged(round);
+        Q_EMIT roundChanged(round);
     }
 }
 

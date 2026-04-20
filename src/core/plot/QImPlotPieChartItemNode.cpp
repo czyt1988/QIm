@@ -88,7 +88,8 @@ void QImPlotPieChartItemNode::setData(QImAbstractPieChartDataSeries* series)
  */
 QImAbstractPieChartDataSeries* QImPlotPieChartItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**
@@ -125,7 +126,7 @@ void QImPlotPieChartItemNode::setCenter(const QPointF& center)
     if (d->centerX != center.x() || d->centerY != center.y()) {
         d->centerX = center.x();
         d->centerY = center.y();
-        emit centerChanged(center);
+        Q_EMIT centerChanged(center);
     }
 }
 
@@ -162,7 +163,7 @@ void QImPlotPieChartItemNode::setRadius(double radius)
     QIM_D(d);
     if (d->radius != radius) {
         d->radius = radius;
-        emit radiusChanged(radius);
+        Q_EMIT radiusChanged(radius);
     }
 }
 
@@ -200,7 +201,7 @@ void QImPlotPieChartItemNode::setLabelFormat(const QString& format)
     QByteArray utf8 = format.toUtf8();
     if (d->labelFormatUtf8 != utf8) {
         d->labelFormatUtf8 = utf8;
-        emit labelFormatChanged(format);
+        Q_EMIT labelFormatChanged(format);
     }
 }
 
@@ -237,7 +238,7 @@ void QImPlotPieChartItemNode::setStartAngle(double angle)
     QIM_D(d);
     if (d->startAngle != angle) {
         d->startAngle = angle;
-        emit startAngleChanged(angle);
+        Q_EMIT startAngleChanged(angle);
     }
 }
 
@@ -279,8 +280,8 @@ void QImPlotPieChartItemNode::setNormalize(bool normalize)
         d->flags &= ~ImPlotPieChartFlags_Normalize;
     }
     if (d->flags != oldFlags) {
-        emit normalizeChanged(normalize);
-        emit pieChartFlagChanged();
+        Q_EMIT normalizeChanged(normalize);
+        Q_EMIT pieChartFlagChanged();
     }
 }
 
@@ -322,8 +323,8 @@ void QImPlotPieChartItemNode::setIgnoreHidden(bool ignore)
         d->flags &= ~ImPlotPieChartFlags_IgnoreHidden;
     }
     if (d->flags != oldFlags) {
-        emit ignoreHiddenChanged(ignore);
-        emit pieChartFlagChanged();
+        Q_EMIT ignoreHiddenChanged(ignore);
+        Q_EMIT pieChartFlagChanged();
     }
 }
 
@@ -365,8 +366,8 @@ void QImPlotPieChartItemNode::setExploding(bool exploding)
         d->flags &= ~ImPlotPieChartFlags_Exploding;
     }
     if (d->flags != oldFlags) {
-        emit explodingChanged(exploding);
-        emit pieChartFlagChanged();
+        Q_EMIT explodingChanged(exploding);
+        Q_EMIT pieChartFlagChanged();
     }
 }
 
@@ -403,7 +404,7 @@ void QImPlotPieChartItemNode::setPieChartFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotPieChartFlags >(flags);
-        emit pieChartFlagChanged();
+        Q_EMIT pieChartFlagChanged();
     }
 }
 

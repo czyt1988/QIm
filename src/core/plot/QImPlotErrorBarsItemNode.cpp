@@ -68,7 +68,7 @@ void QImPlotErrorBarsItemNode::setData(QImAbstractErrorDataSeries* errorDataSeri
 {
     QIM_D(d);
     d->data.reset(errorDataSeries);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -84,7 +84,8 @@ void QImPlotErrorBarsItemNode::setData(QImAbstractErrorDataSeries* errorDataSeri
  */
 QImAbstractErrorDataSeries* QImPlotErrorBarsItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**
@@ -125,8 +126,8 @@ void QImPlotErrorBarsItemNode::setHorizontal(bool horizontal)
         d->flags &= ~ImPlotErrorBarsFlags_Horizontal;
     }
     if (d->flags != oldFlags) {
-        emit orientationChanged(horizontal);
-        emit errorBarsFlagChanged();
+        Q_EMIT orientationChanged(horizontal);
+        Q_EMIT errorBarsFlagChanged();
     }
 }
 
@@ -143,7 +144,8 @@ void QImPlotErrorBarsItemNode::setHorizontal(bool horizontal)
  */
 QColor QImPlotErrorBarsItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -159,14 +161,15 @@ QColor QImPlotErrorBarsItemNode::color() const
  */
 void QImPlotErrorBarsItemNode::setColor(const QColor& c)
 {
+    QIM_D(d);
     ImVec4 imColor = toImVec4(c);
-    if (d_ptr->color.has_value()) {
-        d_ptr->color->operator=(imColor);  // Trigger dirty flag via assignment
+    if (d->color.has_value()) {
+        d->color->operator=(imColor);  // Trigger dirty flag via assignment
     } else {
-        d_ptr->color.emplace(imColor);
-        d_ptr->color->mark_dirty();  // Mark dirty for new color
+        d->color.emplace(imColor);
+        d->color->mark_dirty();  // Mark dirty for new color
     }
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -202,7 +205,7 @@ void QImPlotErrorBarsItemNode::setErrorBarsFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast<ImPlotErrorBarsFlags>(flags);
-        emit errorBarsFlagChanged();
+        Q_EMIT errorBarsFlagChanged();
     }
 }
 

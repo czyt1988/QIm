@@ -5,64 +5,66 @@
 namespace QIM
 {
 /**
- * @brief 字体文件帮助类
+ * @brief Font file helper class
  *
- * 用于根据 QFont 对象查找对应的字体文件路径
+ * Used to find font file paths based on QFont objects.
  *
- * 在程序启动的时候，调用preloadCommonFonts，将扫描操作系统下的字体目录，把字体的家族名字和字体文件缓存到一个静态对象中
+ * At program startup, preloadCommonFonts scans OS font directories and caches
+ * font family names and file paths in a static object.
  *
- * 后续可以通过QFont来查找这个字体对应哪些ttf文件
+ * Subsequently, QFont objects can be used to look up corresponding TTF files.
  */
 class QIM_CORE_API QImFontFileHelper
 {
     QIM_DECLARE_PRIVATE(QImFontFileHelper)
 public:
     /**
-     * @brief 构造函数
+     * @brief Constructor
      */
     QImFontFileHelper();
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~QImFontFileHelper();
 
     /**
-     * @brief 获取指定字体的所有字体文件路径
-     * @param font Qt字体对象
-     * @return 字体文件路径列表（自动去重）
+     * @brief Get all font file paths for the specified font
+     * @param font Qt font object
+     * @return List of font file paths (deduplicated)
      *
-     * 获取指定字体家族的所有可用字体文件，包括粗体、斜体等变体。
-     * 支持缓存以提高性能。
+     * Retrieves all available font files for the specified font family,
+     * including bold, italic, and other variants.
+     * Supports caching for improved performance.
      */
     static QList< QString > getFontFiles(const QFont& font);
 
     /**
-     * @brief 获取所有已缓存的字体家族
-     * @return 字体家族名称列表
+     * @brief Get all cached font families
+     * @return List of font family names
      */
     static QList< QString > getAvailableFamilies();
 
     /**
-     * @brief 清空字体缓存
+     * @brief Clear font cache
      */
     static void clearCache();
 
     /**
-     * @brief 预加载常用字体
+     * @brief Preload common fonts
      */
     static void preloadCommonFonts();
 
     /**
-     * @brief 获取QFont的像素大小，如果是点大小会自动转换
+     * @brief Get pixel size from QFont, auto-converting from point size if needed
      * @param qtFont
-     * @return
+     * @return Pixel size as float
      */
     static float getFontPixelSize(const QFont& qtFont);
 
     /**
-     * @brief 推荐的中文字体
-     * @return
+     * @brief Recommended Chinese font file path
+     * @return Path to recommended Chinese font
      */
     static std::string getRecommendedChineseFontPath();
 };

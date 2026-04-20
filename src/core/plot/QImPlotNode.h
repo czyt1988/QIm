@@ -1,4 +1,4 @@
-﻿#ifndef QIMPLOTNODE_H
+#ifndef QIMPLOTNODE_H
 #define QIMPLOTNODE_H
 #include "QImAbstractNode.h"
 #include <QSizeF>
@@ -13,28 +13,51 @@ class QImPlotItemNode;
 class QImPlotLegendNode;
 class QImPlotLineItemNode;
 /**
+ * \if ENGLISH
+ * @brief ImPlot plot area node
+ * @details Manages the lifecycle, axis configuration, and rendering context for a
+ *          single ImPlot plot area within the QIm object tree. Provides Qt-style
+ *          properties for plot flags (title, legend, mouse text, inputs, menus,
+ *          box select, frame, equal aspect, crosshairs, canvas), and convenience
+ *          methods for adding plot items and axis manipulation.
+ *
+ *          Rendering flow (strictly follows ImPlot constraints):
+ *          1. BeginPlot() - Creates the plot context
+ *          2. SetupAxes() - Must set axes before the first plot item call
+ *          3. Child node rendering (Series elements)
+ *          4. EndPlot()
+ *
+ * @note Uses the PIMPL pattern via QIM_DECLARE_PRIVATE for encapsulation.
+ * @see QImPlotItemNode, QImPlotAxisInfo, QImPlotLegendNode
+ * \endif
+ *
+ * \if CHINESE
  * @brief ImPlot 绘图区域节点
+ * @details 在QIm对象树中管理单个ImPlot绘图区域的生命周期、坐标轴配置和渲染上下文。
+ *          为ImPlot标志提供Qt风格属性（标题、图例、鼠标文本、输入、菜单、
+ *          框选、边框、等比例、十字线、画布），以及添加绘图项目和坐标轴操作的便捷方法。
  *
- * 负责管理单个 plot 的生命周期、坐标轴配置和渲染上下文
+ *          渲染流程（严格遵循 ImPlot 约束）：
+ *          1. BeginPlot() - 创建绘图上下文
+ *          2. SetupAxes() - 必须在首个绘图调用前设置坐标轴
+ *          3. 子节点渲染（Series 元素）
+ *          4. EndPlot()
  *
- * 渲染流程（严格遵循 ImPlot 约束）：
- * 1. BeginPlot() - 创建绘图上下文
- * 2. SetupAxes() - 必须在首个绘图调用前设置坐标轴
- * 3. 子节点渲染（Series 元素）
- * 4. EndPlot()
- *
+ * @note 通过QIM_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * @see QImPlotItemNode, QImPlotAxisInfo, QImPlotLegendNode
+ * \endif
  */
 class QIM_CORE_API QImPlotNode : public QImAbstractNode
 {
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotNode)
 
-    // == 标题属性 ==
+    // == Title properties ==
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    // === 尺寸属性 ===
+    // === Size properties ===
     Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY sizeChanged)
     Q_PROPERTY(bool autoSize READ isAutoSize WRITE setAutoSize NOTIFY autoSizeChanged)
-    // ImPlotFlags相关
+    // ImPlotFlags
     Q_PROPERTY(bool titleEnabled READ isTitleEnabled WRITE setTitleEnabled NOTIFY plotFlagChanged)
     Q_PROPERTY(bool legendEnabled READ isLegendEnabled WRITE setLegendEnabled NOTIFY plotFlagChanged)
     Q_PROPERTY(bool mouseTextEnabled READ isMouseTextEnabled WRITE setMouseTextEnabled NOTIFY plotFlagChanged)
@@ -54,13 +77,13 @@ public:
     ~QImPlotNode() override;
 
     //----------------------------------------------------
-    // 标题
+    // Title
     //----------------------------------------------------
     QString title() const;
     void setTitle(const QString& title);
 
     //----------------------------------------------------
-    // 尺寸
+    // Size
     //----------------------------------------------------
     QSizeF size() const;
     void setSize(const QSizeF& size);
@@ -68,7 +91,7 @@ public:
     bool isAutoSize() const;
     void setAutoSize(bool autoSize);
     //----------------------------------------------------
-    // 坐标轴相关
+    // Axes
     //----------------------------------------------------
     QImPlotAxisInfo* axisInfo(QImPlotAxisId aid) const;
     QImPlotAxisInfo* x1Axis() const;
@@ -80,9 +103,9 @@ public:
     bool isAxisEnabled(QImPlotAxisId aid) const;
     void setAxisEnabled(QImPlotAxisId aid, bool on);
     //----------------------------------------------------
-    // ImPlotFlags相关
+    // ImPlotFlags
     //----------------------------------------------------
-    // 标志访问器（肯定语义）
+    // Flag accessors (affirmative semantics)
     bool isTitleEnabled() const;
     void setTitleEnabled(bool enabled);
 
@@ -113,17 +136,17 @@ public:
     bool isCanvasEnabled() const;
     void setCanvasEnabled(bool enabled);
 
-    // 原始标志访问
+    // Raw flag access
     int imPlotFlags() const;
     void setImPlotFlags(int flags);
     //----------------------------------------------------
-    // 添加绘图
+    // Plot items
     //----------------------------------------------------
     void addPlotItem(QImPlotItemNode* item);
-    // 获取所有绘图item
+    // Get all plot items
     QList< QImPlotItemNode* > plotItemNodes() const;
     //----------------------------------------------------
-    // 快速函数
+    // Convenience functions
     //----------------------------------------------------
     void addLine(QImPlotLineItemNode* lineItem);
     template< typename ContainerX, typename ContainerY >
@@ -133,21 +156,76 @@ public:
     //===============================================================
     QImPlotLegendNode* legendNode() const;
     //----------------------------------------------------
-    // 交互 注意，这些函数需要确保在开始绘制后调用
+    // Interaction (must be called after beginDraw)
     //----------------------------------------------------
     bool isPlotHovered() const;
-    // 屏幕到绘图坐标的转换
+    // Screen to plot coordinate conversion
     QPointF pixelsToPlot(const float& screenX, const float& screenY);
     QPointF plotToPixels(const double& doubleX, const double& doubleY);
-    // 坐标轴上渲染的文字内容，注意此函数一定只能在当前绘图的beginDraw内部使用
+    // Axis label text (must only be used inside beginDraw of current plot)
     std::string axisValueText(double val, QImPlotAxisId axisId) const;
-    // 自适应坐标轴，让所有曲线都能显示
+    // Auto-fit axes to show all curves
     void rescaleAxes();
     void setAxesToFit();
 Q_SIGNALS:
+    /**
+     * \if ENGLISH
+     * @brief Emitted when title changes
+     * @param[in] title The new title value
+     * @details Triggered by setTitle() when value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 标题更改时触发
+     * @param[in] title 新标题值
+     * @details 当值实际更改时由setTitle()触发。
+     * \endif
+     */
     void titleChanged(const QString& title);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when size changes
+     * @param[in] size The new size value
+     * @details Triggered by setSize() when value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 尺寸更改时触发
+     * @param[in] size 新尺寸值
+     * @details 当值实际更改时由setSize()触发。
+     * \endif
+     */
     void sizeChanged(const QSizeF& size);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when autoSize changes
+     * @param[in] autoSize The new autoSize state
+     * @details Triggered by setAutoSize() when value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 自适应尺寸更改时触发
+     * @param[in] autoSize 新自适应尺寸状态
+     * @details 当值实际更改时由setAutoSize()触发。
+     * \endif
+     */
     void autoSizeChanged(bool autoSize);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any ImPlot flag changes
+     * @details Triggered by any flag property setter (setTitleEnabled, setLegendEnabled, etc.)
+     *          when value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief ImPlot标志更改时触发
+     * @details 任何标志属性setter（setTitleEnabled、setLegendEnabled等）
+     *          当值实际更改时触发。
+     * \endif
+     */
     void plotFlagChanged();
 
 protected:

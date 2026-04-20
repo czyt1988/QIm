@@ -1,4 +1,4 @@
-﻿#include "QImWidget.h"
+#include "QImWidget.h"
 // Qt
 #include <QTimer>
 #include <QColor>
@@ -442,14 +442,44 @@ void QImWidget::PrivateData::drawFPSToast()
 // QImWidget
 //----------------------------------------------------
 
+/**
+ * \if ENGLISH
+ * @brief Constructor with optional parent widget and window flags
+ * @param[in] parent Parent QWidget
+ * @param[in] f Qt window flags
+ * \endif
+ * \if CHINESE
+ * @brief 构造函数（带可选父窗口和窗口标志）
+ * @param[in] parent 父 QWidget
+ * @param[in] f Qt 窗口标志
+ * \endif
+ */
 QImWidget::QImWidget(QWidget* parent, Qt::WindowFlags f) : QOpenGLWidget(parent, f), QIM_PIMPL_CONSTRUCT
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor
+ * \endif
+ * \if CHINESE
+ * @brief 析构函数
+ * \endif
+ */
 QImWidget::~QImWidget()
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the rendering mode that controls frame rate behavior
+ * @param[in] mode RenderContinuous (18FPS), RenderOnDemand (event-driven), or RenderAdaptive (smart switching)
+ * \endif
+ * \if CHINESE
+ * @brief 设置控制帧率行为的渲染模式
+ * @param[in] mode RenderContinuous（18FPS）、RenderOnDemand（事件驱动）或 RenderAdaptive（智能切换）
+ * \endif
+ */
 void QImWidget::setRenderMode(RenderMode mode)
 {
     QIM_D(d);
@@ -457,15 +487,33 @@ void QImWidget::setRenderMode(RenderMode mode)
     d->applyRenderMode();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the current rendering mode
+ * @return Current RenderMode
+ * \endif
+ * \if CHINESE
+ * @brief 获取当前渲染模式
+ * @return 当前 RenderMode
+ * \endif
+ */
 QImWidget::RenderMode QImWidget::renderMode() const
 {
-    return d_ptr->renderMode;
+    QIM_DC(d);
+    return d->renderMode;
 }
 
 /**
- * @brief 设置刷新间隔，仅对RenderContinuous模式有效
- * @param ms 间隔
+ * \if ENGLISH
+ * @brief Sets the refresh interval for continuous rendering mode
+ * @param[in] ms Refresh interval in milliseconds
  * @see setRenderMode
+ * \endif
+ * \if CHINESE
+ * @brief 设置刷新间隔，仅对 RenderContinuous 模式有效
+ * @param[in] ms 刷新间隔（毫秒）
+ * @see setRenderMode
+ * \endif
  */
 void QImWidget::setRefreshInterval(int ms)
 {
@@ -474,30 +522,80 @@ void QImWidget::setRefreshInterval(int ms)
     d->timer->setInterval(ms);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the current refresh interval
+ * @return Refresh interval in milliseconds
+ * \endif
+ * \if CHINESE
+ * @brief 获取当前刷新间隔
+ * @return 刷新间隔（毫秒）
+ * \endif
+ */
 int QImWidget::refreshInterval() const
 {
     return d_ptr->highFPSInterval;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Requests an immediate render update
+ * @details Triggers Qt's update() to schedule a repaint on the next frame
+ * \endif
+ * \if CHINESE
+ * @brief 请求立即渲染更新
+ * @details 触发 Qt 的 update() 以在下一帧安排重绘
+ * \endif
+ */
 void QImWidget::requestRender()
 {
     update();  // 触发 Qt 的重新绘制
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the minimum render interval between consecutive frames
+ * @return Minimum interval in milliseconds
+ * \endif
+ * \if CHINESE
+ * @brief 获取连续帧之间的最小渲染间隔
+ * @return 最小间隔（毫秒）
+ * \endif
+ */
 int QImWidget::minRenderInterval() const
 {
-    return d_ptr->minRenderInterval;
-}
-
-void QImWidget::setMinRenderInterval(int min)
-{
-    min                      = qMax(0, min);
-    d_ptr->minRenderInterval = min;
+    QIM_DC(d);
+    return d->minRenderInterval;
 }
 
 /**
- * @brief 设置
- * @param ranges
+ * \if ENGLISH
+ * @brief Sets the minimum render interval between consecutive frames
+ * @param[in] min Minimum interval in milliseconds (0 means no limit)
+ * \endif
+ * \if CHINESE
+ * @brief 设置连续帧之间的最小渲染间隔
+ * @param[in] min 最小间隔（毫秒，0 表示无限制）
+ * \endif
+ */
+void QImWidget::setMinRenderInterval(int min)
+{
+    QIM_D(d);
+    min = qMax(0, min);
+    d->minRenderInterval = min;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the glyph ranges flags for font loading
+ * @param[in] ranges Combination of GlyphRangesFlags (Default, Chinese, Japanese, etc.)
+ * @details Triggers font reload on next paint cycle
+ * \endif
+ * \if CHINESE
+ * @brief 设置字体加载的字形范围标志
+ * @param[in] ranges GlyphRangesFlags 的组合（默认、中文、日文等）
+ * @details 在下次绘制周期触发字体重新加载
+ * \endif
  */
 void QImWidget::setFontGlyphRanges(GlyphRangesFlags ranges)
 {
@@ -507,75 +605,129 @@ void QImWidget::setFontGlyphRanges(GlyphRangesFlags ranges)
 }
 
 /**
- * @brief 设置ImGui的颜色主题
- * @param style
+ * \if ENGLISH
+ * @brief Sets the ImGui color theme style
+ * @param[in] style Theme to apply (StyleDark, StyleLight, or StyleClassic)
+ * \endif
+ * \if CHINESE
+ * @brief 设置 ImGui 颜色主题
+ * @param[in] style 要应用的主题（StyleDark、StyleLight 或 StyleClassic）
+ * \endif
  */
 void QImWidget::setStyleColorsTheme(StyleColorsTheme style)
 {
-    d_ptr->styleColorTheme = style;
+    QIM_D(d);
+    d->styleColorTheme = style;
 }
 
 /**
- * @brief 添加渲染节点
- *
- * 渲染节点会在虚函数drawIM之前执行
- *
- * @note QImWidget会管理QImAbstractNode的生命周期，在窗口销毁的时候会销毁QImAbstractNode对象，你不需要手动进行delete
- * @param node
+ * \if ENGLISH
+ * @brief Adds a render node as a child of the root render node
+ * @param[in] node Node to add (QImWidget manages its lifetime)
+ * @note QImWidget manages QImAbstractNode lifetime; nodes are deleted when the widget is destroyed
+ * @details Render nodes are executed before the virtual drawIM() method
+ * \endif
+ * \if CHINESE
+ * @brief 添加渲染节点作为根渲染节点的子节点
+ * @param[in] node 要添加的节点（QImWidget 管理其生命周期）
+ * @note QImWidget 管理 QImAbstractNode 的生命周期，窗口销毁时会删除节点对象，无需手动 delete
+ * @details 渲染节点在虚函数 drawIM() 之前执行
+ * \endif
  */
 void QImWidget::addRenderNode(QImAbstractNode* node)
 {
-    if (d_ptr->rootRenderNode) {
-        d_ptr->rootRenderNode->addChildNode(node);
+    QIM_D(d);
+    if (d->rootRenderNode) {
+        d->rootRenderNode->addChildNode(node);
     }
 }
 
 /**
- * @brief 获取所有的渲染节点
- * @return
+ * \if ENGLISH
+ * @brief Gets all render nodes attached to the root render node
+ * @return List of child QImAbstractNode pointers
+ * \endif
+ * \if CHINESE
+ * @brief 获取所有附加到根渲染节点的渲染节点
+ * @return 子 QImAbstractNode 指针列表
+ * \endif
  */
 QList< QImAbstractNode* > QImWidget::renderNodeList() const
 {
-    if (d_ptr->rootRenderNode) {
-        return d_ptr->rootRenderNode->childrenNodes();
+    QIM_DC(d);
+    if (d->rootRenderNode) {
+        return d->rootRenderNode->childrenNodes();
     }
     return {};
 }
 
 /**
- * @brief 移除节点
- * @note 此函数会对节点进行delete操作
- * @param node
+ * \if ENGLISH
+ * @brief Removes and deletes a render node from the root render node
+ * @param[in] node Node to remove (will be deleted)
+ * @note This function performs delete on the node
+ * \endif
+ * \if CHINESE
+ * @brief 从根渲染节点移除并删除渲染节点
+ * @param[in] node 要移除的节点（将被 delete）
+ * @note 此函数会对节点进行 delete 操作
+ * \endif
  */
 void QImWidget::removeRenderNode(QImAbstractNode* node)
 {
-    if (d_ptr->rootRenderNode) {
-        d_ptr->rootRenderNode->removeChildNode(node);
+    QIM_D(d);
+    if (d->rootRenderNode) {
+        d->rootRenderNode->removeChildNode(node);
     }
 }
 
 /**
- * @brief 抽取渲染节点
- * @param node
- * @return 成功返回true
+ * \if ENGLISH
+ * @brief Takes (extracts) a render node without deleting it
+ * @param[in] node Node to extract
+ * @return true if the node was successfully taken (ownership transferred to caller)
+ * \endif
+ * \if CHINESE
+ * @brief 抽取渲染节点（不删除）
+ * @param[in] node 要抽取的节点
+ * @return true 表示成功抽取（所有权转移给调用者）
+ * \endif
  */
 bool QImWidget::takeRenderNode(QImAbstractNode* node)
 {
     if (!node) {
         return false;
     }
-    return d_ptr->rootRenderNode->takeChildNode(node);
+    QIM_D(d);
+    return d->rootRenderNode->takeChildNode(node);
 }
 
 /**
- * @brief ImGui的颜色主题
- * @return
+ * \if ENGLISH
+ * @brief Gets the current ImGui color theme
+ * @return Current StyleColorsTheme
+ * \endif
+ * \if CHINESE
+ * @brief 获取当前 ImGui 颜色主题
+ * @return 当前 StyleColorsTheme
+ * \endif
  */
 QImWidget::StyleColorsTheme QImWidget::styleColorsTheme() const
 {
-    return d_ptr->styleColorTheme.value();
+    QIM_DC(d);
+    return d->styleColorTheme.value();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the current font glyph ranges flags
+ * @return Current GlyphRangesFlags configuration
+ * \endif
+ * \if CHINESE
+ * @brief 获取当前字体字形范围标志
+ * @return 当前 GlyphRangesFlags 配置
+ * \endif
+ */
 QImWidget::GlyphRangesFlags QImWidget::fontGlyphRangesFlag() const
 {
     QIM_DC(d);
@@ -583,9 +735,16 @@ QImWidget::GlyphRangesFlags QImWidget::fontGlyphRangesFlag() const
 }
 
 /**
- * @brief 初始化GL，重写此方法理论上都应该调用QImWidget::initializeGL()进行imgui的初始化，否则会异常
- *
- * @note 子类都应该显示调用QImWidget::initializeGL()以确保Imgui的初始化
+ * \if ENGLISH
+ * @brief Initializes OpenGL context and ImGui for this widget
+ * @note Subclasses must explicitly call QImWidget::initializeGL() to ensure ImGui initialization
+ * @details Creates a per-widget ImGui render context and connects the timer for periodic updates
+ * \endif
+ * \if CHINESE
+ * @brief 初始化 OpenGL 和 ImGui 上下文
+ * @note 子类必须显式调用 QImWidget::initializeGL() 以确保 ImGui 初始化
+ * @details 为此窗口创建独立的 ImGui 渲染上下文，并连接定时器进行周期性更新
+ * \endif
  */
 void QImWidget::initializeGL()
 {
@@ -678,13 +837,14 @@ void QImWidget::changeEvent(QEvent* e)
 
 bool QImWidget::event(QEvent* e)
 {
+    QIM_D(d);
     // 这些事件触发渲染
     switch (e->type()) {
     case QEvent::MouseMove:
     case QEvent::MouseButtonPress:
     case QEvent::MouseButtonRelease:
     case QEvent::MouseButtonDblClick:
-    case QEvent::Enter:  // 鼠标进入窗口
+    case QEvent::Enter:  // Mouse enters window
     case QEvent::Wheel:
     case QEvent::KeyPress:
     case QEvent::KeyRelease:
@@ -693,7 +853,7 @@ bool QImWidget::event(QEvent* e)
     case QEvent::HoverMove:
     case QEvent::Resize:
     case QEvent::Leave:
-        if (d_ptr->needDemandUpdate()) {
+        if (d->needDemandUpdate()) {
             requestRender();
         }
         break;
@@ -703,17 +863,17 @@ bool QImWidget::event(QEvent* e)
         break;
     case QEvent::FontChange:
     case QEvent::StyleChange:
-        if (d_ptr->needDemandUpdate()) {
+        if (d->needDemandUpdate()) {
             requestRender();
         }
         break;
     case QEvent::Hide:
-        d_ptr->timer->stop();  // 隐藏时停止渲染
+        d->timer->stop();
         break;
 
     case QEvent::Show:
-        if (d_ptr->needStartContinuousTimer()) {
-            d_ptr->timer->start();  // 非OnDemand模式恢复渲染
+        if (d->needStartContinuousTimer()) {
+            d->timer->start();
         }
         break;
     default:
@@ -724,9 +884,14 @@ bool QImWidget::event(QEvent* e)
 }
 
 /**
- * @brief 绘制背景
- *
- * 在刷新GL窗口的时候，需要先绘制一遍背景，避免imgui的窗口重影
+ * \if ENGLISH
+ * @brief Draws the background color to prevent ImGui window ghosting
+ * @details Clears the OpenGL color buffer with the configured backgroundColor
+ * \endif
+ * \if CHINESE
+ * @brief 绘制背景色以避免 ImGui 窗口重影
+ * @details 使用配置的 backgroundColor 清除 OpenGL 颜色缓冲区
+ * \endif
  */
 void QImWidget::drawBackground()
 {
@@ -738,9 +903,20 @@ void QImWidget::drawBackground()
 }
 
 /**
- * @brief 在ImGui调用节点渲染树之前执行的函数，可以在此函数绘制底图，例如背景
- * @note QImWidget::drawBeforeIMRender主要处理背景清除工作，如果重写drawBeforeIMRender，
- * 建议显示调用QImWidget::drawBeforeIMRender(),除非你明确不需要清除背景
+ * \if ENGLISH
+ * @brief Hook called before ImGui node rendering tree is executed
+ * @note QImWidget::beforeRenderImNodes() handles background clearing and theme switching.
+ *       If overridden, explicitly call QImWidget::beforeRenderImNodes() unless you
+ *       intentionally skip theme application.
+ * @details Applies the ImGui style theme if it has been marked dirty since last render
+ * \endif
+ * \if CHINESE
+ * @brief 在 ImGui 节点渲染树执行之前调用的钩子
+ * @note QImWidget::beforeRenderImNodes() 处理背景清除和主题切换。
+ *       如果重写此函数，建议显式调用 QImWidget::beforeRenderImNodes()，
+ *       除非明确不需要应用主题。
+ * @details 若主题在上次渲染后被标记为 dirty，则应用 ImGui 样式主题
+ * \endif
  */
 void QImWidget::beforeRenderImNodes()
 {
@@ -763,51 +939,35 @@ void QImWidget::beforeRenderImNodes()
 }
 
 /**
- * @brief 在ImGui调用Render之前执行的函数，这时所有渲染节点以及执行完
- *
- * 如果你的窗口没有任何渲染节点，可以把这个函数作为你执行imgui的渲染窗口
- *
- * 例如下面这个是进行
+ * \if ENGLISH
+ * @brief Hook called after all render nodes have been executed, before ImGui::Render()
+ * @details If your widget has no render nodes, you can use this method to draw
+ *          ImGui windows directly. Example:
  * @code
- * void ImWidget::afterRenderIM()
- * {
- *     static ImVec4 clear_color = ImColor(114, 144, 154);
- *     static bool show_labels   = true;
- *     double x1                 = 0.2;
- *     double x2                 = 0.8;
- *     double y1                 = 0.25;
- *     double y2                 = 0.75;
- *     double f                  = 0.1;
- *
- *     ImPlot::SetCurrentContext(m_context);
- *
- *     static bool use_work_area     = false;
- *     static ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
- * ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
- *
- *     const ImGuiViewport* viewport = ImGui::GetMainViewport();
- *     ImGui::SetNextWindowPos(use_work_area ? viewport->WorkPos : viewport->Pos);
- *     ImGui::SetNextWindowSize(use_work_area ? viewport->WorkSize : viewport->Size);
- *
- *     if (ImGui::Begin("Example: Fullscreen window", nullptr, flags)) {
- *         ImGui::BulletText("Click and drag the horizontal and vertical lines.");
- *
- *         ImGui::Checkbox("Show Labels##1", &show_labels);
- *         if (ImPlot::BeginPlot("##guides", 0, 0, ImVec2(-1, -1), ImPlotFlags_YAxis2)) {
- *             double xs[ 1000 ], ys[ 1000 ];
- *             for (int i = 0; i < 1000; ++i) {
- *                 xs[ i ] = (x2 + x1) / 2 + abs(x2 - x1) * (i / 1000.0f - 0.5f);
- *                 ys[ i ] = (y1 + y2) / 2 + abs(y2 - y1) / 2 * sin(f * i / 10);
- *             }
- *             ImPlot::PlotLine("Interactive Data", xs, ys, 1000);
- *             ImPlot::EndPlot();
- *         }
+ * void MyWidget::afterRenderImNodes() {
+ *     if (ImGui::Begin("My Window", nullptr, flags)) {
+ *         // custom ImGui drawing here
  *         ImGui::End();
  *     }
  * }
  * @endcode
- *
- * 在beforeRenderIM也可以执行上面的函数，不过更建议在afterRenderIM上执行，如果在beforeRenderIM执行，记得调用QImWidget::beforeRenderIM()，否则主题会失效
+ * @note You can also draw in beforeRenderImNodes(), but must call
+ *       QImWidget::beforeRenderImNodes() first to ensure theme is applied.
+ * \endif
+ * \if CHINESE
+ * @brief 在所有渲染节点执行完毕后、ImGui::Render() 之前调用的钩子
+ * @details 如果你的窗口没有任何渲染节点，可以将此函数作为执行 ImGui 渲染的入口。例如：
+ * @code
+ * void MyWidget::afterRenderImNodes() {
+ *     if (ImGui::Begin("My Window", nullptr, flags)) {
+ *         // 在此处自定义 ImGui 绘制
+ *         ImGui::End();
+ *     }
+ * }
+ * @endcode
+ * @note 也可以在 beforeRenderImNodes() 中执行 ImGui 绘制，但必须先调用
+ *       QImWidget::beforeRenderImNodes() 以确保主题生效。
+ * \endif
  */
 void QImWidget::afterRenderImNodes()
 {
@@ -817,9 +977,20 @@ void QImWidget::afterRenderImNodes()
 #endif
 }
 
+/**
+ * \if ENGLISH
+ * @brief Replaces the root render node with a new one
+ * @param[in] node New root render node (ownership transferred)
+ * \endif
+ * \if CHINESE
+ * @brief 替换根渲染节点
+ * @param[in] node 新的根渲染节点（所有权转移）
+ * \endif
+ */
 void QImWidget::resetRootRenderNode(QImAbstractNode* node)
 {
-    d_ptr->rootRenderNode.reset(node);
+    QIM_D(d);
+    d->rootRenderNode.reset(node);
 }
 
 }  // end namespace QIM

@@ -158,8 +158,8 @@ if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
     scatter->setLabel("samples");
     scatter->setData(xs, ys, zs);
     scatter->setMarkerSize(4.0f);
-    scatter->setFillColor(QColor(217, 83, 25));
-    scatter->setOutlineColor(QColor(120, 45, 10));
+    scatter->setMarkerFillColor(QColor(217, 83, 25));
+    scatter->setMarkerOutlineColor(QColor(120, 45, 10));
 }
 // 创建子图3-曲面图
 if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {

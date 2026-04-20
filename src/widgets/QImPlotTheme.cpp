@@ -81,8 +81,9 @@ QImPlotTheme::QImPlotTheme() : QIM_PIMPL_CONSTRUCT
  */
 QImPlotTheme::QImPlotTheme(const QImPlotTheme& other)
 {
+    QIM_D(d);
     // Deep copy all color components from source
-    d_ptr->copyColorsFrom(other);
+    d->copyColorsFrom(other);
 }
 
 /**
@@ -100,9 +101,10 @@ QImPlotTheme::QImPlotTheme(const QImPlotTheme& other)
  */
 QImPlotTheme::QImPlotTheme(QImPlotTheme&& other) noexcept : d_ptr(std::move(other.d_ptr))
 {
+    QIM_D(d);
     // Rebind q_ptr in moved PrivateData to new owner
-    if (d_ptr) {
-        d_ptr->q_ptr = this;
+    if (d) {
+        d->q_ptr = this;
     }
 }
 
@@ -124,23 +126,14 @@ QImPlotTheme::~QImPlotTheme()
  */
 void QImPlotTheme::setFrameBackgroundColor(const QColor& c)
 {
-    d_ptr->m_frameBg = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_frameBg = QIM::toImVec4(c);
 }
 
-/**
- * \if ENGLISH
- * @brief Get current plot frame background color
- * @return Current background color as QColor
- * \endif
- *
- * \if CHINESE
- * @brief 获取当前图表框架背景颜色
- * @return 当前背景颜色（QColor 格式）
- * \endif
- */
 QColor QImPlotTheme::frameBackgroundColor() const
 {
-    return QIM::toQColor(d_ptr->m_frameBg);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_frameBg);
 }
 
 // ===== Plot Area Colors =====
@@ -157,11 +150,13 @@ QColor QImPlotTheme::frameBackgroundColor() const
  */
 void QImPlotTheme::setPlotBackgroundColor(const QColor& c)
 {
-    d_ptr->m_plotBg = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_plotBg = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::plotBackgroundColor() const
 {
-    return QIM::toQColor(d_ptr->m_plotBg);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_plotBg);
 }
 
 /**
@@ -177,11 +172,13 @@ QColor QImPlotTheme::plotBackgroundColor() const
  */
 void QImPlotTheme::setPlotBorderColor(const QColor& c)
 {
-    d_ptr->m_plotBorder = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_plotBorder = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::plotBorderColor() const
 {
-    return QIM::toQColor(d_ptr->m_plotBorder);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_plotBorder);
 }
 
 // ===== Legend Colors =====
@@ -198,11 +195,13 @@ QColor QImPlotTheme::plotBorderColor() const
  */
 void QImPlotTheme::setLegendBackgroundColor(const QColor& c)
 {
-    d_ptr->m_legendBg = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_legendBg = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::legendBackgroundColor() const
 {
-    return QIM::toQColor(d_ptr->m_legendBg);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_legendBg);
 }
 
 /**
@@ -218,11 +217,13 @@ QColor QImPlotTheme::legendBackgroundColor() const
  */
 void QImPlotTheme::setLegendBorderColor(const QColor& c)
 {
-    d_ptr->m_legendBorder = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_legendBorder = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::legendBorderColor() const
 {
-    return QIM::toQColor(d_ptr->m_legendBorder);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_legendBorder);
 }
 
 /**
@@ -238,11 +239,13 @@ QColor QImPlotTheme::legendBorderColor() const
  */
 void QImPlotTheme::setLegendTextColor(const QColor& c)
 {
-    d_ptr->m_legendText = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_legendText = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::legendTextColor() const
 {
-    return QIM::toQColor(d_ptr->m_legendText);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_legendText);
 }
 
 // ===== Text Colors =====
@@ -259,11 +262,13 @@ QColor QImPlotTheme::legendTextColor() const
  */
 void QImPlotTheme::setTitleTextColor(const QColor& c)
 {
-    d_ptr->m_titleText = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_titleText = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::titleTextColor() const
 {
-    return QIM::toQColor(d_ptr->m_titleText);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_titleText);
 }
 
 /**
@@ -279,11 +284,13 @@ QColor QImPlotTheme::titleTextColor() const
  */
 void QImPlotTheme::setInlayTextColor(const QColor& c)
 {
-    d_ptr->m_inlayText = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_inlayText = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::inlayTextColor() const
 {
-    return QIM::toQColor(d_ptr->m_inlayText);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_inlayText);
 }
 
 /**
@@ -299,11 +306,13 @@ QColor QImPlotTheme::inlayTextColor() const
  */
 void QImPlotTheme::setAxisTextColor(const QColor& c)
 {
-    d_ptr->m_axisText = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_axisText = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::axisTextColor() const
 {
-    return QIM::toQColor(d_ptr->m_axisText);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_axisText);
 }
 
 // ===== Grid & Ticks =====
@@ -320,11 +329,13 @@ QColor QImPlotTheme::axisTextColor() const
  */
 void QImPlotTheme::setAxisGridColor(const QColor& c)
 {
-    d_ptr->m_axisGrid = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_axisGrid = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::axisGridColor() const
 {
-    return QIM::toQColor(d_ptr->m_axisGrid);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_axisGrid);
 }
 
 /**
@@ -340,11 +351,13 @@ QColor QImPlotTheme::axisGridColor() const
  */
 void QImPlotTheme::setAxisTickColor(const QColor& c)
 {
-    d_ptr->m_axisTick = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_axisTick = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::axisTickColor() const
 {
-    return QIM::toQColor(d_ptr->m_axisTick);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_axisTick);
 }
 
 // ===== Interactive Elements =====
@@ -361,11 +374,13 @@ QColor QImPlotTheme::axisTickColor() const
  */
 void QImPlotTheme::setSelectionColor(const QColor& c)
 {
-    d_ptr->m_selection = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_selection = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::selectionColor() const
 {
-    return QIM::toQColor(d_ptr->m_selection);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_selection);
 }
 
 /**
@@ -381,11 +396,13 @@ QColor QImPlotTheme::selectionColor() const
  */
 void QImPlotTheme::setCrosshairsColor(const QColor& c)
 {
-    d_ptr->m_crosshairs = QIM::toImVec4(c);
+    QIM_D(d);
+    d->m_crosshairs = QIM::toImVec4(c);
 }
 QColor QImPlotTheme::crosshairsColor() const
 {
-    return QIM::toQColor(d_ptr->m_crosshairs);
+    QIM_DC(d);
+    return QIM::toQColor(d->m_crosshairs);
 }
 
 // ===== Comparison Operators =====
@@ -412,19 +429,20 @@ bool QImPlotTheme::operator==(const QImPlotTheme& other) const
     }
 
     // Compare all 13 non-AUTO color components with epsilon tolerance
-    return QIM::fuzzyEqual(d_ptr->m_frameBg, other.d_ptr->m_frameBg)
-           && QIM::fuzzyEqual(d_ptr->m_plotBg, other.d_ptr->m_plotBg)
-           && QIM::fuzzyEqual(d_ptr->m_plotBorder, other.d_ptr->m_plotBorder)
-           && QIM::fuzzyEqual(d_ptr->m_legendBg, other.d_ptr->m_legendBg)
-           && QIM::fuzzyEqual(d_ptr->m_legendBorder, other.d_ptr->m_legendBorder)
-           && QIM::fuzzyEqual(d_ptr->m_legendText, other.d_ptr->m_legendText)
-           && QIM::fuzzyEqual(d_ptr->m_titleText, other.d_ptr->m_titleText)
-           && QIM::fuzzyEqual(d_ptr->m_inlayText, other.d_ptr->m_inlayText)
-           && QIM::fuzzyEqual(d_ptr->m_axisText, other.d_ptr->m_axisText)
-           && QIM::fuzzyEqual(d_ptr->m_axisGrid, other.d_ptr->m_axisGrid)
-           && QIM::fuzzyEqual(d_ptr->m_axisTick, other.d_ptr->m_axisTick)
-           && QIM::fuzzyEqual(d_ptr->m_selection, other.d_ptr->m_selection)
-           && QIM::fuzzyEqual(d_ptr->m_crosshairs, other.d_ptr->m_crosshairs);
+    QIM_DC(d);
+    return QIM::fuzzyEqual(d->m_frameBg, other.d_ptr->m_frameBg)
+           && QIM::fuzzyEqual(d->m_plotBg, other.d_ptr->m_plotBg)
+           && QIM::fuzzyEqual(d->m_plotBorder, other.d_ptr->m_plotBorder)
+           && QIM::fuzzyEqual(d->m_legendBg, other.d_ptr->m_legendBg)
+           && QIM::fuzzyEqual(d->m_legendBorder, other.d_ptr->m_legendBorder)
+           && QIM::fuzzyEqual(d->m_legendText, other.d_ptr->m_legendText)
+           && QIM::fuzzyEqual(d->m_titleText, other.d_ptr->m_titleText)
+           && QIM::fuzzyEqual(d->m_inlayText, other.d_ptr->m_inlayText)
+           && QIM::fuzzyEqual(d->m_axisText, other.d_ptr->m_axisText)
+           && QIM::fuzzyEqual(d->m_axisGrid, other.d_ptr->m_axisGrid)
+           && QIM::fuzzyEqual(d->m_axisTick, other.d_ptr->m_axisTick)
+           && QIM::fuzzyEqual(d->m_selection, other.d_ptr->m_selection)
+           && QIM::fuzzyEqual(d->m_crosshairs, other.d_ptr->m_crosshairs);
 }
 
 /**
@@ -464,7 +482,8 @@ QImPlotTheme& QImPlotTheme::operator=(const QImPlotTheme& other)
 {
     if (this != &other && other.d_ptr) {
         // Copy all color components (d_ptr already exists from construction)
-        d_ptr->copyColorsFrom(other);
+        QIM_D(d);
+        d->copyColorsFrom(other);
     }
     return *this;
 }
@@ -491,8 +510,9 @@ QImPlotTheme& QImPlotTheme::operator=(QImPlotTheme&& other) noexcept
         d_ptr.swap(other.d_ptr);
 
         // Rebind q_ptr in both objects to maintain PIMPL integrity
-        if (d_ptr)
-            d_ptr->q_ptr = this;
+        QIM_D(d);
+        if (d)
+            d->q_ptr = this;
         if (other.d_ptr)
             other.d_ptr->q_ptr = &other;
     }

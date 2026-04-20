@@ -28,6 +28,50 @@ QIm使用PIMPL模式，将实现细节封装在`private`成员中。PIMPL模式�
 | `QIM_DC(d)`                  | 在const方法中获取`const d_ptr`指针                |
 | `QIM_PIMPL_CONSTRUCT`        | 构造函数中初始化PIMPL快捷宏                          |
 
+## 颜色属性类型别名
+
+为了简化 Plot Item 颜色属性的声明，项目在 `QImPlotItemNode.h` 中提供了类型别名：
+
+| 类型别名 | 定义 | 用途 |
+|---------|------|------|
+| `QImTrackedColor` | `QImTrackedValue<ImVec4, ImVecComparator<ImVec4>>` | 带脏标记跟踪的 ImVec4 颜色值 |
+| `QImOptionalColor` | `std::optional<QImTrackedColor>` | 可选的跟踪颜色值，用于延迟初始化模式 |
+
+### 使用示例
+
+```cpp
+// 在 PrivateData 中声明颜色属性
+class QImPlotLineItemNode::PrivateData
+{
+    QImOptionalColor color;  ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
+};
+
+// 在 beginDraw() 中使用
+bool QImPlotLineItemNode::beginDraw()
+{
+    // 如果用户设置了颜色，应用到渲染
+    if (d->color) {
+        ImPlot::SetNextLineStyle(d->color->value(), d->lineWidth.value());
+    }
+    
+    // ... 调用 ImPlot::PlotLine ...
+    
+    // 首次渲染且未设置颜色时，捕获 ImPlot 分配的默认颜色
+    if (!d->color) {
+        d->color = ImPlot::GetLastItemColor();
+    }
+}
+```
+
+### 设计说明
+
+`QImOptionalColor` 使用 **延迟初始化模式**（Lazy Initialization）：
+1. `std::nullopt`：用户未设置颜色，使用 ImPlot 默认颜色
+2. 有值：用户已设置颜色，或已从 ImPlot 捕获默认颜色
+3. 配合 `beginDraw()` 实现 Node 与 ImPlot 之间的状态同步
+
+此设计解决了 Node 封装 ImPlot 属性时，因 ImPlot 内部交互导致属性不同步的问题。
+
 ## 已实现的Plot Items（全部完成）
 
 | Item Node Class              | ImPlot API      | 描述        | 关键属性                                                 |
@@ -137,6 +181,7 @@ protected:
 ```cpp
 #include "QImPlotNewItemNode.h"
 #include "implot.h"
+#include "implot_internal.h"
 
 QIM_DECLARE_PRIVATE(QImPlotNewItemNode)
 
@@ -147,7 +192,7 @@ public:
     PrivateData() = default;
     
     QImAbstractXYDataSeries* dataSeries = nullptr;
-    QColor color;
+    QImOptionalColor color;  ///< 使用类型别名声明颜色属性
     bool horizontal = false;
     // 更多私有成员...
 };
@@ -155,24 +200,20 @@ public:
 // 构造/析构
 QImPlotNewItemNode::QImPlotNewItemNode(QObject* parent)
     : QImPlotItemNode(parent)
-    , d_ptr(new PrivateData)
+    , QIM_PIMPL_CONSTRUCT
 {
 }
 
 // 属性访问器实现
 QColor QImPlotNewItemNode::color() const
 {
-    QIM_DC(d);
-    return d->color;
+    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
 }
 
 void QImPlotNewItemNode::setColor(const QColor& color)
 {
-    QIM_D(d);
-    if (d->color != color) {
-        d->color = color;
-        emit colorChanged(color);
-    }
+    d_ptr->color = toImVec4(color);
+    emit colorChanged(color);
 }
 
 // 核心渲染方法
@@ -181,10 +222,9 @@ bool QImPlotNewItemNode::beginDraw()
     QIM_D(d);
     if (!d->dataSeries) return false;
     
-    // 设置样式
-    if (d->color.isValid()) {
-        ImPlot::SetNextLineStyle(ImVec4(d->color.redF(), d->color.greenF(), 
-                                        d->color.blueF(), d->color.alphaF()));
+    // 设置样式：如果用户设置了颜色，应用到渲染
+    if (d->color) {
+        ImPlot::SetNextLineStyle(d->color->value());
     }
     
     // 调用ImPlot API
@@ -193,6 +233,12 @@ bool QImPlotNewItemNode::beginDraw()
                          d->dataSeries->yData(),
                          d->dataSeries->count(),
                          newItemFlags());
+    
+    // 首次渲染且未设置颜色时，捕获 ImPlot 分配的默认颜色
+    if (!d->color) {
+        d->color = ImPlot::GetLastItemColor();
+    }
+    
     return true;
 }
 ```
@@ -224,21 +270,38 @@ examples/qimfigure-test/functions/
 └── TestFunctionManager.cpp # 注册所有测试
 ```
 
-## 子代理快速参考
+### 子代理快速参考
 
 ### 开发新Plot Item时必读文件
 
 1. **参考实现**: `src/core/plot/QImPlotBarsItemNode.h` (完整属性+Doxygen注释)
 2. **简单参考**: `src/core/plot/QImPlotStairsItemNode.h` (简单属性)
-3. **ImPlot API**: `3rdparty/implot/implot.h` (原始API签名)
-4. **数据系列**: `src/core/plot/QImPlotDataSeries.h` (XY数据接口)
-5. **测试模板**: `examples/qimfigure-test/functions/datapoints/BarsFunction.cpp`
+3. **颜色属性类型别名**: `src/core/plot/QImPlotItemNode.h` (QImOptionalColor 定义)
+4. **ImPlot API**: `3rdparty/implot/implot.h` (原始API签名)
+5. **数据系列**: `src/core/plot/QImPlotDataSeries.h` (XY数据接口)
+6. **测试模板**: `examples/qimfigure-test/functions/datapoints/BarsFunction.cpp`
 
 ### 关键约定
 
 1. **属性命名**: 使用Qt风格（`setColor`/`color`/`colorChanged`）
 2. **标志属性**: 使用肯定语义（`isHorizontal`而非`noHorizontal`）
-3. **Doxygen注释**: 必须双语（`\if ENGLISH` / `\if CHINESE`）
-4. **头文件注释**: public函数仅单行英文简要注释
-5. **详细注释**: 在cpp文件中使用完整Doxygen双语块
+3. **颜色属性**: 使用 `QImOptionalColor` 类型别名，遵循延迟初始化模式
+4. **Doxygen注释**: 必须双语（`\if ENGLISH` / `\if CHINESE`）
+5. **头文件注释**: public函数仅单行英文简要注释
+6. **详细注释**: 在cpp文件中使用完整Doxygen双语块
 
+### 涉及代码开发必须阅读文档
+
+1. **代码风格与注释规范**: `docs\zh\dev\coding-standards.md`
+2. **PIMPL开发规范**: `docs\zh\dev\pimpl-dev-guide.md`
+3. **Qt集成规范**: `docs\zh\dev\qt-integration.md`
+
+涉及新节点开发，你还需要阅读：
+
+1. **新节点开发指南**: `docs\zh\dev\new-node-guide.md`
+2. **渲染性能规范**: `docs\zh\dev\render-guidelines.md`
+3. **枚举语义转换规范**: `docs\zh\dev\flag-mapping.md`
+
+这些文档你可以通过**开发规范索引**了解详情: `docs\zh\dev\index.md`
+
+你如果要编译和构建，必须阅读`build.md`

@@ -211,18 +211,17 @@ void SubplotsFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
-    // Use figure's internal subplotNode instead of creating a new one
-    // QImFigureWidget already has an internal QImSubplotsNode created in its constructor
-    // Creating another SubplotsNode would cause nested BeginSubplots/EndSubplots calls,
-    // which corrupts ImPlot's Push/Pop style stack and causes assertion failures.
+    // Create subplot grid (this creates QImSubplotsNode on demand)
+    // With the new lazy architecture, subplot only exists when explicitly requested
+    figure->setSubplotGrid(m_rows, m_cols);
+    
     m_subplotsNode = figure->subplotNode();
     if (!m_subplotsNode) {
         return;
     }
     
-    // Configure the internal subplot node
+    // Configure subplot properties (grid is already set via setSubplotGrid above)
     m_subplotsNode->setTitle(m_title);
-    m_subplotsNode->setGrid(m_rows, m_cols);
     m_subplotsNode->setLinkAllX(m_linkAllX);
     m_subplotsNode->setLinkAllY(m_linkAllY);
     m_subplotsNode->setLegendEnabled(m_legendEnabled);
@@ -322,19 +321,25 @@ void SubplotsFunction::setTitle(const QString& title)
 
 void SubplotsFunction::setRows(int rows)
 {
-    if (m_rows != rows) {
+    if (m_rows != rows && rows > 0) {
         m_rows = rows;
         emit rowsChanged(rows);
-        // Note: Grid changes require recreate
+        // Update subplot grid in real-time
+        if (m_subplotsNode) {
+            m_subplotsNode->setRows(rows);
+        }
     }
 }
 
 void SubplotsFunction::setCols(int cols)
 {
-    if (m_cols != cols) {
+    if (m_cols != cols && cols > 0) {
         m_cols = cols;
         emit colsChanged(cols);
-        // Note: Grid changes require recreate
+        // Update subplot grid in real-time
+        if (m_subplotsNode) {
+            m_subplotsNode->setColumns(cols);
+        }
     }
 }
 

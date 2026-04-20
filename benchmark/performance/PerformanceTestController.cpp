@@ -1,4 +1,4 @@
-﻿// PerformanceTestController.cpp
+// PerformanceTestController.cpp
 #include "PerformanceTestController.h"
 #include <QCoreApplication>
 #include <QtConcurrent/QtConcurrent>
@@ -156,6 +156,13 @@ PerformanceTestController::PerformanceTestController(QObject* parent) : QObject(
 void PerformanceTestController::runTests(const TestConfig& config)
 {
     m_config = config;
+    QVector< TestResult > allResults = runTestsInternal(config);
+    emit allTestsCompleted(allResults);
+}
+
+QVector< TestResult > PerformanceTestController::runTestsInternal(const TestConfig& config)
+{
+    m_config = config;
 
     // 计算需要的最大数据点数
     int maxPointCount = *std::max_element(config.pointCounts.begin(), config.pointCounts.end());
@@ -208,7 +215,43 @@ void PerformanceTestController::runTests(const TestConfig& config)
         cleanupMemory();
     }
 
-    emit allTestsCompleted(allResults);
+    return allResults;
+}
+
+QVector< TestResult > PerformanceTestController::runFullBenchmark(const TestConfig& baseConfig)
+{
+    QVector< TestResult > allResults;
+    QList< TestConfig > configs;
+
+    // Config 1: Baseline (no downsampling, no OpenGL)
+    TestConfig config1 = baseConfig;
+    config1.useDownsampling = false;
+    config1.useOpenGL       = false;
+
+    // Config 2: OpenGL only
+    TestConfig config2 = baseConfig;
+    config2.useDownsampling = false;
+    config2.useOpenGL       = true;
+
+    // Config 3: Downsampling only
+    TestConfig config3 = baseConfig;
+    config3.useDownsampling = true;
+    config3.useOpenGL       = false;
+
+    // Config 4: Both
+    TestConfig config4 = baseConfig;
+    config4.useDownsampling = true;
+    config4.useOpenGL       = true;
+
+    configs = {config1, config2, config3, config4};
+
+    for (int i = 0; i < configs.size(); ++i) {
+        Q_EMIT testProgressUpdate(i + 1, configs.size(), 0);
+        QVector< TestResult > configResults = runTestsInternal(configs[ i ]);
+        allResults.append(configResults);
+    }
+
+    return allResults;
 }
 
 TestResult PerformanceTestController::testQImPlot(int pointCount)
@@ -217,7 +260,9 @@ TestResult PerformanceTestController::testQImPlot(int pointCount)
     result.libraryName      = "QIm";
     result.pointCount       = pointCount;
     result.usedDownsampling = m_config.useDownsampling;
+    // QIm uses OpenGL as its rendering backend (ImGui renders via GPU), this is not a toggleable option
     result.usedOpenGL       = true;
+    result.qtVersion        = qVersion();
     // 记录基准内存（测试开始前）
     MemoryMonitor mem;
     qDebug().noquote() << "\nBegin Test QIm Baseline memory:" << mem.recordedMemory() << "MB";
@@ -227,6 +272,12 @@ TestResult PerformanceTestController::testQImPlot(int pointCount)
     figure->resize(800, 600);
     figure->show();
     QCoreApplication::processEvents();
+
+    // Collect GPU info while QIm's GL context is active (only once)
+    if (m_systemInfo.openglVersion.isEmpty()) {
+        m_systemInfo = SystemInfoCollector::collectSystemInfo();
+        SystemInfoCollector::collectGPUInfo(m_systemInfo);
+    }
 
     // 计算滑动步长
     int step = (m_totalDataSize - pointCount) / (m_config.testFrames - 1);
@@ -270,9 +321,9 @@ TestResult PerformanceTestController::testQImPlot(int pointCount)
             QVector< double >(m_testDataX.constData() + startIdx, m_testDataX.constData() + startIdx + pointCount - 1),
             QVector< double >(m_testDataY.constData() + startIdx, m_testDataY.constData() + startIdx + pointCount - 1)
         );
-        QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
         plotNode->rescaleAxes();
         figure->requestRender();
+        QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
         mem.updatePeak();  // 更新峰值内存
     }
     double totalTime = timer.elapsed();
@@ -296,6 +347,7 @@ TestResult PerformanceTestController::testQwt(int pointCount)
     result.pointCount       = pointCount;
     result.usedDownsampling = m_config.useDownsampling;
     result.usedOpenGL       = m_config.useOpenGL;
+    result.qtVersion        = qVersion();
     MemoryMonitor mem;
     qDebug().noquote() << "\nBegin Test QWT Baseline memory:" << mem.recordedMemory() << "MB";
     auto* plot = new QwtPlot();
@@ -368,6 +420,7 @@ TestResult PerformanceTestController::testQCustomPlot(int pointCount)
     result.pointCount       = pointCount;
     result.usedDownsampling = m_config.useDownsampling;
     result.usedOpenGL       = m_config.useOpenGL;
+    result.qtVersion        = qVersion();
     MemoryMonitor mem;
     qDebug().noquote() << "\nBegin Test QCustomPlot Baseline memory:" << mem.recordedMemory() << "MB";
 
@@ -381,7 +434,6 @@ TestResult PerformanceTestController::testQCustomPlot(int pointCount)
     customPlot->addGraph();
     customPlot->graph(0)->setName("Test Curve");
     customPlot->graph(0)->setAdaptiveSampling(result.usedDownsampling);
-    customPlot->setAntialiasedElements(QCP::aeNone);  // 关闭抗锯齿提高性能
     QCoreApplication::processEvents();
 
     int step = (m_totalDataSize - pointCount) / (m_config.testFrames - 1);
@@ -532,17 +584,10 @@ void PerformanceTestController::cleanupMemory()
     // Windows：强制工作集修剪
     SetProcessWorkingSetSize(GetCurrentProcess(), (SIZE_T)-1, (SIZE_T)-1);
 #elif defined(Q_OS_LINUX)
-    // Linux：触发内存页回写并释放
-    std::ofstream ofs("/proc/sys/vm/drop_caches");
-    if (ofs.is_open()) {
-        ofs << "3" << std::endl;  // 释放页缓存、目录项、inodes
-        ofs.close();
-    }
-    // 触发进程堆整理
-    mallopt(M_TRIM_THRESHOLD, 0);
+    // Linux：用户态堆内存整理（无需 root 权限）
+    malloc_trim(0);
 #elif defined(Q_OS_MACOS)
-    // macOS：触发内存压缩/回收
-    vm_deallocate(mach_task_self(), vm_address_t(0), vm_size_t(0));
+    // macOS relies on system memory management; malloc_trim not available
 #endif
 
     // 3. 短暂等待系统回收（给系统100ms时间处理）

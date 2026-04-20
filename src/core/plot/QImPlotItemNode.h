@@ -1,14 +1,62 @@
-﻿#ifndef QIMPLOTITEMNODE_H
+#ifndef QIMPLOTITEMNODE_H
 #define QIMPLOTITEMNODE_H
 #include "QImAbstractNode.h"
 #include "QImPlot.h"
+#include <optional>
+#include "QImTrackedValue.hpp"
+#include "QtImGuiUtils.h"
 
 struct ImPlotItem;
+struct ImVec4;
+
 namespace QIM
 {
+
+// ============================================================
+// Type alias definitions - simplifies Plot Item color property declarations
+// ============================================================
+
+/**
+ * @brief Tracked ImVec4 color value with dirty flag
+ * @details Wraps ImVec4 with change detection, used when tracking color
+ *          changes and emitting signals.
+ */
+using QImTrackedColor = QImTrackedValue<ImVec4, ImVecComparator<ImVec4>>;
+
+/**
+ * @brief Optional tracked color value
+ * @details Used for Plot Item color properties:
+ *          - std::nullopt: user hasn't set a color, use ImPlot default
+ *          - has value: user set a color, or captured ImPlot default
+ *          Compatible with deferred initialization pattern in beginDraw().
+ */
+using QImOptionalColor = std::optional<QImTrackedColor>;
+
+
 class QImPlotNode;
 /**
+ * \if ENGLISH
+ * @brief Base class for all ImPlot plot item nodes
+ * @details Provides the foundational QObject-based node for all plot visualization
+ *          items (lines, bars, scatter, etc.) within the QIm object tree. Manages
+ *          common properties such as label, axis binding, visibility, and color.
+ *          Each plot item is associated with a QImPlotNode parent that provides
+ *          the rendering context (BeginPlot/EndPlot block).
+ *          Uses the PIMPL pattern via QIM_DECLARE_PRIVATE for encapsulation.
+ * @note Subclasses must implement type() for fast runtime type identification
+ *       without dynamic_cast overhead.
+ * @see QImPlotNode, QImPlotLineItemNode, QImPlotBarsItemNode
+ * \endif
+ *
+ * \if CHINESE
  * @brief PlotItem对应的基类
+ * @details 为QIm对象树中所有绘图可视化项目（折线、柱状、散点等）提供基于QObject的基础节点。
+ *          管理通用属性如标签、坐标轴绑定、可见性和颜色。
+ *          每个绘图项目关联一个QImPlotNode父节点，后者提供渲染上下文（BeginPlot/EndPlot块）。
+ *          通过QIM_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * @note 子类必须实现type()以实现快速运行时类型识别，避免dynamic_cast开销。
+ * @see QImPlotNode, QImPlotLineItemNode, QImPlotBarsItemNode
+ * \endif
  */
 class QIM_CORE_API QImPlotItemNode : public QImAbstractNode
 {
@@ -24,36 +72,49 @@ public:
     };
     QImPlotItemNode(QObject* par = nullptr);
     ~QImPlotItemNode();
-    // 用于快速识别那种绘图类型，避免进行大量的qobject_cast、dynamic_cast
+    // Quick type identification to avoid qobject_cast/dynamic_cast overhead
     virtual int type() const = 0;
     //
     void setLabel(const QString& name);
     QString label() const;
     const char* labelConstData() const;
-    // 绑定轴
+    // Bind axes
     void bindAxis(QImPlotAxisId x, QImPlotAxisId y);
-    // 屏幕到绘图坐标的转换
+    // Screen to plot coordinate conversion
     QPointF pixelsToPlot(const float& screenX, const float& screenY);
     QPointF plotToPixels(const double& doubleX, const double& doubleY);
-    // 绑定的x轴id
+    // Bound X axis ID
     QImPlotAxisId xAxisId() const;
-    // 绑定的y轴id
+    // Bound Y axis ID
     QImPlotAxisId yAxisId() const;
-    // 获取绘图节点
+    // Get plot node
     QImPlotNode* plotNode() const;
-    // 颜色
+    // Item color
     QColor itemColor() const;
-    // 是否在legend上悬停
+    // Whether hovered in legend
     bool isLegendHovered() const;
     //
     virtual bool isVisible() const override;
     virtual void setVisible(bool visible) override;
 Q_SIGNALS:
+    /**
+     * \if ENGLISH
+     * @brief Emitted when label changes
+     * @param[in] name The new label value
+     * @details Triggered by setLabel() when value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 标签更改时触发
+     * @param[in] name 新标签值
+     * @details 当值实际更改时由setLabel()触发。
+     * \endif
+     */
     void labelChanged(const QString& name);
 
 protected:
     virtual void endDraw() override;
-    // ImPlotItem的操作
+    // ImPlotItem operations
     ImPlotItem* imPlotItem() const;
     void setImPlotItem(ImPlotItem* item);
 };

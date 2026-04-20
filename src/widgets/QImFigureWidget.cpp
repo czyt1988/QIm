@@ -1,10 +1,12 @@
-﻿#include "QImFigureWidget.h"
+#include "QImFigureWidget.h"
 #include "QImTrackedValue.hpp"
 #include "implot.h"
 #include "implot3d.h"
 #include "plot/QImSubplotsNode.h"
-#include "plot/QImPlot3DNode.h"
+#include "plot3d/QImSubplots3DNode.h"
+#include "plot3d/QImPlot3DNode.h"
 #include "plot/QImPlotNode.h"
+#include <QDebug>
 
 namespace QIM
 {
@@ -17,39 +19,81 @@ public:
     }
 
 public:
-    QImTrackedValue< QImPlotTheme > m_theme;
-    QPointer< QImSubplotsNode > m_subplotNode;
+    QImTrackedValue<QImPlotTheme> m_theme;
+    QPointer<QImSubplotsNode> m_subplotNode;  // nullptr until setSubplotGrid() is called
+    QPointer<QImSubplots3DNode> m_subplot3DNode;  // nullptr until setSubplot3DGrid() is called
     ImPlotContext* m_context2D { nullptr };
     ImPlot3DContext* m_context3D { nullptr };
 };
 
+/**
+ * \if ENGLISH
+ * @brief Constructor with optional parent widget and window flags
+ * @param[in] parent Parent QWidget
+ * @param[in] f Qt window flags
+ * @details Subplot grid is created on demand when setSubplotGrid() is called.
+ *          Single-plot mode renders QImPlotNode directly at root level.
+ * \endif
+ * \if CHINESE
+ * @brief 构造函数（带可选父窗口和窗口标志）
+ * @param[in] parent 父 QWidget
+ * @param[in] f Qt 窗口标志
+ * @details 子图网格在调用 setSubplotGrid() 时按需创建。
+ *          单子图模式下 QImPlotNode 直接在根层级渲染。
+ * \endif
+ */
 QImFigureWidget::QImFigureWidget(QWidget* parent, Qt::WindowFlags f) : QImWidget(parent, f), QIM_PIMPL_CONSTRUCT
 {
-    d_ptr->m_subplotNode = new QImSubplotsNode();
-    addRenderNode(d_ptr->m_subplotNode.data());
+    // Subplot is no longer created by default. It will be created on demand
+    // when setSubplotGrid() is called with rows*cols > 1, or via ensureSubplotNode().
+    // Single-plot mode renders QImPlotNode directly at root level.
 }
 
 QImFigureWidget::~QImFigureWidget()
 {
+    QIM_D(d);
+    if (d->m_context3D) {
+        ImPlot3D::DestroyContext(d->m_context3D);
+    }
+    if (d->m_context2D) {
+        ImPlot::DestroyContext(d->m_context2D);
+    }
 }
 
 void QImFigureWidget::setPlotTheme(const QImPlotTheme& t)
 {
-    d_ptr->m_theme = t;
+    QIM_D(d);
+    d->m_theme = t;
 }
 
 const QImPlotTheme& QImFigureWidget::plotTheme() const
 {
-    return d_ptr->m_theme.value();
+    QIM_DC(d);
+    return d->m_theme.value();
 }
 
-void QImFigureWidget::setSubplotGrid(int rows, int cols, const std::vector< float >& rowsRatios, const std::vector< float >& colsRatios)
+QImSubplotsNode* QImFigureWidget::ensureSubplotNode()
 {
-    Q_UNUSED(rowsRatios);
-    Q_UNUSED(colsRatios);
     QIM_D(d);
-    if (d->m_subplotNode) {
-        d->m_subplotNode->setGrid(rows, cols);
+    if (!d->m_subplotNode) {
+        d->m_subplotNode = new QImSubplotsNode();
+        addRenderNode(d->m_subplotNode.data());
+        d->m_subplotNode->setTitleEnabled(true);
+        connect(d->m_subplotNode, &QImSubplotsNode::childNodeAdded, this, &QImFigureWidget::onSubplotChildNodeAdded);
+        connect(d->m_subplotNode, &QImSubplotsNode::childNodeRemoved, this, &QImFigureWidget::onSubplotChildNodeRemoved);
+    }
+    return d->m_subplotNode.data();
+}
+
+void QImFigureWidget::setSubplotGrid(int rows, int cols, const std::vector<float>& rowsRatios, const std::vector<float>& colsRatios)
+{
+    QIM_D(d);
+    // If no subplot exists yet and grid is 1x1, don't create one —
+    // single-plot mode uses root-level QImPlotNode directly.
+    // Only create/use subplot for multi-plot grids or if subplot already exists.
+    if (rows * cols > 1 || d->m_subplotNode) {
+        QImSubplotsNode* subplot = ensureSubplotNode();
+        subplot->setGrid(rows, cols, rowsRatios, colsRatios);
     }
 }
 
@@ -65,69 +109,133 @@ int QImFigureWidget::subplotGridColumns() const
     return d->m_subplotNode ? d->m_subplotNode->columns() : -1;
 }
 
-std::vector< float > QImFigureWidget::subplotGridRowRatios() const
+std::vector<float> QImFigureWidget::subplotGridRowRatios() const
 {
-    return {};
+    QIM_DC(d);
+    return d->m_subplotNode ? d->m_subplotNode->rowRatios() : std::vector<float>();
 }
 
-std::vector< float > QImFigureWidget::subplotGridColumnRatios() const
+std::vector<float> QImFigureWidget::subplotGridColumnRatios() const
 {
-    return {};
+    QIM_DC(d);
+    return d->m_subplotNode ? d->m_subplotNode->columnRatios() : std::vector<float>();
+}
+
+void QImFigureWidget::clearSubplotGrid()
+{
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        removeRenderNode(d->m_subplotNode.data());
+        d->m_subplotNode = nullptr;
+    }
 }
 
 QImSubplotsNode* QImFigureWidget::subplotNode() const
 {
-    return d_ptr->m_subplotNode.data();
+    QIM_DC(d);
+    return d->m_subplotNode.data();
 }
 
+/**
+ * @brief Create a 2D plot node, placed intelligently based on current mode
+ *
+ * If no subplot exists, creates QImPlotNode as a root-level render node (fills window).
+ * If subplot exists, delegates to QImSubplotsNode::createPlotNode() (plot occupies a grid cell).
+ *
+ * @return New QImPlotNode, or nullptr if subplot grid is full
+ */
 QImPlotNode* QImFigureWidget::createPlotNode()
 {
-    QImPlotNode* plot = d_ptr->m_subplotNode ? d_ptr->m_subplotNode->createPlotNode() : nullptr;
-    if (plot) {
-        Q_EMIT plotNodeAttached(plot, true);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        // Subplot exists — delegate to it (plot occupies a grid cell)
+        // Note: SubplotsNode::createPlotNode() adds plot as direct child,
+        // which triggers childNodeAdded → onSubplotChildNodeAdded → plotNodeAttached signal
+        // So we don't emit here to avoid double emission
+        return d->m_subplotNode->createPlotNode();
     }
+    // No subplot — create plot as root-level render node (fills entire window)
+    QImPlotNode* plot = new QImPlotNode();
+    addRenderNode(plot);
+    Q_EMIT plotNodeAttached(plot, true);
     return plot;
 }
 
-QList< QImPlotNode* > QImFigureWidget::plotNodes() const
+QList<QImPlotNode*> QImFigureWidget::plotNodes() const
 {
-    return d_ptr->m_subplotNode ? d_ptr->m_subplotNode->plotNodes() : QList< QImPlotNode* >();
+    QIM_DC(d);
+    if (d->m_subplotNode) {
+        return d->m_subplotNode->plotNodes();
+    }
+    // No subplot — search root render node children for QImPlotNode*
+    QList<QImPlotNode*> result;
+    const auto children = renderNodeList();
+    for (QImAbstractNode* node : children) {
+        if (QImPlotNode* plot = qobject_cast<QImPlotNode*>(node)) {
+            result.append(plot);
+        }
+    }
+    return result;
 }
 
 int QImFigureWidget::plotCount() const
 {
-    return d_ptr->m_subplotNode ? d_ptr->m_subplotNode->plotCount() : 0;
+    return plotNodes().size();
 }
 
 void QImFigureWidget::addPlotNode(QImPlotNode* plot)
 {
-    if (!d_ptr->m_subplotNode || !plot) {
+    if (!plot) {
         return;
     }
-    d_ptr->m_subplotNode->addPlotNode(plot);
-    Q_EMIT plotNodeAttached(plot, true);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        // Subplot exists — addPlotNode triggers childNodeAdded → onSubplotChildNodeAdded → plotNodeAttached
+        // Don't emit here to avoid double emission
+        d->m_subplotNode->addPlotNode(plot);
+    } else {
+        addRenderNode(plot);
+        Q_EMIT plotNodeAttached(plot, true);
+    }
 }
 
 void QImFigureWidget::insertPlotNode(int plotIndex, QImPlotNode* plot)
 {
-    if (!d_ptr->m_subplotNode || !plot) {
+    if (!plot) {
         return;
     }
-    d_ptr->m_subplotNode->insertPlotNode(plotIndex, plot);
-    Q_EMIT plotNodeAttached(plot, true);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        // Subplot exists — insertPlotNode triggers childNodeAdded → onSubplotChildNodeAdded → plotNodeAttached
+        // Don't emit here to avoid double emission
+        d->m_subplotNode->insertPlotNode(plotIndex, plot);
+    } else {
+        addRenderNode(plot);
+        Q_EMIT plotNodeAttached(plot, true);
+    }
 }
 
 int QImFigureWidget::plotNodeSubplotIndex(QImPlotNode* plot)
 {
-    return d_ptr->m_subplotNode ? d_ptr->m_subplotNode->plotNodeSubplotIndex(plot) : -1;
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        return d->m_subplotNode->plotNodeSubplotIndex(plot);
+    }
+    return plotNodes().indexOf(plot);
 }
 
 bool QImFigureWidget::takePlotNode(QImPlotNode* plot)
 {
-    if (!d_ptr->m_subplotNode || !plot) {
+    if (!plot) {
         return false;
     }
-    const bool ok = d_ptr->m_subplotNode->takePlotNode(plot);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        // Subplot exists — takePlotNode triggers childNodeRemoved → onSubplotChildNodeRemoved → plotNodeAttached(false)
+        // Don't emit here to avoid double emission
+        return d->m_subplotNode->takePlotNode(plot);
+    }
+    const bool ok = takeRenderNode(plot);
     if (ok) {
         Q_EMIT plotNodeAttached(plot, false);
     }
@@ -136,26 +244,90 @@ bool QImFigureWidget::takePlotNode(QImPlotNode* plot)
 
 void QImFigureWidget::removePlotNode(QImPlotNode* plot)
 {
-    if (!d_ptr->m_subplotNode || !plot) {
+    if (!plot) {
         return;
     }
-    d_ptr->m_subplotNode->removePlotNode(plot);
-    Q_EMIT plotNodeAttached(plot, false);
+    QIM_D(d);
+    if (d->m_subplotNode) {
+        // Subplot exists — removePlotNode triggers childNodeRemoved → onSubplotChildNodeRemoved → plotNodeAttached(false)
+        // Don't emit here to avoid double emission
+        d->m_subplotNode->removePlotNode(plot);
+    } else {
+        removeRenderNode(plot);
+        Q_EMIT plotNodeAttached(plot, false);
+    }
+}
+
+// ===========================
+//  3D subplot grid
+// ===========================
+
+QImSubplots3DNode* QImFigureWidget::ensureSubplot3DNode()
+{
+    QIM_D(d);
+    if (!d->m_subplot3DNode) {
+        d->m_subplot3DNode = new QImSubplots3DNode();
+        addRenderNode(d->m_subplot3DNode.data());
+    }
+    return d->m_subplot3DNode.data();
+}
+
+void QImFigureWidget::setSubplot3DGrid(int rows, int cols)
+{
+    QIM_D(d);
+    if (rows * cols > 1 || d->m_subplot3DNode) {
+        QImSubplots3DNode* subplot3D = ensureSubplot3DNode();
+        subplot3D->setGrid(rows, cols);
+    }
+}
+
+QImSubplots3DNode* QImFigureWidget::subplot3DNode() const
+{
+    QIM_DC(d);
+    return d->m_subplot3DNode.data();
+}
+
+void QImFigureWidget::clearSubplot3DGrid()
+{
+    QIM_D(d);
+    if (d->m_subplot3DNode) {
+        removeRenderNode(d->m_subplot3DNode.data());
+        d->m_subplot3DNode = nullptr;
+    }
 }
 
 QImPlot3DNode* QImFigureWidget::createPlot3DNode()
 {
-    return d_ptr->m_subplotNode ? d_ptr->m_subplotNode->createPlot3DNode() : nullptr;
+    QIM_D(d);
+    if (d->m_subplot3DNode) {
+        return d->m_subplot3DNode->createPlotNode();
+    }
+    // No 3D subplot — create as top-level render node
+    QImPlot3DNode* plot3D = new QImPlot3DNode();
+    addRenderNode(plot3D);
+    return plot3D;
 }
 
-QList< QImPlot3DNode* > QImFigureWidget::plot3DNodes() const
+QList<QImPlot3DNode*> QImFigureWidget::plot3DNodes() const
 {
-    return d_ptr->m_subplotNode ? d_ptr->m_subplotNode->plot3DNodes() : QList< QImPlot3DNode* >();
+    QIM_DC(d);
+    if (d->m_subplot3DNode) {
+        return d->m_subplot3DNode->plotNodes();
+    }
+    // No 3D subplot — search root render nodes
+    QList<QImPlot3DNode*> result;
+    const auto children = renderNodeList();
+    for (QImAbstractNode* node : children) {
+        if (QImPlot3DNode* plot3D = qobject_cast<QImPlot3DNode*>(node)) {
+            result.append(plot3D);
+        }
+    }
+    return result;
 }
 
 int QImFigureWidget::plot3DCount() const
 {
-    return d_ptr->m_subplotNode ? d_ptr->m_subplotNode->plot3DCount() : 0;
+    return plot3DNodes().size();
 }
 
 void QImFigureWidget::initializeGL()
@@ -178,4 +350,21 @@ void QImFigureWidget::beforeRenderImNodes()
         ImPlot3D::SetCurrentContext(d->m_context3D);
     }
 }
+
+void QImFigureWidget::onSubplotChildNodeRemoved(QImAbstractNode* c)
+{
+    QImPlotNode* plot = qobject_cast<QImPlotNode*>(c);
+    if (plot) {
+        Q_EMIT plotNodeAttached(plot, false);
+    }
+}
+
+void QImFigureWidget::onSubplotChildNodeAdded(QImAbstractNode* c)
+{
+    QImPlotNode* plot = qobject_cast<QImPlotNode*>(c);
+    if (plot) {
+        Q_EMIT plotNodeAttached(plot, true);
+    }
+}
+
 }  // end namespace QIM

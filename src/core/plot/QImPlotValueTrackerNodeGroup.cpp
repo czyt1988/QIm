@@ -1,4 +1,4 @@
-﻿#include "QImPlotValueTrackerNodeGroup.h"
+#include "QImPlotValueTrackerNodeGroup.h"
 #include "QImPlotValueTrackerNode.h"
 
 namespace QIM
@@ -29,8 +29,9 @@ QImPlotValueTrackerNodeGroup::QImPlotValueTrackerNodeGroup(QObject* parent) : QO
 
 QImPlotValueTrackerNodeGroup::~QImPlotValueTrackerNodeGroup()
 {
+    QIM_D(d);
     // 从所有追踪器中移除组引用
-    for (auto tracker : std::as_const(d_ptr->trackers)) {
+    for (auto tracker : std::as_const(d->trackers)) {
         if (tracker) {
             tracker->setGroup(nullptr);
         }
@@ -39,11 +40,12 @@ QImPlotValueTrackerNodeGroup::~QImPlotValueTrackerNodeGroup()
 
 void QImPlotValueTrackerNodeGroup::addTracker(QImPlotValueTrackerNode* tracker)
 {
-    if (!tracker || d_ptr->trackers.contains(tracker)) {
+    QIM_D(d);
+    if (!tracker || d->trackers.contains(tracker)) {
         return;
     }
 
-    d_ptr->trackers.append(tracker);
+    d->trackers.append(tracker);
 }
 
 void QImPlotValueTrackerNodeGroup::removeTracker(QImPlotValueTrackerNode* tracker)
@@ -60,7 +62,8 @@ void QImPlotValueTrackerNodeGroup::removeTracker(QImPlotValueTrackerNode* tracke
 
 QImPlotValueTrackerNodeGroup::SyncMode QImPlotValueTrackerNodeGroup::syncMode() const
 {
-    return d_ptr->syncMode;
+    QIM_DC(d);
+    return d->syncMode;
 }
 
 void QImPlotValueTrackerNodeGroup::setSyncMode(SyncMode mode)
@@ -75,18 +78,21 @@ void QImPlotValueTrackerNodeGroup::setSyncMode(SyncMode mode)
 
 bool QImPlotValueTrackerNodeGroup::isActive() const
 {
-    return d_ptr->activeTracker != nullptr;
+    QIM_DC(d);
+    return d->activeTracker != nullptr;
 }
 
 float QImPlotValueTrackerNodeGroup::pixelRatio() const
 {
-    return d_ptr->pixelRatio;
+    QIM_DC(d);
+    return d->pixelRatio;
 }
 
 void QImPlotValueTrackerNodeGroup::updateActiveTracker(QImPlotValueTrackerNode* activeTracker, float pixelRatio)
 {
-    d_ptr->activeTracker = activeTracker;
-    d_ptr->pixelRatio    = pixelRatio;
+    QIM_D(d);
+    d->activeTracker = activeTracker;
+    d->pixelRatio    = pixelRatio;
 }
 
 bool QImPlotValueTrackerNodeGroup::getSyncState(float& outPixelRatio, SyncMode& outMode) const

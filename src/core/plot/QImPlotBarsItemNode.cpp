@@ -4,7 +4,6 @@
 #include "implot_internal.h"
 #include "QImTrackedValue.hpp"
 #include "QtImGuiUtils.h"
-#include <QDebug>
 
 namespace QIM
 {
@@ -69,7 +68,7 @@ void QImPlotBarsItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
-    emit dataChanged();
+    Q_EMIT dataChanged();
 }
 
 /**
@@ -85,7 +84,8 @@ void QImPlotBarsItemNode::setData(QImAbstractXYDataSeries* series)
  */
 QImAbstractXYDataSeries* QImPlotBarsItemNode::data() const
 {
-    return d_ptr->data.get();
+    QIM_DC(d);
+    return d->data.get();
 }
 
 /**
@@ -121,7 +121,7 @@ void QImPlotBarsItemNode::setBarWidth(double width)
     QIM_D(d);
     if (d->barWidth != width) {
         d->barWidth = width;
-        emit barWidthChanged(width);
+        Q_EMIT barWidthChanged(width);
     }
 }
 
@@ -163,8 +163,8 @@ void QImPlotBarsItemNode::setHorizontal(bool horizontal)
         d->flags &= ~ImPlotBarsFlags_Horizontal;
     }
     if (d->flags != oldFlags) {
-        emit orientationChanged(horizontal);
-        emit barsFlagChanged();
+        Q_EMIT orientationChanged(horizontal);
+        Q_EMIT barsFlagChanged();
     }
 }
 
@@ -201,7 +201,7 @@ void QImPlotBarsItemNode::setBarsFlags(int flags)
     QIM_D(d);
     if (d->flags != flags) {
         d->flags = static_cast< ImPlotBarsFlags >(flags);
-        emit barsFlagChanged();
+        Q_EMIT barsFlagChanged();
     }
 }
 
@@ -218,24 +218,15 @@ void QImPlotBarsItemNode::setBarsFlags(int flags)
  */
 void QImPlotBarsItemNode::setColor(const QColor& c)
 {
-    qDebug() << "[BarsItemNode] setColor called with:" << c;
-    
+    QIM_D(d);
     ImVec4 imColor = toImVec4(c);
-    
-    if (d_ptr->color.has_value()) {
-        qDebug() << "[BarsItemNode] color optional has value, current dirty=" << d_ptr->color->is_dirty();
-        qDebug() << "[BarsItemNode] current color value:" << toQColor(d_ptr->color->value());
-        d_ptr->color->operator=(imColor);  // Explicitly call assignment to trigger dirty
-        qDebug() << "[BarsItemNode] after assignment, dirty=" << d_ptr->color->is_dirty();
+    if (d->color.has_value()) {
+        d->color->operator=(imColor);
     } else {
-        qDebug() << "[BarsItemNode] color optional has NO value, creating new QImTrackedValue";
-        // Create with value and then mark dirty
-        d_ptr->color.emplace(imColor);
-        d_ptr->color->mark_dirty();  // Force dirty because this is a new color being set
-        qDebug() << "[BarsItemNode] after emplace+mark_dirty, dirty=" << d_ptr->color->is_dirty();
+        d->color.emplace(imColor);
+        d->color->mark_dirty();
     }
-    
-    emit colorChanged(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -251,7 +242,8 @@ void QImPlotBarsItemNode::setColor(const QColor& c)
  */
 QColor QImPlotBarsItemNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -272,20 +264,10 @@ bool QImPlotBarsItemNode::beginDraw()
         return false;
     }
 
-    // Debug: Check color state before applying style
-    qDebug() << "[BarsItemNode] beginDraw - color has_value:" << d->color.has_value();
-    if (d->color.has_value()) {
-        qDebug() << "[BarsItemNode] beginDraw - color is_dirty:" << d->color->is_dirty();
-        qDebug() << "[BarsItemNode] beginDraw - color value:" << toQColor(d->color->value());
-    }
-
     // Apply style - use SetNextFillStyle for bars (not SetNextLineStyle)
     if (d->color.has_value() && d->color->is_dirty()) {
-        qDebug() << "[BarsItemNode] beginDraw - calling SetNextFillStyle with color:" << toQColor(d->color->value());
         ImPlot::SetNextFillStyle(d->color->value());
         d->color->clear();  // Clear dirty flag after applying
-    } else {
-        qDebug() << "[BarsItemNode] beginDraw - NOT calling SetNextFillStyle (color not dirty or no value)";
     }
 
     // Call ImPlot API

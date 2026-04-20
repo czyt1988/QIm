@@ -4,6 +4,7 @@
 #include "functions/TestFunctionManager.h"
 #include "functions/TestFunction.h"
 #include <QImFigureWidget.h>
+#include <plot/QImSubplotsNode.h>
 #include <QDockWidget>
 #include <QMenuBar>
 #include <QStatusBar>
@@ -98,7 +99,7 @@ void MainWindow::createDockWidgets()
 void MainWindow::createCentralWidget()
 {
     m_figureWidget = new QIM::QImFigureWidget(this);
-    m_figureWidget->setRenderMode(QIM::QImWidget::RenderOnDemand);
+    m_figureWidget->setRenderMode(QIM::QImWidget::RenderAdaptive);
     setCentralWidget(m_figureWidget);
 }
 
@@ -172,15 +173,20 @@ void MainWindow::onFunctionSelected(const QString& functionId)
         m_currentFunction->cleanupPlot();
     }
     
-    // Clear figure widget by removing all plot nodes
-    auto plotNodes = m_figureWidget->plotNodes();
-    for (auto* plot : plotNodes) {
-        m_figureWidget->removePlotNode(plot);
+    // Clear standalone render nodes (3D nodes, root-level 2D plots)
+    // Anything that's not the subplot node gets removed
+    const auto renderNodes = m_figureWidget->renderNodeList();
+    for (auto* node : renderNodes) {
+        if (node != m_figureWidget->subplotNode()) {
+            m_figureWidget->removeRenderNode(node);
+        }
     }
     
-    // Reset subplot grid to 1x1 for new function (unless it's SubplotsFunction)
-    // This ensures new plots are displayed correctly, not stuck in previous 2x2 grid
-    m_figureWidget->setSubplotGrid(1, 1);
+    // Remove subplot entirely (returns to single-plot mode)
+    // This also destroys any 2D plots under the subplot
+    // If the new function needs subplot, it will call setSubplotGrid()
+    m_figureWidget->clearSubplotGrid();
+    m_figureWidget->clearSubplot3DGrid();
     
     // Create new plot for the selected function
     function->createPlot(m_figureWidget);

@@ -15,7 +15,7 @@ public:
     double value { 0.0 };
     
     // Style and configuration
-    QColor color { Qt::white };  ///< Tag line color
+    QImOptionalColor color;  ///< Tag line color (optional tracked ImVec4)
     QByteArray textUtf8;         ///< Text label (UTF8, used directly by ImGui)
     bool round { false };        ///< Round position to integer pixels
 };
@@ -66,7 +66,8 @@ QImPlotTagYNode::~QImPlotTagYNode()
  */
 double QImPlotTagYNode::value() const
 {
-    return d_ptr->value;
+    QIM_DC(d);
+    return d->value;
 }
 
 /**
@@ -85,7 +86,7 @@ void QImPlotTagYNode::setValue(double value)
     QIM_D(d);
     if (d->value != value) {
         d->value = value;
-        emit valueChanged(value);
+        Q_EMIT valueChanged(value);
     }
 }
 
@@ -102,7 +103,8 @@ void QImPlotTagYNode::setValue(double value)
  */
 QString QImPlotTagYNode::text() const
 {
-    return QString::fromUtf8(d_ptr->textUtf8);
+    QIM_DC(d);
+    return QString::fromUtf8(d->textUtf8);
 }
 
 /**
@@ -122,7 +124,7 @@ void QImPlotTagYNode::setText(const QString& text)
     QByteArray utf8 = text.toUtf8();
     if (d->textUtf8 != utf8) {
         d->textUtf8 = utf8;
-        emit textChanged(text);
+        Q_EMIT textChanged(text);
     }
 }
 
@@ -154,7 +156,7 @@ void QImPlotTagYNode::setText(const char* fmt, ...)
     QByteArray utf8 = text.toUtf8();
     if (d->textUtf8 != utf8) {
         d->textUtf8 = utf8;
-        emit textChanged(text);
+        Q_EMIT textChanged(text);
     }
 }
 
@@ -171,7 +173,8 @@ void QImPlotTagYNode::setText(const char* fmt, ...)
  */
 QColor QImPlotTagYNode::color() const
 {
-    return d_ptr->color;
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -188,10 +191,14 @@ QColor QImPlotTagYNode::color() const
 void QImPlotTagYNode::setColor(const QColor& c)
 {
     QIM_D(d);
-    if (d->color != c) {
-        d->color = c;
-        emit colorChanged(c);
+    ImVec4 imColor = toImVec4(c);
+    if (d->color.has_value()) {
+        d->color->operator=(imColor);
+    } else {
+        d->color.emplace(imColor);
+        d->color->mark_dirty();
     }
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -207,7 +214,8 @@ void QImPlotTagYNode::setColor(const QColor& c)
  */
 bool QImPlotTagYNode::round() const
 {
-    return d_ptr->round;
+    QIM_DC(d);
+    return d->round;
 }
 
 /**
@@ -226,7 +234,7 @@ void QImPlotTagYNode::setRound(bool round)
     QIM_D(d);
     if (d->round != round) {
         d->round = round;
-        emit roundChanged(round);
+        Q_EMIT roundChanged(round);
     }
 }
 
@@ -249,10 +257,10 @@ void QImPlotTagYNode::setRound(bool round)
  */
 bool QImPlotTagYNode::beginDraw()
 {
-    QIM_DC(d);
+QIM_DC(d);
     
-    // Convert color to ImVec4
-    ImVec4 colorVec = toImVec4(d->color);
+    // Use stored ImVec4 directly (no conversion in beginDraw)
+    ImVec4 colorVec = d->color.has_value() ? d->color->value() : ImVec4(1, 1, 1, 1);
     
     // Call ImPlot TagY API
     if (d->textUtf8.isEmpty()) {

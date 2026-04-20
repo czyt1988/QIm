@@ -1,4 +1,4 @@
-﻿#include "QImPlotValueTrackerNode.h"
+#include "QImPlotValueTrackerNode.h"
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -197,7 +197,8 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
 QImPlotValueTrackerNode::QImPlotValueTrackerNode(QImPlotNode* plotNode, QObject* parent)
     : QImAbstractNode(parent), QIM_PIMPL_CONSTRUCT
 {
-    d_ptr->plotNode = plotNode;
+    QIM_D(d);
+    d->plotNode = plotNode;
     setObjectName(QStringLiteral("QImPlotValueTrackerNode"));
     setZOrder(99999);  // 确保绘制在最上层
     setAutoIdEnabled(true);
@@ -205,14 +206,15 @@ QImPlotValueTrackerNode::QImPlotValueTrackerNode(QImPlotNode* plotNode, QObject*
     if (plotNode) {
         connect(plotNode, &QImPlotNode::childNodeAdded, this, &QImPlotValueTrackerNode::onChildNodeAdded);
         connect(plotNode, &QImPlotNode::childNodeRemoved, this, &QImPlotValueTrackerNode::onChildNodeRemoved);
-        d_ptr->updateSupportSeries(plotNode);
+        d->updateSupportSeries(plotNode);
     }
 }
 
 QImPlotValueTrackerNode::~QImPlotValueTrackerNode()
 {
-    if (d_ptr->group) {
-        d_ptr->group->removeTracker(this);
+    QIM_D(d);
+    if (d->group) {
+        d->group->removeTracker(this);
     }
 }
 
@@ -236,12 +238,14 @@ void QImPlotValueTrackerNode::setGroup(QImPlotValueTrackerNodeGroup* group)
 
 bool QImPlotValueTrackerNode::hasGroup() const
 {
-    return (d_ptr->group != nullptr);
+    QIM_DC(d);
+    return (d->group != nullptr);
 }
 
 QImPlotValueTrackerNodeGroup* QIM::QImPlotValueTrackerNode::group() const
 {
-    return d_ptr->group;
+    QIM_DC(d);
+    return d->group;
 }
 
 void QImPlotValueTrackerNode::onChildNodeAdded(QImAbstractNode* n)
@@ -258,32 +262,38 @@ void QImPlotValueTrackerNode::onChildNodeRemoved(QImAbstractNode* n)
 
 void QImPlotValueTrackerNode::setSkipNanFiniteValues(bool on)
 {
-    d_ptr->skipNanFiniteValues = on;
+    QIM_D(d);
+    d->skipNanFiniteValues = on;
 }
 
 bool QImPlotValueTrackerNode::isSkipNanFiniteValues() const
 {
-    return d_ptr->skipNanFiniteValues;
+    QIM_DC(d);
+    return d->skipNanFiniteValues;
 }
 
 void QImPlotValueTrackerNode::setFixedWidth(float width)
 {
-    d_ptr->fixedWidth = width;
+    QIM_D(d);
+    d->fixedWidth = width;
 }
 
 float QIM::QImPlotValueTrackerNode::fixedWidth() const
 {
-    return d_ptr->fixedWidth;
+    QIM_DC(d);
+    return d->fixedWidth;
 }
 
 void QImPlotValueTrackerNode::setAutoWidthEnabled(bool on)
 {
-    d_ptr->autoWidth = on;
+    QIM_D(d);
+    d->autoWidth = on;
 }
 
 bool QImPlotValueTrackerNode::isAutoWidthEnabled() const
 {
-    return d_ptr->autoWidth;
+    QIM_DC(d);
+    return d->autoWidth;
 }
 
 void QImPlotValueTrackerNode::setTextColor(const QColor& color)
@@ -294,37 +304,44 @@ void QImPlotValueTrackerNode::setTextColor(const QColor& color)
 
 QColor QImPlotValueTrackerNode::textColor() const
 {
-    return d_ptr->textColor;
+    QIM_DC(d);
+    return d->textColor;
 }
 
 void QImPlotValueTrackerNode::setBackgroundColor(const QColor& color)
 {
-    d_ptr->bgColor = color;
+    QIM_D(d);
+    d->bgColor = color;
 }
 
 QColor QImPlotValueTrackerNode::backgroundColor() const
 {
-    return d_ptr->bgColor;
+    QIM_DC(d);
+    return d->bgColor;
 }
 
 void QImPlotValueTrackerNode::setBorderColor(const QColor& color)
 {
-    d_ptr->borderColor = color;
+    QIM_D(d);
+    d->borderColor = color;
 }
 
 QColor QImPlotValueTrackerNode::borderColor() const
 {
-    return d_ptr->borderColor;
+    QIM_DC(d);
+    return d->borderColor;
 }
 
 void QImPlotValueTrackerNode::setTrackerLineColor(const QColor& color)
 {
-    d_ptr->trackerLineColor = toImU32(color);
+    QIM_D(d);
+    d->trackerLineColor = toImU32(color);
 }
 
 QColor QImPlotValueTrackerNode::trackerLineColor() const
 {
-    return d_ptr->trackerLineColor;
+    QIM_DC(d);
+    return d->trackerLineColor;
 }
 
 bool QImPlotValueTrackerNode::beginDraw()

@@ -1,4 +1,4 @@
-﻿#ifndef QIMWIDGET_H
+#ifndef QIMWIDGET_H
 #define QIMWIDGET_H
 #include "QImAPI.h"
 #include <QOpenGLFunctions>
@@ -11,6 +11,34 @@ namespace QIM
 {
 class QImAbstractNode;
 /**
+ * \if ENGLISH
+ * @brief Qt widget wrapper for quick ImGui integration
+ *
+ * Simply override the drawIM() function to render ImGui content on the widget.
+ *
+ * @code
+ * #include "QImWidget.h"
+ * #include "imgui.h"
+ * class ImTestWidget : public QIM::QImWidget
+ * {
+ *     Q_OBJECT
+ * public:
+ *     ImTestWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) : QIM::QImWidget(parent, f)
+ *     {
+ *     }
+ *
+ * public:
+ *     virtual void drawIM() override
+ *     {
+ *         ImGui::Begin("Control Panel");
+ *         ImGui::Text("Hello, World!");
+ *         ImGui::End();
+ *     }
+ * };
+ * @endcode
+ * \endif
+ *
+ * \if CHINESE
  * @brief qt窗口快速使用ImGui的封装
  *
  * 你只需要重写drawIM函数，就可以在窗口上绘制imgui
@@ -37,6 +65,7 @@ class QImAbstractNode;
  *     }
  * };
  * @endcode
+ * \endif
  */
 class QIM_WIDGETS_API QImWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -44,7 +73,7 @@ class QIM_WIDGETS_API QImWidget : public QOpenGLWidget, protected QOpenGLFunctio
     QIM_DECLARE_PRIVATE(QImWidget)
 public:
     /**
-     * @brief Imgui的字形范围
+     * @brief ImGui glyph range flags
      */
     enum GlyphRanges
     {
@@ -61,7 +90,7 @@ public:
     Q_DECLARE_FLAGS(GlyphRangesFlags, GlyphRanges)
 
     /**
-     * @brief Imgui的颜色样式
+     * @brief ImGui color style themes
      */
     enum StyleColorsTheme
     {
@@ -71,69 +100,78 @@ public:
     };
 
     /**
-     * @brief 渲染模式枚举
+     * \if ENGLISH
+     * @brief Render mode enumeration
+     * @details Three rendering strategies for different scenarios:
+     * - Continuous: Continuous rendering at 18 FPS, suitable for animations and real-time data visualization
+     * - OnDemand: Single frame rendering on event trigger, optimal for static content (energy saving)
+     * - Adaptive: Smart adaptive (default), continuous during interaction, 1 FPS when idle
+     * \endif
      *
-     * 三种渲染策略，适用于不同场景：
+     * \if CHINESE
+     * @brief 渲染模式枚举
+     * @details 三种渲染策略，适用于不同场景：
      * - Continuous: 持续渲染（18 FPS），适用于动画、实时数据可视化等
      * - OnDemand: 仅在事件触发时渲染单帧，适用于静态内容显示（节能最优）
      * - Adaptive: 智能自适应（默认），交互时持续渲染 FPS，静止时1 FPS
+     * \endif
      */
     enum RenderMode
     {
-        RenderContinuous,  // 持续渲染
-        RenderOnDemand,  // 按需渲染，此模式完全依赖qt的事件触发渲染,自动会setMouseTracking,如果有动画，建议使用RenderContinuous
-        RenderAdaptive   // 自适应
+        RenderContinuous,  // Continuous rendering
+        RenderOnDemand,  // On-demand; relies on Qt events for rendering, auto-enables mouse tracking. Use RenderContinuous for animations
+        RenderAdaptive   // Adaptive
     };
 
 public:
     QImWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QImWidget();
     //----------------------------------------------------
-    // 渲染控制
+    // Render control
     //----------------------------------------------------
     void setRenderMode(RenderMode mode);
     RenderMode renderMode() const;
-    // 设置刷新间隔
+    // Set refresh interval
     void setRefreshInterval(int ms);
     int refreshInterval() const;
-    // 强制请求渲染
+    // Force render request
     void requestRender();
-    // 最小渲染时间间隔，避免过高渲染间隔导致频繁触发绘制，默认为16，对应60FPS
+    // Minimum render interval to avoid excessive redraw triggers, default 16ms (60 FPS)
     int minRenderInterval() const;
     void setMinRenderInterval(int min);
     //----------------------------------------------------
-    // 节点控制
+    // Node control
     //----------------------------------------------------
-    // 添加渲染节点
+    // Add render node
     void addRenderNode(QImAbstractNode* node);
-    // 获取所有渲染节点
+    // Get all render nodes
     QList< QImAbstractNode* > renderNodeList() const;
-    // 移除节点
+    // Remove node
     void removeRenderNode(QImAbstractNode* node);
-    // 抽取渲染节点
+    // Extract render node
     bool takeRenderNode(QImAbstractNode* node);
     //----------------------------------------------------
-    // 主题字体控制
+    // Theme and font control
     //----------------------------------------------------
-    // 设置使用中文字体
+    // Set font glyph ranges
     void setFontGlyphRanges(GlyphRangesFlags ranges);
     GlyphRangesFlags fontGlyphRangesFlag() const;
-    // 设置颜色主题
+    // Set color theme
     void setStyleColorsTheme(StyleColorsTheme style);
     StyleColorsTheme styleColorsTheme() const;
 
 public:
-    // 绘制背景
+    // Draw background
     virtual void drawBackground();
-    // 在调用渲染节点树进行ImGui Render之前执行的函数，可以在此函数绘制底图，例如背景
+    // Called before rendering node tree for ImGui render; paint background here
     virtual void beforeRenderImNodes();
-    // 在调用渲染节点树之后执行的函数，可以在此函数绘制顶图
+    // Called after rendering node tree; paint overlay here
     virtual void afterRenderImNodes();
 
 protected:
-    // 重置渲染根节点，默认是一个QImWidgetNode
+    // Reset root render node (default is QImWidgetNode)
     void resetRootRenderNode(QImAbstractNode* node);
-    // 初始化GL，重写此方法理论上都应该调用QImWidget::initializeGL()进行imgui的初始化，否则会异常
+    // Initialize GL; overriding this must call QImWidget::initializeGL() or ImGui will fail
     void initializeGL() override;
     void paintGL() override;
     void changeEvent(QEvent* e) override;

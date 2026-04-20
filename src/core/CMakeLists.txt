@@ -1,4 +1,4 @@
-﻿# ================================================================
+# ================================================================
 # 核心库 (QIM Core)
 # ================================================================
 set(QIMCORE_VERSION_MAJOR 0)
@@ -44,6 +44,14 @@ file(GLOB QIMCORE_PLOT_HEADERS CONFIGURE_DEPENDS
     "${QIMCORE_SRC_DIR}/plot/*.h"
     "${QIMCORE_SRC_DIR}/plot/*.hpp"
 )
+#plot3d folder
+file(GLOB QIMCORE_PLOT3D_SOURCES
+    "${QIMCORE_SRC_DIR}/plot3d/*.cpp"
+)
+file(GLOB QIMCORE_PLOT3D_HEADERS
+    "${QIMCORE_SRC_DIR}/plot3d/*.h"
+    "${QIMCORE_SRC_DIR}/plot3d/*.hpp"
+)
 
 # 添加源文件
 target_sources(${QIMCORE_PROJECT_NAME} PRIVATE
@@ -51,6 +59,8 @@ target_sources(${QIMCORE_PROJECT_NAME} PRIVATE
     ${QIMCORE_HEADERS}
     ${QIMCORE_PLOT_SOURCES}
     ${QIMCORE_PLOT_HEADERS}
+    ${QIMCORE_PLOT3D_SOURCES}
+    ${QIMCORE_PLOT3D_HEADERS}
     ${QIMCORE_SRC_DIR}/../QImAPI.h
     # imgui
     ${QIM_IMGUI_HEADERS}
@@ -150,6 +160,9 @@ install(FILES ${QIMCORE_HEADERS}
         COMPONENT headers)
 install(FILES ${QIMCORE_PLOT_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${QIM_PROJECT_NAME}/core/plot
+        COMPONENT headers)
+install(FILES ${QIMCORE_PLOT3D_HEADERS}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${QIM_PROJECT_NAME}/core/plot3d
         COMPONENT headers)
 
 # 安装第三方库头文件

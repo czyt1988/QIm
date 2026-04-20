@@ -80,7 +80,8 @@ QImPlotDragPointNode::~QImPlotDragPointNode()
  */
 QPointF QImPlotDragPointNode::position() const
 {
-    return QPointF(d_ptr->x, d_ptr->y);
+    QIM_DC(d);
+    return QPointF(d->x, d->y);
 }
 
 /**
@@ -118,7 +119,7 @@ void QImPlotDragPointNode::setPosition(double x, double y)
     if (d->x != x || d->y != y) {
         d->x = x;
         d->y = y;
-        emit positionChanged(QPointF(x, y));
+        Q_EMIT positionChanged(QPointF(x, y));
     }
 }
 
@@ -135,7 +136,8 @@ void QImPlotDragPointNode::setPosition(double x, double y)
  */
 QColor QImPlotDragPointNode::color() const
 {
-    return (d_ptr->color.has_value()) ? toQColor(d_ptr->color->value()) : QColor();
+    QIM_DC(d);
+    return (d->color.has_value()) ? toQColor(d->color->value()) : QColor();
 }
 
 /**
@@ -151,8 +153,9 @@ QColor QImPlotDragPointNode::color() const
  */
 void QImPlotDragPointNode::setColor(const QColor& c)
 {
-    d_ptr->color = toImVec4(c);
-    emit colorChanged(c);
+    QIM_D(d);
+    d->color = toImVec4(c);
+    Q_EMIT colorChanged(c);
 }
 
 /**
@@ -168,7 +171,8 @@ void QImPlotDragPointNode::setColor(const QColor& c)
  */
 float QImPlotDragPointNode::size() const
 {
-    return d_ptr->size;
+    QIM_DC(d);
+    return d->size;
 }
 
 /**
@@ -184,9 +188,10 @@ float QImPlotDragPointNode::size() const
  */
 void QImPlotDragPointNode::setSize(float size)
 {
-    if (d_ptr->size != size) {
-        d_ptr->size = size;
-        emit sizeChanged(size);
+    QIM_D(d);
+    if (d->size != size) {
+        d->size = size;
+        Q_EMIT sizeChanged(size);
     }
 }
 
@@ -203,7 +208,8 @@ void QImPlotDragPointNode::setSize(float size)
  */
 int QImPlotDragPointNode::id() const
 {
-    return d_ptr->id;
+    QIM_DC(d);
+    return d->id;
 }
 
 /**
@@ -219,9 +225,10 @@ int QImPlotDragPointNode::id() const
  */
 void QImPlotDragPointNode::setId(int id)
 {
-    if (d_ptr->id != id) {
-        d_ptr->id = id;
-        emit idChanged(id);
+    QIM_D(d);
+    if (d->id != id) {
+        d->id = id;
+        Q_EMIT idChanged(id);
     }
 }
 
@@ -238,7 +245,8 @@ void QImPlotDragPointNode::setId(int id)
  */
 int QImPlotDragPointNode::flags() const
 {
-    return d_ptr->flags;
+    QIM_DC(d);
+    return d->flags;
 }
 
 /**
@@ -254,9 +262,10 @@ int QImPlotDragPointNode::flags() const
  */
 void QImPlotDragPointNode::setFlags(int flags)
 {
-    if (d_ptr->flags != flags) {
-        d_ptr->flags = static_cast<ImPlotDragToolFlags>(flags);
-        emit flagsChanged(flags);
+    QIM_D(d);
+    if (d->flags != flags) {
+        d->flags = static_cast<ImPlotDragToolFlags>(flags);
+        Q_EMIT flagsChanged(flags);
     }
 }
 
@@ -465,7 +474,8 @@ void QImPlotDragPointNode::setDelayed(bool on)
  */
 bool QImPlotDragPointNode::clicked() const
 {
-    return d_ptr->clicked;
+    QIM_DC(d);
+    return d->clicked;
 }
 
 /**
@@ -481,7 +491,8 @@ bool QImPlotDragPointNode::clicked() const
  */
 bool QImPlotDragPointNode::hovered() const
 {
-    return d_ptr->hovered;
+    QIM_DC(d);
+    return d->hovered;
 }
 
 /**
@@ -497,7 +508,8 @@ bool QImPlotDragPointNode::hovered() const
  */
 bool QImPlotDragPointNode::held() const
 {
-    return d_ptr->held;
+    QIM_DC(d);
+    return d->held;
 }
 
 /**
@@ -513,7 +525,8 @@ bool QImPlotDragPointNode::held() const
  */
 bool QImPlotDragPointNode::wasModified() const
 {
-    return d_ptr->wasModified;
+    QIM_DC(d);
+    return d->wasModified;
 }
 
 /**
@@ -563,7 +576,7 @@ bool QImPlotDragPointNode::beginDraw()
     // Emit signals if position changed
     if (modified) {
         if (d->x != prevX || d->y != prevY) {
-            emit positionChanged(QPointF(d->x, d->y));
+            Q_EMIT positionChanged(QPointF(d->x, d->y));
         }
     }
     
