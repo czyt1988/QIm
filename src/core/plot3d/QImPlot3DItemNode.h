@@ -171,22 +171,7 @@ Q_SIGNALS:
     void fitEnabledChanged();
 
 protected:
-    /**
-     * \if ENGLISH
-     * @brief Captures the default color assigned by ImPlot3D for this item
-     * @return ImVec4 color, or ImVec4() if item not found (safe fallback)
-     * @details Uses label-based lookup via ImPlot3D internal structures to retrieve
-     *          the auto-assigned colormap color. Called in beginDraw() after PlotXxx()
-     *          for deferred color initialization when user hasn't set an explicit color.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 捕获 ImPlot3D 为此元素分配的默认颜色
-     * @return ImVec4 颜色值，若元素未找到则返回 ImVec4()（安全回退）
-     * @details 通过 ImPlot3D 内部结构的标签查找获取自动分配的颜色映射颜色。
-     *          在 beginDraw() 中 PlotXxx() 之后调用，用于用户未设置显式颜色时的延迟初始化。
-     * \endif
-     */
+    // Captures the default color assigned by ImPlot3D for this item
     ImVec4 captureItemColor() const;
 
     // Called after beginDraw() completes

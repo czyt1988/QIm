@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
 
     // Create 2x2 mixed grid
     auto* grid = new QIM::QImGridNode("Mixed 2D+3D", figure);
+    figure->addRenderNode(grid);
     grid->setGrid(2, 2);
 
     // Cell 0: 2D Line (damped sine)

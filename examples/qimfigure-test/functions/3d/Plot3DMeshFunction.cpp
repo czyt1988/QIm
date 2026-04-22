@@ -3,7 +3,7 @@
 #include "plot3d/QImPlot3DNode.h"
 #include "plot3d/QImPlot3DAxisInfo.h"
 #include "plot3d/QImPlot3DMeshItemNode.h"
-#include "implot3d.h"
+#include "plot3d/QImPlot3DTypes.h"
 #include <vector>
 
 /**
@@ -230,16 +230,16 @@ void Plot3DMeshFunction::createPlot(QIM::QImFigureWidget* figure)
     m_plot3DNode->setBoxRotation(35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
     
     // Create cube vertices: 8 corners of unit cube centered at origin
-    std::vector<ImPlot3DPoint> vertices;
+    std::vector<QIM::QImPlot3DPoint> vertices;
     vertices.reserve(8);
-    vertices.emplace_back(-1.0f, -1.0f, -1.0f); // v0
-    vertices.emplace_back(1.0f, -1.0f, -1.0f);  // v1
-    vertices.emplace_back(1.0f, 1.0f, -1.0f);   // v2
-    vertices.emplace_back(-1.0f, 1.0f, -1.0f);  // v3
-    vertices.emplace_back(-1.0f, -1.0f, 1.0f);  // v4
-    vertices.emplace_back(1.0f, -1.0f, 1.0f);   // v5
-    vertices.emplace_back(1.0f, 1.0f, 1.0f);    // v6
-    vertices.emplace_back(-1.0f, 1.0f, 1.0f);   // v7
+    vertices.emplace_back(-1.0, -1.0, -1.0); // v0
+    vertices.emplace_back(1.0, -1.0, -1.0);  // v1
+    vertices.emplace_back(1.0, 1.0, -1.0);   // v2
+    vertices.emplace_back(-1.0, 1.0, -1.0);  // v3
+    vertices.emplace_back(-1.0, -1.0, 1.0);  // v4
+    vertices.emplace_back(1.0, -1.0, 1.0);   // v5
+    vertices.emplace_back(1.0, 1.0, 1.0);    // v6
+    vertices.emplace_back(-1.0, 1.0, 1.0);   // v7
     
     // Create cube indices: 12 triangle faces (36 indices total)
     std::vector<unsigned int> indices;

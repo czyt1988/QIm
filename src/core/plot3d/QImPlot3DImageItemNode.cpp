@@ -24,6 +24,16 @@ public:
     ImVec2 uv1 { 1.0f, 1.0f };
     QImOptional3DColor tintColor;
     ImPlot3DImageFlags flags { ImPlot3DImageFlags_None };
+
+    bool quadModeEnabled { false };
+    ImPlot3DPoint p0 { 0.0, 0.0, 0.0 };
+    ImPlot3DPoint p1 { 1.0, 0.0, 0.0 };
+    ImPlot3DPoint p2 { 1.0, 1.0, 0.0 };
+    ImPlot3DPoint p3 { 0.0, 1.0, 0.0 };
+    ImVec2 uvP0 { 0.0f, 0.0f };
+    ImVec2 uvP1 { 1.0f, 0.0f };
+    ImVec2 uvP2 { 1.0f, 1.0f };
+    ImVec2 uvP3 { 0.0f, 1.0f };
 };
 
 QImPlot3DImageItemNode::PrivateData::PrivateData(QImPlot3DImageItemNode* p) : q_ptr(p)
@@ -660,6 +670,874 @@ void QImPlot3DImageItemNode::setImageFlags(int flags)
 
 /**
  * \if ENGLISH
+ * @brief Get quad mode enabled state
+ * @return true if quad mode is enabled, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取四边形模式启用状态
+ * @return 四边形模式是否启用
+ * \endif
+ */
+bool QImPlot3DImageItemNode::quadModeEnabled() const
+{
+    QIM_DC(d);
+    return d->quadModeEnabled;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set quad mode enabled state
+ * @param enabled New quad mode state
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置四边形模式启用状态
+ * @param enabled 新的四边形模式状态
+ * \endif
+ */
+void QImPlot3DImageItemNode::setQuadModeEnabled(bool enabled)
+{
+    QIM_D(d);
+    if (d->quadModeEnabled != enabled) {
+        d->quadModeEnabled = enabled;
+        Q_EMIT quadModeEnabledChanged(enabled);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 0 X coordinate
+ * @return Current P0 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点0的X坐标
+ * @return 当前P0 X坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p0x() const
+{
+    QIM_DC(d);
+    return d->p0.x;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 0 X coordinate
+ * @param x New P0 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点0的X坐标
+ * @param x 新的P0 X坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP0x(double x)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p0.x, x)) {
+        d->p0.x = x;
+        Q_EMIT p0Changed(d->p0.x, d->p0.y, d->p0.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 0 Y coordinate
+ * @return Current P0 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点0的Y坐标
+ * @return 当前P0 Y坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p0y() const
+{
+    QIM_DC(d);
+    return d->p0.y;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 0 Y coordinate
+ * @param y New P0 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点0的Y坐标
+ * @param y 新的P0 Y坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP0y(double y)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p0.y, y)) {
+        d->p0.y = y;
+        Q_EMIT p0Changed(d->p0.x, d->p0.y, d->p0.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 0 Z coordinate
+ * @return Current P0 Z coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点0的Z坐标
+ * @return 当前P0 Z坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p0z() const
+{
+    QIM_DC(d);
+    return d->p0.z;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 0 Z coordinate
+ * @param z New P0 Z coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点0的Z坐标
+ * @param z 新的P0 Z坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP0z(double z)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p0.z, z)) {
+        d->p0.z = z;
+        Q_EMIT p0Changed(d->p0.x, d->p0.y, d->p0.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 1 X coordinate
+ * @return Current P1 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点1的X坐标
+ * @return 当前P1 X坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p1x() const
+{
+    QIM_DC(d);
+    return d->p1.x;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 1 X coordinate
+ * @param x New P1 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点1的X坐标
+ * @param x 新的P1 X坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP1x(double x)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p1.x, x)) {
+        d->p1.x = x;
+        Q_EMIT p1Changed(d->p1.x, d->p1.y, d->p1.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 1 Y coordinate
+ * @return Current P1 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点1的Y坐标
+ * @return 当前P1 Y坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p1y() const
+{
+    QIM_DC(d);
+    return d->p1.y;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 1 Y coordinate
+ * @param y New P1 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点1的Y坐标
+ * @param y 新的P1 Y坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP1y(double y)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p1.y, y)) {
+        d->p1.y = y;
+        Q_EMIT p1Changed(d->p1.x, d->p1.y, d->p1.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 1 Z coordinate
+ * @return Current P1 Z coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点1的Z坐标
+ * @return 当前P1 Z坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p1z() const
+{
+    QIM_DC(d);
+    return d->p1.z;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 1 Z coordinate
+ * @param z New P1 Z coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点1的Z坐标
+ * @param z 新的P1 Z坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP1z(double z)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p1.z, z)) {
+        d->p1.z = z;
+        Q_EMIT p1Changed(d->p1.x, d->p1.y, d->p1.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 2 X coordinate
+ * @return Current P2 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点2的X坐标
+ * @return 当前P2 X坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p2x() const
+{
+    QIM_DC(d);
+    return d->p2.x;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 2 X coordinate
+ * @param x New P2 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点2的X坐标
+ * @param x 新的P2 X坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP2x(double x)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p2.x, x)) {
+        d->p2.x = x;
+        Q_EMIT p2Changed(d->p2.x, d->p2.y, d->p2.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 2 Y coordinate
+ * @return Current P2 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点2的Y坐标
+ * @return 当前P2 Y坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p2y() const
+{
+    QIM_DC(d);
+    return d->p2.y;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 2 Y coordinate
+ * @param y New P2 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点2的Y坐标
+ * @param y 新的P2 Y坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP2y(double y)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p2.y, y)) {
+        d->p2.y = y;
+        Q_EMIT p2Changed(d->p2.x, d->p2.y, d->p2.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 2 Z coordinate
+ * @return Current P2 Z coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点2的Z坐标
+ * @return 当前P2 Z坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p2z() const
+{
+    QIM_DC(d);
+    return d->p2.z;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 2 Z coordinate
+ * @param z New P2 Z coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点2的Z坐标
+ * @param z 新的P2 Z坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP2z(double z)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p2.z, z)) {
+        d->p2.z = z;
+        Q_EMIT p2Changed(d->p2.x, d->p2.y, d->p2.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 3 X coordinate
+ * @return Current P3 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点3的X坐标
+ * @return 当前P3 X坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p3x() const
+{
+    QIM_DC(d);
+    return d->p3.x;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 3 X coordinate
+ * @param x New P3 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点3的X坐标
+ * @param x 新的P3 X坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP3x(double x)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p3.x, x)) {
+        d->p3.x = x;
+        Q_EMIT p3Changed(d->p3.x, d->p3.y, d->p3.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 3 Y coordinate
+ * @return Current P3 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点3的Y坐标
+ * @return 当前P3 Y坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p3y() const
+{
+    QIM_DC(d);
+    return d->p3.y;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 3 Y coordinate
+ * @param y New P3 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点3的Y坐标
+ * @param y 新的P3 Y坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP3y(double y)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p3.y, y)) {
+        d->p3.y = y;
+        Q_EMIT p3Changed(d->p3.x, d->p3.y, d->p3.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get corner point 3 Z coordinate
+ * @return Current P3 Z coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取角点3的Z坐标
+ * @return 当前P3 Z坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::p3z() const
+{
+    QIM_DC(d);
+    return d->p3.z;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set corner point 3 Z coordinate
+ * @param z New P3 Z coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置角点3的Z坐标
+ * @param z 新的P3 Z坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setP3z(double z)
+{
+    QIM_D(d);
+    if (!fuzzyEqual(d->p3.z, z)) {
+        d->p3.z = z;
+        Q_EMIT p3Changed(d->p3.x, d->p3.y, d->p3.z);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get UV point 0 X coordinate
+ * @return Current UV P0 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取UV点0的X坐标
+ * @return 当前UV P0 X坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::uvP0x() const
+{
+    QIM_DC(d);
+    return static_cast<double>(d->uvP0.x);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set UV point 0 X coordinate
+ * @param x New UV P0 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置UV点0的X坐标
+ * @param x 新的UV P0 X坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setUvP0x(double x)
+{
+    QIM_D(d);
+    const float newX = static_cast<float>(x);
+    if (!fuzzyEqual(d->uvP0.x, newX)) {
+        d->uvP0.x = newX;
+        Q_EMIT uvP0Changed(static_cast<double>(d->uvP0.x), static_cast<double>(d->uvP0.y));
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get UV point 0 Y coordinate
+ * @return Current UV P0 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取UV点0的Y坐标
+ * @return 当前UV P0 Y坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::uvP0y() const
+{
+    QIM_DC(d);
+    return static_cast<double>(d->uvP0.y);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set UV point 0 Y coordinate
+ * @param y New UV P0 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置UV点0的Y坐标
+ * @param y 新的UV P0 Y坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setUvP0y(double y)
+{
+    QIM_D(d);
+    const float newY = static_cast<float>(y);
+    if (!fuzzyEqual(d->uvP0.y, newY)) {
+        d->uvP0.y = newY;
+        Q_EMIT uvP0Changed(static_cast<double>(d->uvP0.x), static_cast<double>(d->uvP0.y));
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get UV point 1 X coordinate
+ * @return Current UV P1 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取UV点1的X坐标
+ * @return 当前UV P1 X坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::uvP1x() const
+{
+    QIM_DC(d);
+    return static_cast<double>(d->uvP1.x);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set UV point 1 X coordinate
+ * @param x New UV P1 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置UV点1的X坐标
+ * @param x 新的UV P1 X坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setUvP1x(double x)
+{
+    QIM_D(d);
+    const float newX = static_cast<float>(x);
+    if (!fuzzyEqual(d->uvP1.x, newX)) {
+        d->uvP1.x = newX;
+        Q_EMIT uvP1Changed(static_cast<double>(d->uvP1.x), static_cast<double>(d->uvP1.y));
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get UV point 1 Y coordinate
+ * @return Current UV P1 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取UV点1的Y坐标
+ * @return 当前UV P1 Y坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::uvP1y() const
+{
+    QIM_DC(d);
+    return static_cast<double>(d->uvP1.y);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set UV point 1 Y coordinate
+ * @param y New UV P1 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置UV点1的Y坐标
+ * @param y 新的UV P1 Y坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setUvP1y(double y)
+{
+    QIM_D(d);
+    const float newY = static_cast<float>(y);
+    if (!fuzzyEqual(d->uvP1.y, newY)) {
+        d->uvP1.y = newY;
+        Q_EMIT uvP1Changed(static_cast<double>(d->uvP1.x), static_cast<double>(d->uvP1.y));
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get UV point 2 X coordinate
+ * @return Current UV P2 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取UV点2的X坐标
+ * @return 当前UV P2 X坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::uvP2x() const
+{
+    QIM_DC(d);
+    return static_cast<double>(d->uvP2.x);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set UV point 2 X coordinate
+ * @param x New UV P2 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置UV点2的X坐标
+ * @param x 新的UV P2 X坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setUvP2x(double x)
+{
+    QIM_D(d);
+    const float newX = static_cast<float>(x);
+    if (!fuzzyEqual(d->uvP2.x, newX)) {
+        d->uvP2.x = newX;
+        Q_EMIT uvP2Changed(static_cast<double>(d->uvP2.x), static_cast<double>(d->uvP2.y));
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get UV point 2 Y coordinate
+ * @return Current UV P2 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取UV点2的Y坐标
+ * @return 当前UV P2 Y坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::uvP2y() const
+{
+    QIM_DC(d);
+    return static_cast<double>(d->uvP2.y);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set UV point 2 Y coordinate
+ * @param y New UV P2 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置UV点2的Y坐标
+ * @param y 新的UV P2 Y坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setUvP2y(double y)
+{
+    QIM_D(d);
+    const float newY = static_cast<float>(y);
+    if (!fuzzyEqual(d->uvP2.y, newY)) {
+        d->uvP2.y = newY;
+        Q_EMIT uvP2Changed(static_cast<double>(d->uvP2.x), static_cast<double>(d->uvP2.y));
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get UV point 3 X coordinate
+ * @return Current UV P3 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取UV点3的X坐标
+ * @return 当前UV P3 X坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::uvP3x() const
+{
+    QIM_DC(d);
+    return static_cast<double>(d->uvP3.x);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set UV point 3 X coordinate
+ * @param x New UV P3 X coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置UV点3的X坐标
+ * @param x 新的UV P3 X坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setUvP3x(double x)
+{
+    QIM_D(d);
+    const float newX = static_cast<float>(x);
+    if (!fuzzyEqual(d->uvP3.x, newX)) {
+        d->uvP3.x = newX;
+        Q_EMIT uvP3Changed(static_cast<double>(d->uvP3.x), static_cast<double>(d->uvP3.y));
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get UV point 3 Y coordinate
+ * @return Current UV P3 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取UV点3的Y坐标
+ * @return 当前UV P3 Y坐标
+ * \endif
+ */
+double QImPlot3DImageItemNode::uvP3y() const
+{
+    QIM_DC(d);
+    return static_cast<double>(d->uvP3.y);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set UV point 3 Y coordinate
+ * @param y New UV P3 Y coordinate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置UV点3的Y坐标
+ * @param y 新的UV P3 Y坐标
+ * \endif
+ */
+void QImPlot3DImageItemNode::setUvP3y(double y)
+{
+    QIM_D(d);
+    const float newY = static_cast<float>(y);
+    if (!fuzzyEqual(d->uvP3.y, newY)) {
+        d->uvP3.y = newY;
+        Q_EMIT uvP3Changed(static_cast<double>(d->uvP3.x), static_cast<double>(d->uvP3.y));
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Convenience method to set all quad image parameters at once
+ * @param textureId Texture identifier for the image
+ * @param p0x Corner point 0 X coordinate
+ * @param p0y Corner point 0 Y coordinate
+ * @param p0z Corner point 0 Z coordinate
+ * @param p1x Corner point 1 X coordinate
+ * @param p1y Corner point 1 Y coordinate
+ * @param p1z Corner point 1 Z coordinate
+ * @param p2x Corner point 2 X coordinate
+ * @param p2y Corner point 2 Y coordinate
+ * @param p2z Corner point 2 Z coordinate
+ * @param p3x Corner point 3 X coordinate
+ * @param p3y Corner point 3 Y coordinate
+ * @param p3z Corner point 3 Z coordinate
+ * @param uvP0x UV point 0 X coordinate
+ * @param uvP0y UV point 0 Y coordinate
+ * @param uvP1x UV point 1 X coordinate
+ * @param uvP1y UV point 1 Y coordinate
+ * @param uvP2x UV point 2 X coordinate
+ * @param uvP2y UV point 2 Y coordinate
+ * @param uvP3x UV point 3 X coordinate
+ * @param uvP3y UV point 3 Y coordinate
+ * @param tintCol Tint color applied to the image (default: white)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 一次性设置所有四边形图像参数的便捷方法
+ * @param textureId 图像纹理标识符
+ * @param p0x 角点0的X坐标
+ * @param p0y 角点0的Y坐标
+ * @param p0z 角点0的Z坐标
+ * @param p1x 角点1的X坐标
+ * @param p1y 角点1的Y坐标
+ * @param p1z 角点1的Z坐标
+ * @param p2x 角点2的X坐标
+ * @param p2y 角点2的Y坐标
+ * @param p2z 角点2的Z坐标
+ * @param p3x 角点3的X坐标
+ * @param p3y 角点3的Y坐标
+ * @param p3z 角点3的Z坐标
+ * @param uvP0x UV点0的X坐标
+ * @param uvP0y UV点0的Y坐标
+ * @param uvP1x UV点1的X坐标
+ * @param uvP1y UV点1的Y坐标
+ * @param uvP2x UV点2的X坐标
+ * @param uvP2y UV点2的Y坐标
+ * @param uvP3x UV点3的X坐标
+ * @param uvP3y UV点3的Y坐标
+ * @param tintCol 应用于图像的色调颜色（默认：白色）
+ * \endif
+ */
+void QImPlot3DImageItemNode::setQuadImage(quintptr textureId, double p0x, double p0y, double p0z, double p1x, double p1y, double p1z,
+                                           double p2x, double p2y, double p2z, double p3x, double p3y, double p3z,
+                                           double uvP0x, double uvP0y, double uvP1x, double uvP1y, double uvP2x, double uvP2y,
+                                           double uvP3x, double uvP3y, const QColor& tintCol)
+{
+    setQuadModeEnabled(true);
+    setTextureId(textureId);
+    setP0x(p0x);
+    setP0y(p0y);
+    setP0z(p0z);
+    setP1x(p1x);
+    setP1y(p1y);
+    setP1z(p1z);
+    setP2x(p2x);
+    setP2y(p2y);
+    setP2z(p2z);
+    setP3x(p3x);
+    setP3y(p3y);
+    setP3z(p3z);
+    setUvP0x(uvP0x);
+    setUvP0y(uvP0y);
+    setUvP1x(uvP1x);
+    setUvP1y(uvP1y);
+    setUvP2x(uvP2x);
+    setUvP2y(uvP2y);
+    setUvP3x(uvP3x);
+    setUvP3y(uvP3y);
+    setTintColor(tintCol);
+}
+
+/**
+ * \if ENGLISH
  * @brief Begin drawing implementation
  * @return false to prevent endDraw from being called
  * \endif
@@ -681,18 +1559,36 @@ bool QImPlot3DImageItemNode::beginDraw()
     ImTextureRef texRef = (ImTextureID)(d->textureId);
     const ImVec4 tint_col = d->tintColor.has_value() ? d->tintColor->value() : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-    // Call ImPlot3D API with center+axes overload
-    ImPlot3D::PlotImage(
-        labelConstData(),
-        texRef,
-        d->center,
-        d->axisU,
-        d->axisV,
-        d->uv0,
-        d->uv1,
-        tint_col,
-        d->flags
-    );
+    if (d->quadModeEnabled) {
+        // Call ImPlot3D API with 4-point quad overload
+        ImPlot3D::PlotImage(
+            labelConstData(),
+            texRef,
+            d->p0,
+            d->p1,
+            d->p2,
+            d->p3,
+            d->uvP0,
+            d->uvP1,
+            d->uvP2,
+            d->uvP3,
+            tint_col,
+            d->flags
+        );
+    } else {
+        // Call ImPlot3D API with center+axes overload
+        ImPlot3D::PlotImage(
+            labelConstData(),
+            texRef,
+            d->center,
+            d->axisU,
+            d->axisV,
+            d->uv0,
+            d->uv1,
+            tint_col,
+            d->flags
+        );
+    }
 
     return false;
 }

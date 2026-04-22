@@ -13,9 +13,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot3D 3D image visualization
  *
- * @class QImPlot3DImageItemNode
- * @ingroup plot3d
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot3D 3D image rendering.
  *          Supports rendering an image texture in 3D space defined by a center point and
  *          two direction vectors (axes). Inherits from QImPlot3DItemNode and follows the
@@ -32,9 +29,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot3D 3D图像可视化的Qt风格封装
- *
- * @class QImPlot3DImageItemNode
- * @ingroup plot3d
  *
  * @details 为ImPlot3D 3D图像渲染提供Qt风格的保留模式封装。
  *          支持在由中心点和两个方向向量（轴）定义的3D空间中渲染图像纹理。
@@ -54,186 +48,24 @@ class QIM_CORE_API QImPlot3DImageItemNode : public QImPlot3DItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlot3DImageItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::textureId
-     * @brief Texture identifier for the image
-     *
-     * @details Holds the ImTextureID value that references the image texture in the graphics backend.
-     *          Must be a valid texture ID obtained from the rendering system.
-     *          Default is 0 (null texture). Setting to 0 will result in no image being drawn.
-     * @accessors READ textureId WRITE setTextureId NOTIFY textureIdChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::textureId
-     * @brief 图像的纹理标识符
-     *
-     * @details 保存引用图形后端中图像纹理的 ImTextureID 值。
-     *          必须是从渲染系统获得的有效纹理 ID。
-     *          默认值为 0（空纹理）。设置为 0 将导致不绘制图像。
-     * @accessors READ textureId WRITE setTextureId NOTIFY textureIdChanged
-     * \endif
-     */
     Q_PROPERTY(quintptr textureId READ textureId WRITE setTextureId NOTIFY textureIdChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::centerX
-     * @brief X coordinate of the image center in 3D plot coordinates
-     * @details Default is 0.0.
-     * @accessors READ centerX WRITE setCenterX NOTIFY centerChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::centerX
-     * @brief 图像中心在3D绘图坐标中的X坐标
-     * @details 默认值为0.0。
-     * @accessors READ centerX WRITE setCenterX NOTIFY centerChanged
-     * \endif
-     */
     Q_PROPERTY(double centerX READ centerX WRITE setCenterX NOTIFY centerChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::centerY
-     * @brief Y coordinate of the image center in 3D plot coordinates
-     * @details Default is 0.0.
-     * @accessors READ centerY WRITE setCenterY NOTIFY centerChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::centerY
-     * @brief 图像中心在3D绘图坐标中的Y坐标
-     * @details 默认值为0.0。
-     * @accessors READ centerY WRITE setCenterY NOTIFY centerChanged
-     * \endif
-     */
     Q_PROPERTY(double centerY READ centerY WRITE setCenterY NOTIFY centerChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::centerZ
-     * @brief Z coordinate of the image center in 3D plot coordinates
-     * @details Default is 0.0.
-     * @accessors READ centerZ WRITE setCenterZ NOTIFY centerChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::centerZ
-     * @brief 图像中心在3D绘图坐标中的Z坐标
-     * @details 默认值为0.0。
-     * @accessors READ centerZ WRITE setCenterZ NOTIFY centerChanged
-     * \endif
-     */
     Q_PROPERTY(double centerZ READ centerZ WRITE setCenterZ NOTIFY centerChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::axisUX
-     * @brief X component of the U axis vector (first direction/half-extent)
-     * @details Defines the direction and half-length of the U axis of the image rectangle.
-     *          Default is 1.0.
-     * @accessors READ axisUX WRITE setAxisUX NOTIFY axisUChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::axisUX
-     * @brief U轴向量的X分量（第一个方向/半长度）
-     * @details 定义图像矩形U轴的方向和半长度。默认值为1.0。
-     * @accessors READ axisUX WRITE setAxisUX NOTIFY axisUChanged
-     * \endif
-     */
     Q_PROPERTY(double axisUX READ axisUX WRITE setAxisUX NOTIFY axisUChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::axisUY
-     * @brief Y component of the U axis vector (first direction/half-extent)
-     * @details Defines the direction and half-length of the U axis of the image rectangle.
-     *          Default is 0.0.
-     * @accessors READ axisUY WRITE setAxisUY NOTIFY axisUChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::axisUY
-     * @brief U轴向量的Y分量（第一个方向/半长度）
-     * @details 定义图像矩形U轴的方向和半长度。默认值为0.0。
-     * @accessors READ axisUY WRITE setAxisUY NOTIFY axisUChanged
-     * \endif
-     */
     Q_PROPERTY(double axisUY READ axisUY WRITE setAxisUY NOTIFY axisUChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::axisUZ
-     * @brief Z component of the U axis vector (first direction/half-extent)
-     * @details Defines the direction and half-length of the U axis of the image rectangle.
-     *          Default is 0.0.
-     * @accessors READ axisUZ WRITE setAxisUZ NOTIFY axisUChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::axisUZ
-     * @brief U轴向量的Z分量（第一个方向/半长度）
-     * @details 定义图像矩形U轴的方向和半长度。默认值为0.0。
-     * @accessors READ axisUZ WRITE setAxisUZ NOTIFY axisUChanged
-     * \endif
-     */
     Q_PROPERTY(double axisUZ READ axisUZ WRITE setAxisUZ NOTIFY axisUChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::axisVX
-     * @brief X component of the V axis vector (second direction/half-extent)
-     * @details Defines the direction and half-length of the V axis of the image rectangle.
-     *          Default is 0.0.
-     * @accessors READ axisVX WRITE setAxisVX NOTIFY axisVChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::axisVX
-     * @brief V轴向量的X分量（第二个方向/半长度）
-     * @details 定义图像矩形V轴的方向和半长度。默认值为0.0。
-     * @accessors READ axisVX WRITE setAxisVX NOTIFY axisVChanged
-     * \endif
-     */
     Q_PROPERTY(double axisVX READ axisVX WRITE setAxisVX NOTIFY axisVChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::axisVY
-     * @brief Y component of the V axis vector (second direction/half-extent)
-     * @details Defines the direction and half-length of the V axis of the image rectangle.
-     *          Default is 1.0.
-     * @accessors READ axisVY WRITE setAxisVY NOTIFY axisVChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::axisVY
-     * @brief V轴向量的Y分量（第二个方向/半长度）
-     * @details 定义图像矩形V轴的方向和半长度。默认值为1.0。
-     * @accessors READ axisVY WRITE setAxisVY NOTIFY axisVChanged
-     * \endif
-     */
     Q_PROPERTY(double axisVY READ axisVY WRITE setAxisVY NOTIFY axisVChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::axisVZ
-     * @brief Z component of the V axis vector (second direction/half-extent)
-     * @details Defines the direction and half-length of the V axis of the image rectangle.
-     *          Default is 0.0.
-     * @accessors READ axisVZ WRITE setAxisVZ NOTIFY axisVChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::axisVZ
-     * @brief V轴向量的Z分量（第二个方向/半长度）
-     * @details 定义图像矩形V轴的方向和半长度。默认值为0.0。
-     * @accessors READ axisVZ WRITE setAxisVZ NOTIFY axisVChanged
-     * \endif
-     */
     Q_PROPERTY(double axisVZ READ axisVZ WRITE setAxisVZ NOTIFY axisVChanged)
 
     /**
@@ -331,6 +163,30 @@ class QIM_CORE_API QImPlot3DImageItemNode : public QImPlot3DItemNode
      */
     Q_PROPERTY(QColor tintColor READ tintColor WRITE setTintColor NOTIFY tintColorChanged)
 
+    Q_PROPERTY(bool quadModeEnabled READ quadModeEnabled WRITE setQuadModeEnabled NOTIFY quadModeEnabledChanged)
+
+    Q_PROPERTY(double p0x READ p0x WRITE setP0x NOTIFY p0Changed)
+    Q_PROPERTY(double p0y READ p0y WRITE setP0y NOTIFY p0Changed)
+    Q_PROPERTY(double p0z READ p0z WRITE setP0z NOTIFY p0Changed)
+    Q_PROPERTY(double p1x READ p1x WRITE setP1x NOTIFY p1Changed)
+    Q_PROPERTY(double p1y READ p1y WRITE setP1y NOTIFY p1Changed)
+    Q_PROPERTY(double p1z READ p1z WRITE setP1z NOTIFY p1Changed)
+    Q_PROPERTY(double p2x READ p2x WRITE setP2x NOTIFY p2Changed)
+    Q_PROPERTY(double p2y READ p2y WRITE setP2y NOTIFY p2Changed)
+    Q_PROPERTY(double p2z READ p2z WRITE setP2z NOTIFY p2Changed)
+    Q_PROPERTY(double p3x READ p3x WRITE setP3x NOTIFY p3Changed)
+    Q_PROPERTY(double p3y READ p3y WRITE setP3y NOTIFY p3Changed)
+    Q_PROPERTY(double p3z READ p3z WRITE setP3z NOTIFY p3Changed)
+
+    Q_PROPERTY(double uvP0x READ uvP0x WRITE setUvP0x NOTIFY uvP0Changed)
+    Q_PROPERTY(double uvP0y READ uvP0y WRITE setUvP0y NOTIFY uvP0Changed)
+    Q_PROPERTY(double uvP1x READ uvP1x WRITE setUvP1x NOTIFY uvP1Changed)
+    Q_PROPERTY(double uvP1y READ uvP1y WRITE setUvP1y NOTIFY uvP1Changed)
+    Q_PROPERTY(double uvP2x READ uvP2x WRITE setUvP2x NOTIFY uvP2Changed)
+    Q_PROPERTY(double uvP2y READ uvP2y WRITE setUvP2y NOTIFY uvP2Changed)
+    Q_PROPERTY(double uvP3x READ uvP3x WRITE setUvP3x NOTIFY uvP3Changed)
+    Q_PROPERTY(double uvP3y READ uvP3y WRITE setUvP3y NOTIFY uvP3Changed)
+
 public:
     // Image item type = InnerType3D + 7
     enum
@@ -401,6 +257,72 @@ public:
     // Raw ImPlot3DImageFlags access
     int imageFlags() const;
     void setImageFlags(int flags);
+
+    // Quad mode toggle
+    bool quadModeEnabled() const;
+    void setQuadModeEnabled(bool enabled);
+
+    // Quad corner point 0
+    double p0x() const;
+    void setP0x(double x);
+    double p0y() const;
+    void setP0y(double y);
+    double p0z() const;
+    void setP0z(double z);
+
+    // Quad corner point 1
+    double p1x() const;
+    void setP1x(double x);
+    double p1y() const;
+    void setP1y(double y);
+    double p1z() const;
+    void setP1z(double z);
+
+    // Quad corner point 2
+    double p2x() const;
+    void setP2x(double x);
+    double p2y() const;
+    void setP2y(double y);
+    double p2z() const;
+    void setP2z(double z);
+
+    // Quad corner point 3
+    double p3x() const;
+    void setP3x(double x);
+    double p3y() const;
+    void setP3y(double y);
+    double p3z() const;
+    void setP3z(double z);
+
+    // Quad per-corner UV 0
+    double uvP0x() const;
+    void setUvP0x(double x);
+    double uvP0y() const;
+    void setUvP0y(double y);
+
+    // Quad per-corner UV 1
+    double uvP1x() const;
+    void setUvP1x(double x);
+    double uvP1y() const;
+    void setUvP1y(double y);
+
+    // Quad per-corner UV 2
+    double uvP2x() const;
+    void setUvP2x(double x);
+    double uvP2y() const;
+    void setUvP2y(double y);
+
+    // Quad per-corner UV 3
+    double uvP3x() const;
+    void setUvP3x(double x);
+    double uvP3y() const;
+    void setUvP3y(double y);
+
+    // Convenience: set all quad image parameters at once
+    void setQuadImage(quintptr textureId, double p0x, double p0y, double p0z, double p1x, double p1y, double p1z,
+                      double p2x, double p2y, double p2z, double p3x, double p3y, double p3z,
+                      double uvP0x, double uvP0y, double uvP1x, double uvP1y, double uvP2x, double uvP2y,
+                      double uvP3x, double uvP3y, const QColor& tintCol = QColor(255, 255, 255));
 
 Q_SIGNALS:
     /**
@@ -520,6 +442,147 @@ Q_SIGNALS:
      * \endif
      */
     void imageFlagChanged();
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when quad mode enabled state changes
+     * @param[in] enabled New quad mode enabled state
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 四边形模式启用状态更改时触发
+     * @param[in] enabled 新的四边形模式启用状态
+     * \endif
+     */
+    void quadModeEnabledChanged(bool enabled);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any corner point 0 coordinate changes
+     * @param[in] x New P0 X coordinate
+     * @param[in] y New P0 Y coordinate
+     * @param[in] z New P0 Z coordinate
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 任意角点0坐标更改时触发
+     * @param[in] x 新的P0 X坐标
+     * @param[in] y 新的P0 Y坐标
+     * @param[in] z 新的P0 Z坐标
+     * \endif
+     */
+    void p0Changed(double x, double y, double z);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any corner point 1 coordinate changes
+     * @param[in] x New P1 X coordinate
+     * @param[in] y New P1 Y coordinate
+     * @param[in] z New P1 Z coordinate
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 任意角点1坐标更改时触发
+     * @param[in] x 新的P1 X坐标
+     * @param[in] y 新的P1 Y坐标
+     * @param[in] z 新的P1 Z坐标
+     * \endif
+     */
+    void p1Changed(double x, double y, double z);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any corner point 2 coordinate changes
+     * @param[in] x New P2 X coordinate
+     * @param[in] y New P2 Y coordinate
+     * @param[in] z New P2 Z coordinate
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 任意角点2坐标更改时触发
+     * @param[in] x 新的P2 X坐标
+     * @param[in] y 新的P2 Y坐标
+     * @param[in] z 新的P2 Z坐标
+     * \endif
+     */
+    void p2Changed(double x, double y, double z);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any corner point 3 coordinate changes
+     * @param[in] x New P3 X coordinate
+     * @param[in] y New P3 Y coordinate
+     * @param[in] z New P3 Z coordinate
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 任意角点3坐标更改时触发
+     * @param[in] x 新的P3 X坐标
+     * @param[in] y 新的P3 Y坐标
+     * @param[in] z 新的P3 Z坐标
+     * \endif
+     */
+    void p3Changed(double x, double y, double z);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any UV point 0 coordinate changes
+     * @param[in] x New UV P0 X coordinate
+     * @param[in] y New UV P0 Y coordinate
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 任意UV点0坐标更改时触发
+     * @param[in] x 新的UV P0 X坐标
+     * @param[in] y 新的UV P0 Y坐标
+     * \endif
+     */
+    void uvP0Changed(double x, double y);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any UV point 1 coordinate changes
+     * @param[in] x New UV P1 X coordinate
+     * @param[in] y New UV P1 Y coordinate
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 任意UV点1坐标更改时触发
+     * @param[in] x 新的UV P1 X坐标
+     * @param[in] y 新的UV P1 Y坐标
+     * \endif
+     */
+    void uvP1Changed(double x, double y);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any UV point 2 coordinate changes
+     * @param[in] x New UV P2 X coordinate
+     * @param[in] y New UV P2 Y coordinate
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 任意UV点2坐标更改时触发
+     * @param[in] x 新的UV P2 X坐标
+     * @param[in] y 新的UV P2 Y坐标
+     * \endif
+     */
+    void uvP2Changed(double x, double y);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when any UV point 3 coordinate changes
+     * @param[in] x New UV P3 X coordinate
+     * @param[in] y New UV P3 Y coordinate
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 任意UV点3坐标更改时触发
+     * @param[in] x 新的UV P3 X坐标
+     * @param[in] y 新的UV P3 Y坐标
+     * \endif
+     */
+    void uvP3Changed(double x, double y);
 
 protected:
     // Begins drawing the image

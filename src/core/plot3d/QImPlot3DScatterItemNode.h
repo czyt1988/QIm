@@ -13,9 +13,6 @@ class QImAbstractXYZDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot3D scatter plot visualization
  *
- * @class QImPlot3DScatterItemNode
- * @ingroup plot3d_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot3D scatter plots.
  *          Supports marker customization (shape, size, fill color, outline color, outline weight)
  *          and full Qt property system integration with signal-slot event handling.
@@ -36,9 +33,6 @@ class QImAbstractXYZDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot3D散点图可视化的Qt风格封装
- *
- * @class QImPlot3DScatterItemNode
- * @ingroup plot3d_items
  *
  * @details 为ImPlot3D散点图提供Qt风格的保留模式封装。
  *          支持标记自定义（形状、大小、填充颜色、描边颜色、描边粗细）以及完整的Qt属性系统集成和信号槽事件处理。
@@ -78,17 +72,7 @@ class QIM_CORE_API QImPlot3DScatterItemNode : public QImPlot3DItemNode
     Q_PROPERTY(int markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
 
 public:
-    /**
-     * \if ENGLISH
-     * @brief Unique type identifier for QImPlot3DScatterItemNode
-     * @details InnerType3D + 1 distinguishes this from other 3D item types.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief QImPlot3DScatterItemNode的唯一类型标识符
-     * @details InnerType3D + 1 用于与其他3D元素类型区分。
-     * \endif
-     */
+    // Unique type identifier for QImPlot3DScatterItemNode
     enum
     {
         Type = InnerType3D + 1
@@ -123,56 +107,16 @@ public:
     // Style property accessors
     //----------------------------------------------------
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the marker fill color
-     * @return Current fill color as QColor, or invalid QColor() if using ImPlot3D default
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取标记填充颜色
-     * @return 当前填充颜色（QColor），使用 ImPlot3D 默认颜色时返回无效 QColor()
-     * \endif
-     */
+    // Gets the marker fill color
     QColor markerFillColor() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the marker fill color
-     * @param[in] c New fill color
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置标记填充颜色
-     * @param[in] c 新的填充颜色
-     * \endif
-     */
+    // Sets the marker fill color
     void setMarkerFillColor(const QColor& c);
 
-    /**
-     * \if ENGLISH
-     * @brief Gets the marker outline color
-     * @return Current outline color as QColor, or invalid QColor() if using ImPlot3D default
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取标记描边颜色
-     * @return 当前描边颜色（QColor），使用 ImPlot3D 默认颜色时返回无效 QColor()
-     * \endif
-     */
+    // Gets the marker outline color
     QColor markerOutlineColor() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Sets the marker outline color
-     * @param[in] c New outline color
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 设置标记描边颜色
-     * @param[in] c 新的描边颜色
-     * \endif
-     */
+    // Sets the marker outline color
     void setMarkerOutlineColor(const QColor& c);
 
     // Gets the marker size in pixels

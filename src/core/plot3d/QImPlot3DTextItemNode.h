@@ -12,9 +12,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot3D text label visualization
  *
- * @class QImPlot3DTextItemNode
- * @ingroup plot3d_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot3D text labels.
  *          Text labels render centered text at specified 3D plot coordinates with optional
  *          rotation angle and pixel offset. Useful for annotating specific points in 3D space,
@@ -35,9 +32,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot3D 文本标签的 Qt 风格封装
- *
- * @class QImPlot3DTextItemNode
- * @ingroup plot3d_items
  *
  * @details 为 ImPlot3D 文本标签提供 Qt 风格的保留模式封装。
  *          文本标签在指定的 3D 绘图坐标处渲染居中文本，可选旋转角度和像素偏移。

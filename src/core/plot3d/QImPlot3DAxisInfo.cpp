@@ -1,4 +1,5 @@
 #include "QImPlot3DAxisInfo.h"
+#include "QImPlot3DAxisTransform.h"
 #include "implot3d.h"
 #include "QImPlot3DNode.h"
 
@@ -21,10 +22,82 @@ public:
     ImPlot3DCond limitsCond { ImPlot3DCond_Once };
     QImPlot3DScaleType scale { QImPlot3DScaleType::Linear };
     QImPlot3DNode* plot { nullptr };
+    
+    // Limits constraints
+    double limitsConstraintMin { 0.0 };
+    double limitsConstraintMax { 1.0 };
+    bool hasLimitsConstraints { false };     ///< Whether limits constraints are set
+    
+    // Zoom constraints
+    double zoomConstraintMin { 0.0 };
+    double zoomConstraintMax { 1.0 };
+    bool hasZoomConstraints { false };       ///< Whether zoom constraints are set
+
+    // Custom axis transform (lifetime external)
+    QImPlot3DAxisTransform* m_axisTransform { nullptr };
+
+    // Tick configuration
+    QList<double> tickValues;                ///< Tick position values
+    QList<QByteArray> tickLabels;            ///< Tick label strings (UTF-8)
+    bool keepDefaultTicks { false };         ///< Whether to keep default ticks
+    bool hasTickConfig { false };            ///< Whether tick configuration is set
+    bool useRangeTicks { false };            ///< Whether to use range-based tick generation
+    double rangeTickMin { 0.0 };             ///< Range tick minimum value
+    double rangeTickMax { 1.0 };             ///< Range tick maximum value
+    int rangeTickCount { 5 };                ///< Number of ticks in range mode
+
+    // Axis formatter (lifetime external)
+    QImPlot3DAxisFormatter* m_axisFormatter { nullptr };
 };
 
 QImPlot3DAxisInfo::PrivateData::PrivateData(QImPlot3DAxisInfo* p) : q_ptr(p)
 {
+}
+
+//===============================================================
+// Static C Callbacks for Custom Axis Transform
+//===============================================================
+
+/**
+ * \if ENGLISH
+ * @brief Static C callback for forwarding axis transform values
+ * @param value Data value to transform
+ * @param data User data pointer (cast to QImPlot3DAxisTransform*)
+ * @return Transformed (screen) value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 用于正向轴变换的静态 C 回调函数
+ * @param value 待变换的数据值
+ * @param data 用户数据指针（转换为 QImPlot3DAxisTransform*）
+ * @return 变换后的（屏幕）值
+ * \endif
+ */
+static double axisTransformForward(double value, void* data)
+{
+    QImPlot3DAxisTransform* transform = static_cast<QImPlot3DAxisTransform*>(data);
+    return transform->forward(value);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Static C callback for inverse axis transform values
+ * @param value Screen value to inverse-transform
+ * @param data User data pointer (cast to QImPlot3DAxisTransform*)
+ * @return Inverse-transformed (data) value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 用于反向轴变换的静态 C 回调函数
+ * @param value 待反向变换的屏幕值
+ * @param data 用户数据指针（转换为 QImPlot3DAxisTransform*）
+ * @return 反向变换后的（数据）值
+ * \endif
+ */
+static double axisTransformInverse(double value, void* data)
+{
+    QImPlot3DAxisTransform* transform = static_cast<QImPlot3DAxisTransform*>(data);
+    return transform->inverse(value);
 }
 
 //===============================================================
@@ -299,6 +372,47 @@ void QImPlot3DAxisInfo::setScale(QImPlot3DScaleType type)
 
 /**
  * \if ENGLISH
+ * @brief Returns the custom axis transform object
+ * @return Pointer to the current QImPlot3DAxisTransform, or nullptr if not set
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回自定义坐标轴变换对象
+ * @return 当前 QImPlot3DAxisTransform 指针，未设置时返回 nullptr
+ * \endif
+ */
+QImPlot3DAxisTransform* QImPlot3DAxisInfo::axisTransform() const
+{
+    QIM_DC(d);
+    return d->m_axisTransform;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets a custom axis transform for scale conversion
+ * @param transform Pointer to a QImPlot3DAxisTransform implementation (nullptr resets to builtin scale)
+ * @note QImPlot3DAxisInfo does NOT own the transform — lifetime must be managed externally.
+ *       When a custom transform is set, it overrides the builtin scale type (Linear/Log10/SymLog).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置自定义坐标轴变换用于刻度转换
+ * @param transform QImPlot3DAxisTransform 实现的指针（nullptr 重置为内置刻度）
+ * @note QImPlot3DAxisInfo 不拥有变换对象 — 生命周期必须由外部管理。
+ *       设置自定义变换时，将覆盖内置刻度类型（Linear/Log10/SymLog）。
+ * \endif
+ */
+void QImPlot3DAxisInfo::setAxisTransform(QImPlot3DAxisTransform* transform)
+{
+    QIM_D(d);
+    if (d->m_axisTransform != transform) {
+        d->m_axisTransform = transform;
+        Q_EMIT axisTransformChanged(transform);
+    }
+}
+
+/**
+ * \if ENGLISH
  * @brief Returns the raw ImPlot3DAxisFlags value
  * @return ImPlot3DAxisFlags value as integer
  * \endif
@@ -468,17 +582,469 @@ void QImPlot3DAxisInfo::setDecorationsEnabled(bool enabled)
     }
 }
 
+// ===== Limits Constraint Methods =====
+
+/**
+ * \if ENGLISH
+ * @brief Gets the minimum limits constraint value
+ * @return Minimum constraint value for axis limits
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取范围限制约束的最小值
+ * @return 坐标轴范围限制的最小约束值
+ * \endif
+ */
+double QImPlot3DAxisInfo::limitsConstraintMin() const
+{
+    QIM_DC(d);
+    return d->limitsConstraintMin;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the minimum limits constraint value
+ * @param min New minimum constraint value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置范围限制约束的最小值
+ * @param min 新的最小约束值
+ * \endif
+ */
+void QImPlot3DAxisInfo::setLimitsConstraintMin(double min)
+{
+    QIM_D(d);
+    if (d->limitsConstraintMin != min) {
+        d->limitsConstraintMin = min;
+        d->hasLimitsConstraints = true;
+        Q_EMIT limitsConstraintsChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Gets the maximum limits constraint value
+ * @return Maximum constraint value for axis limits
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取范围限制约束的最大值
+ * @return 坐标轴范围限制的最大约束值
+ * \endif
+ */
+double QImPlot3DAxisInfo::limitsConstraintMax() const
+{
+    QIM_DC(d);
+    return d->limitsConstraintMax;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the maximum limits constraint value
+ * @param max New maximum constraint value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置范围限制约束的最大值
+ * @param max 新的最大约束值
+ * \endif
+ */
+void QImPlot3DAxisInfo::setLimitsConstraintMax(double max)
+{
+    QIM_D(d);
+    if (d->limitsConstraintMax != max) {
+        d->limitsConstraintMax = max;
+        d->hasLimitsConstraints = true;
+        Q_EMIT limitsConstraintsChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets both minimum and maximum limits constraints simultaneously
+ * @param min New minimum constraint value
+ * @param max New maximum constraint value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 同时设置范围限制约束的最小和最大值
+ * @param min 新的最小约束值
+ * @param max 新的最大约束值
+ * \endif
+ */
+void QImPlot3DAxisInfo::setLimitsConstraints(double min, double max)
+{
+    QIM_D(d);
+    bool changed = false;
+    if (d->limitsConstraintMin != min) {
+        d->limitsConstraintMin = min;
+        changed = true;
+    }
+    if (d->limitsConstraintMax != max) {
+        d->limitsConstraintMax = max;
+        changed = true;
+    }
+    if (changed) {
+        d->hasLimitsConstraints = true;
+        Q_EMIT limitsConstraintsChanged();
+    }
+}
+
+// ===== Zoom Constraint Methods =====
+
+/**
+ * \if ENGLISH
+ * @brief Gets the minimum zoom constraint value
+ * @return Minimum constraint value for axis zoom (range size)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取缩放约束的最小值
+ * @return 坐标轴缩放（范围大小）的最小约束值
+ * \endif
+ */
+double QImPlot3DAxisInfo::zoomConstraintMin() const
+{
+    QIM_DC(d);
+    return d->zoomConstraintMin;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the minimum zoom constraint value
+ * @param min New minimum zoom constraint value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置缩放约束的最小值
+ * @param min 新的最小缩放约束值
+ * \endif
+ */
+void QImPlot3DAxisInfo::setZoomConstraintMin(double min)
+{
+    QIM_D(d);
+    if (d->zoomConstraintMin != min) {
+        d->zoomConstraintMin = min;
+        d->hasZoomConstraints = true;
+        Q_EMIT zoomConstraintsChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Gets the maximum zoom constraint value
+ * @return Maximum constraint value for axis zoom (range size)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取缩放约束的最大值
+ * @return 坐标轴缩放（范围大小）的最大约束值
+ * \endif
+ */
+double QImPlot3DAxisInfo::zoomConstraintMax() const
+{
+    QIM_DC(d);
+    return d->zoomConstraintMax;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the maximum zoom constraint value
+ * @param max New maximum zoom constraint value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置缩放约束的最大值
+ * @param max 新的最大缩放约束值
+ * \endif
+ */
+void QImPlot3DAxisInfo::setZoomConstraintMax(double max)
+{
+    QIM_D(d);
+    if (d->zoomConstraintMax != max) {
+        d->zoomConstraintMax = max;
+        d->hasZoomConstraints = true;
+        Q_EMIT zoomConstraintsChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets both minimum and maximum zoom constraints simultaneously
+ * @param min New minimum zoom constraint value
+ * @param max New maximum zoom constraint value
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 同时设置缩放约束的最小和最大值
+ * @param min 新的最小缩放约束值
+ * @param max 新的最大缩放约束值
+ * \endif
+ */
+void QImPlot3DAxisInfo::setZoomConstraints(double min, double max)
+{
+    QIM_D(d);
+    bool changed = false;
+    if (d->zoomConstraintMin != min) {
+        d->zoomConstraintMin = min;
+        changed = true;
+    }
+    if (d->zoomConstraintMax != max) {
+        d->zoomConstraintMax = max;
+        changed = true;
+    }
+    if (changed) {
+        d->hasZoomConstraints = true;
+        Q_EMIT zoomConstraintsChanged();
+    }
+}
+
+// ===== Axis Formatter Methods =====
+
+/**
+ * \if ENGLISH
+ * @brief Gets the current axis formatter for custom tick label formatting
+ * @return Pointer to the current QImPlot3DAxisFormatter, or nullptr if no formatter is set
+ * @note The formatter is NOT owned by QImPlot3DAxisInfo. The caller must ensure
+ *       the formatter remains alive during rendering.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取当前坐标轴格式化器，用于自定义刻度标签格式化
+ * @return 当前 QImPlot3DAxisFormatter 指针，若未设置则返回 nullptr
+ * @note 格式化器不由 QImPlot3DAxisInfo 管理。调用者必须确保格式化器在渲染期间保持存活。
+ * \endif
+ */
+QImPlot3DAxisFormatter* QImPlot3DAxisInfo::axisFormatter() const
+{
+    QIM_DC(d);
+    return d->m_axisFormatter;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the axis formatter for custom tick label formatting
+ * @param formatter Pointer to a QImPlot3DAxisFormatter subclass instance.
+ *        Pass nullptr to remove the formatter and revert to default formatting.
+ * @note The formatter is NOT owned by QImPlot3DAxisInfo. The caller must manage
+ *       the formatter's lifetime and ensure it remains valid during plot rendering.
+ * @warning If the formatter is deleted before the plot renders, undefined behavior
+ *          will occur because ImPlot3D uses the formatter pointer as callback data.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置坐标轴格式化器，用于自定义刻度标签格式化
+ * @param formatter QImPlot3DAxisFormatter 子类实例指针。
+ *        传入 nullptr 可移除格式化器并恢复默认格式化。
+ * @note 格式化器不由 QImPlot3DAxisInfo 管理。调用者必须管理格式化器的生命周期，
+ *       并确保其在绘图渲染期间保持有效。
+ * @warning 若格式化器在绘图渲染之前被删除，将导致未定义行为，
+ *          因为 ImPlot3D 将格式化器指针作为回调数据使用。
+ * \endif
+ */
+void QImPlot3DAxisInfo::setAxisFormatter(QImPlot3DAxisFormatter* formatter)
+{
+    QIM_D(d);
+    if (d->m_axisFormatter != formatter) {
+        d->m_axisFormatter = formatter;
+        Q_EMIT axisFormatterChanged();
+    }
+}
+
+// ===== Tick Configuration Methods =====
+
+/**
+ * \if ENGLISH
+ * @brief Gets the list of tick position values
+ * @return List of double values specifying tick positions on the axis
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取刻度位置值列表
+ * @return 指定坐标轴上刻度位置的 double 值列表
+ * \endif
+ */
+QList<double> QImPlot3DAxisInfo::tickValues() const
+{
+    QIM_DC(d);
+    return d->tickValues;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the list of tick position values
+ * @param values List of double values specifying tick positions on the axis
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置刻度位置值列表
+ * @param values 指定坐标轴上刻度位置的 double 值列表
+ * \endif
+ */
+void QImPlot3DAxisInfo::setTickValues(const QList<double>& values)
+{
+    QIM_D(d);
+    if (d->tickValues != values) {
+        d->tickValues = values;
+        d->useRangeTicks = false;
+        d->hasTickConfig = true;
+        Q_EMIT tickConfigChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Gets the list of tick label strings (UTF-8 encoded)
+ * @return List of QByteArray tick labels, empty list means no custom labels
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取刻度标签字符串列表（UTF-8 编码）
+ * @return QByteArray 刻度标签列表，空列表表示无自定义标签
+ * \endif
+ */
+QList<QByteArray> QImPlot3DAxisInfo::tickLabels() const
+{
+    QIM_DC(d);
+    return d->tickLabels;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the list of tick label strings (UTF-8 encoded)
+ * @param labels List of QByteArray tick labels, empty list means no custom labels
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置刻度标签字符串列表（UTF-8 编码）
+ * @param labels QByteArray 刻度标签列表，空列表表示无自定义标签
+ * \endif
+ */
+void QImPlot3DAxisInfo::setTickLabels(const QList<QByteArray>& labels)
+{
+    QIM_D(d);
+    if (d->tickLabels != labels) {
+        d->tickLabels = labels;
+        d->hasTickConfig = true;
+        Q_EMIT tickConfigChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Checks if default ticks should be kept alongside custom ticks
+ * @return true if default ticks are kept, false if custom ticks replace them
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查是否在自定义刻度之外保留默认刻度
+ * @return true 表示保留默认刻度，false 表示自定义刻度替换默认刻度
+ * \endif
+ */
+bool QImPlot3DAxisInfo::isKeepDefaultTicks() const
+{
+    QIM_DC(d);
+    return d->keepDefaultTicks;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets whether default ticks should be kept alongside custom ticks
+ * @param keep true to keep default ticks, false to replace with custom ticks only
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置是否在自定义刻度之外保留默认刻度
+ * @param keep true 保留默认刻度，false 仅使用自定义刻度
+ * \endif
+ */
+void QImPlot3DAxisInfo::setKeepDefaultTicks(bool keep)
+{
+    QIM_D(d);
+    if (d->keepDefaultTicks != keep) {
+        d->keepDefaultTicks = keep;
+        d->hasTickConfig = true;
+        Q_EMIT tickConfigChanged();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Convenience method to set custom tick values with optional labels
+ * @param values List of tick position values
+ * @param labels Optional list of tick labels (UTF-8), empty means no custom labels
+ * @param keepDefault Whether to keep default ticks alongside custom ones
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置自定义刻度值及可选标签的便捷方法
+ * @param values 刻度位置值列表
+ * @param labels 可选的刻度标签列表（UTF-8），空列表表示无自定义标签
+ * @param keepDefault 是否在自定义刻度之外保留默认刻度
+ * \endif
+ */
+void QImPlot3DAxisInfo::setAxisTicks(const QList<double>& values, const QList<QByteArray>& labels, bool keepDefault)
+{
+    QIM_D(d);
+    d->tickValues = values;
+    d->tickLabels = labels;
+    d->keepDefaultTicks = keepDefault;
+    d->useRangeTicks = false;
+    d->hasTickConfig = true;
+    Q_EMIT tickConfigChanged();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Convenience method to set ticks using a range and count
+ * @param v_min Minimum value of the tick range
+ * @param v_max Maximum value of the tick range
+ * @param n_ticks Number of evenly-spaced ticks in the range
+ * @param labels Optional list of tick labels (UTF-8), empty means no custom labels
+ * @param keepDefault Whether to keep default ticks alongside custom ones
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用范围和数量设置刻度的便捷方法
+ * @param v_min 刻度范围的最小值
+ * @param v_max 刻度范围的最大值
+ * @param n_ticks 范围内均匀分布的刻度数量
+ * @param labels 可选的刻度标签列表（UTF-8），空列表表示无自定义标签
+ * @param keepDefault 是否在自定义刻度之外保留默认刻度
+ * \endif
+ */
+void QImPlot3DAxisInfo::setAxisTicksRange(double v_min, double v_max, int n_ticks, const QList<QByteArray>& labels, bool keepDefault)
+{
+    QIM_D(d);
+    d->rangeTickMin = v_min;
+    d->rangeTickMax = v_max;
+    d->rangeTickCount = n_ticks;
+    d->tickLabels = labels;
+    d->keepDefaultTicks = keepDefault;
+    d->useRangeTicks = true;
+    d->hasTickConfig = true;
+    Q_EMIT tickConfigChanged();
+}
+
 /**
  * \if ENGLISH
  * @brief Applies all stored configuration to ImPlot3D via Setup API calls
  * @details Calls SetupAxis() with label and flags, SetupAxisLimits() if limits were set,
- *          and SetupAxisScale() if scale is non-linear.
+ *          SetupAxisScale() with custom transform if set or builtin scale if non-linear,
+ *          SetupAxisLimitsConstraints() / SetupAxisZoomConstraints() if constraints are configured,
+ *          SetupAxisFormat() if a custom formatter is set, and SetupAxisTicks() if tick config exists.
+ *          When a custom axisTransform is set, it overrides the builtin scale type.
  * \endif
  *
  * \if CHINESE
  * @brief 通过 Setup API 将所有存储的配置应用到 ImPlot3D
  * @details 使用标签和标志调用 SetupAxis()，如设置了范围则调用 SetupAxisLimits()，
- *          如刻度非线性则调用 SetupAxisScale()。
+ *          如设置了自定义变换或刻度非线性则调用 SetupAxisScale()，
+ *          如配置了约束则调用 SetupAxisLimitsConstraints() / SetupAxisZoomConstraints()，
+ *          如设置了自定义格式化器则调用 SetupAxisFormat()，
+ *          如配置了刻度则调用 SetupAxisTicks()。
+ *          设置自定义 axisTransform 时，将覆盖内置刻度类型。
  * \endif
  */
 void QImPlot3DAxisInfo::applySetup() const
@@ -495,11 +1061,72 @@ void QImPlot3DAxisInfo::applySetup() const
         ImPlot3D::SetupAxisLimits(imAxis, d->minLimit, d->maxLimit, d->limitsCond);
     }
 
-    // Setup scale if non-linear
-    if (d->scale != QImPlot3DScaleType::Linear) {
+    // Setup scale: custom transform overrides builtin scale
+    if (d->m_axisTransform != nullptr) {
+        ImPlot3D::SetupAxisScale(imAxis, axisTransformForward, axisTransformInverse,
+                                  static_cast<void*>(d->m_axisTransform));
+    } else if (d->scale != QImPlot3DScaleType::Linear) {
         ImPlot3D::SetupAxisScale(imAxis, static_cast<ImPlot3DScale>(toImPlot3DScale(d->scale)));
+    }
+
+    // Setup limits constraints if configured
+    if (d->hasLimitsConstraints) {
+        ImPlot3D::SetupAxisLimitsConstraints(imAxis, d->limitsConstraintMin, d->limitsConstraintMax);
+    }
+
+    // Setup zoom constraints if configured
+    if (d->hasZoomConstraints) {
+        ImPlot3D::SetupAxisZoomConstraints(imAxis, d->zoomConstraintMin, d->zoomConstraintMax);
+    }
+
+    // Setup axis format if custom formatter is set
+    if (d->m_axisFormatter) {
+        // Bridge C callback that converts QImPlot3DAxisFormatter::format() to ImPlot3DFormatter
+        // ImPlot3DFormatter signature: int (*)(double value, char* buff, int size, void* user_data)
+        // Returns number of bytes written to buff (excluding null terminator)
+        static const auto axisFormatterCallback =
+            [](double value, char* buff, int size, void* user_data) -> int {
+                QImPlot3DAxisFormatter* formatter = static_cast<QImPlot3DAxisFormatter*>(user_data);
+                QByteArray result = formatter->format(value, QByteArray());
+                int copyLen = qMin(size - 1, static_cast<int>(result.size()));
+                if (copyLen > 0) {
+                    memcpy(buff, result.constData(), copyLen);
+                }
+                buff[copyLen] = '\0';
+                return copyLen;
+            };
+        ImPlot3D::SetupAxisFormat(imAxis, axisFormatterCallback, static_cast<void*>(d->m_axisFormatter));
+    }
+
+    // Setup axis ticks if configured
+    if (d->hasTickConfig) {
+        if (d->useRangeTicks) {
+            // Range-based tick generation: v_min, v_max, n_ticks
+            const char* const* labelsPtr = nullptr;
+            std::vector<const char*> labelPtrs;
+            if (!d->tickLabels.isEmpty()) {
+                labelPtrs.reserve(d->tickLabels.size());
+                for (const QByteArray& lbl : d->tickLabels) {
+                    labelPtrs.push_back(lbl.constData());
+                }
+                labelsPtr = labelPtrs.data();
+            }
+            ImPlot3D::SetupAxisTicks(imAxis, d->rangeTickMin, d->rangeTickMax, d->rangeTickCount, labelsPtr, d->keepDefaultTicks);
+        } else {
+            // Explicit tick values
+            std::vector<double> valuesVec(d->tickValues.begin(), d->tickValues.end());
+            const char* const* labelsPtr = nullptr;
+            std::vector<const char*> labelPtrs;
+            if (!d->tickLabels.isEmpty()) {
+                labelPtrs.reserve(d->tickLabels.size());
+                for (const QByteArray& lbl : d->tickLabels) {
+                    labelPtrs.push_back(lbl.constData());
+                }
+                labelsPtr = labelPtrs.data();
+            }
+            ImPlot3D::SetupAxisTicks(imAxis, valuesVec.data(), static_cast<int>(valuesVec.size()), labelsPtr, d->keepDefaultTicks);
+        }
     }
 }
 
 }  // namespace QIM
-
