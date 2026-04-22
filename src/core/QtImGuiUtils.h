@@ -6,11 +6,13 @@
 #include <QSize>
 #include <QDebug>
 #include <QPointF>
+#include <QQuaternion>
 #include <vector>
 #include "QImAPI.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "implot.h"
+#include "implot3d.h"
 /**
  * \if ENGLISH
  * @file QtImGuiUtils.h
@@ -29,6 +31,13 @@
  */
 namespace QIM
 {
+// Forward declarations for 3D math types (Task 4 will add conversion functions)
+struct QImPlot3DPoint;
+struct QImPlot3DRay;
+struct QImPlot3DPlane;
+struct QImPlot3DBox;
+struct QImPlot3DRange;
+
 // 操作系统是否为暗色主题
 QIM_CORE_API bool isSystemDarkTheme();
 // QColor < - > ImVec4
@@ -52,12 +61,28 @@ QIM_CORE_API QColor toQColor(ImU32 color);
 // ImPlotLocation < - > Qt::Alignment
 QIM_CORE_API Qt::Alignment toQAlignment(ImPlotLocation location);
 QIM_CORE_API ImPlotLocation toImPlotLocation(Qt::Alignment alignment);
+// ImPlot3D < - > QImPlot3D type conversions
+QIM_CORE_API ImPlot3DPoint toImPlot3DPoint(const QImPlot3DPoint& v);
+QIM_CORE_API QImPlot3DPoint toQImPlot3DPoint(const ImPlot3DPoint& v);
+QIM_CORE_API ImPlot3DQuat toImPlot3DQuat(const QQuaternion& q);
+QIM_CORE_API QQuaternion toQQuaternion(const ImPlot3DQuat& q);
+QIM_CORE_API ImPlot3DRay toImPlot3DRay(const QImPlot3DRay& r);
+QIM_CORE_API QImPlot3DRay toQImPlot3DRay(const ImPlot3DRay& r);
+QIM_CORE_API ImPlot3DPlane toImPlot3DPlane(const QImPlot3DPlane& p);
+QIM_CORE_API QImPlot3DPlane toQImPlot3DPlane(const ImPlot3DPlane& p);
+QIM_CORE_API ImPlot3DBox toImPlot3DBox(const QImPlot3DBox& b);
+QIM_CORE_API QImPlot3DBox toQImPlot3DBox(const ImPlot3DBox& b);
+QIM_CORE_API ImPlot3DRange toImPlot3DRange(const QImPlot3DRange& r);
+QIM_CORE_API QImPlot3DRange toQImPlot3DRange(const ImPlot3DRange& r);
 // 模糊判断相等
 // 更简单的fuzzyEqual，可指定精度，不使用qFuzzyCompare，当前场景不需要使用相对误差或ULP-based 比较
 QIM_CORE_API bool fuzzyEqual(float a, float b, float epsilon = 1e-5f);
 QIM_CORE_API bool fuzzyEqual(double a, double b, double epsilon = 1e-9);
 QIM_CORE_API bool fuzzyEqual(const ImVec2& a, const ImVec2& b, float epsilon = 1e-5f);
 QIM_CORE_API bool fuzzyEqual(const ImVec4& a, const ImVec4& b, float epsilon = 1e-5f);
+QIM_CORE_API bool fuzzyEqual(const QImPlot3DPoint& a, const QImPlot3DPoint& b, double epsilon = 1e-9);
+QIM_CORE_API bool fuzzyEqual(const QImPlot3DBox& a, const QImPlot3DBox& b, double epsilon = 1e-9);
+QIM_CORE_API bool fuzzyEqual(const QImPlot3DRange& a, const QImPlot3DRange& b, double epsilon = 1e-9);
 template< typename T >
 bool fuzzyEqual(const std::vector< T >& a, const std::vector< T >& b, T epsilon = 1e-5f);
 // QDebug Support
@@ -65,6 +90,11 @@ QIM_CORE_API QDebug operator<<(QDebug debug, const ImVec2& v);
 QIM_CORE_API QDebug operator<<(QDebug debug, const ImVec4& v);
 QIM_CORE_API QDebug operator<<(QDebug debug, const ImPlotPoint& v);
 QIM_CORE_API QDebug operator<<(QDebug debug, const ImRect& v);
+QIM_CORE_API QDebug operator<<(QDebug debug, const QImPlot3DPoint& v);
+QIM_CORE_API QDebug operator<<(QDebug debug, const QImPlot3DRay& v);
+QIM_CORE_API QDebug operator<<(QDebug debug, const QImPlot3DPlane& v);
+QIM_CORE_API QDebug operator<<(QDebug debug, const QImPlot3DBox& v);
+QIM_CORE_API QDebug operator<<(QDebug debug, const QImPlot3DRange& v);
 // ImVec2/ImVec4的模糊比较器 - 返回 true 表示"不相等"(需要更新)
 // 用于 QImTrackedValue 的 comparator，语义与 DefaultComparator 一致
 template< typename T >

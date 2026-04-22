@@ -56,6 +56,8 @@ class QIM_CORE_API QImPlot3DTriangleItemNode : public QImPlot3DItemNode
     Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
     // Line width
     Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth NOTIFY lineWidthChanged)
+    // Fill alpha
+    Q_PROPERTY(float fillAlpha READ fillAlpha WRITE setFillAlpha NOTIFY fillAlphaChanged)
 
 public:
     // Triangle item type = InnerType3D + 5
@@ -119,6 +121,9 @@ public:
 
     float lineWidth() const;
     void setLineWidth(float width);
+
+    float fillAlpha() const;
+    void setFillAlpha(float alpha);
 
     int triangleFlags() const;
     void setTriangleFlags(int flags);
@@ -244,6 +249,20 @@ Q_SIGNALS:
      * \endif
      */
     void lineWidthChanged(float width);
+    /**
+     * \if ENGLISH
+     * @brief Emitted when the fill alpha changes
+     * @param[in] alpha The new fill alpha value (0.0 to 1.0, or -1.0 for auto)
+     * @details Triggered by setFillAlpha() when the fill alpha value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 填充透明度更改时触发
+     * @param[in] alpha 新的填充透明度值（0.0到1.0，或-1.0表示自动）
+     * @details 当填充透明度值实际更改时由setFillAlpha()触发。
+     * \endif
+     */
+    void fillAlphaChanged(float alpha);
 
 protected:
     bool beginDraw() override;

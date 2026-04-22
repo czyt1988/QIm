@@ -28,6 +28,7 @@ public:
     QImOptional3DColor markerFillColor;
     QImOptional3DColor markerOutlineColor;
     float lineWidth{1.0f};
+    float fillAlpha{-1.0f};  // IMPLOT3D_AUTO
     QImAbstractXYZDataSeries* dataSeries = nullptr;
 };
 
@@ -416,6 +417,58 @@ void QImPlot3DQuadItemNode::setLineWidth(float width)
 
 /**
  * \if ENGLISH
+ * @brief Returns the current fill alpha value
+ * @return Fill alpha value (0.0 to 1.0, or -1.0 for auto)
+ * @details Returns the fill transparency value. A value of -1.0 indicates
+ *          IMPLOT3D_AUTO, meaning the default style value should be used.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回当前填充透明度值
+ * @return 填充透明度值（0.0到1.0，或-1.0表示自动）
+ * @details 返回填充透明度值。-1.0表示IMPLOT3D_AUTO，应使用默认样式值。
+ * \endif
+ */
+float QImPlot3DQuadItemNode::fillAlpha() const
+{
+    QIM_DC(d);
+    return d->fillAlpha;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the fill alpha value
+ * @param[in] alpha Fill alpha value (0.0 to 1.0, or -1.0 for auto)
+ * @details Sets the fill transparency value. A value of -1.0 indicates
+ *          IMPLOT3D_AUTO, meaning the default style value should be used.
+ *          Values outside the valid range are clamped to [0.0, 1.0].
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置填充透明度值
+ * @param[in] alpha 填充透明度值（0.0到1.0，或-1.0表示自动）
+ * @details 设置填充透明度值。-1.0表示IMPLOT3D_AUTO，应使用默认样式值。
+ *          超出有效范围的值将被限制在[0.0, 1.0]范围内。
+ * \endif
+ */
+void QImPlot3DQuadItemNode::setFillAlpha(float alpha)
+{
+    QIM_D(d);
+    // Clamp to valid range, but allow -1.0 for IMPLOT3D_AUTO
+    float clampedAlpha = alpha;
+    if (alpha >= 0.0f) {
+        // Only clamp non-negative values (auto is -1.0)
+        clampedAlpha = qBound(0.0f, alpha, 1.0f);
+    }
+    
+    if (!qFuzzyCompare(d->fillAlpha, clampedAlpha)) {
+        d->fillAlpha = clampedAlpha;
+        Q_EMIT fillAlphaChanged(clampedAlpha);
+    }
+}
+
+/**
+ * \if ENGLISH
  * @brief Returns the quad flags
  * @return Current ImPlot3DQuadFlags value
  * \endif
@@ -486,7 +539,12 @@ bool QImPlot3DQuadItemNode::beginDraw()
     }
 
     if (d->fillColor.has_value()) {
-        ImPlot3D::SetNextFillStyle(d->fillColor->value());
+        ImVec4 fillColor = d->fillColor->value();
+        // Apply fill alpha if explicitly set (not auto)
+        if (d->fillAlpha >= 0.0f) {
+            fillColor.w = d->fillAlpha;
+        }
+        ImPlot3D::SetNextFillStyle(fillColor);
     }
     if (d->lineColor.has_value()) {
         ImPlot3D::SetNextLineStyle(d->lineColor->value(), d->lineWidth);

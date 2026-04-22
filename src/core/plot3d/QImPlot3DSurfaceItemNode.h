@@ -11,9 +11,6 @@ namespace QIM
  * \if ENGLISH
  * @brief 3D surface plot item node
  *
- * @class QImPlot3DSurfaceItemNode
- * @ingroup plot3d
- *
  * @details Renders a 3D surface defined by a grid of X, Y, Z data points.
  * Supports configurable visibility for lines, fill, and markers,
  * optional colormap-based coloring, and independent style properties
@@ -25,9 +22,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief 三维曲面绘图项节点
- *
- * @class QImPlot3DSurfaceItemNode
- * @ingroup plot3d
  *
  * @details 通过X、Y、Z数据点网格渲染三维曲面。
  * 支持线条、填充和标记点的可见性配置，
@@ -60,9 +54,13 @@ class QIM_CORE_API QImPlot3DSurfaceItemNode : public QImPlot3DItemNode
     Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
     // Line width
     Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth NOTIFY lineWidthChanged)
+    // Fill alpha
+    Q_PROPERTY(float fillAlpha READ fillAlpha WRITE setFillAlpha NOTIFY fillAlphaChanged)
     // Colormap
     Q_PROPERTY(bool colormapEnabled READ isColormapEnabled WRITE setColormapEnabled NOTIFY colormapChanged)
     Q_PROPERTY(int colormap READ colormap WRITE setColormap NOTIFY colormapChanged)
+    Q_PROPERTY(double colormapScaleMin READ colormapScaleMin WRITE setColormapScaleMin NOTIFY colormapScaleChanged)
+    Q_PROPERTY(double colormapScaleMax READ colormapScaleMax WRITE setColormapScaleMax NOTIFY colormapScaleChanged)
 
 public:
     // Surface item type = InnerType3D + 3
@@ -134,11 +132,20 @@ public:
     float lineWidth() const;
     void setLineWidth(float width);
 
+    float fillAlpha() const;
+    void setFillAlpha(float alpha);
+
     bool isColormapEnabled() const;
     void setColormapEnabled(bool enabled);
 
     int colormap() const;
     void setColormap(int colormap);
+
+    double colormapScaleMin() const;
+    void setColormapScaleMin(double min);
+
+    double colormapScaleMax() const;
+    void setColormapScaleMax(double max);
 
     int surfaceFlags() const;
     void setSurfaceFlags(int flags);
@@ -278,6 +285,20 @@ Q_SIGNALS:
     void lineWidthChanged(float width);
     /**
      * \if ENGLISH
+     * @brief Emitted when the fill alpha changes
+     * @param[in] alpha The new fill alpha value (0.0 to 1.0, or -1.0 for auto)
+     * @details Triggered by setFillAlpha() when the fill alpha value actually changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 填充透明度更改时触发
+     * @param[in] alpha 新的填充透明度值（0.0到1.0，或-1.0表示自动）
+     * @details 当填充透明度值实际更改时由setFillAlpha()触发。
+     * \endif
+     */
+    void fillAlphaChanged(float alpha);
+    /**
+     * \if ENGLISH
      * @brief Emitted when colormap properties change
      * @details Triggered when colormapEnabled or colormap properties change.
      * \endif
@@ -288,6 +309,18 @@ Q_SIGNALS:
      * \endif
      */
     void colormapChanged();
+    /**
+     * \if ENGLISH
+     * @brief Emitted when colormap scale range changes
+     * @details Triggered when colormapScaleMin or colormapScaleMax properties change.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 颜色映射缩放范围更改时触发
+     * @details 当colormapScaleMin或colormapScaleMax属性变更时触发。
+     * \endif
+     */
+    void colormapScaleChanged();
 
 protected:
     bool beginDraw() override;

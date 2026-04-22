@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.15)
 ########################################################
 # version
 ########################################################
@@ -33,6 +33,7 @@ option(QIM_ENABLE_DEBUG_PRINT "Enable Debug Print" ON)
 option(QIM_ENABLE_DEBUG_PRINT_FPS "Enable Debug Print fps" ON)
 option(QIM_ENABLE_BENCHMARK "Enable build benchmark" ON)
 option(QIM_BUILD_QML "Build QML compatibility layer" OFF) # TODO:QML
+option(QIM_BUILD_TESTS "Build tests" OFF)
 
 
 # postfix
@@ -199,6 +200,10 @@ if(QIM_BUILD_EXAMPLES)
 endif()
 if(QIM_ENABLE_BENCHMARK)
     add_subdirectory(benchmark)
+endif()
+if(QIM_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
 endif()
 ########################################################
 # 总安装

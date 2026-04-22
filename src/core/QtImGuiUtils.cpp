@@ -2,6 +2,7 @@
 #include <QGuiApplication>
 #include <QPalette>
 #include <QDebug>
+#include "plot3d/QImPlot3DTypes.h"
 
 namespace QIM
 {
@@ -502,4 +503,402 @@ QDebug operator<<(QDebug debug, const ImRect& v)
     return debug;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Converts a QImPlot3DPoint to ImPlot3DPoint
+ * @param[in] v QImPlot3DPoint to convert
+ * @return ImPlot3DPoint with the same x, y, z values
+ * \endif
+ * \if CHINESE
+ * @brief 将 QImPlot3DPoint 转换为 ImPlot3DPoint
+ * @param[in] v 待转换的 QImPlot3DPoint
+ * @return ImPlot3DPoint，包含相同的 x、y、z 值
+ * \endif
+ */
+ImPlot3DPoint toImPlot3DPoint(const QImPlot3DPoint& v)
+{
+    return ImPlot3DPoint(v.x, v.y, v.z);
 }
+
+/**
+ * \if ENGLISH
+ * @brief Converts an ImPlot3DPoint to QImPlot3DPoint
+ * @param[in] v ImPlot3DPoint to convert
+ * @return QImPlot3DPoint with the same x, y, z values
+ * \endif
+ * \if CHINESE
+ * @brief 将 ImPlot3DPoint 转换为 QImPlot3DPoint
+ * @param[in] v 待转换的 ImPlot3DPoint
+ * @return QImPlot3DPoint，包含相同的 x、y、z 值
+ * \endif
+ */
+QImPlot3DPoint toQImPlot3DPoint(const ImPlot3DPoint& v)
+{
+    return QImPlot3DPoint(v.x, v.y, v.z);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts a QQuaternion to ImPlot3DQuat
+ * @param[in] q QQuaternion to convert (float components)
+ * @return ImPlot3DQuat with double precision components
+ * @note QQuaternion stores components as (x, y, z, scalar) where scalar is w
+ * \endif
+ * \if CHINESE
+ * @brief 将 QQuaternion 转换为 ImPlot3DQuat
+ * @param[in] q 待转换的 QQuaternion（浮点分量）
+ * @return ImPlot3DQuat，双精度分量
+ * @note QQuaternion 以 (x, y, z, scalar) 存储分量，其中 scalar 对应 w
+ * \endif
+ */
+ImPlot3DQuat toImPlot3DQuat(const QQuaternion& q)
+{
+    // QQuaternion: (x, y, z, scalar) where scalar is w
+    // ImPlot3DQuat: (x, y, z, w)
+    return ImPlot3DQuat(q.x(), q.y(), q.z(), q.scalar());
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts an ImPlot3DQuat to QQuaternion
+ * @param[in] q ImPlot3DQuat to convert (double precision)
+ * @return QQuaternion with float components
+ * @note Precision loss from double to float is expected
+ * \endif
+ * \if CHINESE
+ * @brief 将 ImPlot3DQuat 转换为 QQuaternion
+ * @param[in] q 待转换的 ImPlot3DQuat（双精度）
+ * @return QQuaternion，浮点分量
+ * @note 从双精度到浮点会有精度损失
+ * \endif
+ */
+QQuaternion toQQuaternion(const ImPlot3DQuat& q)
+{
+    // ImPlot3DQuat: (x, y, z, w)
+    // QQuaternion: (x, y, z, scalar) where scalar is w
+    return QQuaternion(static_cast<float>(q.w), static_cast<float>(q.x), static_cast<float>(q.y), static_cast<float>(q.z));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts a QImPlot3DRay to ImPlot3DRay
+ * @param[in] r QImPlot3DRay to convert
+ * @return ImPlot3DRay with converted origin and direction
+ * \endif
+ * \if CHINESE
+ * @brief 将 QImPlot3DRay 转换为 ImPlot3DRay
+ * @param[in] r 待转换的 QImPlot3DRay
+ * @return ImPlot3DRay，包含转换后的原点和方向
+ * \endif
+ */
+ImPlot3DRay toImPlot3DRay(const QImPlot3DRay& r)
+{
+    ImPlot3DRay result;
+    result.Origin = toImPlot3DPoint(r.Origin);
+    result.Direction = toImPlot3DPoint(r.Direction);
+    return result;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts an ImPlot3DRay to QImPlot3DRay
+ * @param[in] r ImPlot3DRay to convert
+ * @return QImPlot3DRay with converted origin and direction
+ * \endif
+ * \if CHINESE
+ * @brief 将 ImPlot3DRay 转换为 QImPlot3DRay
+ * @param[in] r 待转换的 ImPlot3DRay
+ * @return QImPlot3DRay，包含转换后的原点和方向
+ * \endif
+ */
+QImPlot3DRay toQImPlot3DRay(const ImPlot3DRay& r)
+{
+    QImPlot3DRay result;
+    result.Origin = toQImPlot3DPoint(r.Origin);
+    result.Direction = toQImPlot3DPoint(r.Direction);
+    return result;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts a QImPlot3DPlane to ImPlot3DPlane
+ * @param[in] p QImPlot3DPlane to convert
+ * @return ImPlot3DPlane with converted point and normal
+ * \endif
+ * \if CHINESE
+ * @brief 将 QImPlot3DPlane 转换为 ImPlot3DPlane
+ * @param[in] p 待转换的 QImPlot3DPlane
+ * @return ImPlot3DPlane，包含转换后的点和法向量
+ * \endif
+ */
+ImPlot3DPlane toImPlot3DPlane(const QImPlot3DPlane& p)
+{
+    ImPlot3DPlane result;
+    result.Point = toImPlot3DPoint(p.Point);
+    result.Normal = toImPlot3DPoint(p.Normal);
+    return result;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts an ImPlot3DPlane to QImPlot3DPlane
+ * @param[in] p ImPlot3DPlane to convert
+ * @return QImPlot3DPlane with converted point and normal
+ * \endif
+ * \if CHINESE
+ * @brief 将 ImPlot3DPlane 转换为 QImPlot3DPlane
+ * @param[in] p 待转换的 ImPlot3DPlane
+ * @return QImPlot3DPlane，包含转换后的点和法向量
+ * \endif
+ */
+QImPlot3DPlane toQImPlot3DPlane(const ImPlot3DPlane& p)
+{
+    QImPlot3DPlane result;
+    result.Point = toQImPlot3DPoint(p.Point);
+    result.Normal = toQImPlot3DPoint(p.Normal);
+    return result;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts a QImPlot3DBox to ImPlot3DBox
+ * @param[in] b QImPlot3DBox to convert
+ * @return ImPlot3DBox with converted min and max corners
+ * \endif
+ * \if CHINESE
+ * @brief 将 QImPlot3DBox 转换为 ImPlot3DBox
+ * @param[in] b 待转换的 QImPlot3DBox
+ * @return ImPlot3DBox，包含转换后的最小和最大角点
+ * \endif
+ */
+ImPlot3DBox toImPlot3DBox(const QImPlot3DBox& b)
+{
+    ImPlot3DBox result;
+    result.Min = toImPlot3DPoint(b.Min);
+    result.Max = toImPlot3DPoint(b.Max);
+    return result;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts an ImPlot3DBox to QImPlot3DBox
+ * @param[in] b ImPlot3DBox to convert
+ * @return QImPlot3DBox with converted min and max corners
+ * \endif
+ * \if CHINESE
+ * @brief 将 ImPlot3DBox 转换为 QImPlot3DBox
+ * @param[in] b 待转换的 ImPlot3DBox
+ * @return QImPlot3DBox，包含转换后的最小和最大角点
+ * \endif
+ */
+QImPlot3DBox toQImPlot3DBox(const ImPlot3DBox& b)
+{
+    QImPlot3DBox result;
+    result.Min = toQImPlot3DPoint(b.Min);
+    result.Max = toQImPlot3DPoint(b.Max);
+    return result;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts a QImPlot3DRange to ImPlot3DRange
+ * @param[in] r QImPlot3DRange to convert
+ * @return ImPlot3DRange with the same min and max values
+ * \endif
+ * \if CHINESE
+ * @brief 将 QImPlot3DRange 转换为 ImPlot3DRange
+ * @param[in] r 待转换的 QImPlot3DRange
+ * @return ImPlot3DRange，包含相同的最小和最大值
+ * \endif
+ */
+ImPlot3DRange toImPlot3DRange(const QImPlot3DRange& r)
+{
+    return ImPlot3DRange(r.Min, r.Max);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts an ImPlot3DRange to QImPlot3DRange
+ * @param[in] r ImPlot3DRange to convert
+ * @return QImPlot3DRange with the same min and max values
+ * \endif
+ * \if CHINESE
+ * @brief 将 ImPlot3DRange 转换为 QImPlot3DRange
+ * @param[in] r 待转换的 ImPlot3DRange
+ * @return QImPlot3DRange，包含相同的最小和最大值
+ * \endif
+ */
+QImPlot3DRange toQImPlot3DRange(const ImPlot3DRange& r)
+{
+    return QImPlot3DRange(r.Min, r.Max);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Fuzzy comparison of two QImPlot3DPoint values component-wise
+ * @param[in] a First QImPlot3DPoint
+ * @param[in] b Second QImPlot3DPoint
+ * @param[in] epsilon Tolerance (default 1e-9)
+ * @return true if all three components (x, y, z) are within epsilon
+ * \endif
+ * \if CHINESE
+ * @brief 两个 QImPlot3DPoint 的逐分量模糊比较
+ * @param[in] a 第一个 QImPlot3DPoint
+ * @param[in] b 第二个 QImPlot3DPoint
+ * @param[in] epsilon 容差（默认 1e-9）
+ * @return 若所有三个分量（x、y、z）均在容差范围内，则返回 true
+ * \endif
+ */
+bool fuzzyEqual(const QImPlot3DPoint& a, const QImPlot3DPoint& b, double epsilon)
+{
+    return fuzzyEqual(a.x, b.x, epsilon) && fuzzyEqual(a.y, b.y, epsilon) && fuzzyEqual(a.z, b.z, epsilon);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Fuzzy comparison of two QImPlot3DBox values
+ * @param[in] a First QImPlot3DBox
+ * @param[in] b Second QImPlot3DBox
+ * @param[in] epsilon Tolerance (default 1e-9)
+ * @return true if both min and max corners are within epsilon
+ * \endif
+ * \if CHINESE
+ * @brief 两个 QImPlot3DBox 的模糊比较
+ * @param[in] a 第一个 QImPlot3DBox
+ * @param[in] b 第二个 QImPlot3DBox
+ * @param[in] epsilon 容差（默认 1e-9）
+ * @return 若最小和最大角点均在容差范围内，则返回 true
+ * \endif
+ */
+bool fuzzyEqual(const QImPlot3DBox& a, const QImPlot3DBox& b, double epsilon)
+{
+    return fuzzyEqual(a.Min, b.Min, epsilon) && fuzzyEqual(a.Max, b.Max, epsilon);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Fuzzy comparison of two QImPlot3DRange values
+ * @param[in] a First QImPlot3DRange
+ * @param[in] b Second QImPlot3DRange
+ * @param[in] epsilon Tolerance (default 1e-9)
+ * @return true if both min and max values are within epsilon
+ * \endif
+ * \if CHINESE
+ * @brief 两个 QImPlot3DRange 的模糊比较
+ * @param[in] a 第一个 QImPlot3DRange
+ * @param[in] b 第二个 QImPlot3DRange
+ * @param[in] epsilon 容差（默认 1e-9）
+ * @return 若最小和最大值均在容差范围内，则返回 true
+ * \endif
+ */
+bool fuzzyEqual(const QImPlot3DRange& a, const QImPlot3DRange& b, double epsilon)
+{
+    return fuzzyEqual(a.Min, b.Min, epsilon) && fuzzyEqual(a.Max, b.Max, epsilon);
+}
+
+/**
+ * \if ENGLISH
+ * @brief QDebug stream operator for QImPlot3DPoint
+ * @param[in] debug QDebug stream
+ * @param[in] v QImPlot3DPoint value to output
+ * @return QDebug stream with formatted QImPlot3DPoint
+ * \endif
+ * \if CHINESE
+ * @brief QImPlot3DPoint 的 QDebug 流输出操作符
+ * @param[in] debug QDebug 流
+ * @param[in] v 待输出的 QImPlot3DPoint 值
+ * @return 包含格式化 QImPlot3DPoint 的 QDebug 流
+ * \endif
+ */
+QDebug operator<<(QDebug debug, const QImPlot3DPoint& v)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << '(' << v.x << "," << v.y << "," << v.z << ')';
+    return debug;
+}
+
+/**
+ * \if ENGLISH
+ * @brief QDebug stream operator for QImPlot3DRay
+ * @param[in] debug QDebug stream
+ * @param[in] v QImPlot3DRay value to output
+ * @return QDebug stream with formatted QImPlot3DRay
+ * \endif
+ * \if CHINESE
+ * @brief QImPlot3DRay 的 QDebug 流输出操作符
+ * @param[in] debug QDebug 流
+ * @param[in] v 待输出的 QImPlot3DRay 值
+ * @return 包含格式化 QImPlot3DRay 的 QDebug 流
+ * \endif
+ */
+QDebug operator<<(QDebug debug, const QImPlot3DRay& v)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "Origin:" << v.Origin << ",Direction:" << v.Direction;
+    return debug;
+}
+
+/**
+ * \if ENGLISH
+ * @brief QDebug stream operator for QImPlot3DPlane
+ * @param[in] debug QDebug stream
+ * @param[in] v QImPlot3DPlane value to output
+ * @return QDebug stream with formatted QImPlot3DPlane
+ * \endif
+ * \if CHINESE
+ * @brief QImPlot3DPlane 的 QDebug 流输出操作符
+ * @param[in] debug QDebug 流
+ * @param[in] v 待输出的 QImPlot3DPlane 值
+ * @return 包含格式化 QImPlot3DPlane 的 QDebug 流
+ * \endif
+ */
+QDebug operator<<(QDebug debug, const QImPlot3DPlane& v)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "Point:" << v.Point << ",Normal:" << v.Normal;
+    return debug;
+}
+
+/**
+ * \if ENGLISH
+ * @brief QDebug stream operator for QImPlot3DBox
+ * @param[in] debug QDebug stream
+ * @param[in] v QImPlot3DBox value to output
+ * @return QDebug stream with formatted QImPlot3DBox
+ * \endif
+ * \if CHINESE
+ * @brief QImPlot3DBox 的 QDebug 流输出操作符
+ * @param[in] debug QDebug 流
+ * @param[in] v 待输出的 QImPlot3DBox 值
+ * @return 包含格式化 QImPlot3DBox 的 QDebug 流
+ * \endif
+ */
+QDebug operator<<(QDebug debug, const QImPlot3DBox& v)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "Min:" << v.Min << ",Max:" << v.Max;
+    return debug;
+}
+
+/**
+ * \if ENGLISH
+ * @brief QDebug stream operator for QImPlot3DRange
+ * @param[in] debug QDebug stream
+ * @param[in] v QImPlot3DRange value to output
+ * @return QDebug stream with formatted QImPlot3DRange
+ * \endif
+ * \if CHINESE
+ * @brief QImPlot3DRange 的 QDebug 流输出操作符
+ * @param[in] debug QDebug 流
+ * @param[in] v 待输出的 QImPlot3DRange 值
+ * @return 包含格式化 QImPlot3DRange 的 QDebug 流
+ * \endif
+ */
+QDebug operator<<(QDebug debug, const QImPlot3DRange& v)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << '[' << v.Min << "," << v.Max << ']';
+    return debug;
+}
+
+}  // namespace QIM

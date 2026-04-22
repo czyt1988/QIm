@@ -2,13 +2,16 @@
 #define QIMPLOT3DAXISINFO_H
 
 #include <QObject>
+#include <QList>
 #include "QImAPI.h"
 #include "QImPlot3D.h"
+#include "QImPlot3DAxisFormatter.h"
 
 namespace QIM
 {
 
 class QImPlot3DNode;
+class QImPlot3DAxisTransform;
 
 /**
  * \if ENGLISH
@@ -46,6 +49,8 @@ class QImPlot3DNode;
 class QIM_CORE_API QImPlot3DAxisInfo : public QObject
 {
     Q_OBJECT
+    QIM_DECLARE_PRIVATE(QImPlot3DAxisInfo)
+
     Q_PROPERTY(QString label READ label WRITE setLabel NOTIFY labelChanged)
     Q_PROPERTY(double minLimit READ minLimit WRITE setMinLimit NOTIFY limitsChanged)
     Q_PROPERTY(double maxLimit READ maxLimit WRITE setMaxLimit NOTIFY limitsChanged)
@@ -70,63 +75,33 @@ class QIM_CORE_API QImPlot3DAxisInfo : public QObject
     // Scale type
     Q_PROPERTY(QImPlot3DScaleType scale READ scale WRITE setScale NOTIFY scaleChanged)
 
-    QIM_DECLARE_PRIVATE(QImPlot3DAxisInfo)
-    Q_DISABLE_COPY(QImPlot3DAxisInfo)
+    // Axis constraints
+    Q_PROPERTY(double limitsConstraintMin READ limitsConstraintMin WRITE setLimitsConstraintMin NOTIFY limitsConstraintsChanged)
+    Q_PROPERTY(double limitsConstraintMax READ limitsConstraintMax WRITE setLimitsConstraintMax NOTIFY limitsConstraintsChanged)
+    Q_PROPERTY(double zoomConstraintMin READ zoomConstraintMin WRITE setZoomConstraintMin NOTIFY zoomConstraintsChanged)
+    Q_PROPERTY(double zoomConstraintMax READ zoomConstraintMax WRITE setZoomConstraintMax NOTIFY zoomConstraintsChanged)
 
+    // Tick configuration
+    Q_PROPERTY(QList<double> tickValues READ tickValues WRITE setTickValues NOTIFY tickConfigChanged)
+    Q_PROPERTY(QList<QByteArray> tickLabels READ tickLabels WRITE setTickLabels NOTIFY tickConfigChanged)
+    Q_PROPERTY(bool keepDefaultTicks READ isKeepDefaultTicks WRITE setKeepDefaultTicks NOTIFY tickConfigChanged)
+
+    // Axis formatter
+    Q_PROPERTY(QImPlot3DAxisFormatter* axisFormatter READ axisFormatter WRITE setAxisFormatter NOTIFY axisFormatterChanged)
+
+   // Q_DISABLE_COPY(QImPlot3DAxisInfo)
 public:
-    /**
-     * \if ENGLISH
-     * @brief Constructor for QImPlot3DAxisInfo
-     * @param axis The ImPlot3D axis identifier (X1, Y1, or Z1)
-     * @param plot Optional QImPlot3DNode parent for memory management
-     * \endif
-     *
-     * \if CHINESE
-     * @brief QImPlot3DAxisInfo 构造函数
-     * @param axis ImPlot3D 轴标识符（X1、Y1 或 Z1）
-     * @param plot 可选的 QImPlot3DNode 父对象，用于内存管理
-     * \endif
-     */
+    // Constructor for QImPlot3DAxisInfo
     explicit QImPlot3DAxisInfo(QImPlot3DAxisId axis, QImPlot3DNode* plot = nullptr);
     ~QImPlot3DAxisInfo();
 
-    /**
-     * \if ENGLISH
-     * @brief Returns the QImPlot3DAxisId axis identifier
-     * @return QImPlot3DAxisId enum value (X1, Y1, or Z1)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 返回 QImPlot3DAxisId 轴标识符
-     * @return QImPlot3DAxisId 枚举值（X1、Y1 或 Z1）
-     * \endif
-     */
+    // Returns the QImPlot3DAxisId axis identifier
     QImPlot3DAxisId axisId() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Returns the raw ImAxis3D value for direct ImPlot3D API usage
-     * @return Integer matching ImAxis3D_ enumeration (ImAxis3D_X=0, ImAxis3D_Y=1, ImAxis3D_Z=2)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 返回原始 ImAxis3D 值，用于直接调用 ImPlot3D API
-     * @return 匹配 ImAxis3D_ 枚举的整数（ImAxis3D_X=0, ImAxis3D_Y=1, ImAxis3D_Z=2）
-     * \endif
-     */
+    // Returns the raw ImAxis3D value for direct ImPlot3D API usage
     int imAxis3D() const;
 
-    /**
-     * \if ENGLISH
-     * @brief Returns the parent QImPlot3DNode
-     * @return Pointer to the parent plot node, or nullptr if not attached
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 返回父级 QImPlot3DNode
-     * @return 父级绘图节点指针，如未关联则返回 nullptr
-     * \endif
-     */
+    // Returns the parent QImPlot3DNode
     QImPlot3DNode* plotNode() const;
 
     // Label property
@@ -143,6 +118,10 @@ public:
     // Scale property
     QImPlot3DScaleType scale() const;
     void setScale(QImPlot3DScaleType type);
+
+    // Custom axis transform property
+    QImPlot3DAxisTransform* axisTransform() const;
+    void setAxisTransform(QImPlot3DAxisTransform* transform);
 
     // Raw axis flags access
     int axisFlags() const;
@@ -180,19 +159,37 @@ public:
     bool isDecorationsEnabled() const;
     void setDecorationsEnabled(bool enabled);
 
-    /**
-     * \if ENGLISH
-     * @brief Applies all stored configuration to ImPlot3D via Setup API calls
-     * @details Should be called inside BeginPlot/EndPlot block before plotting items.
-     *          Calls ImPlot3D::SetupAxis(), SetupAxisLimits(), SetupAxisScale() as needed.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 通过 Setup API 将所有存储的配置应用到 ImPlot3D
-     * @details 应在 BeginPlot/EndPlot 块内调用，在绘制项目之前。
-     *          根据需要调用 ImPlot3D::SetupAxis()、SetupAxisLimits()、SetupAxisScale()。
-     * \endif
-     */
+    // Limits constraint properties
+    double limitsConstraintMin() const;
+    void setLimitsConstraintMin(double min);
+    double limitsConstraintMax() const;
+    void setLimitsConstraintMax(double max);
+    void setLimitsConstraints(double min, double max);
+
+    // Zoom constraint properties
+    double zoomConstraintMin() const;
+    void setZoomConstraintMin(double min);
+    double zoomConstraintMax() const;
+    void setZoomConstraintMax(double max);
+    void setZoomConstraints(double min, double max);
+
+    // Axis formatter property
+    QImPlot3DAxisFormatter* axisFormatter() const;
+    void setAxisFormatter(QImPlot3DAxisFormatter* formatter);
+
+    // Tick configuration properties
+    QList<double> tickValues() const;
+    void setTickValues(const QList<double>& values);
+    QList<QByteArray> tickLabels() const;
+    void setTickLabels(const QList<QByteArray>& labels);
+    bool isKeepDefaultTicks() const;
+    void setKeepDefaultTicks(bool keep);
+
+    // Convenience methods for tick configuration
+    void setAxisTicks(const QList<double>& values, const QList<QByteArray>& labels = {}, bool keepDefault = false);
+    void setAxisTicksRange(double v_min, double v_max, int n_ticks, const QList<QByteArray>& labels = {}, bool keepDefault = false);
+
+    // Applies all stored configuration to ImPlot3D via Setup API calls
     void applySetup() const;
 
 Q_SIGNALS:
@@ -245,6 +242,63 @@ Q_SIGNALS:
      * \endif
      */
     void scaleChanged();
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when axis limits constraints change
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 当坐标轴范围限制约束变更时发射
+     * \endif
+     */
+    void limitsConstraintsChanged();
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when axis zoom constraints change
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 当坐标轴缩放约束变更时发射
+     * \endif
+     */
+    void zoomConstraintsChanged();
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when the custom axis transform changes
+     * @param transform New transform pointer (may be nullptr if reset)
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 当自定义坐标轴变换变更时发射
+     * @param transform 新的变换指针（重置时可能为 nullptr）
+     * \endif
+     */
+    void axisTransformChanged(QImPlot3DAxisTransform* transform);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when the axis formatter changes
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 当坐标轴格式化器变更时发射
+     * \endif
+     */
+    void axisFormatterChanged();
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when tick configuration changes (values, labels, or keepDefault)
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 当刻度配置变更时发射（值、标签或保留默认刻度）
+     * \endif
+     */
+    void tickConfigChanged();
 
 private:
     QImPlot3DAxisId m_axisId;

@@ -2,8 +2,13 @@
 #define QIMPLOT3DNODE_H
 
 #include "QImAbstractNode.h"
+#include <QPointF>
 #include <QSizeF>
+#include <QQuaternion>
 #include "QImPlot3D.h"
+
+// Include ImGui for ImDrawList type
+#include "imgui.h"
 
 namespace QIM
 {
@@ -12,6 +17,8 @@ class QImPlot3DAxisInfo;
 class QImPlot3DItemNode;
 class QImPlot3DLineItemNode;
 class QImPlot3DScatterItemNode;
+class QImPlot3DStyleNode;
+class QImPlot3DMeshItemNode;
 
 /**
  * \if ENGLISH
@@ -70,6 +77,10 @@ class QIM_CORE_API QImPlot3DNode : public QImAbstractNode
 
     // Combined flags
     Q_PROPERTY(bool canvasEnabled READ isCanvasEnabled WRITE setCanvasEnabled NOTIFY plot3DFlagChanged)
+
+    // Legend configuration
+    Q_PROPERTY(QImPlot3DLocation legendLocation READ legendLocation WRITE setLegendLocation NOTIFY legendConfigChanged)
+    Q_PROPERTY(int legendFlags READ legendFlags WRITE setLegendFlags NOTIFY legendConfigChanged)
 
     Q_DISABLE_COPY(QImPlot3DNode)
 
@@ -175,12 +186,58 @@ public:
 
     // Sets the plot box rotation angles
     void setBoxRotation(double elevation, double azimuth, bool animate = false, QImPlot3DCondition cond = QImPlot3DCondition::Once);
+    // Sets the plot box rotation using quaternion
+    void setBoxRotation(const QQuaternion& rotation, bool animate = false, QImPlot3DCondition cond = QImPlot3DCondition::Once);
 
     // Sets the plot box initial rotation (for double-click reset)
     void setBoxInitialRotation(double elevation, double azimuth);
+    // Sets the plot box initial rotation using quaternion (for double-click reset)
+    void setBoxInitialRotation(const QQuaternion& rotation);
 
     // Sets the plot box scale factors
     void setBoxScale(double x, double y, double z);
+
+//----------------------------------------------------
+    // Convenience axis setup methods
+    //----------------------------------------------------
+
+    // Convenience wrapper for ImPlot3D::SetupAxes - sets labels and flags for all 3 axes
+    void setupAxes(const QByteArray& xLabel, const QByteArray& yLabel, const QByteArray& zLabel, int xFlags = 0, int yFlags = 0, int zFlags = 0);
+
+    // Convenience wrapper for ImPlot3D::SetupAxesLimits - sets limits for all 3 axes
+    void setupAxesLimits(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax, QImPlot3DCondition cond = QImPlot3DCondition::Once);
+
+    //----------------------------------------------------
+    // Legend configuration
+    //----------------------------------------------------
+
+    // Gets the legend location
+    QImPlot3DLocation legendLocation() const;
+
+    // Sets the legend location
+    void setLegendLocation(QImPlot3DLocation location);
+
+    // Gets the legend flags
+    int legendFlags() const;
+
+    // Sets the legend flags
+    void setLegendFlags(int flags);
+
+    // Convenience method to set legend location and flags together
+    void setLegend(QImPlot3DLocation location, int flags = 0);
+
+    //----------------------------------------------------
+    // Colormap push/pop
+    //----------------------------------------------------
+
+    // Pushes a colormap onto the colormap stack (applied in beginDraw)
+    void pushColormap(QImPlot3DColormap colormap);
+
+    // Pushes a colormap by name onto the colormap stack (applied in beginDraw)
+    void pushColormap(const QByteArray& name);
+
+    // Pops colormaps from the stack (applied in endDraw)
+    void popColormap(int count = 1);
 
     //----------------------------------------------------
     // Item management
@@ -204,12 +261,44 @@ public:
     template<typename CX, typename CY, typename CZ>
     QImPlot3DScatterItemNode* addScatter(const CX& x, const CY& y, const CZ& z, const QString& label);
 
-    //----------------------------------------------------
+    // Quick add mesh factory methods
+    QImPlot3DMeshItemNode* addCube(const QString& label = {});
+    QImPlot3DMeshItemNode* addSphere(const QString& label = {});
+    QImPlot3DMeshItemNode* addDuck(const QString& label = {});
+
+//----------------------------------------------------
     // Interaction query
     //----------------------------------------------------
 
     // Checks if plot is hovered by mouse
     bool isPlot3DHovered() const;
+
+    // Converts a 3D plot point to pixel coordinates
+    QPointF plotToPixels(const QImPlot3DPoint& point);
+
+    // Converts 3D plot coordinates to pixel coordinates
+    QPointF plotToPixels(double x, double y, double z);
+
+    // Converts pixel coordinates to a 3D ray from camera through pixel
+    QImPlot3DRay pixelsToPlotRay(const QPointF& pixel);
+
+    // Converts pixel coordinates to a 3D point on the specified plane
+    QImPlot3DPoint pixelsToPlotPlane(const QPointF& pixel, QImPlane3D plane, bool mask = true);
+
+    // Gets the plot rectangle position in pixel coordinates
+    QPointF getPlotRectPos();
+
+    // Gets the plot rectangle size in pixels
+    QSizeF getPlotRectSize();
+
+    // Gets the ImDrawList pointer for low-level drawing operations
+    ImDrawList* getPlotDrawList() const;
+
+    // Gets the next marker shape in the cycle
+    QImPlot3DMarkerShape nextMarker();
+
+    // Gets the style node for this plot
+    QImPlot3DStyleNode* styleNode() const;
 
 Q_SIGNALS:
     /**
@@ -261,6 +350,17 @@ Q_SIGNALS:
      * \endif
      */
     void plot3DFlagChanged();
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when legend configuration (location or flags) changes
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 图例配置（位置或标志）变更时发射
+     * \endif
+     */
+    void legendConfigChanged();
 
 protected:
     // Begins the 3D plot rendering scope

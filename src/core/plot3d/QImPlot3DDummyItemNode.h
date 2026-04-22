@@ -10,9 +10,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot3D dummy item visualization
  *
- * @class QImPlot3DDummyItemNode
- * @ingroup plot3d_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot3D dummy items.
  *          Dummy items create placeholder entries in the legend with a color icon,
  *          useful for custom legend entries or annotations that don't correspond
@@ -33,9 +30,6 @@ namespace QIM
  * \if CHINESE
  * @brief ImPlot3D 虚拟项的 Qt 风格封装
  *
- * @class QImPlot3DDummyItemNode
- * @ingroup plot3d_items
- *
  * @details 为 ImPlot3D 虚拟项提供 Qt 风格的保留模式封装。
  *          虚拟项在图例中创建带有颜色图标的占位符条目，
  *          适用于不与实际绘图数据对应的自定义图例条目或注释。
@@ -55,25 +49,6 @@ class QIM_CORE_API QImPlot3DDummyItemNode : public QImPlot3DItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlot3DDummyItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DDummyItemNode::color
-     * @brief Color of the dummy item legend icon
-     *
-     * @details Defines the color for the dummy item's legend icon.
-     *          When not set, uses ImPlot3D's default color sequence.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DDummyItemNode::color
-     * @brief 虚拟项图例图标的颜色
-     *
-     * @details 定义虚拟项图例图标的颜色。
-     *          未设置时，使用 ImPlot3D 的默认颜色序列。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:
