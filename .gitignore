@@ -18,7 +18,7 @@ build*
 *.drawio.bkp
 .$*
 # 不忽略 .trae 目录（Agent 规则配置）
-!.trae/
+.trae/
 # 顶层的临时文件夹不追踪
 tmp
 ~
