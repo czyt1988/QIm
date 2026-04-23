@@ -23,7 +23,15 @@ graph TD
     Figure[QImFigureWidget] --> Plot[QImPlotNode]
     Plot --> Line[QImPlotLineNode]
     Plot --> Scatter[QImPlotScatterNode]
-    Plot --> Bar[QImPlotBarNode]
+    Plot --> Stairs[QImPlotStairsNode]
+    Plot --> Bar[QImPlotBarsNode]
+    Plot --> Shaded[QImPlotShadedNode]
+    Plot --> Stems[QImPlotStemsNode]
+    Plot --> Pie[QImPlotPieChartNode]
+    Plot --> Text[QImPlotTextNode]
+    Plot --> Dummy[QImPlotDummyNode]
+    Plot --> ErrorBars[QImPlotErrorBarsNode]
+    Plot --> InfLines[QImPlotInfLinesNode]
     Plot --> Axis1[x1Axis]
     Plot --> Axis2[y1Axis]
 ```
@@ -32,10 +40,18 @@ graph TD
 
 | 文档 | 说明 |
 |------|------|
-| [Figure Widget](figure-widget.md) | 绘图窗口组件的使用方法 |
-| [线条图](plot-line.md) | 折线图数据系列的详细配置 |
-| [数据系列](data-series.md) | 数据输入接口和类型说明 |
-| [降采样](downsampling.md) | 大规模数据降采样优化策略 |
+| [Figure Widget](figure-widget.md) | 绘图窗口组件 |
+| [绘图容器](plot-node.md) | QImPlotNode完整使用指南 |
+| [坐标轴配置](plot-axis.md) | 坐标轴属性和刻度配置 |
+| [线条图](plot-line.md) | 折线图数据系列 |
+| [基本图表](plot-basic-charts.md) | 折线图+散点图+阶梯图 |
+| [柱状图类](plot-bar-charts.md) | 柱状图+分组柱状图+直方图 |
+| [填充区域](plot-area-charts.md) | 填充区域图+茎叶图 |
+| [特殊图表](plot-special-charts.md) | 饼图+热力图+数字图+图像+无限线 |
+| [标注类](plot-annotations.md) | 文本标注+占位项+误差棒 |
+| [交互工具](plot-tools.md) | 拖拽点/线/矩形+注释+轴标签+值追踪 |
+| [数据系列](data-series.md) | 数据输入接口 |
+| [降采样](downsampling.md) | 大数据量优化策略 |
 
 ## 快速示例
 

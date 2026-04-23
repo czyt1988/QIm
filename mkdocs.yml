@@ -59,11 +59,24 @@ plugins:
             - 2D绘图:
                 - 概述: zh/plot2d/index.md
                 - Figure Widget: zh/plot2d/figure-widget.md
+                - 绘图容器: zh/plot2d/plot-node.md
+                - 坐标轴配置: zh/plot2d/plot-axis.md
+                - 基本图表: zh/plot2d/plot-basic-charts.md
                 - 线条图: zh/plot2d/plot-line.md
+                - 柱状图类: zh/plot2d/plot-bar-charts.md
+                - 填充区域: zh/plot2d/plot-area-charts.md
+                - 特殊图表: zh/plot2d/plot-special-charts.md
+                - 标注类: zh/plot2d/plot-annotations.md
+                - 交互工具: zh/plot2d/plot-tools.md
                 - 数据系列: zh/plot2d/data-series.md
                 - 降采样: zh/plot2d/downsampling.md
             - 3D绘图:
                 - 概述: zh/plot3d/index.md
+                - 基本图表: zh/plot3d/basic-charts.md
+                - 曲面图表: zh/plot3d/surface-charts.md
+                - 网格: zh/plot3d/mesh.md
+                - 标注: zh/plot3d/annotations.md
+                - 配置: zh/plot3d/configuration.md
             - 开发规范:
                 - 概述: zh/dev/index.md
                 - Qt集成规范: zh/dev/qt-integration.md
