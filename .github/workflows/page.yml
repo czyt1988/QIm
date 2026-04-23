@@ -26,17 +26,18 @@ jobs:
       - name: Install Doxygen
         run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
-      # Doxygen会在docs目录下生成doxygen文件夹(cn)和doxygen-en文件夹(en)，里面为api文档
+      # Doxygen生成API文档到项目根目录的doxygen/和doxygen-en/（不在docs/内）
+      # 这样mkdocs不会扫描到Doxygen生成的HTML文件，避免i18n插件编码错误
       - name: Build Doxygen API docs (Chinese)
         run: |
-          cd docs
-          cd doxygen-doc-file
+          cd docs/doxygen-doc-file
+          sed -i 's|OUTPUT_DIRECTORY       = ../|OUTPUT_DIRECTORY       = ../../doxygen|' Doxyfile-wiki-cn
           doxygen Doxyfile-wiki-cn
 
       - name: Build Doxygen API docs (English)
         run: |
-          cd docs
-          cd doxygen-doc-file
+          cd docs/doxygen-doc-file
+          echo 'OUTPUT_DIRECTORY = ../../doxygen-en' >> Doxyfile-wiki-en
           doxygen Doxyfile-wiki-en
           
       - name: Setup Python
@@ -57,11 +58,12 @@ jobs:
 
       # 将Doxygen生成的API文档复制到MkDocs输出目录
       # 中文API文档 → site/doxygen/，英文API文档 → site/en/doxygen-en/
+      # Doxygen输出结构：doxygen/doxygen/ 和 doxygen-en/doxygen-en/（OUTPUT_DIRECTORY + HTML_OUTPUT双层）
       - name: Copy Doxygen docs to site
         run: |
-          cp -r docs/doxygen site/doxygen
+          cp -r doxygen/doxygen site/doxygen
           mkdir -p site/en
-          cp -r docs/doxygen-en site/en/doxygen-en
+          cp -r doxygen-en/doxygen-en site/en/doxygen-en
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
