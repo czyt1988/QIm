@@ -4,6 +4,11 @@ site_description: 'Qt 4 ImGui'
 repo_url: https://github.com/czyt1988/QIm
 repo_name: QIm-github
 
+# 排除 Doxygen 生成的 API 文档目录（由 workflow 手动复制到 site/）
+exclude_docs: |
+  doxygen/
+  doxygen-en/
+
 # 多语言站点信息
 extra:
   site_name:
