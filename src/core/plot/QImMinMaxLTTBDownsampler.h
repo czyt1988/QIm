@@ -137,7 +137,10 @@ public:
      * @param target_points 目标点数（默认 2000，≈1.5 倍典型屏幕宽度）
      * @param preselection_ratio MinMax 预筛选比例（默认 4.0，即每个桶保留 4 个极值候选点）
      */
-    explicit QImMinMaxLTTBDownsampler(QImAbstractXYDataSeries* source, int target_points = 2000, double preselection_ratio = 4.0);
+    explicit QImMinMaxLTTBDownsampler(QImAbstractXYDataSeries* source,
+                                      int target_points         = 2000,
+                                      double preselection_ratio = 4.0,
+                                      bool autoDownsample       = true);
     ~QImMinMaxLTTBDownsampler() override = default;
 
     // ===== QImAbstractXYDataSeries 接口重写 =====
@@ -187,7 +190,6 @@ private:
     mutable std::vector< double > m_cached_x;
     mutable std::vector< double > m_cached_y;
     mutable bool m_cached_valid = false;
-
 
     // 查找视图范围内的数据索引 [start_idx, end_idx)
     std::pair< int, int > findVisibleRange(double x_min, double x_max) const;

@@ -1,4 +1,4 @@
-#include "QImPlotLineItemNode.h"
+﻿#include "QImPlotLineItemNode.h"
 #include "QImPlotDataSeries.h"
 #include "QImMinMaxLTTBDownsampler.h"
 #include "implot.h"
@@ -19,24 +19,29 @@ namespace QIM
 // ImPlotMarker_Plus   ->   ＋ 加号
 // ImPlotMarker_Asterisk   ->   ✻ 星形
 
+// Zoom detection thresholds for adaptive re-sampling
+static constexpr double kZoomInThreshold  = 0.67;  // X range shrinks below 67% → zoom-in > 33%
+static constexpr double kZoomOutThreshold = 1.5;   // X range expands above 150% → zoom-out > 50%
+static constexpr double kPixelChangeRatio = 0.1;   // Pixel width changes > 10%
+
 class QImPlotLineItemNode::PrivateData
 {
     QIM_DECLARE_PUBLIC(QImPlotLineItemNode)
 public:
     PrivateData(QImPlotLineItemNode* p);
-    void resetDownSamplerData(double x_min = 0, double x_max = -1, int pixelWidth = 0);
+    void resetDownSamplerData(int pixelWidth = 0);
     std::unique_ptr< QImAbstractXYDataSeries > data;
     std::unique_ptr< QImAbstractXYDataSeries > dataLTTB;
     bool isAdaptiveSampling { true };
     int downsampleThreshold { 20000 };
     ImPlotLineFlags lineFlags { ImPlotLineFlags_None };
     QImOptionalColor color;  ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
-    QImTrackedValue< float > lineWidth { 1.0f };                                  ///< 线宽
-    bool isPlotItemVisible { false };
+    QImTrackedValue< float > lineWidth { 1.0f };  ///< 线宽
 
-    // Viewport-aware re-sampling state
-    mutable std::optional<ImPlotRect> m_lastPlotLimits;
-    int m_lastPixelWidth = 0;
+    // Zoom-aware re-sampling state
+    double m_lastXRange { 0.0 };
+    int m_lastPixelWidth { 0 };
+    bool m_initialDownsampleDone { false };
 };
 
 QImPlotLineItemNode::PrivateData::PrivateData(QImPlotLineItemNode* p) : q_ptr(p)
@@ -44,26 +49,31 @@ QImPlotLineItemNode::PrivateData::PrivateData(QImPlotLineItemNode* p) : q_ptr(p)
 }
 
 /**
- * @brief 重置降采样数据，在设置数据后或者视口变化时调用
- * @param x_min 视口 X 轴最小值（0 表示使用全量数据）
- * @param x_max 视口 X 轴最大值（-1 表示使用全量数据）
- * @param pixelWidth 绘图像素宽度（>0 时根据像素宽度计算目标点数）
+ * @brief 重置降采样数据，始终对全量数据进行降采样
+ * @param pixelWidth 绘图像素宽度（>0 时根据像素宽度计算目标点数，0 时使用阈值作为目标）
  */
-void QImPlotLineItemNode::PrivateData::resetDownSamplerData(double x_min, double x_max, int pixelWidth)
+void QImPlotLineItemNode::PrivateData::resetDownSamplerData(int pixelWidth)
 {
-    if (isAdaptiveSampling) {
-        if (data && (data->size() > downsampleThreshold)) {
-            int effectiveTarget = pixelWidth > 0
-                ? QImPlotItemNode::pixelAwareTargetPoints(pixelWidth)
-                : downsampleThreshold;
-            QImMinMaxLTTBDownsampler* lttb = new QImMinMaxLTTBDownsampler(data.get(), effectiveTarget);
-            dataLTTB.reset(lttb);
-            if (x_max > 0) {
-                lttb->downSampler(x_min, x_max);
-            }
-        }
-    } else {
+    if (!isAdaptiveSampling) {
         dataLTTB.reset(nullptr);
+        return;
+    }
+    if (!data || data->size() <= downsampleThreshold) {
+        dataLTTB.reset(nullptr);
+        return;
+    }
+
+    int effectiveTarget = pixelWidth > 0 ? QImPlotItemNode::pixelAwareTargetPoints(pixelWidth) : downsampleThreshold;
+
+    if (dataLTTB) {
+        // 复用已有 downsampler 实例，仅更新目标点数
+        auto* lttb = static_cast< QImMinMaxLTTBDownsampler* >(dataLTTB.get());
+        lttb->setTargetPoints(effectiveTarget);
+    } else {
+        // 首次创建：autoDownsample=false，手动调用全量降采样
+        auto* lttb = new QImMinMaxLTTBDownsampler(data.get(), effectiveTarget, 4.0, false);
+        dataLTTB.reset(lttb);
+        lttb->downSampler();
     }
 }
 //----------------------------------------------------
@@ -114,8 +124,11 @@ void QImPlotLineItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
+    d->m_initialDownsampleDone = false;
+    d->m_lastXRange            = 0.0;
+    d->m_lastPixelWidth        = 0;
     if (d->isAdaptiveSampling) {
-        d->resetDownSamplerData();
+        d->resetDownSamplerData(0);
     }
 }
 
@@ -153,7 +166,7 @@ QImAbstractXYDataSeries* QImPlotLineItemNode::data() const
         else                                                                                                           \
             d->lineFlags &= ~FlagEnum;                                                                                 \
         if (d->lineFlags != oldFlags)                                                                                  \
-            Q_EMIT lineFlagChanged();                                                                                    \
+            Q_EMIT lineFlagChanged();                                                                                  \
     }
 #endif
 #ifndef QImPlotLineItemNode_ENABLED_ACCESSOR
@@ -172,7 +185,7 @@ QImAbstractXYDataSeries* QImPlotLineItemNode::data() const
         else                                                                                                           \
             d->lineFlags |= FlagEnum;                                                                                  \
         if (d->lineFlags != oldFlags)                                                                                  \
-            Q_EMIT lineFlagChanged();                                                                                    \
+            Q_EMIT lineFlagChanged();                                                                                  \
     }
 #endif
 
@@ -295,9 +308,11 @@ QColor QImPlotLineItemNode::color() const
 void QImPlotLineItemNode::setAdaptivesSampling(bool on)
 {
     QIM_D(d);
-    d->isAdaptiveSampling = on;
-    d->resetDownSamplerData();
+    d->isAdaptiveSampling      = on;
+    d->m_initialDownsampleDone = false;
+    d->resetDownSamplerData(0);
 }
+
 
 /**
  * \if ENGLISH
@@ -329,8 +344,9 @@ void QImPlotLineItemNode::setDownsampleThreshold(int threshold)
     QIM_D(d);
     int clamped = std::max(threshold, 100);
     if (clamped != d->downsampleThreshold) {
-        d->downsampleThreshold = clamped;
-        d->resetDownSamplerData();
+        d->downsampleThreshold     = clamped;
+        d->m_initialDownsampleDone = false;
+        d->resetDownSamplerData(0);
     }
 }
 
@@ -469,20 +485,20 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
     // clang-format on
     // clang-format on
 
-/**
- * \if ENGLISH
- * @brief Renders the line plot with pre-converted data
- * @return true if beginDraw succeeded, false if no valid data
- * @details Calls ImPlot::PlotLine with XY data. All conversions done in setters.
- * \endif
- *
- * \if CHINESE
- * @brief 使用预转换数据渲染线图
- * @return true 表示 beginDraw 成功，false 表示无有效数据
- * @details 调用 ImPlot::PlotLine 处理 XY 数据。所有转换在 setter 中完成。
- * \endif
- */
-bool QImPlotLineItemNode::beginDraw()
+    /**
+     * \if ENGLISH
+     * @brief Renders the line plot with pre-converted data
+     * @return true if beginDraw succeeded, false if no valid data
+     * @details Calls ImPlot::PlotLine with XY data. All conversions done in setters.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 使用预转换数据渲染线图
+     * @return true 表示 beginDraw 成功，false 表示无有效数据
+     * @details 调用 ImPlot::PlotLine 处理 XY 数据。所有转换在 setter 中完成。
+     * \endif
+     */
+    bool QImPlotLineItemNode::beginDraw()
 {
     QIM_D(d);
     if (!d->data) {
@@ -491,26 +507,47 @@ bool QImPlotLineItemNode::beginDraw()
     }
     QImAbstractXYDataSeries* series = d->data.get();
 
-    // Viewport-aware re-sampling: detect viewport changes from user pan/zoom
-    if (d->isAdaptiveSampling && d->data && !d->isPlotItemVisible && d->data->size() > d->downsampleThreshold) {
-        ImPlotRect currentLimits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
-        int currentPixelWidth = static_cast<int>(ImPlot::GetPlotSize().x);
+    // Zoom-aware re-sampling: only re-downsample on significant zoom, skip pans
+    if (d->isAdaptiveSampling && d->data && d->data->size() > d->downsampleThreshold) {
+        int currentPixelWidth = static_cast< int >(ImPlot::GetPlotSize().x);
 
-        auto rectsEqual = [](const ImPlotRect& a, const ImPlotRect& b, double eps = 1e-6) -> bool {
-            return std::fabs(a.X.Min - b.X.Min) < eps &&
-                   std::fabs(a.X.Max - b.X.Max) < eps &&
-                   std::fabs(a.Y.Min - b.Y.Min) < eps &&
-                   std::fabs(a.Y.Max - b.Y.Max) < eps;
-        };
+        if (!d->m_initialDownsampleDone) {
+            // 首帧初始化：获取实际像素宽度后用精确目标点数重新降采样
+            d->resetDownSamplerData(currentPixelWidth);
+            ImPlotRect limits          = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
+            d->m_lastXRange            = limits.X.Max - limits.X.Min;
+            d->m_lastPixelWidth        = currentPixelWidth;
+            d->m_initialDownsampleDone = true;
+        } else {
+            // 后续帧：检测缩放和窗口大小变化
+            ImPlotRect currentLimits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
+            double currentXRange     = currentLimits.X.Max - currentLimits.X.Min;
 
-        bool needsResample = !d->m_lastPlotLimits.has_value()
-                          || !rectsEqual(currentLimits, *d->m_lastPlotLimits)
-                          || d->m_lastPixelWidth != currentPixelWidth;
+            bool needsResample = false;
 
-        if (needsResample) {
-            d->resetDownSamplerData(currentLimits.X.Min, currentLimits.X.Max, currentPixelWidth);
-            d->m_lastPlotLimits = currentLimits;
-            d->m_lastPixelWidth = currentPixelWidth;
+            // 缩放检测：X轴范围比率
+            if (d->m_lastXRange > 1e-15) {
+                double zoomRatio = currentXRange / d->m_lastXRange;
+                if (zoomRatio > kZoomOutThreshold || zoomRatio < kZoomInThreshold) {
+                    needsResample = true;
+                }
+            } else {
+                needsResample = true;
+            }
+
+            // 像素宽度变化检测
+            if (!needsResample && d->m_lastPixelWidth > 0) {
+                double pixelDelta = std::abs(currentPixelWidth - d->m_lastPixelWidth);
+                if (pixelDelta > d->m_lastPixelWidth * kPixelChangeRatio) {
+                    needsResample = true;
+                }
+            }
+
+            if (needsResample) {
+                d->resetDownSamplerData(currentPixelWidth);
+                d->m_lastXRange     = currentXRange;
+                d->m_lastPixelWidth = currentPixelWidth;
+            }
         }
     }
 
@@ -529,23 +566,27 @@ bool QImPlotLineItemNode::beginDraw()
     if (series->isContiguous()) {
         if (series->xRawData()) {
             // 有x指针，说明不是yonly
-            ImPlot::PlotLine(labelConstData(),
-                             series->xRawData(),
-                             series->yRawData(),
-                             series->size(),
-                             d->lineFlags,
-                             series->offset(),
-                             series->stride());
+            ImPlot::PlotLine(
+                labelConstData(),
+                series->xRawData(),
+                series->yRawData(),
+                series->size(),
+                d->lineFlags,
+                series->offset(),
+                series->stride()
+            );
         } else {
             // x指针没有说明是yonly
-            ImPlot::PlotLine(labelConstData(),
-                             series->yRawData(),
-                             series->size(),
-                             series->xScale(),
-                             series->xStart(),
-                             d->lineFlags,
-                             series->offset(),
-                             series->stride());
+            ImPlot::PlotLine(
+                labelConstData(),
+                series->yRawData(),
+                series->size(),
+                series->xScale(),
+                series->xStart(),
+                d->lineFlags,
+                series->offset(),
+                series->stride()
+            );
         }
     } else {
         // TODO:非连续内存

@@ -38,57 +38,60 @@ private Q_SLOTS:
     void testThresholdQPropertyGetterSetter();
     void testThresholdChangeTriggersReSampling();
 
+    // 2 new tests for autoDownsample and full-range global extent
+    void testConstructorAutoDownsampleFalse();
+    void testFullRangeDownsamplePreservesGlobalExtent();
+
 private:
     // Helper: create linearly spaced X values 0, 1, 2, ..., n-1
-    static std::vector<double> makeXs(int n)
+    static std::vector< double > makeXs(int n)
     {
-        std::vector<double> xs(n);
+        std::vector< double > xs(n);
         for (int i = 0; i < n; ++i)
-            xs[i] = static_cast<double>(i);
+            xs[ i ] = static_cast< double >(i);
         return xs;
     }
 
     // Helper: create deterministic Y values for testing
-    static std::vector<double> makeYs(int n)
+    static std::vector< double > makeYs(int n)
     {
-        std::vector<double> ys(n);
+        std::vector< double > ys(n);
         for (int i = 0; i < n; ++i)
-            ys[i] = std::sin(i * 0.1) + (i % 7) * 0.01;
+            ys[ i ] = std::sin(i * 0.1) + (i % 7) * 0.01;
         return ys;
     }
 };
 
-void TestDownsampler::initTestCase() {}
-void TestDownsampler::cleanupTestCase() {}
+void TestDownsampler::initTestCase()
+{
+}
+void TestDownsampler::cleanupTestCase()
+{
+}
 
 // ============================================================================
 // Test 1: First and last data points must be preserved in downsampled output
 // ============================================================================
-// RED phase: Fails because target_points=20 gets clamped to 100 by
-// setTargetPoints(std::max(points, 100)). With source_size=100 <= target=100,
-// the data passes through unmodified. xValue(19) returns source index 19
-// (=19.0), but source.xValue(99) = 99.0. Assertion xValue(19) == xOriginal[99]
-// fails.
+// GREEN: Unconditional tail push guarantees last point = source last point.
+// target_points=20, source_size=100 > 20, downsampling occurs.
+// Output: 20 points with first = source[0] and last = source[99].
 void TestDownsampler::testFirstAndLastPreserved()
 {
     auto source = QImVectorXYDataSeries(makeXs(100), makeYs(100));
-    // target=20 is clamped to 100 by setTargetPoints
     QImMinMaxLTTBDownsampler downsampler(&source, 20, 4.0);
 
     // First point should always equal original first point
     QCOMPARE(downsampler.xValue(0), source.xValue(0));
 
-    // OPTIMIZED: xValue(19) should equal original last x (99.0)
-    // CURRENT: passthrough makes xValue(19) = source index 19 = 19.0
-    QCOMPARE(downsampler.xValue(19), source.xValue(99));
+    // Last output point should equal original last x (99.0)
+    QCOMPARE(downsampler.xValue(downsampler.size() - 1), source.xValue(99));
 }
 
 // ============================================================================
 // Test 2: Downsampled output count must equal target_points
 // ============================================================================
-// RED phase: All three fail due to off-by-one in minMaxLTTB bucket_end check.
-// When bucket_end >= n, the last bucket is skipped. Total output =
-// 1 + (num_buckets - 1) + 1 = target_points - 1.
+// GREEN: Unconditional tail push guarantees output = 1 + num_buckets + 1
+// = target_points. No off-by-one.
 void TestDownsampler::testOutputCountEqualsTarget()
 {
     const int n = 10000;
@@ -136,10 +139,8 @@ void TestDownsampler::testSmallDataPassThrough()
 // ============================================================================
 // Test 4: Viewport-aware downsampling must preserve endpoints within range
 // ============================================================================
-// RED phase: downSampler(x_min, x_max) overload does not exist yet.
-// The current downSampler() processes ALL data without viewport filtering,
-// so xValue(0) = 0.0 < 2000.0 and the last value = 9999.0 > 8000.0.
-// Both assertions fail.
+// GREEN: downSampler(x_min, x_max) filters data via findVisibleRange,
+// then applies MinMaxLTTB only on the visible portion.
 void TestDownsampler::testViewportRangePreservesEndpoints()
 {
     auto source = QImVectorXYDataSeries(makeXs(10000), makeYs(10000));
@@ -156,26 +157,24 @@ void TestDownsampler::testViewportRangePreservesEndpoints()
 // ============================================================================
 // Test 5: Dataset with all-NaN Y values must not crash
 // ============================================================================
-// RED phase: The current algorithm processes all-NaN data normally (skips NaN
-// in comparisons, falls back to sub_start index). Output size is ~1999
-// (target-1), not source_size. Assertion fails.
+// GREEN: All-NaN data is detected in minMaxLTTB, caches are cleared,
+// m_cached_valid = false, so size() returns source size (passthrough).
 void TestDownsampler::testAllNaNYDoesNotCrash()
 {
     const int n = 10000;
-    std::vector<double> xs(n), ys(n);
+    std::vector< double > xs(n), ys(n);
     for (int i = 0; i < n; ++i) {
-        xs[i] = static_cast<double>(i);
-        ys[i] = std::numeric_limits<double>::quiet_NaN();
+        xs[ i ] = static_cast< double >(i);
+        ys[ i ] = std::numeric_limits< double >::quiet_NaN();
     }
     auto source = QImVectorXYDataSeries(std::move(xs), std::move(ys));
 
     QImMinMaxLTTBDownsampler downsampler(&source, 2000, 4.0);
 
-    // Must not crash — basic sanity check
+    // Must not crash -- basic sanity check
     QVERIFY(downsampler.size() >= 0);
 
-    // OPTIMIZED: degenerate all-NaN data should pass through at source size
-    // CURRENT: processed normally, size ~1999
+    // All-NaN data clears cache, falls back to source size
     QCOMPARE(downsampler.size(), source.size());
 }
 
@@ -187,9 +186,9 @@ void TestDownsampler::testAllNaNYDoesNotCrash()
 // No crash. Test validates stability.
 void TestDownsampler::testSinglePointBucketNoCrash()
 {
-    std::vector<double> xs = { 0.0, 1.0, 2.0 };
-    std::vector<double> ys = { 3.0, 4.0, 1.0 };
-    auto source = QImVectorXYDataSeries(std::move(xs), std::move(ys));
+    std::vector< double > xs = { 0.0, 1.0, 2.0 };
+    std::vector< double > ys = { 3.0, 4.0, 1.0 };
+    auto source              = QImVectorXYDataSeries(std::move(xs), std::move(ys));
 
     QImMinMaxLTTBDownsampler downsampler(&source, 2000, 100.0);
 
@@ -200,34 +199,29 @@ void TestDownsampler::testSinglePointBucketNoCrash()
 // ============================================================================
 // Test 7: Preselection ratio below minimum must be caught
 // ============================================================================
-// RED phase:
-// - Debug: assert(preselection_ratio >= 2.0) triggers abort → crash
-// - Release: assert compiled out, m_preselection_ratio = 1.5 (violates min)
-//   preselectionRatio() returns 1.5, assertion QVERIFY(>= 2.0) fails
+// GREEN: Constructor enforces minimum via std::max(2.0, preselection_ratio).
+// ratio=1.5 is clamped to 2.0.
 void TestDownsampler::testPreselectionRatioAssert()
 {
     auto source = QImVectorXYDataSeries(makeXs(100), makeYs(100));
 
     // Construct with ratio=1.5 (below minimum 2.0)
-    // Debug build: assert aborts → test failure (RED ✓)
-    // Release build: assert compiled out, ratio stored as 1.5
+    // Constructor clamps to 2.0 via std::max()
     QImMinMaxLTTBDownsampler downsampler(&source, 2000, 1.5);
 
-    // OPTIMIZED: constructor should enforce minimum ratio
-    // CURRENT: stores the raw value without validation
+    // Constructor enforces minimum ratio
     QVERIFY(downsampler.preselectionRatio() >= 2.0);
 }
 
 // ============================================================================
 // Test 8: findVisibleRange for XY (explicit X array) mode
 // ============================================================================
-// RED phase: Inline range logic assertions pass (lower_bound/upper_bound on
-// source data are correct). However, the downsampler's viewport filtering
-// assertion fails: current code does not limit output to [250, 750].
+// GREEN: downSampler(x_min, x_max) uses findVisibleRange to filter,
+// then applies MinMaxLTTB on the visible portion only.
 void TestDownsampler::testFindVisibleRangeXY()
 {
     // Create sorted XY data: x = 0, 10, 20, ..., 990 (100 points)
-    std::vector<double> xs, ys;
+    std::vector< double > xs, ys;
     xs.reserve(100);
     ys.reserve(100);
     for (int i = 0; i < 100; ++i) {
@@ -241,8 +235,8 @@ void TestDownsampler::testFindVisibleRangeXY()
     // upper_bound for 750.0 → index 76 (first x > 750 is x[76] = 760)
     const double* x_ptr = source.xRawData();
     QVERIFY(x_ptr != nullptr);
-    int start_idx = static_cast<int>(std::lower_bound(x_ptr, x_ptr + 100, 250.0) - x_ptr);
-    int end_idx   = static_cast<int>(std::upper_bound(x_ptr, x_ptr + 100, 750.0) - x_ptr);
+    int start_idx = static_cast< int >(std::lower_bound(x_ptr, x_ptr + 100, 250.0) - x_ptr);
+    int end_idx   = static_cast< int >(std::upper_bound(x_ptr, x_ptr + 100, 750.0) - x_ptr);
 
     QCOMPARE(start_idx, 25);
     QCOMPARE(end_idx, 76);
@@ -270,16 +264,16 @@ void TestDownsampler::testFindVisibleRangeXY()
 // ============================================================================
 // Test 9: findVisibleRange for Y-only (implicit X) mode
 // ============================================================================
-// RED phase: Inline range logic assertions pass. Downsampler viewport
-// assertion fails because current code does not filter by viewport.
+// GREEN: downSampler(x_min, x_max) uses findVisibleRange in Y-only mode
+// to compute index range from xStart/xScale, then applies MinMaxLTTB.
 void TestDownsampler::testFindVisibleRangeYOnly()
 {
     const int n = 1000;
 
     // Y-only mode: X is computed as xStart + index * xScale
     // Need xs same size as ys for size() to work
-    auto ys = makeYs(n);
-    auto xs = std::vector<double>(n);
+    auto ys     = makeYs(n);
+    auto xs     = std::vector< double >(n);
     auto source = QImVectorXYDataSeries(std::move(xs), std::move(ys));
     source.setYOnly(true, 0.0, 1.0);
 
@@ -288,10 +282,10 @@ void TestDownsampler::testFindVisibleRangeYOnly()
     // end_idx = ceil((500.0 - 0.0) / 1.0) + 1 = 501
     const double xStart = 0.0;
     const double xScale = 1.0;
-    int start_idx = static_cast<int>(std::floor((200.0 - xStart) / xScale));
-    int end_idx   = static_cast<int>(std::ceil((500.0 - xStart) / xScale)) + 1;
-    start_idx = std::max(0, start_idx);
-    end_idx   = std::min(n, end_idx);
+    int start_idx       = static_cast< int >(std::floor((200.0 - xStart) / xScale));
+    int end_idx         = static_cast< int >(std::ceil((500.0 - xStart) / xScale)) + 1;
+    start_idx           = std::max(0, start_idx);
+    end_idx             = std::min(n, end_idx);
 
     QCOMPARE(start_idx, 200);
     QCOMPARE(end_idx, 501);
@@ -381,7 +375,7 @@ void TestDownsampler::testPixelAwareTargetPointsRange()
 // ============================================================================
 void TestDownsampler::testThresholdQPropertyGetterSetter()
 {
-    auto node = std::make_unique<QImPlotLineItemNode>();
+    auto node = std::make_unique< QImPlotLineItemNode >();
     // Default threshold is 20000
     QCOMPARE(node->downsampleThreshold(), 20000);
     // Set to 5000, verify getter
@@ -394,7 +388,7 @@ void TestDownsampler::testThresholdQPropertyGetterSetter()
 // ============================================================================
 void TestDownsampler::testThresholdChangeTriggersReSampling()
 {
-    auto node = std::make_unique<QImPlotLineItemNode>();
+    auto node = std::make_unique< QImPlotLineItemNode >();
     // Default threshold
     QCOMPARE(node->downsampleThreshold(), 20000);
     // Below minimum → clamped to 100
@@ -406,6 +400,47 @@ void TestDownsampler::testThresholdChangeTriggersReSampling()
     // Valid value set triggers internal resetDownSamplerData()
     node->setDownsampleThreshold(500);
     QCOMPARE(node->downsampleThreshold(), 500);
+}
+
+// ============================================================================
+// New test: autoDownsample=false skips initial downsampling
+// ============================================================================
+void TestDownsampler::testConstructorAutoDownsampleFalse()
+{
+    const int n = 10000;
+    auto source = QImVectorXYDataSeries(makeXs(n), makeYs(n));
+
+    // autoDownsample=false: constructor should NOT trigger downSampler()
+    QImMinMaxLTTBDownsampler ds(&source, 500, 4.0, false);
+
+    // Cache is not valid, so size() returns source size (passthrough)
+    QCOMPARE(ds.size(), n);
+
+    // xRawData should point to source data (not downsampled)
+    QCOMPARE(ds.xRawData(), source.xRawData());
+
+    // Manually trigger downsampling
+    ds.downSampler();
+    QCOMPARE(ds.size(), 500);
+}
+
+// ============================================================================
+// New test: Full-range downsample preserves global data extent
+// ============================================================================
+void TestDownsampler::testFullRangeDownsamplePreservesGlobalExtent()
+{
+    const int n = 50000;
+    auto source = QImVectorXYDataSeries(makeXs(n), makeYs(n));
+    QImMinMaxLTTBDownsampler ds(&source, 1000, 4.0);
+
+    // Full-range downsample: first output x should be original first x
+    QCOMPARE(ds.xValue(0), source.xValue(0));
+
+    // Last output x should be original last x
+    QCOMPARE(ds.xValue(ds.size() - 1), source.xValue(n - 1));
+
+    // Output count should be exactly target_points
+    QCOMPARE(ds.size(), 1000);
 }
 
 QTEST_MAIN(TestDownsampler)
