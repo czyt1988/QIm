@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "QImMinMaxLTTBDownsampler.h"
+#include "QImPlotLineItemNode.h"
 
 using namespace QIM;
 
@@ -28,6 +29,14 @@ private Q_SLOTS:
     void testPreselectionRatioAssert();
     void testFindVisibleRangeXY();
     void testFindVisibleRangeYOnly();
+
+    // 6 integration tests for downsampleThreshold Q_PROPERTY and viewport re-sampling
+    void testViewportReSamplingOutputCount();
+    void testViewportReSamplingEndpointPreservation();
+    void testFullRangeBackwardCompatibility();
+    void testPixelAwareTargetPointsRange();
+    void testThresholdQPropertyGetterSetter();
+    void testThresholdChangeTriggersReSampling();
 
 private:
     // Helper: create linearly spaced X values 0, 1, 2, ..., n-1
@@ -306,6 +315,97 @@ void TestDownsampler::testFindVisibleRangeYOnly()
         }
     }
     QVERIFY(allInRange);
+}
+
+// ============================================================================
+// Integration test 1: Viewport-aware re-sampling produces expected output count
+// ============================================================================
+void TestDownsampler::testViewportReSamplingOutputCount()
+{
+    const int n = 50000;
+    auto source = QImVectorXYDataSeries(makeXs(n), makeYs(n));
+    QImMinMaxLTTBDownsampler downsampler(&source, 500, 4.0);
+    downsampler.downSampler(10000.0, 20000.0);
+    // Visible range [10000,20000] has 10001 points >> target 500, so output = 500
+    QCOMPARE(downsampler.size(), 500);
+}
+
+// ============================================================================
+// Integration test 2: Viewport-aware re-sampling preserves viewport endpoints
+// ============================================================================
+void TestDownsampler::testViewportReSamplingEndpointPreservation()
+{
+    const int n = 50000;
+    auto source = QImVectorXYDataSeries(makeXs(n), makeYs(n));
+    QImMinMaxLTTBDownsampler downsampler(&source, 500, 4.0);
+    downsampler.downSampler(10000.0, 20000.0);
+    // First x must be >= viewport lower bound
+    QVERIFY(downsampler.xValue(0) >= 10000.0);
+    // Last x must be <= viewport upper bound
+    QVERIFY(downsampler.xValue(downsampler.size() - 1) <= 20000.0);
+}
+
+// ============================================================================
+// Integration test 3: Full-range downSampler() matches original global behavior
+// ============================================================================
+void TestDownsampler::testFullRangeBackwardCompatibility()
+{
+    const int n = 10000;
+    auto source = QImVectorXYDataSeries(makeXs(n), makeYs(n));
+    QImMinMaxLTTBDownsampler downsampler(&source, 500, 4.0);
+    downsampler.downSampler();  // No range params = full range
+    QCOMPARE(downsampler.size(), 500);
+    QVERIFY(downsampler.xValue(0) >= 0.0);
+    QVERIFY(downsampler.xValue(downsampler.size() - 1) <= 9999.0);
+}
+
+// ============================================================================
+// Integration test 4: pixelAwareTargetPoints calculation and clamping
+// ============================================================================
+void TestDownsampler::testPixelAwareTargetPointsRange()
+{
+    // 800px * 1.5 = 1200 (no clamping)
+    QCOMPARE(QImPlotItemNode::pixelAwareTargetPoints(800), 1200);
+    // 50px * 1.5 = 75 → clamped to 100
+    QCOMPARE(QImPlotItemNode::pixelAwareTargetPoints(50), 100);
+    // 8000px * 1.5 = 12000 → clamped to 10000
+    QCOMPARE(QImPlotItemNode::pixelAwareTargetPoints(8000), 10000);
+    // 0px → clamped to 100
+    QCOMPARE(QImPlotItemNode::pixelAwareTargetPoints(0), 100);
+    // negative → clamped to 100
+    QCOMPARE(QImPlotItemNode::pixelAwareTargetPoints(-10), 100);
+}
+
+// ============================================================================
+// Integration test 5: downsampleThreshold Q_PROPERTY getter/setter
+// ============================================================================
+void TestDownsampler::testThresholdQPropertyGetterSetter()
+{
+    auto node = std::make_unique<QImPlotLineItemNode>();
+    // Default threshold is 20000
+    QCOMPARE(node->downsampleThreshold(), 20000);
+    // Set to 5000, verify getter
+    node->setDownsampleThreshold(5000);
+    QCOMPARE(node->downsampleThreshold(), 5000);
+}
+
+// ============================================================================
+// Integration test 6: Threshold clamping and re-sampling trigger
+// ============================================================================
+void TestDownsampler::testThresholdChangeTriggersReSampling()
+{
+    auto node = std::make_unique<QImPlotLineItemNode>();
+    // Default threshold
+    QCOMPARE(node->downsampleThreshold(), 20000);
+    // Below minimum → clamped to 100
+    node->setDownsampleThreshold(50);
+    QCOMPARE(node->downsampleThreshold(), 100);
+    // At minimum boundary
+    node->setDownsampleThreshold(100);
+    QCOMPARE(node->downsampleThreshold(), 100);
+    // Valid value set triggers internal resetDownSamplerData()
+    node->setDownsampleThreshold(500);
+    QCOMPARE(node->downsampleThreshold(), 500);
 }
 
 QTEST_MAIN(TestDownsampler)

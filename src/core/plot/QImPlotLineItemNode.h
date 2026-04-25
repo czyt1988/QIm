@@ -46,6 +46,8 @@ class QIM_CORE_API QImPlotLineItemNode : public QImPlotItemNode
     Q_PROPERTY(bool skipNaN READ isSkipNaN WRITE setSkipNaN NOTIFY lineFlagChanged)
     Q_PROPERTY(bool clippingEnabled READ isClippingEnabled WRITE setClippingEnabled NOTIFY lineFlagChanged)
     Q_PROPERTY(bool shaded READ isShaded WRITE setShaded NOTIFY lineFlagChanged)
+    // Downsample threshold for adaptive sampling
+    Q_PROPERTY(int downsampleThreshold READ downsampleThreshold WRITE setDownsampleThreshold)
 public:
     QImPlotLineItemNode(QObject* par = nullptr);
     ~QImPlotLineItemNode();
@@ -101,6 +103,9 @@ public:
     //===============================================================
     void setAdaptivesSampling(bool on);
     bool isAdaptiveSampling() const;
+
+    int downsampleThreshold() const;
+    void setDownsampleThreshold(int threshold);
 Q_SIGNALS:
     /**
      * \if ENGLISH

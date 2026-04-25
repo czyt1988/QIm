@@ -318,6 +318,22 @@ bool QImPlotLineItemNode::isAdaptiveSampling() const
     return d->isAdaptiveSampling;
 }
 
+int QImPlotLineItemNode::downsampleThreshold() const
+{
+    QIM_DC(d);
+    return d->downsampleThreshold;
+}
+
+void QImPlotLineItemNode::setDownsampleThreshold(int threshold)
+{
+    QIM_D(d);
+    int clamped = std::max(threshold, 100);
+    if (clamped != d->downsampleThreshold) {
+        d->downsampleThreshold = clamped;
+        d->resetDownSamplerData();
+    }
+}
+
 // ===== 标志访问器实现（带 Doxygen 注释）=====
 // clang-format off
 
