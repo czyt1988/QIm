@@ -35,7 +35,7 @@ public:
     bool isAdaptiveSampling { true };
     int downsampleThreshold { 20000 };
     ImPlotLineFlags lineFlags { ImPlotLineFlags_None };
-    QImOptionalColor color;  ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
+    QImOptionalColor color;                       ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
     QImTrackedValue< float > lineWidth { 1.0f };  ///< 线宽
 
     // Zoom-aware re-sampling state
@@ -124,6 +124,7 @@ void QImPlotLineItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
+    d->dataLTTB.reset(nullptr);  // 数据源变更，必须销毁旧降采样器（避免悬空指针）
     d->m_initialDownsampleDone = false;
     d->m_lastXRange            = 0.0;
     d->m_lastPixelWidth        = 0;
@@ -312,7 +313,6 @@ void QImPlotLineItemNode::setAdaptivesSampling(bool on)
     d->m_initialDownsampleDone = false;
     d->resetDownSamplerData(0);
 }
-
 
 /**
  * \if ENGLISH
@@ -566,27 +566,23 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
     if (series->isContiguous()) {
         if (series->xRawData()) {
             // 有x指针，说明不是yonly
-            ImPlot::PlotLine(
-                labelConstData(),
-                series->xRawData(),
-                series->yRawData(),
-                series->size(),
-                d->lineFlags,
-                series->offset(),
-                series->stride()
-            );
+            ImPlot::PlotLine(labelConstData(),
+                             series->xRawData(),
+                             series->yRawData(),
+                             series->size(),
+                             d->lineFlags,
+                             series->offset(),
+                             series->stride());
         } else {
             // x指针没有说明是yonly
-            ImPlot::PlotLine(
-                labelConstData(),
-                series->yRawData(),
-                series->size(),
-                series->xScale(),
-                series->xStart(),
-                d->lineFlags,
-                series->offset(),
-                series->stride()
-            );
+            ImPlot::PlotLine(labelConstData(),
+                             series->yRawData(),
+                             series->size(),
+                             series->xScale(),
+                             series->xStart(),
+                             d->lineFlags,
+                             series->offset(),
+                             series->stride());
         }
     } else {
         // TODO:非连续内存

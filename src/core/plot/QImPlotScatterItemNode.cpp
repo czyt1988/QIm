@@ -127,6 +127,7 @@ void QImPlotScatterItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
+    d->dataLTTB.reset(nullptr);  // 数据源变更，必须销毁旧降采样器（避免悬空指针）
     d->m_initialDownsampleDone = false;
     d->m_lastXRange            = 0.0;
     d->m_lastPixelWidth        = 0;
