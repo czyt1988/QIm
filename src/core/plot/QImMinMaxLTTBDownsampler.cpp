@@ -8,10 +8,11 @@ namespace QIM
 
 // ===== 构造函数 =====
 QImMinMaxLTTBDownsampler::QImMinMaxLTTBDownsampler(QImAbstractXYDataSeries* source, int target_points, double preselection_ratio)
-    : m_source(source), m_preselection_ratio(preselection_ratio)
+    : m_source(source)
 {
     assert(source && "Source must not be null");
-    assert(preselection_ratio >= 2.0 && "Preselection ratio must be at least 2.0");
+    m_preselection_ratio = std::max(2.0, preselection_ratio);
+    assert(m_preselection_ratio >= 2.0 && "Preselection ratio must be at least 2.0");
     setTargetPoints(target_points);
 }
 
@@ -67,8 +68,8 @@ int QImMinMaxLTTBDownsampler::offset() const
 
 void QImMinMaxLTTBDownsampler::setTargetPoints(int points)
 {
-    // 限制最小目标点数，避免无效采样
-    int new_points = std::max(points, 100);  // 最小 100 点
+    // 限制最小目标点数（算法至少需要 3 个点）
+    int new_points = std::max(points, 3);
     if (new_points != m_target_points) {
         m_target_points = new_points;
         // 目标点数变化时重新下采样
@@ -132,7 +133,34 @@ void QImMinMaxLTTBDownsampler::downSampler()
 
     // 对全量数据执行 MinMaxLTTB 下采样
     minMaxLTTB(m_source->xRawData(), m_source->yRawData(), 0, source_size, m_target_points);
-    m_cached_valid = true;
+    m_cached_valid = !m_cached_x.empty();
+}
+
+void QImMinMaxLTTBDownsampler::downSampler(double x_min, double x_max)
+{
+    m_cached_x.clear();
+    m_cached_y.clear();
+    m_cached_valid = false;
+
+    if (!m_source || m_source->size() <= 0) {
+        return;
+    }
+
+    const int source_size = m_source->size();
+
+    auto [start_idx, end_idx] = findVisibleRange(x_min, x_max);
+    if (start_idx >= end_idx) {
+        return;
+    }
+
+    const int visible_count = end_idx - start_idx;
+    if (visible_count <= m_target_points || visible_count < 3) {
+        m_cached_valid = false;
+        return;
+    }
+
+    minMaxLTTB(m_source->xRawData(), m_source->yRawData(), start_idx, end_idx, m_target_points);
+    m_cached_valid = !m_cached_x.empty();
 }
 
 
@@ -193,30 +221,22 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
     m_cached_x.reserve(target_points);
     m_cached_y.reserve(target_points);
 
-    // 预先获取所有X和Y值，避免重复计算和边界检查
-    std::vector< double > x_values(n);
-    std::vector< double > y_values(n);
-
-    // Y-only模式处理
-    const bool is_y_only = (x_data == nullptr);
-    const double x_start = is_y_only ? m_source->xStart() : 0.0;
-    const double x_scale = is_y_only ? m_source->xScale() : 1.0;
-
-    // 一次性获取所有数据
-    for (int i = 0; i < n; ++i) {
-        const int global_idx = start_idx + i;
-        y_values[ i ]        = y_data[ global_idx ];
-
-        if (is_y_only) {
-            x_values[ i ] = x_start + global_idx * x_scale;
-        } else {
-            x_values[ i ] = x_data[ global_idx ];
-        }
-    }
+    // Lambda getters: inline direct access, no temp vector allocation
+    auto getX = [&](int local_idx) -> double {
+        if (x_data)
+            return x_data[ start_idx + local_idx ];
+        const double scale = m_source->xScale();
+        if (std::fabs(scale) < 1e-12)
+            return m_source->xStart();
+        return m_source->xStart() + (start_idx + local_idx) * scale;
+    };
+    auto getY = [&](int local_idx) -> double {
+        return y_data[ start_idx + local_idx ];
+    };
 
     // 1. 保留第一个点
-    m_cached_x.push_back(x_values[ 0 ]);
-    m_cached_y.push_back(y_values[ 0 ]);
+    m_cached_x.push_back(getX(0));
+    m_cached_y.push_back(getY(0));
 
     // 2. 预计算每个桶的边界 - 整数计算替代浮点
     const int num_buckets = target_points - 2;
@@ -232,16 +252,17 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
     std::vector< int > candidate_indices;
     candidate_indices.reserve(max_candidates_per_bucket);
 
-    const int last_cached_index = 0;
-
     for (int bucket = 0; bucket < num_buckets; ++bucket) {
         // 计算桶边界 - 整数算法
         const int bucket_start = current_idx;
         const int extra        = (bucket < remainder) ? 1 : 0;
-        const int bucket_end   = bucket_start + bucket_size + extra;
+        int bucket_end         = bucket_start + bucket_size + extra;
 
-        if (bucket_end >= n || bucket_start >= bucket_end) {
-            break;
+        if (bucket_start >= n || bucket_start >= bucket_end) {
+            continue;
+        }
+        if (bucket_end > n) {
+            bucket_end = n;
         }
 
         // 计算桶大小
@@ -265,12 +286,12 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
 
             int max_idx    = sub_start;
             int min_idx    = sub_start;
-            double max_val = y_values[ sub_start ];
+            double max_val = getY(sub_start);
             double min_val = max_val;
 
             // 寻找子区间内的极值
             for (int j = sub_start + 1; j < sub_end; ++j) {
-                const double y = y_values[ j ];
+                const double y = getY(j);
                 if (std::isnan(y))
                     continue;
 
@@ -301,8 +322,8 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
         int valid_count = 0;
 
         for (int idx : candidate_indices) {
-            const double x = x_values[ idx ];
-            const double y = y_values[ idx ];
+            const double x = getX(idx);
+            const double y = getY(idx);
             if (!std::isnan(x) && !std::isnan(y)) {
                 avg_x += x;
                 avg_y += y;
@@ -315,8 +336,8 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
             avg_y /= valid_count;
         } else {
             // 回退到桶内第一个有效点
-            avg_x = x_values[ bucket_start - start_idx ];
-            avg_y = y_values[ bucket_start - start_idx ];
+            avg_x = getX(bucket_start);
+            avg_y = getY(bucket_start);
         }
 
         // 寻找最大三角形面积的候选点
@@ -326,8 +347,8 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
         int best_idx        = candidate_indices[ 0 ];
 
         for (int idx : candidate_indices) {
-            const double curr_x = x_values[ idx - start_idx ];
-            const double curr_y = y_values[ idx - start_idx ];
+            const double curr_x = getX(idx);
+            const double curr_y = getY(idx);
 
             if (std::isnan(curr_x) || std::isnan(curr_y))
                 continue;
@@ -346,16 +367,30 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
         }
 
         // 添加最佳点
-        m_cached_x.push_back(x_values[ best_idx - start_idx ]);
-        m_cached_y.push_back(y_values[ best_idx - start_idx ]);
+        m_cached_x.push_back(getX(best_idx));
+        m_cached_y.push_back(getY(best_idx));
 
         current_idx = bucket_end;
     }
 
     // 3. 保留最后一个点
     if (m_cached_x.size() < static_cast< size_t >(target_points)) {
-        m_cached_x.push_back(x_values[ n - 1 ]);
-        m_cached_y.push_back(y_values[ n - 1 ]);
+        m_cached_x.push_back(getX(n - 1));
+        m_cached_y.push_back(getY(n - 1));
+    }
+
+    // NaN pass-through: if all cached Y values are NaN, treat as degenerate → clear cache
+    bool all_y_nan = true;
+    for (size_t i = 0; i < m_cached_y.size(); ++i) {
+        if (!std::isnan(m_cached_y[ i ])) {
+            all_y_nan = false;
+            break;
+        }
+    }
+    if (all_y_nan) {
+        m_cached_x.clear();
+        m_cached_y.clear();
+        m_cached_valid = false;
     }
 }
 

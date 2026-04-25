@@ -1,4 +1,5 @@
 #include "QImPlotItemNode.h"
+#include <algorithm>
 #include "implot.h"
 #include "implot_internal.h"
 #include "QtImGuiUtils.h"
@@ -343,6 +344,24 @@ void QImPlotItemNode::setVisible(bool visible)
         // 此函数同步根节点的可见性状态，同时会触发信号
         QImAbstractNode::setVisible(visible);
     }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Calculate optimal target points from plot pixel width
+ * @param pixelWidth Plot width in pixels (from ImPlot::GetPlotSize().x)
+ * @return Clamped target point count: max(100, min(pixelWidth * kPixelToPointRatio, 10000))
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 根据绘图像素宽度计算最佳降采样目标点数
+ * @param pixelWidth 以像素为单位的绘图宽度（来自 ImPlot::GetPlotSize().x）
+ * @return 钳位后的目标点数：max(100, min(pixelWidth * kPixelToPointRatio, 10000))
+ * \endif
+ */
+int QImPlotItemNode::pixelAwareTargetPoints(int pixelWidth)
+{
+    return std::clamp(static_cast<int>(pixelWidth * kPixelToPointRatio), 100, 10000);
 }
 
 void QImPlotItemNode::endDraw()

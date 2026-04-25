@@ -96,6 +96,22 @@ public:
     //
     virtual bool isVisible() const override;
     virtual void setVisible(bool visible) override;
+
+    /**
+     * \if ENGLISH
+     * @brief Calculate optimal target points from plot pixel width
+     * @param pixelWidth Plot width in pixels (from ImPlot::GetPlotSize().x)
+     * @return Clamped target point count: max(100, min(pixelWidth * kPixelToPointRatio, 10000))
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 根据绘图像素宽度计算最佳降采样目标点数
+     * @param pixelWidth 以像素为单位的绘图宽度（来自 ImPlot::GetPlotSize().x）
+     * @return 钳位后的目标点数：max(100, min(pixelWidth * kPixelToPointRatio, 10000))
+     * \endif
+     */
+    static constexpr double kPixelToPointRatio = 1.5;
+    static int pixelAwareTargetPoints(int pixelWidth);
 Q_SIGNALS:
     /**
      * \if ENGLISH

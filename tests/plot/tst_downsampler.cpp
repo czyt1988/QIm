@@ -135,14 +135,12 @@ void TestDownsampler::testViewportRangePreservesEndpoints()
 {
     auto source = QImVectorXYDataSeries(makeXs(10000), makeYs(10000));
     QImMinMaxLTTBDownsampler downsampler(&source, 500, 4.0);
-    downsampler.downSampler();
+    downsampler.downSampler(2000.0, 8000.0);
 
-    // OPTIMIZED: with downSampler(2000.0, 8000.0), first x >= 2000
-    // CURRENT: downSampler() processes [0, 10000), first x = 0.0
+    // First x must be >= 2000 (viewport lower bound)
     QVERIFY(downsampler.xValue(0) >= 2000.0);
 
-    // OPTIMIZED: last x <= 8000
-    // CURRENT: last x = 9999.0
+    // Last x must be <= 8000 (viewport upper bound)
     QVERIFY(downsampler.xValue(downsampler.size() - 1) <= 8000.0);
 }
 
@@ -244,11 +242,11 @@ void TestDownsampler::testFindVisibleRangeXY()
     QCOMPARE(source.xValue(25), 250.0);
     QCOMPARE(source.xValue(76), 760.0);
 
-    // Create downsampler — without viewport filtering it includes ALL data
+    // Create downsampler with viewport filtering
     QImMinMaxLTTBDownsampler downsampler(&source, 50, 4.0);
+    downsampler.downSampler(250.0, 750.0);
 
-    // OPTIMIZED: viewport-aware downsampling should limit output to [250, 750]
-    // CURRENT: processes entire [0, 990] range
+    // All output points must be within [250, 750]
     bool allInRange = true;
     for (int i = 0; i < downsampler.size(); ++i) {
         const double xv = downsampler.xValue(i);
@@ -294,11 +292,11 @@ void TestDownsampler::testFindVisibleRangeYOnly()
     QCOMPARE(source.xValue(500), 500.0);
     QCOMPARE(source.xRawData(), nullptr);
 
-    // Create downsampler — without viewport filtering it includes ALL data
+    // Create downsampler with viewport filtering
     QImMinMaxLTTBDownsampler downsampler(&source, 100, 4.0);
+    downsampler.downSampler(200.0, 500.0);
 
-    // OPTIMIZED: viewport-aware downsampling should limit output to [200, 500]
-    // CURRENT: processes all 1000 data points
+    // All output points must be within [200, 500]
     bool allInRange = true;
     for (int i = 0; i < downsampler.size(); ++i) {
         const double xv = downsampler.xValue(i);

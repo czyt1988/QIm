@@ -1,6 +1,5 @@
 #include "QImPlotLineItemNode.h"
 #include "QImPlotDataSeries.h"
-#include "QImLTTBDownsampler.h"
 #include "QImMinMaxLTTBDownsampler.h"
 #include "implot.h"
 #include "implot_internal.h"
@@ -46,13 +45,8 @@ void QImPlotLineItemNode::PrivateData::resetDownSamplerData()
 {
     if (isAdaptiveSampling) {
         if (data && (data->size() > downsampleThreshold)) {
-#if 0
-            QImLTTBDownsampler* lttb = new QImLTTBDownsampler(data.get(), downsampleThreshold);
-            dataLTTB.reset(lttb);
-#else
             QImMinMaxLTTBDownsampler* lttb = new QImMinMaxLTTBDownsampler(data.get(), downsampleThreshold);
             dataLTTB.reset(lttb);
-#endif
         }
     } else {
         dataLTTB.reset(nullptr);

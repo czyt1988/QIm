@@ -175,6 +175,7 @@ public:
 
     // 根据目标点数更新数据，这个函数在目标点数变化，或原数据发生变化时调用，用于更新
     void downSampler();
+    void downSampler(double x_min, double x_max);
 
 private:
     // ===== 内部状态 =====
