@@ -12,3 +12,6 @@ set(CMAKE_AUTORCC ON)
 
 # Add plot3d test subdirectory
 add_subdirectory(plot3d)
+
+# Add plot test subdirectory
+add_subdirectory(plot)
