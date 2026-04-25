@@ -48,6 +48,9 @@ public:
     // 功能
     //===============================================================
     QImTrackedValue< bool > axesToFit { false };  ///< 是否需要自适应坐标轴，只需一次即可，因此使用QImTrackedValue
+    // 视口变化检测
+    ImPlotRect lastLimits;
+    bool firstFrame { true };
 };
 
 QImPlotNode::PrivateData::PrivateData(QImPlotNode* q) : q_ptr(q)
@@ -1153,6 +1156,21 @@ bool QImPlotNode::beginDraw()
     // 构建坐标轴
     d->renderAllAxis();
     ImPlot::SetupLegend(ImPlotLocation_East);
+    // 视口变化检测：比较当前ImPlot绘图范围与上次缓存的范围
+    {
+        ImPlotRect currentLimits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
+        auto rectsEqual = [](const ImPlotRect& a, const ImPlotRect& b, double eps = 1e-6) -> bool {
+            return std::fabs(a.X.Min - b.X.Min) < eps &&
+                   std::fabs(a.X.Max - b.X.Max) < eps &&
+                   std::fabs(a.Y.Min - b.Y.Min) < eps &&
+                   std::fabs(a.Y.Max - b.Y.Max) < eps;
+        };
+        if (d->firstFrame || !rectsEqual(currentLimits, d->lastLimits)) {
+            d->lastLimits = currentLimits;
+            d->firstFrame = false;
+            Q_EMIT plotLimitsChanged();
+        }
+    }
     return true;
 }
 

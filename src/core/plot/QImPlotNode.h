@@ -228,6 +228,22 @@ Q_SIGNALS:
      */
     void plotFlagChanged();
 
+    /**
+     * \if ENGLISH
+     * @brief Emitted when plot viewport limits change
+     * @details Triggered when the user pans or zooms the plot, causing the visible axis ranges
+     *          to change. Uses epsilon-based comparison to avoid false triggers from
+     *          floating-point jitter.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 绘图视口范围更改时触发
+     * @details 当用户平移或缩放绘图导致可见坐标轴范围更改时触发。
+     *          使用基于epsilon的比较避免浮点抖动引发误触发。
+     * \endif
+     */
+    void plotLimitsChanged();
+
 protected:
     bool beginDraw() override;
     void endDraw() override;
