@@ -32,7 +32,7 @@ public:
     ImPlotLineFlags lineFlags { ImPlotLineFlags_None };
     QImOptionalColor color;  ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
     QImTrackedValue< float > lineWidth { 1.0f };                                  ///< 线宽
-    bool isPlotItemVisible;
+    bool isPlotItemVisible { false };
 
     // Viewport-aware re-sampling state
     mutable std::optional<ImPlotRect> m_lastPlotLimits;
