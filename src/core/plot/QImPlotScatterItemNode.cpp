@@ -4,6 +4,8 @@
 #include "implot.h"
 #include "implot_internal.h"
 #include <QDebug>
+#include <cmath>
+#include <optional>
 
 namespace QIM
 {
@@ -24,7 +26,7 @@ class QImPlotScatterItemNode::PrivateData
     QIM_DECLARE_PUBLIC(QImPlotScatterItemNode)
 public:
     PrivateData(QImPlotScatterItemNode* p);
-    void resetDownSamplerData();
+    void resetDownSamplerData(double x_min = 0, double x_max = -1, int pixelWidth = 0);
     std::unique_ptr< QImAbstractXYDataSeries > data;
     std::unique_ptr< QImAbstractXYDataSeries > dataLTTB;
     bool isAdaptiveSampling { true };
@@ -35,6 +37,9 @@ public:
     QImTrackedValue< float > markerSize { 4.0f };                                 ///< 标记大小
     ImPlotScatterFlags scatterFlags { ImPlotScatterFlags_None };                   ///< 散点图标志位
     bool isPlotItemVisible;
+    // Viewport-aware re-sampling state
+    mutable std::optional<ImPlotRect> m_lastPlotLimits;
+    int m_lastPixelWidth = 0;
 };
 
 QImPlotScatterItemNode::PrivateData::PrivateData(QImPlotScatterItemNode* p) : q_ptr(p)
@@ -42,14 +47,23 @@ QImPlotScatterItemNode::PrivateData::PrivateData(QImPlotScatterItemNode* p) : q_
 }
 
 /**
- * @brief 重置降采样数据，在设置数据后或者
+ * @brief 重置降采样数据，在设置数据后或者视口变化时调用
+ * @param x_min 视口X轴下限（默认0，不传则不进行视口范围降采样）
+ * @param x_max 视口X轴上限（默认-1，≤0时不进行视口范围降采样）
+ * @param pixelWidth 绘图像素宽度（默认0，≤0时使用阈值作为目标点数）
  */
-void QImPlotScatterItemNode::PrivateData::resetDownSamplerData()
+void QImPlotScatterItemNode::PrivateData::resetDownSamplerData(double x_min, double x_max, int pixelWidth)
 {
     if (isAdaptiveSampling) {
         if (data && (data->size() > downsampleThreshold)) {
-            QImMinMaxLTTBDownsampler* lttb = new QImMinMaxLTTBDownsampler(data.get(), downsampleThreshold);
+            int effectiveTarget = pixelWidth > 0
+                ? QImPlotItemNode::pixelAwareTargetPoints(pixelWidth)
+                : downsampleThreshold;
+            auto* lttb = new QImMinMaxLTTBDownsampler(data.get(), effectiveTarget);
             dataLTTB.reset(lttb);
+            if (x_max > 0) {
+                lttb->downSampler(x_min, x_max);
+            }
         }
     } else {
         dataLTTB.reset(nullptr);
@@ -569,6 +583,30 @@ bool QImPlotScatterItemNode::beginDraw()
         return false;
     }
     QImAbstractXYDataSeries* series = d->data.get();
+
+    // Viewport-aware re-sampling for scatter data
+    if (d->isAdaptiveSampling && d->data && d->data->size() > d->downsampleThreshold) {
+        ImPlotRect currentLimits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
+        int currentPixelWidth = static_cast<int>(ImPlot::GetPlotSize().x);
+
+        auto rectsEqual = [](const ImPlotRect& a, const ImPlotRect& b, double eps = 1e-6) -> bool {
+            return std::fabs(a.X.Min - b.X.Min) < eps &&
+                   std::fabs(a.X.Max - b.X.Max) < eps &&
+                   std::fabs(a.Y.Min - b.Y.Min) < eps &&
+                   std::fabs(a.Y.Max - b.Y.Max) < eps;
+        };
+
+        bool needsResample = !d->m_lastPlotLimits.has_value()
+                          || !rectsEqual(currentLimits, *d->m_lastPlotLimits)
+                          || d->m_lastPixelWidth != currentPixelWidth;
+
+        if (needsResample) {
+            d->resetDownSamplerData(currentLimits.X.Min, currentLimits.X.Max, currentPixelWidth);
+            d->m_lastPlotLimits = currentLimits;
+            d->m_lastPixelWidth = currentPixelWidth;
+        }
+    }
+
     if (d->isAdaptiveSampling && d->dataLTTB) {
         series = d->dataLTTB.get();
     }
