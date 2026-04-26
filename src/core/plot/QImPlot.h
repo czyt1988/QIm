@@ -6,6 +6,39 @@ namespace QIM
 {
 /**
  * \if ENGLISH
+ * @brief Downsampling algorithm selection
+ * @details Defines available downsampling algorithms for large dataset rendering.
+ *          - None: No downsampling, render all data points
+ *          - LTTB: Largest-Triangle-Three-Buckets algorithm (balanced performance)
+ *          - MinMaxLTTB: MinMax-optimized LTTB (faster, suitable for >100K points)
+ *          - Auto: System auto-selects based on data size (default)
+ * @note The default value (Auto) uses heuristic: <10K points → no downsampling,
+ *       10K-100K → LTTB, >100K → MinMaxLTTB.
+ * @see QImLTTBDownsampler, QImMinMaxLTTBDownsampler
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 降采样算法选择
+ * @details 定义大数据量渲染时可选的降采样算法。
+ *          - None: 不降采样，渲染所有数据点
+ *          - LTTB: 最大三角形三桶算法（性能均衡）
+ *          - MinMaxLTTB: MinMax 优化的 LTTB（更快，适合 >10 万点场景）
+ *          - Auto: 系统根据数据量自动选择（默认）
+ * @note 默认值 Auto 的启发式规则：<1 万点 → 不降采样，
+ *       1 万-10 万 → LTTB，>10 万 → MinMaxLTTB。
+ * @see QImLTTBDownsampler, QImMinMaxLTTBDownsampler
+ * \endif
+ */
+enum class QImDownsampleAlgorithm
+{
+    None       = 0,  ///< No downsampling
+    LTTB,             ///< Largest-Triangle-Three-Buckets
+    MinMaxLTTB,       ///< MinMax-optimized LTTB
+    Auto              ///< System automatic selection (default)
+};
+
+/**
+ * \if ENGLISH
  * @brief Corresponds to ImAxis
  * \endif
  *
@@ -137,6 +170,7 @@ Q_DECLARE_METATYPE(QIM::QImPlotAxisId)
 Q_DECLARE_METATYPE(QIM::QImPlotScaleType)
 Q_DECLARE_METATYPE(QIM::QImPlotCondition)
 Q_DECLARE_METATYPE(QIM::QImPlotLegendLocation)
+Q_DECLARE_METATYPE(QIM::QImDownsampleAlgorithm)
 
 // ===== Helper macros =====
 #ifndef QIMPLOT_FLAG_ACCESSOR

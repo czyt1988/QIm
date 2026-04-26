@@ -2,6 +2,7 @@
 #define QIMPLOTLINEITEMNODE_H
 #include "QImPlotItemNode.h"
 #include "QImPlotDataSeries.h"
+#include "QImDownsamplingController.h"
 
 namespace QIM
 {
@@ -46,8 +47,11 @@ class QIM_CORE_API QImPlotLineItemNode : public QImPlotItemNode
     Q_PROPERTY(bool skipNaN READ isSkipNaN WRITE setSkipNaN NOTIFY lineFlagChanged)
     Q_PROPERTY(bool clippingEnabled READ isClippingEnabled WRITE setClippingEnabled NOTIFY lineFlagChanged)
     Q_PROPERTY(bool shaded READ isShaded WRITE setShaded NOTIFY lineFlagChanged)
-    // Downsample threshold for adaptive sampling
-    Q_PROPERTY(int downsampleThreshold READ downsampleThreshold WRITE setDownsampleThreshold)
+    // Downsampling
+    Q_PROPERTY(QImDownsampleAlgorithm downsampleAlgorithm READ downsampleAlgorithm
+               WRITE setDownsampleAlgorithm NOTIFY downsampleAlgorithmChanged)
+    Q_PROPERTY(int downsampleThreshold READ downsampleThreshold
+               WRITE setDownsampleThreshold NOTIFY downsampleThresholdChanged)
 public:
     QImPlotLineItemNode(QObject* par = nullptr);
     ~QImPlotLineItemNode();
@@ -99,12 +103,15 @@ public:
     void setColor(const QColor& c);
     QColor color() const;
     //===============================================================
-    // name
+    // Downsampling
     //===============================================================
-    void setAdaptivesSampling(bool on);
-    bool isAdaptiveSampling() const;
-
+    // Get the downsampling algorithm
+    QImDownsampleAlgorithm downsampleAlgorithm() const;
+    // Set the downsampling algorithm
+    void setDownsampleAlgorithm(QImDownsampleAlgorithm algo);
+    // Get the downsampling threshold
     int downsampleThreshold() const;
+    // Set the downsampling threshold
     void setDownsampleThreshold(int threshold);
 Q_SIGNALS:
     /**
@@ -121,6 +128,32 @@ Q_SIGNALS:
      * \endif
      */
     void lineFlagChanged();
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when downsample algorithm changes
+     * @param[in] algo The new algorithm value
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 降采样算法变更时发射
+     * @param[in] algo 新的算法值
+     * \endif
+     */
+    void downsampleAlgorithmChanged(QImDownsampleAlgorithm algo);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when downsample threshold changes
+     * @param[in] threshold The new threshold value
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 降采样阈值变更时发射
+     * @param[in] threshold 新的阈值
+     * \endif
+     */
+    void downsampleThresholdChanged(int threshold);
 
 protected:
     virtual bool beginDraw() override;

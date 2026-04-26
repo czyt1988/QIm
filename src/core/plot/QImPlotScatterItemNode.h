@@ -2,6 +2,7 @@
 #define QIMPLOTSCATTERITEMNODE_H
 #include "QImPlotItemNode.h"
 #include "QImPlotDataSeries.h"
+#include "QImDownsamplingController.h"
 
 namespace QIM
 {
@@ -67,10 +68,10 @@ class QIM_CORE_API QImPlotScatterItemNode : public QImPlotItemNode
     // Fill style for markers, true=filled false=outline only (READ isMarkerFill WRITE setMarkerFill NOTIFY markerFillChanged)
     Q_PROPERTY(bool markerFill READ isMarkerFill WRITE setMarkerFill NOTIFY markerFillChanged)
 
-    // Enable/disable adaptive sampling for large datasets (READ isAdaptiveSampling WRITE setAdaptiveSampling NOTIFY adaptiveSamplingChanged)
-    Q_PROPERTY(bool adaptiveSampling READ isAdaptiveSampling WRITE setAdaptiveSampling NOTIFY adaptiveSamplingChanged)
+    // Downsampling algorithm selection (READ downsampleAlgorithm WRITE setDownsampleAlgorithm NOTIFY downsampleAlgorithmChanged)
+    Q_PROPERTY(QImDownsampleAlgorithm downsampleAlgorithm READ downsampleAlgorithm WRITE setDownsampleAlgorithm NOTIFY downsampleAlgorithmChanged)
 
-    // Dataset size threshold for triggering adaptive sampling (READ downsampleThreshold WRITE setDownsampleThreshold NOTIFY downsampleThresholdChanged)
+    // Dataset size threshold for triggering downsampling (READ downsampleThreshold WRITE setDownsampleThreshold NOTIFY downsampleThresholdChanged)
     Q_PROPERTY(int downsampleThreshold READ downsampleThreshold WRITE setDownsampleThreshold NOTIFY downsampleThresholdChanged)
 
     // Color of scatter plot markers (READ color WRITE setColor NOTIFY colorChanged)
@@ -138,11 +139,11 @@ public:
     // Sets marker fill state
     void setMarkerFill(bool fill);
 
-    // Checks if adaptive sampling is enabled
-    bool isAdaptiveSampling() const;
+    // Gets the downsampling algorithm
+    QImDownsampleAlgorithm downsampleAlgorithm() const;
 
-    // Enables or disables adaptive sampling
-    void setAdaptiveSampling(bool enabled);
+    // Sets the downsampling algorithm
+    void setDownsampleAlgorithm(QImDownsampleAlgorithm algo);
 
     // Gets the downsample threshold
     int downsampleThreshold() const;
@@ -226,20 +227,16 @@ Q_SIGNALS:
 
     /**
      * \if ENGLISH
-     * @brief Emitted when adaptive sampling state changes
-     * @param[in] enabled New adaptive sampling state
-     * @details Triggered by setAdaptiveSampling() when value actually changes.
-     *          Connect to update UI elements or perform related actions.
+     * @brief Emitted when downsample algorithm changes
+     * @param[in] algo The new algorithm value
      * \endif
      *
      * \if CHINESE
-     * @brief 自适应采样状态更改时触发
-     * @param[in] enabled 新自适应采样状态
-     * @details 当值实际更改时由setAdaptiveSampling()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 降采样算法变更时发射
+     * @param[in] algo 新的算法值
      * \endif
      */
-    void adaptiveSamplingChanged(bool enabled);
+    void downsampleAlgorithmChanged(QImDownsampleAlgorithm algo);
 
     /**
      * \if ENGLISH

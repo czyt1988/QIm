@@ -1,6 +1,6 @@
 ﻿#include "QImPlotLineItemNode.h"
 #include "QImPlotDataSeries.h"
-#include "QImMinMaxLTTBDownsampler.h"
+#include "QImDownsamplingController.h"
 #include "implot.h"
 #include "implot_internal.h"
 #include <QDebug>
@@ -19,63 +19,22 @@ namespace QIM
 // ImPlotMarker_Plus   ->   ＋ 加号
 // ImPlotMarker_Asterisk   ->   ✻ 星形
 
-// Zoom detection thresholds for adaptive re-sampling
-static constexpr double kZoomInThreshold  = 0.67;  // X range shrinks below 67% → zoom-in > 33%
-static constexpr double kZoomOutThreshold = 1.5;   // X range expands above 150% → zoom-out > 50%
-static constexpr double kPixelChangeRatio = 0.1;   // Pixel width changes > 10%
-
 class QImPlotLineItemNode::PrivateData
 {
     QIM_DECLARE_PUBLIC(QImPlotLineItemNode)
 public:
     PrivateData(QImPlotLineItemNode* p);
-    void resetDownSamplerData(int pixelWidth = 0);
     std::unique_ptr< QImAbstractXYDataSeries > data;
-    std::unique_ptr< QImAbstractXYDataSeries > dataLTTB;
-    bool isAdaptiveSampling { true };
-    int downsampleThreshold { 20000 };
+    QImDownsamplingController m_sampling;
     ImPlotLineFlags lineFlags { ImPlotLineFlags_None };
     QImOptionalColor color;                       ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
     QImTrackedValue< float > lineWidth { 1.0f };  ///< 线宽
-
-    // Zoom-aware re-sampling state
-    double m_lastXRange { 0.0 };
-    int m_lastPixelWidth { 0 };
-    bool m_initialDownsampleDone { false };
 };
 
 QImPlotLineItemNode::PrivateData::PrivateData(QImPlotLineItemNode* p) : q_ptr(p)
 {
 }
 
-/**
- * @brief 重置降采样数据，始终对全量数据进行降采样
- * @param pixelWidth 绘图像素宽度（>0 时根据像素宽度计算目标点数，0 时使用阈值作为目标）
- */
-void QImPlotLineItemNode::PrivateData::resetDownSamplerData(int pixelWidth)
-{
-    if (!isAdaptiveSampling) {
-        dataLTTB.reset(nullptr);
-        return;
-    }
-    if (!data || data->size() <= downsampleThreshold) {
-        dataLTTB.reset(nullptr);
-        return;
-    }
-
-    int effectiveTarget = pixelWidth > 0 ? QImPlotItemNode::pixelAwareTargetPoints(pixelWidth) : downsampleThreshold;
-
-    if (dataLTTB) {
-        // 复用已有 downsampler 实例，仅更新目标点数
-        auto* lttb = static_cast< QImMinMaxLTTBDownsampler* >(dataLTTB.get());
-        lttb->setTargetPoints(effectiveTarget);
-    } else {
-        // 首次创建：autoDownsample=false，手动调用全量降采样
-        auto* lttb = new QImMinMaxLTTBDownsampler(data.get(), effectiveTarget, 4.0, false);
-        dataLTTB.reset(lttb);
-        lttb->downSampler();
-    }
-}
 //----------------------------------------------------
 // QImPlotLineItemNode
 //----------------------------------------------------
@@ -124,13 +83,8 @@ void QImPlotLineItemNode::setData(QImAbstractXYDataSeries* series)
 {
     QIM_D(d);
     d->data.reset(series);
-    d->dataLTTB.reset(nullptr);  // 数据源变更，必须销毁旧降采样器（避免悬空指针）
-    d->m_initialDownsampleDone = false;
-    d->m_lastXRange            = 0.0;
-    d->m_lastPixelWidth        = 0;
-    if (d->isAdaptiveSampling) {
-        d->resetDownSamplerData(0);
-    }
+    d->m_sampling.setSource(series);
+    d->m_sampling.invalidate();
 }
 
 /**
@@ -293,60 +247,93 @@ QColor QImPlotLineItemNode::color() const
 
 /**
  * \if ENGLISH
- * @brief Enables or disables adaptive sampling (LTTB downsampling)
- * @param[in] on true to enable adaptive sampling, false to disable
- * @details When enabled, large datasets are automatically downsampled using LTTB/MinMaxLTTB
- *          algorithm when size exceeds downsampleThreshold. Regenerates downsampled data on change.
+ * @brief Gets the downsampling algorithm
+ * @return Current downsampling algorithm
+ * @details Returns the current downsampling algorithm for this line plot.
+ *          Default is QImDownsampleAlgorithm::Auto.
  * \endif
  *
  * \if CHINESE
- * @brief 启用或禁用自适应采样（LTTB 降采样）
- * @param[in] on true 启用自适应采样，false 禁用
- * @details 启用时，大数据集在超过降采样阈值后自动使用 LTTB/MinMaxLTTB 算法降采样。
- *          值改变时重新生成降采样数据。
+ * @brief 获取降采样算法
+ * @return 当前降采样算法
+ * @details 返回此折线图的当前降采样算法。
+ *          默认为 QImDownsampleAlgorithm::Auto。
  * \endif
  */
-void QImPlotLineItemNode::setAdaptivesSampling(bool on)
+QImDownsampleAlgorithm QImPlotLineItemNode::downsampleAlgorithm() const
 {
-    QIM_D(d);
-    d->isAdaptiveSampling      = on;
-    d->m_initialDownsampleDone = false;
-    d->resetDownSamplerData(0);
+    QIM_DC(d);
+    return d->m_sampling.algorithm();
 }
 
 /**
  * \if ENGLISH
- * @brief Checks if adaptive sampling is enabled
- * @return true if adaptive sampling is enabled
- * @details Default is true (enabled). Adaptive sampling uses LTTB/MinMaxLTTB for large datasets.
+ * @brief Sets the downsampling algorithm
+ * @param[in] algo The new downsampling algorithm
+ * @details Updates the downsampling algorithm and triggers re-downsampling.
+ *          Emits downsampleAlgorithmChanged() signal if value changed.
  * \endif
  *
  * \if CHINESE
- * @brief 检查自适应采样是否启用
- * @return true 表示自适应采样启用
- * @details 默认为 true（启用）。自适应采样使用 LTTB/MinMaxLTTB 处理大数据集。
+ * @brief 设置降采样算法
+ * @param[in] algo 新的降采样算法
+ * @details 更新降采样算法并触发重新降采样。
+ *          如果值变更，触发 downsampleAlgorithmChanged() 信号。
  * \endif
  */
-bool QImPlotLineItemNode::isAdaptiveSampling() const
+void QImPlotLineItemNode::setDownsampleAlgorithm(QImDownsampleAlgorithm algo)
 {
-    QIM_DC(d);
-    return d->isAdaptiveSampling;
+    QIM_D(d);
+    QImDownsampleAlgorithm old = d->m_sampling.algorithm();
+    d->m_sampling.setAlgorithm(algo);
+    if (d->m_sampling.algorithm() != old) {
+        Q_EMIT downsampleAlgorithmChanged(d->m_sampling.algorithm());
+    }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the downsample threshold
+ * @return Current downsample threshold in data points
+ * @details Returns the dataset size threshold for triggering downsampling.
+ *          Default is 20000 points.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取降采样阈值
+ * @return 当前降采样阈值（数据点）
+ * @details 返回触发降采样的数据集大小阈值。
+ *          默认为 20000 点。
+ * \endif
+ */
 int QImPlotLineItemNode::downsampleThreshold() const
 {
     QIM_DC(d);
-    return d->downsampleThreshold;
+    return d->m_sampling.threshold();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the downsample threshold
+ * @param[in] threshold New downsample threshold in data points (min: 100)
+ * @details Updates downsample threshold and triggers re-downsampling if needed.
+ *          Emits downsampleThresholdChanged() signal if value changed.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置降采样阈值
+ * @param[in] threshold 新降采样阈值（数据点，最小 100）
+ * @details 更新降采样阈值，如果需要则触发重新降采样。
+ *          如果值变更，触发 downsampleThresholdChanged() 信号。
+ * \endif
+ */
 void QImPlotLineItemNode::setDownsampleThreshold(int threshold)
 {
     QIM_D(d);
-    int clamped = std::max(threshold, 100);
-    if (clamped != d->downsampleThreshold) {
-        d->downsampleThreshold     = clamped;
-        d->m_initialDownsampleDone = false;
-        d->resetDownSamplerData(0);
+    int old = d->m_sampling.threshold();
+    d->m_sampling.setThreshold(threshold);
+    if (d->m_sampling.threshold() != old) {
+        Q_EMIT downsampleThresholdChanged(d->m_sampling.threshold());
     }
 }
 
@@ -507,52 +494,13 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
     }
     QImAbstractXYDataSeries* series = d->data.get();
 
-    // Zoom-aware re-sampling: only re-downsample on significant zoom, skip pans
-    if (d->isAdaptiveSampling && d->data && d->data->size() > d->downsampleThreshold) {
-        int currentPixelWidth = static_cast< int >(ImPlot::GetPlotSize().x);
-
-        if (!d->m_initialDownsampleDone) {
-            // 首帧初始化：获取实际像素宽度后用精确目标点数重新降采样
-            d->resetDownSamplerData(currentPixelWidth);
-            ImPlotRect limits          = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
-            d->m_lastXRange            = limits.X.Max - limits.X.Min;
-            d->m_lastPixelWidth        = currentPixelWidth;
-            d->m_initialDownsampleDone = true;
-        } else {
-            // 后续帧：检测缩放和窗口大小变化
-            ImPlotRect currentLimits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
-            double currentXRange     = currentLimits.X.Max - currentLimits.X.Min;
-
-            bool needsResample = false;
-
-            // 缩放检测：X轴范围比率
-            if (d->m_lastXRange > 1e-15) {
-                double zoomRatio = currentXRange / d->m_lastXRange;
-                if (zoomRatio > kZoomOutThreshold || zoomRatio < kZoomInThreshold) {
-                    needsResample = true;
-                }
-            } else {
-                needsResample = true;
-            }
-
-            // 像素宽度变化检测
-            if (!needsResample && d->m_lastPixelWidth > 0) {
-                double pixelDelta = std::abs(currentPixelWidth - d->m_lastPixelWidth);
-                if (pixelDelta > d->m_lastPixelWidth * kPixelChangeRatio) {
-                    needsResample = true;
-                }
-            }
-
-            if (needsResample) {
-                d->resetDownSamplerData(currentPixelWidth);
-                d->m_lastXRange     = currentXRange;
-                d->m_lastPixelWidth = currentPixelWidth;
-            }
-        }
-    }
-
-    if (d->isAdaptiveSampling && d->dataLTTB) {
-        series = d->dataLTTB.get();
+    // Adaptive downsampling: resolve data series via controller
+    if (d->m_sampling.algorithm() != QImDownsampleAlgorithm::None && d->data && d->data->size() > d->m_sampling.threshold()) {
+        ImPlotRect limits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
+        int pixelWidth    = static_cast<int>(ImPlot::GetPlotSize().x);
+        series = d->m_sampling.resolve(pixelWidth, limits.X.Min, limits.X.Max);
+    } else {
+        series = d->data.get();
     }
     if (!series) {
         return false;
