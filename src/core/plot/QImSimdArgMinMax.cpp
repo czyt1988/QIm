@@ -1,5 +1,6 @@
 #include "QImSimdArgMinMax.h"
 #include <cfloat>
+#include <cmath>
 #include <cstddef>
 
 // Platform-specific intrinsics headers
@@ -227,7 +228,15 @@ ArgMinMaxResult simdArgMinMax(const double* data, int count)
         default:    return argMinMaxScalar;
         }
     }();
-    return kFn(data, count);
+    auto result = kFn(data, count);
+
+    // IEEE 754: min(NaN,x) / max(NaN,x) propagate NaN on x86.
+    // When all input values are NaN, SIMD paths produce NaN results.
+    // Return canonical sentinel: {0, 0, DBL_MAX, -DBL_MAX}
+    if (std::isnan(result.min_val) || std::isnan(result.max_val))
+        return {0, 0, DBL_MAX, -DBL_MAX};
+
+    return result;
 }
 
 }  // namespace QIM
