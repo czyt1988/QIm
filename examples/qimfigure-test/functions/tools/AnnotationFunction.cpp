@@ -89,6 +89,83 @@ AnnotationFunction::AnnotationFunction(QObject* parent)
     clampReg.propertyName = "clamp";
     clampReg.target = this;
     registerProperty(clampReg);
+    
+    // Register annotation X position property
+    PropertyRegistration annotationXReg;
+    annotationXReg.category = tr("Annotation");
+    annotationXReg.subcategory = tr("Position");
+    annotationXReg.displayName = tr("X");
+    annotationXReg.briefDesc = tr("Annotation X position");
+    annotationXReg.detailDesc = tr("Sets the X coordinate of the annotation position in plot space");
+    annotationXReg.editorType = EditorType::DoubleSpinBox;
+    annotationXReg.defaultValue = m_annotationX;
+    annotationXReg.minValue = -100.0;
+    annotationXReg.maxValue = 100.0;
+    annotationXReg.stepValue = 0.1;
+    annotationXReg.propertyName = "annotationX";
+    annotationXReg.target = this;
+    registerProperty(annotationXReg);
+    
+    // Register annotation Y position property
+    PropertyRegistration annotationYReg;
+    annotationYReg.category = tr("Annotation");
+    annotationYReg.subcategory = tr("Position");
+    annotationYReg.displayName = tr("Y");
+    annotationYReg.briefDesc = tr("Annotation Y position");
+    annotationYReg.detailDesc = tr("Sets the Y coordinate of the annotation position in plot space");
+    annotationYReg.editorType = EditorType::DoubleSpinBox;
+    annotationYReg.defaultValue = m_annotationY;
+    annotationYReg.minValue = -100.0;
+    annotationYReg.maxValue = 100.0;
+    annotationYReg.stepValue = 0.1;
+    annotationYReg.propertyName = "annotationY";
+    annotationYReg.target = this;
+    registerProperty(annotationYReg);
+    
+    // Register pixel offset X property
+    PropertyRegistration pixelOffsetXReg;
+    pixelOffsetXReg.category = tr("Annotation");
+    pixelOffsetXReg.subcategory = tr("Offset");
+    pixelOffsetXReg.displayName = tr("X Offset");
+    pixelOffsetXReg.briefDesc = tr("Pixel offset X");
+    pixelOffsetXReg.detailDesc = tr("Sets the horizontal pixel offset from the annotation position");
+    pixelOffsetXReg.editorType = EditorType::DoubleSpinBox;
+    pixelOffsetXReg.defaultValue = m_pixelOffsetX;
+    pixelOffsetXReg.minValue = -500.0;
+    pixelOffsetXReg.maxValue = 500.0;
+    pixelOffsetXReg.stepValue = 1.0;
+    pixelOffsetXReg.propertyName = "pixelOffsetX";
+    pixelOffsetXReg.target = this;
+    registerProperty(pixelOffsetXReg);
+    
+    // Register pixel offset Y property
+    PropertyRegistration pixelOffsetYReg;
+    pixelOffsetYReg.category = tr("Annotation");
+    pixelOffsetYReg.subcategory = tr("Offset");
+    pixelOffsetYReg.displayName = tr("Y Offset");
+    pixelOffsetYReg.briefDesc = tr("Pixel offset Y");
+    pixelOffsetYReg.detailDesc = tr("Sets the vertical pixel offset from the annotation position");
+    pixelOffsetYReg.editorType = EditorType::DoubleSpinBox;
+    pixelOffsetYReg.defaultValue = m_pixelOffsetY;
+    pixelOffsetYReg.minValue = -500.0;
+    pixelOffsetYReg.maxValue = 500.0;
+    pixelOffsetYReg.stepValue = 1.0;
+    pixelOffsetYReg.propertyName = "pixelOffsetY";
+    pixelOffsetYReg.target = this;
+    registerProperty(pixelOffsetYReg);
+    
+    // Register annotation round property
+    PropertyRegistration annotationRoundReg;
+    annotationRoundReg.category = tr("Annotation");
+    annotationRoundReg.subcategory = tr("Style");
+    annotationRoundReg.displayName = tr("Round");
+    annotationRoundReg.briefDesc = tr("Round position to integer pixels");
+    annotationRoundReg.detailDesc = tr("When enabled, the annotation position is rounded to integer pixel coordinates");
+    annotationRoundReg.editorType = EditorType::CheckBox;
+    annotationRoundReg.defaultValue = m_annotationRound;
+    annotationRoundReg.propertyName = "annotationRound";
+    annotationRoundReg.target = this;
+    registerProperty(annotationRoundReg);
 }
 
 /**
@@ -186,7 +263,7 @@ void AnnotationFunction::setTitle(const QString& title)
 {
     if (m_title != title) {
         m_title = title;
-        emit titleChanged(title);
+        Q_EMIT titleChanged(title);
         if (m_plotNode) {
             m_plotNode->setTitle(title);
         }
@@ -197,7 +274,7 @@ void AnnotationFunction::setAnnotationText(const QString& text)
 {
     if (m_annotationText != text) {
         m_annotationText = text;
-        emit annotationTextChanged(text);
+        Q_EMIT annotationTextChanged(text);
         if (m_annotationNode) {
             m_annotationNode->setText(text);
         }
@@ -208,7 +285,7 @@ void AnnotationFunction::setAnnotationColor(const QColor& color)
 {
     if (m_annotationColor != color) {
         m_annotationColor = color;
-        emit annotationColorChanged(color);
+        Q_EMIT annotationColorChanged(color);
         if (m_annotationNode) {
             m_annotationNode->setColor(color);
         }
@@ -219,9 +296,64 @@ void AnnotationFunction::setClamp(bool enabled)
 {
     if (m_clamp != enabled) {
         m_clamp = enabled;
-        emit clampChanged(enabled);
+        Q_EMIT clampChanged(enabled);
         if (m_annotationNode) {
             m_annotationNode->setClamp(enabled);
+        }
+    }
+}
+
+void AnnotationFunction::setAnnotationX(double x)
+{
+    if (m_annotationX != x) {
+        m_annotationX = x;
+        Q_EMIT annotationPositionChanged();
+        if (m_annotationNode) {
+            m_annotationNode->setPosition(QPointF(m_annotationX, m_annotationY));
+        }
+    }
+}
+
+void AnnotationFunction::setAnnotationY(double y)
+{
+    if (m_annotationY != y) {
+        m_annotationY = y;
+        Q_EMIT annotationPositionChanged();
+        if (m_annotationNode) {
+            m_annotationNode->setPosition(QPointF(m_annotationX, m_annotationY));
+        }
+    }
+}
+
+void AnnotationFunction::setPixelOffsetX(double x)
+{
+    if (m_pixelOffsetX != x) {
+        m_pixelOffsetX = x;
+        Q_EMIT annotationPixelOffsetChanged();
+        if (m_annotationNode) {
+            m_annotationNode->setPixelOffset(QPointF(m_pixelOffsetX, m_pixelOffsetY));
+        }
+    }
+}
+
+void AnnotationFunction::setPixelOffsetY(double y)
+{
+    if (m_pixelOffsetY != y) {
+        m_pixelOffsetY = y;
+        Q_EMIT annotationPixelOffsetChanged();
+        if (m_annotationNode) {
+            m_annotationNode->setPixelOffset(QPointF(m_pixelOffsetX, m_pixelOffsetY));
+        }
+    }
+}
+
+void AnnotationFunction::setAnnotationRound(bool enabled)
+{
+    if (m_annotationRound != enabled) {
+        m_annotationRound = enabled;
+        Q_EMIT annotationRoundChanged(enabled);
+        if (m_annotationNode) {
+            m_annotationNode->setRound(enabled);
         }
     }
 }

@@ -73,6 +73,7 @@ class InfLinesFunction : public TestFunction {
     Q_PROPERTY(QColor horizontalInfLinesColor READ horizontalInfLinesColor WRITE setHorizontalInfLinesColor NOTIFY horizontalInfLinesColorChanged)
     Q_PROPERTY(QVector<double> verticalValues READ verticalValues WRITE setVerticalValues NOTIFY verticalValuesChanged)
     Q_PROPERTY(QVector<double> horizontalValues READ horizontalValues WRITE setHorizontalValues NOTIFY horizontalValuesChanged)
+    Q_PROPERTY(bool horizontal READ isHorizontal WRITE setHorizontal NOTIFY horizontalChanged)
     
 public:
     /**
@@ -143,6 +144,10 @@ public:
     // Horizontal values property accessors
     QVector<double> horizontalValues() const { return m_horizontalValues; }
     void setHorizontalValues(const QVector<double>& values);
+    
+    // Horizontal orientation property accessors
+    bool isHorizontal() const { return m_horizontal; }
+    void setHorizontal(bool enabled);
     
 Q_SIGNALS:
     /**
@@ -249,6 +254,19 @@ Q_SIGNALS:
      */
     void horizontalValuesChanged(const QVector<double>& values);
     
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when horizontal orientation changes
+     * @param enabled New horizontal orientation state
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 水平方向改变时发出的信号
+     * @param enabled 新的水平方向状态
+     * \endif
+     */
+    void horizontalChanged(bool enabled);
+    
 private:
     QString m_title = QStringLiteral("Infinite Lines Plot");
     QString m_xLabel = QStringLiteral("x");
@@ -258,6 +276,7 @@ private:
     QColor m_horizontalInfLinesColor = Qt::darkGreen;
     QVector<double> m_verticalValues = {1.0, 3.0, 5.0, 7.0};
     QVector<double> m_horizontalValues = {-3.0, 0.0, 3.0};
+    bool m_horizontal = false;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotLineItemNode* m_lineNode = nullptr;

@@ -4,7 +4,9 @@
 #include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
+#include <QSizeF>
 #include <QPointer>
+#include "plot3d/QImPlot3D.h"
 
 namespace QIM {
 class QImFigureWidget;
@@ -60,13 +62,54 @@ class QImPlot3DScatterItemNode;
 class Plot3DScatterFunction : public TestFunction {
     Q_OBJECT
     
+    // Existing properties
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(QString xLabel READ xLabel WRITE setXLabel NOTIFY xLabelChanged)
     Q_PROPERTY(QString yLabel READ yLabel WRITE setYLabel NOTIFY yLabelChanged)
     Q_PROPERTY(QString zLabel READ zLabel WRITE setZLabel NOTIFY zLabelChanged)
     Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged)
     Q_PROPERTY(int markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
-    Q_PROPERTY(QColor markerColor READ markerColor WRITE setMarkerColor NOTIFY markerColorChanged)
+    Q_PROPERTY(QColor markerFillColor READ markerFillColor WRITE setMarkerFillColor NOTIFY markerFillColorChanged)
+
+    // QImPlot3DNode - Size properties
+    Q_PROPERTY(double plotWidth READ plotWidth WRITE setPlotWidth NOTIFY plotWidthChanged)
+    Q_PROPERTY(double plotHeight READ plotHeight WRITE setPlotHeight NOTIFY plotHeightChanged)
+    Q_PROPERTY(bool autoSize READ isAutoSize WRITE setAutoSize NOTIFY autoSizeChanged)
+
+    // QImPlot3DNode - Flags (NoXxx -> xxxEnabled)
+    Q_PROPERTY(bool titleEnabled READ isTitleEnabled WRITE setTitleEnabled NOTIFY titleEnabledChanged)
+    Q_PROPERTY(bool legendEnabled READ isLegendEnabled WRITE setLegendEnabled NOTIFY legendEnabledChanged)
+    Q_PROPERTY(bool mouseTextEnabled READ isMouseTextEnabled WRITE setMouseTextEnabled NOTIFY mouseTextEnabledChanged)
+    Q_PROPERTY(bool clipEnabled READ isClipEnabled WRITE setClipEnabled NOTIFY clipEnabledChanged)
+    Q_PROPERTY(bool menusEnabled READ isMenusEnabled WRITE setMenusEnabled NOTIFY menusEnabledChanged)
+    Q_PROPERTY(bool rotateEnabled READ isRotateEnabled WRITE setRotateEnabled NOTIFY rotateEnabledChanged)
+    Q_PROPERTY(bool panEnabled READ isPanEnabled WRITE setPanEnabled NOTIFY panEnabledChanged)
+    Q_PROPERTY(bool zoomEnabled READ isZoomEnabled WRITE setZoomEnabled NOTIFY zoomEnabledChanged)
+    Q_PROPERTY(bool inputsEnabled READ isInputsEnabled WRITE setInputsEnabled NOTIFY inputsEnabledChanged)
+    Q_PROPERTY(bool equal READ isEqual WRITE setEqual NOTIFY equalChanged)
+    Q_PROPERTY(bool canvasEnabled READ isCanvasEnabled WRITE setCanvasEnabled NOTIFY canvasEnabledChanged)
+
+    // QImPlot3DNode - Legend configuration
+    Q_PROPERTY(int legendLocation READ legendLocation WRITE setLegendLocation NOTIFY legendLocationChanged)
+    Q_PROPERTY(int legendFlags READ legendFlags WRITE setLegendFlags NOTIFY legendFlagsChanged)
+
+    // QImPlot3DAxisInfo - X axis properties
+    Q_PROPERTY(double xAxisMinLimit READ xAxisMinLimit WRITE setXAxisMinLimit NOTIFY xAxisMinLimitChanged)
+    Q_PROPERTY(double xAxisMaxLimit READ xAxisMaxLimit WRITE setXAxisMaxLimit NOTIFY xAxisMaxLimitChanged)
+    Q_PROPERTY(bool xAxisLabelEnabled READ isXAxisLabelEnabled WRITE setXAxisLabelEnabled NOTIFY xAxisLabelEnabledChanged)
+    Q_PROPERTY(bool xAxisGridLinesEnabled READ isXAxisGridLinesEnabled WRITE setXAxisGridLinesEnabled NOTIFY xAxisGridLinesEnabledChanged)
+    Q_PROPERTY(bool xAxisTickMarksEnabled READ isXAxisTickMarksEnabled WRITE setXAxisTickMarksEnabled NOTIFY xAxisTickMarksEnabledChanged)
+    Q_PROPERTY(bool xAxisTickLabelsEnabled READ isXAxisTickLabelsEnabled WRITE setXAxisTickLabelsEnabled NOTIFY xAxisTickLabelsEnabledChanged)
+    Q_PROPERTY(bool xAxisLockMin READ isXAxisLockMin WRITE setXAxisLockMin NOTIFY xAxisLockMinChanged)
+    Q_PROPERTY(bool xAxisLockMax READ isXAxisLockMax WRITE setXAxisLockMax NOTIFY xAxisLockMaxChanged)
+    Q_PROPERTY(bool xAxisAutoFit READ isXAxisAutoFit WRITE setXAxisAutoFit NOTIFY xAxisAutoFitChanged)
+    Q_PROPERTY(bool xAxisInvert READ isXAxisInvert WRITE setXAxisInvert NOTIFY xAxisInvertChanged)
+    Q_PROPERTY(bool xAxisDecorationsEnabled READ isXAxisDecorationsEnabled WRITE setXAxisDecorationsEnabled NOTIFY xAxisDecorationsEnabledChanged)
+    Q_PROPERTY(int xAxisScale READ xAxisScale WRITE setXAxisScale NOTIFY xAxisScaleChanged)
+
+    // QImPlot3DScatterItemNode - Additional marker properties
+    Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
+    Q_PROPERTY(float markerWeight READ markerWeight WRITE setMarkerWeight NOTIFY markerWeightChanged)
     
 public:
     /**
@@ -141,9 +184,81 @@ public:
     int markerShape() const { return m_markerShape; }
     void setMarkerShape(int shape);
     
-    // Marker color property accessors
-    QColor markerColor() const { return m_markerColor; }
-    void setMarkerColor(const QColor& color);
+    // Marker fill color property accessors (renamed from markerColor to match underlying API)
+    QColor markerFillColor() const { return m_markerFillColor; }
+    void setMarkerFillColor(const QColor& color);
+
+    // Marker outline color property accessors
+    QColor markerOutlineColor() const { return m_markerOutlineColor; }
+    void setMarkerOutlineColor(const QColor& color);
+
+    // Marker weight property accessors
+    float markerWeight() const { return m_markerWeight; }
+    void setMarkerWeight(float weight);
+
+    // QImPlot3DNode - Size property accessors
+    double plotWidth() const { return m_plotWidth; }
+    void setPlotWidth(double width);
+    double plotHeight() const { return m_plotHeight; }
+    void setPlotHeight(double height);
+    bool isAutoSize() const { return m_autoSize; }
+    void setAutoSize(bool enabled);
+
+    // QImPlot3DNode - Flags property accessors
+    bool isTitleEnabled() const { return m_titleEnabled; }
+    void setTitleEnabled(bool enabled);
+    bool isLegendEnabled() const { return m_legendEnabled; }
+    void setLegendEnabled(bool enabled);
+    bool isMouseTextEnabled() const { return m_mouseTextEnabled; }
+    void setMouseTextEnabled(bool enabled);
+    bool isClipEnabled() const { return m_clipEnabled; }
+    void setClipEnabled(bool enabled);
+    bool isMenusEnabled() const { return m_menusEnabled; }
+    void setMenusEnabled(bool enabled);
+    bool isRotateEnabled() const { return m_rotateEnabled; }
+    void setRotateEnabled(bool enabled);
+    bool isPanEnabled() const { return m_panEnabled; }
+    void setPanEnabled(bool enabled);
+    bool isZoomEnabled() const { return m_zoomEnabled; }
+    void setZoomEnabled(bool enabled);
+    bool isInputsEnabled() const { return m_inputsEnabled; }
+    void setInputsEnabled(bool enabled);
+    bool isEqual() const { return m_equal; }
+    void setEqual(bool on);
+    bool isCanvasEnabled() const { return m_canvasEnabled; }
+    void setCanvasEnabled(bool enabled);
+
+    // QImPlot3DNode - Legend configuration accessors
+    int legendLocation() const { return m_legendLocation; }
+    void setLegendLocation(int location);
+    int legendFlags() const { return m_legendFlags; }
+    void setLegendFlags(int flags);
+
+    // QImPlot3DAxisInfo - X axis property accessors
+    double xAxisMinLimit() const { return m_xAxisMinLimit; }
+    void setXAxisMinLimit(double min);
+    double xAxisMaxLimit() const { return m_xAxisMaxLimit; }
+    void setXAxisMaxLimit(double max);
+    bool isXAxisLabelEnabled() const { return m_xAxisLabelEnabled; }
+    void setXAxisLabelEnabled(bool enabled);
+    bool isXAxisGridLinesEnabled() const { return m_xAxisGridLinesEnabled; }
+    void setXAxisGridLinesEnabled(bool enabled);
+    bool isXAxisTickMarksEnabled() const { return m_xAxisTickMarksEnabled; }
+    void setXAxisTickMarksEnabled(bool enabled);
+    bool isXAxisTickLabelsEnabled() const { return m_xAxisTickLabelsEnabled; }
+    void setXAxisTickLabelsEnabled(bool enabled);
+    bool isXAxisLockMin() const { return m_xAxisLockMin; }
+    void setXAxisLockMin(bool on);
+    bool isXAxisLockMax() const { return m_xAxisLockMax; }
+    void setXAxisLockMax(bool on);
+    bool isXAxisAutoFit() const { return m_xAxisAutoFit; }
+    void setXAxisAutoFit(bool on);
+    bool isXAxisInvert() const { return m_xAxisInvert; }
+    void setXAxisInvert(bool on);
+    bool isXAxisDecorationsEnabled() const { return m_xAxisDecorationsEnabled; }
+    void setXAxisDecorationsEnabled(bool enabled);
+    int xAxisScale() const { return m_xAxisScale; }
+    void setXAxisScale(int scale);
     
 Q_SIGNALS:
     /**
@@ -226,16 +341,78 @@ Q_SIGNALS:
     
     /**
      * \if ENGLISH
-     * @brief Signal emitted when marker color changes
-     * @param color New marker color value
+     * @brief Signal emitted when marker fill color changes
+     * @param color New marker fill color value
      * \endif
      * 
      * \if CHINESE
-     * @brief 标记颜色改变时发出的信号
-     * @param color 新的标记颜色值
+     * @brief 标记填充颜色改变时发出的信号
+     * @param color 新的标记填充颜色值
      * \endif
      */
-    void markerColorChanged(const QColor& color);
+    void markerFillColorChanged(const QColor& color);
+
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when marker outline color changes
+     * @param color New marker outline color value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 标记描边颜色改变时发出的信号
+     * @param color 新的标记描边颜色值
+     * \endif
+     */
+    void markerOutlineColorChanged(const QColor& color);
+
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when marker weight changes
+     * @param weight New marker weight value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 标记描边粗细改变时发出的信号
+     * @param weight 新的标记描边粗细值
+     * \endif
+     */
+    void markerWeightChanged(float weight);
+
+    // QImPlot3DNode - Size signals
+    void plotWidthChanged(double width);
+    void plotHeightChanged(double height);
+    void autoSizeChanged(bool enabled);
+
+    // QImPlot3DNode - Flags signals
+    void titleEnabledChanged(bool enabled);
+    void legendEnabledChanged(bool enabled);
+    void mouseTextEnabledChanged(bool enabled);
+    void clipEnabledChanged(bool enabled);
+    void menusEnabledChanged(bool enabled);
+    void rotateEnabledChanged(bool enabled);
+    void panEnabledChanged(bool enabled);
+    void zoomEnabledChanged(bool enabled);
+    void inputsEnabledChanged(bool enabled);
+    void equalChanged(bool on);
+    void canvasEnabledChanged(bool enabled);
+
+    // QImPlot3DNode - Legend configuration signals
+    void legendLocationChanged(int location);
+    void legendFlagsChanged(int flags);
+
+    // QImPlot3DAxisInfo - X axis signals
+    void xAxisMinLimitChanged(double min);
+    void xAxisMaxLimitChanged(double max);
+    void xAxisLabelEnabledChanged(bool enabled);
+    void xAxisGridLinesEnabledChanged(bool enabled);
+    void xAxisTickMarksEnabledChanged(bool enabled);
+    void xAxisTickLabelsEnabledChanged(bool enabled);
+    void xAxisLockMinChanged(bool on);
+    void xAxisLockMaxChanged(bool on);
+    void xAxisAutoFitChanged(bool on);
+    void xAxisInvertChanged(bool on);
+    void xAxisDecorationsEnabledChanged(bool enabled);
+    void xAxisScaleChanged(int scale);
     
 private:
     QString m_title = QStringLiteral("3D Scatter Plot");
@@ -244,7 +421,45 @@ private:
     QString m_zLabel = QStringLiteral("Z");
     float m_markerSize = 4.0f;
     int m_markerShape = 0;  // QImPlot3DMarkerShape::Circle
-    QColor m_markerColor = Qt::blue;
+    QColor m_markerFillColor = Qt::blue;
+    QColor m_markerOutlineColor = QColor(120, 45, 10);
+    float m_markerWeight = 1.0f;
+
+    // QImPlot3DNode - Size members
+    double m_plotWidth = 400.0;
+    double m_plotHeight = 400.0;
+    bool m_autoSize = true;
+
+    // QImPlot3DNode - Flags members
+    bool m_titleEnabled = true;
+    bool m_legendEnabled = true;
+    bool m_mouseTextEnabled = true;
+    bool m_clipEnabled = true;
+    bool m_menusEnabled = true;
+    bool m_rotateEnabled = true;
+    bool m_panEnabled = true;
+    bool m_zoomEnabled = true;
+    bool m_inputsEnabled = true;
+    bool m_equal = false;
+    bool m_canvasEnabled = true;
+
+    // QImPlot3DNode - Legend configuration members
+    int m_legendLocation = static_cast<int>(QIM::QImPlot3DLocation::NorthWest);
+    int m_legendFlags = 0;
+
+    // QImPlot3DAxisInfo - X axis members
+    double m_xAxisMinLimit = 0.0;
+    double m_xAxisMaxLimit = 1.0;
+    bool m_xAxisLabelEnabled = true;
+    bool m_xAxisGridLinesEnabled = true;
+    bool m_xAxisTickMarksEnabled = true;
+    bool m_xAxisTickLabelsEnabled = true;
+    bool m_xAxisLockMin = false;
+    bool m_xAxisLockMax = false;
+    bool m_xAxisAutoFit = true;
+    bool m_xAxisInvert = false;
+    bool m_xAxisDecorationsEnabled = true;
+    int m_xAxisScale = static_cast<int>(QIM::QImPlot3DScaleType::Linear);
     
     QPointer<QIM::QImPlot3DNode> m_plot3DNode = nullptr;
     QPointer<QIM::QImPlot3DScatterItemNode> m_scatter3DNode = nullptr;

@@ -22,6 +22,13 @@
  * - "Plot"/"Axis"/"Y Label" - Y axis label
  * - "Line"/"Style"/"Color" - Line color
  * - "Line"/"Style"/"Label" - Line label
+ * - "Line"/"Flags"/"Segments" - Segments mode
+ * - "Line"/"Flags"/"Loop" - Loop mode
+ * - "Line"/"Flags"/"Skip NaN" - Skip NaN points
+ * - "Line"/"Flags"/"Clipping Enabled" - Clip line at plot edges
+ * - "Line"/"Flags"/"Shaded" - Shaded fill under line
+ * - "Line"/"Downsampling"/"Algorithm" - Downsampling algorithm
+ * - "Line"/"Downsampling"/"Threshold" - Downsampling threshold
  * \endif
  * 
  * \if CHINESE
@@ -34,6 +41,13 @@
  * - "Plot"/"Axis"/"Y Label" - Y 轴标签
  * - "Line"/"Style"/"Color" - 线条颜色
  * - "Line"/"Style"/"Label" - 线条标签
+ * - "Line"/"Flags"/"Segments" - 分段模式
+ * - "Line"/"Flags"/"Loop" - 循环模式
+ * - "Line"/"Flags"/"Skip NaN" - 跳过NaN点
+ * - "Line"/"Flags"/"Clipping Enabled" - 裁剪线条于图表边缘
+ * - "Line"/"Flags"/"Shaded" - 线下方阴影填充
+ * - "Line"/"Downsampling"/"Algorithm" - 降采样算法
+ * - "Line"/"Downsampling"/"Threshold" - 降采样阈值
  * \endif
  */
 Line10KFunction::Line10KFunction(QObject* parent)
@@ -103,6 +117,101 @@ Line10KFunction::Line10KFunction(QObject* parent)
     labelReg.propertyName = "lineLabel";
     labelReg.target = this;
     registerProperty(labelReg);
+
+    // Register segments property
+    PropertyRegistration segmentsReg;
+    segmentsReg.category = tr("Line");
+    segmentsReg.subcategory = tr("Flags");
+    segmentsReg.displayName = tr("Segments");
+    segmentsReg.briefDesc = tr("Segments mode");
+    segmentsReg.detailDesc = tr("Draws line segments instead of a continuous line");
+    segmentsReg.editorType = EditorType::CheckBox;
+    segmentsReg.defaultValue = m_segments;
+    segmentsReg.propertyName = "segments";
+    segmentsReg.target = this;
+    registerProperty(segmentsReg);
+
+    // Register loop property
+    PropertyRegistration loopReg;
+    loopReg.category = tr("Line");
+    loopReg.subcategory = tr("Flags");
+    loopReg.displayName = tr("Loop");
+    loopReg.briefDesc = tr("Loop mode");
+    loopReg.detailDesc = tr("Connects the last data point back to the first");
+    loopReg.editorType = EditorType::CheckBox;
+    loopReg.defaultValue = m_loop;
+    loopReg.propertyName = "loop";
+    loopReg.target = this;
+    registerProperty(loopReg);
+
+    // Register skipNaN property
+    PropertyRegistration skipNaNReg;
+    skipNaNReg.category = tr("Line");
+    skipNaNReg.subcategory = tr("Flags");
+    skipNaNReg.displayName = tr("Skip NaN");
+    skipNaNReg.briefDesc = tr("Skip NaN points");
+    skipNaNReg.detailDesc = tr("Skips NaN values in the data, creating gaps in the line");
+    skipNaNReg.editorType = EditorType::CheckBox;
+    skipNaNReg.defaultValue = m_skipNaN;
+    skipNaNReg.propertyName = "skipNaN";
+    skipNaNReg.target = this;
+    registerProperty(skipNaNReg);
+
+    // Register clippingEnabled property
+    PropertyRegistration clippingReg;
+    clippingReg.category = tr("Line");
+    clippingReg.subcategory = tr("Flags");
+    clippingReg.displayName = tr("Clipping Enabled");
+    clippingReg.briefDesc = tr("Clipping enabled");
+    clippingReg.detailDesc = tr("Clips the line at plot edges to avoid rendering outside bounds");
+    clippingReg.editorType = EditorType::CheckBox;
+    clippingReg.defaultValue = m_clippingEnabled;
+    clippingReg.propertyName = "clippingEnabled";
+    clippingReg.target = this;
+    registerProperty(clippingReg);
+
+    // Register shaded property
+    PropertyRegistration shadedReg;
+    shadedReg.category = tr("Line");
+    shadedReg.subcategory = tr("Display");
+    shadedReg.displayName = tr("Shaded");
+    shadedReg.briefDesc = tr("Shaded fill");
+    shadedReg.detailDesc = tr("Fills the area under the line with a shaded color");
+    shadedReg.editorType = EditorType::CheckBox;
+    shadedReg.defaultValue = m_shaded;
+    shadedReg.propertyName = "shaded";
+    shadedReg.target = this;
+    registerProperty(shadedReg);
+
+    // Register downsample algorithm property
+    PropertyRegistration downsampleAlgoReg;
+    downsampleAlgoReg.category = tr("Line");
+    downsampleAlgoReg.subcategory = tr("Downsample");
+    downsampleAlgoReg.displayName = tr("Algorithm");
+    downsampleAlgoReg.briefDesc = tr("Downsample algorithm");
+    downsampleAlgoReg.detailDesc = tr("Selects the downsampling algorithm for large datasets");
+    downsampleAlgoReg.editorType = EditorType::EnumComboBox;
+    downsampleAlgoReg.defaultValue = static_cast<int>(m_downsampleAlgorithm);
+    downsampleAlgoReg.comboBoxOptions = QStringList() << tr("None") << tr("LTTB") << tr("MinMaxLTTB") << tr("Auto");
+    downsampleAlgoReg.propertyName = "downsampleAlgorithm";
+    downsampleAlgoReg.target = this;
+    registerProperty(downsampleAlgoReg);
+
+    // Register downsample threshold property
+    PropertyRegistration downsampleThreshReg;
+    downsampleThreshReg.category = tr("Line");
+    downsampleThreshReg.subcategory = tr("Downsample");
+    downsampleThreshReg.displayName = tr("Threshold");
+    downsampleThreshReg.briefDesc = tr("Downsample threshold");
+    downsampleThreshReg.detailDesc = tr("Sets the minimum number of points before downsampling kicks in");
+    downsampleThreshReg.editorType = EditorType::SpinBox;
+    downsampleThreshReg.defaultValue = m_downsampleThreshold;
+    downsampleThreshReg.minValue = 0;
+    downsampleThreshReg.maxValue = 10000;
+    downsampleThreshReg.stepValue = 100;
+    downsampleThreshReg.propertyName = "downsampleThreshold";
+    downsampleThreshReg.target = this;
+    registerProperty(downsampleThreshReg);
 }
 
 /**
@@ -170,7 +279,7 @@ void Line10KFunction::setTitle(const QString& title)
 {
     if (m_title != title) {
         m_title = title;
-        emit titleChanged(title);
+        Q_EMIT titleChanged(title);
         if (m_plotNode) {
             m_plotNode->setTitle(title);
         }
@@ -181,7 +290,7 @@ void Line10KFunction::setXLabel(const QString& label)
 {
     if (m_xLabel != label) {
         m_xLabel = label;
-        emit xLabelChanged(label);
+        Q_EMIT xLabelChanged(label);
         if (m_plotNode) {
             m_plotNode->x1Axis()->setLabel(label);
         }
@@ -192,7 +301,7 @@ void Line10KFunction::setYLabel(const QString& label)
 {
     if (m_yLabel != label) {
         m_yLabel = label;
-        emit yLabelChanged(label);
+        Q_EMIT yLabelChanged(label);
         if (m_plotNode) {
             m_plotNode->y1Axis()->setLabel(label);
         }
@@ -203,7 +312,7 @@ void Line10KFunction::setLineColor(const QColor& color)
 {
     if (m_lineColor != color) {
         m_lineColor = color;
-        emit lineColorChanged(color);
+        Q_EMIT lineColorChanged(color);
         if (m_lineNode) {
             m_lineNode->setColor(color);
         }
@@ -214,10 +323,87 @@ void Line10KFunction::setLineLabel(const QString& label)
 {
     if (m_lineLabel != label) {
         m_lineLabel = label;
-        emit lineLabelChanged(label);
+        Q_EMIT lineLabelChanged(label);
         if (m_lineNode) {
             // Note: Line label would typically be set via data series or legend
             // This is a placeholder for future implementation
+        }
+    }
+}
+
+void Line10KFunction::setSegments(bool on)
+{
+    if (m_segments != on) {
+        m_segments = on;
+        Q_EMIT segmentsChanged(on);
+        if (m_lineNode) {
+            m_lineNode->setSegments(on);
+        }
+    }
+}
+
+void Line10KFunction::setLoop(bool on)
+{
+    if (m_loop != on) {
+        m_loop = on;
+        Q_EMIT loopChanged(on);
+        if (m_lineNode) {
+            m_lineNode->setLoop(on);
+        }
+    }
+}
+
+void Line10KFunction::setSkipNaN(bool on)
+{
+    if (m_skipNaN != on) {
+        m_skipNaN = on;
+        Q_EMIT skipNaNChanged(on);
+        if (m_lineNode) {
+            m_lineNode->setSkipNaN(on);
+        }
+    }
+}
+
+void Line10KFunction::setClippingEnabled(bool enabled)
+{
+    if (m_clippingEnabled != enabled) {
+        m_clippingEnabled = enabled;
+        Q_EMIT clippingEnabledChanged(enabled);
+        if (m_lineNode) {
+            m_lineNode->setClippingEnabled(enabled);
+        }
+    }
+}
+
+void Line10KFunction::setShaded(bool on)
+{
+    if (m_shaded != on) {
+        m_shaded = on;
+        Q_EMIT shadedChanged(on);
+        if (m_lineNode) {
+            m_lineNode->setShaded(on);
+        }
+    }
+}
+
+void Line10KFunction::setDownsampleAlgorithm(int algo)
+{
+    if (static_cast<int>(m_downsampleAlgorithm) != algo) {
+        m_downsampleAlgorithm = static_cast<QIM::QImDownsampleAlgorithm>(algo);
+        Q_EMIT downsampleAlgorithmChanged(algo);
+        if (m_lineNode) {
+            m_lineNode->setDownsampleAlgorithm(static_cast<QIM::QImDownsampleAlgorithm>(algo));
+        }
+    }
+}
+
+void Line10KFunction::setDownsampleThreshold(int threshold)
+{
+    if (m_downsampleThreshold != threshold) {
+        m_downsampleThreshold = threshold;
+        Q_EMIT downsampleThresholdChanged(threshold);
+        if (m_lineNode) {
+            m_lineNode->setDownsampleThreshold(threshold);
         }
     }
 }

@@ -70,13 +70,24 @@ class Plot3DSurfaceFunction : public TestFunction {
     Q_PROPERTY(QString xLabel READ xLabel WRITE setXLabel NOTIFY xLabelChanged)
     Q_PROPERTY(QString yLabel READ yLabel WRITE setYLabel NOTIFY yLabelChanged)
     Q_PROPERTY(QString zLabel READ zLabel WRITE setZLabel NOTIFY zLabelChanged)
+    Q_PROPERTY(int xCount READ xCount WRITE setXCount NOTIFY gridShapeChanged)
+    Q_PROPERTY(int yCount READ yCount WRITE setYCount NOTIFY gridShapeChanged)
     Q_PROPERTY(QColor fillColor READ fillColor WRITE setFillColor NOTIFY fillColorChanged)
     Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor NOTIFY lineColorChanged)
     Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth NOTIFY lineWidthChanged)
     Q_PROPERTY(bool linesVisible READ linesVisible WRITE setLinesVisible NOTIFY linesVisibleChanged)
     Q_PROPERTY(bool fillVisible READ fillVisible WRITE setFillVisible NOTIFY fillVisibleChanged)
     Q_PROPERTY(bool markersVisible READ markersVisible WRITE setMarkersVisible NOTIFY markersVisibleChanged)
+    Q_PROPERTY(QString markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
+    Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged)
+    Q_PROPERTY(float markerWeight READ markerWeight WRITE setMarkerWeight NOTIFY markerWeightChanged)
+    Q_PROPERTY(QColor markerFillColor READ markerFillColor WRITE setMarkerFillColor NOTIFY markerFillColorChanged)
+    Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
+    Q_PROPERTY(float fillAlpha READ fillAlpha WRITE setFillAlpha NOTIFY fillAlphaChanged)
     Q_PROPERTY(bool colormapEnabled READ colormapEnabled WRITE setColormapEnabled NOTIFY colormapEnabledChanged)
+    Q_PROPERTY(int colormap READ colormap WRITE setColormap NOTIFY colormapChanged)
+    Q_PROPERTY(double colormapScaleMin READ colormapScaleMin WRITE setColormapScaleMin NOTIFY colormapScaleMinChanged)
+    Q_PROPERTY(double colormapScaleMax READ colormapScaleMax WRITE setColormapScaleMax NOTIFY colormapScaleMaxChanged)
     
 public:
     /**
@@ -143,6 +154,14 @@ public:
     QString zLabel() const { return m_zLabel; }
     void setZLabel(const QString& label);
     
+    // X count property accessors
+    int xCount() const { return m_xCount; }
+    void setXCount(int count);
+    
+    // Y count property accessors
+    int yCount() const { return m_yCount; }
+    void setYCount(int count);
+    
     // Fill color property accessors
     QColor fillColor() const { return m_fillColor; }
     void setFillColor(const QColor& color);
@@ -167,9 +186,45 @@ public:
     bool markersVisible() const { return m_markersVisible; }
     void setMarkersVisible(bool visible);
     
+    // Marker shape property accessors
+    QString markerShape() const { return m_markerShape; }
+    void setMarkerShape(const QString& shape);
+    
+    // Marker size property accessors
+    float markerSize() const { return m_markerSize; }
+    void setMarkerSize(float size);
+    
+    // Marker weight property accessors
+    float markerWeight() const { return m_markerWeight; }
+    void setMarkerWeight(float weight);
+    
+    // Marker fill color property accessors
+    QColor markerFillColor() const { return m_markerFillColor; }
+    void setMarkerFillColor(const QColor& color);
+    
+    // Marker outline color property accessors
+    QColor markerOutlineColor() const { return m_markerOutlineColor; }
+    void setMarkerOutlineColor(const QColor& color);
+    
+    // Fill alpha property accessors
+    float fillAlpha() const { return m_fillAlpha; }
+    void setFillAlpha(float alpha);
+    
     // Colormap enabled property accessors
     bool colormapEnabled() const { return m_colormapEnabled; }
     void setColormapEnabled(bool enabled);
+    
+    // Colormap property accessors
+    int colormap() const { return m_colormap; }
+    void setColormap(int cmap);
+    
+    // Colormap scale min property accessors
+    double colormapScaleMin() const { return m_colormapScaleMin; }
+    void setColormapScaleMin(double min);
+    
+    // Colormap scale max property accessors
+    double colormapScaleMax() const { return m_colormapScaleMax; }
+    void setColormapScaleMax(double max);
     
 Q_SIGNALS:
     /**
@@ -315,18 +370,49 @@ Q_SIGNALS:
      */
     void colormapEnabledChanged(bool enabled);
     
+    void gridShapeChanged();
+    
+    void markerShapeChanged(const QString& shape);
+    
+    void markerSizeChanged(float size);
+    
+    void markerWeightChanged(float weight);
+    
+    void markerFillColorChanged(const QColor& color);
+    
+    void markerOutlineColorChanged(const QColor& color);
+    
+    void fillAlphaChanged(float alpha);
+    
+    void colormapChanged(int cmap);
+    
+    void colormapScaleMinChanged(double min);
+    
+    void colormapScaleMaxChanged(double max);
+    
 private:
     QString m_title = QStringLiteral("3D Surface - sin(x)*cos(y)");
     QString m_xLabel = QStringLiteral("X");
     QString m_yLabel = QStringLiteral("Y");
     QString m_zLabel = QStringLiteral("Z");
+    int m_xCount = 40;
+    int m_yCount = 40;
     QColor m_fillColor = Qt::blue;
     QColor m_lineColor = Qt::black;
     float m_lineWidth = 1.0f;
     bool m_linesVisible = true;
     bool m_fillVisible = true;
     bool m_markersVisible = false;
+    QString m_markerShape = QStringLiteral("Circle");
+    float m_markerSize = 4.0f;
+    float m_markerWeight = 1.5f;
+    QColor m_markerFillColor = QColor(0, 114, 189);
+    QColor m_markerOutlineColor = QColor(0, 0, 0);
+    float m_fillAlpha = 1.0f;
     bool m_colormapEnabled = true;
+    int m_colormap = 5;  // ImPlot3DColormap_Viridis
+    double m_colormapScaleMin = -1.0;
+    double m_colormapScaleMax = 1.0;
     
     QPointer<QIM::QImPlot3DNode> m_plot3DNode = nullptr;
     QPointer<QIM::QImPlot3DSurfaceItemNode> m_surface3DNode = nullptr;

@@ -142,6 +142,129 @@ SubplotsFunction::SubplotsFunction(QObject* parent)
     resizableReg.propertyName = "resizable";
     resizableReg.target = this;
     registerProperty(resizableReg);
+    
+    // Register subplot width property
+    PropertyRegistration widthReg;
+    widthReg.category = tr("Subplots");
+    widthReg.subcategory = tr("Layout");
+    widthReg.displayName = tr("Width");
+    widthReg.briefDesc = tr("Subplot width");
+    widthReg.detailDesc = tr("Sets the width of each subplot cell (-1 for auto)");
+    widthReg.editorType = EditorType::DoubleSpinBox;
+    widthReg.defaultValue = m_size.width();
+    widthReg.minValue = -1;
+    widthReg.maxValue = 2000;
+    widthReg.stepValue = 10;
+    widthReg.propertyName = "subplotWidth";
+    widthReg.target = this;
+    registerProperty(widthReg);
+    
+    // Register subplot height property
+    PropertyRegistration heightReg;
+    heightReg.category = tr("Subplots");
+    heightReg.subcategory = tr("Layout");
+    heightReg.displayName = tr("Height");
+    heightReg.briefDesc = tr("Subplot height");
+    heightReg.detailDesc = tr("Sets the height of each subplot cell (-1 for auto)");
+    heightReg.editorType = EditorType::DoubleSpinBox;
+    heightReg.defaultValue = m_size.height();
+    heightReg.minValue = -1;
+    heightReg.maxValue = 2000;
+    heightReg.stepValue = 10;
+    heightReg.propertyName = "subplotHeight";
+    heightReg.target = this;
+    registerProperty(heightReg);
+    
+    // Register title enabled property
+    PropertyRegistration titleEnabledReg;
+    titleEnabledReg.category = tr("Subplots");
+    titleEnabledReg.subcategory = tr("Features");
+    titleEnabledReg.displayName = tr("Title Enabled");
+    titleEnabledReg.briefDesc = tr("Enable subplot title");
+    titleEnabledReg.detailDesc = tr("When enabled, the subplot title is displayed");
+    titleEnabledReg.editorType = EditorType::CheckBox;
+    titleEnabledReg.defaultValue = m_isTitleEnabled;
+    titleEnabledReg.propertyName = "isTitleEnabled";
+    titleEnabledReg.target = this;
+    registerProperty(titleEnabledReg);
+    
+    // Register default menus enabled property
+    PropertyRegistration defaultMenusReg;
+    defaultMenusReg.category = tr("Subplots");
+    defaultMenusReg.subcategory = tr("Features");
+    defaultMenusReg.displayName = tr("Default Menus");
+    defaultMenusReg.briefDesc = tr("Enable default menus");
+    defaultMenusReg.detailDesc = tr("When enabled, ImPlot default context menus are available");
+    defaultMenusReg.editorType = EditorType::CheckBox;
+    defaultMenusReg.defaultValue = m_isDefaultMenusEnabled;
+    defaultMenusReg.propertyName = "isDefaultMenusEnabled";
+    defaultMenusReg.target = this;
+    registerProperty(defaultMenusReg);
+    
+    // Register aligned enabled property
+    PropertyRegistration alignedReg;
+    alignedReg.category = tr("Subplots");
+    alignedReg.subcategory = tr("Features");
+    alignedReg.displayName = tr("Aligned");
+    alignedReg.briefDesc = tr("Enable aligned plots");
+    alignedReg.detailDesc = tr("When enabled, subplot cells are aligned to pixel boundaries");
+    alignedReg.editorType = EditorType::CheckBox;
+    alignedReg.defaultValue = m_isAlignedEnabled;
+    alignedReg.propertyName = "isAlignedEnabled";
+    alignedReg.target = this;
+    registerProperty(alignedReg);
+    
+    // Register share items enabled property
+    PropertyRegistration shareItemsReg;
+    shareItemsReg.category = tr("Subplots");
+    shareItemsReg.subcategory = tr("Features");
+    shareItemsReg.displayName = tr("Share Items");
+    shareItemsReg.briefDesc = tr("Enable shared items");
+    shareItemsReg.detailDesc = tr("When enabled, plot items are shared across subplot cells");
+    shareItemsReg.editorType = EditorType::CheckBox;
+    shareItemsReg.defaultValue = m_isShareItemsEnabled;
+    shareItemsReg.propertyName = "isShareItemsEnabled";
+    shareItemsReg.target = this;
+    registerProperty(shareItemsReg);
+    
+    // Register link rows property
+    PropertyRegistration linkRowsReg;
+    linkRowsReg.category = tr("Subplots");
+    linkRowsReg.subcategory = tr("Link");
+    linkRowsReg.displayName = tr("Link Rows");
+    linkRowsReg.briefDesc = tr("Link rows");
+    linkRowsReg.detailDesc = tr("When enabled, all plots in the same row share linked axes");
+    linkRowsReg.editorType = EditorType::CheckBox;
+    linkRowsReg.defaultValue = m_isLinkRows;
+    linkRowsReg.propertyName = "isLinkRows";
+    linkRowsReg.target = this;
+    registerProperty(linkRowsReg);
+    
+    // Register link columns property
+    PropertyRegistration linkColsReg;
+    linkColsReg.category = tr("Subplots");
+    linkColsReg.subcategory = tr("Link");
+    linkColsReg.displayName = tr("Link Columns");
+    linkColsReg.briefDesc = tr("Link columns");
+    linkColsReg.detailDesc = tr("When enabled, all plots in the same column share linked axes");
+    linkColsReg.editorType = EditorType::CheckBox;
+    linkColsReg.defaultValue = m_isLinkColumns;
+    linkColsReg.propertyName = "isLinkColumns";
+    linkColsReg.target = this;
+    registerProperty(linkColsReg);
+    
+    // Register column major property
+    PropertyRegistration columnMajorReg;
+    columnMajorReg.category = tr("Subplots");
+    columnMajorReg.subcategory = tr("Layout");
+    columnMajorReg.displayName = tr("Column Major");
+    columnMajorReg.briefDesc = tr("Enable column major order");
+    columnMajorReg.detailDesc = tr("When enabled, subplot cells are filled in column-major order instead of row-major");
+    columnMajorReg.editorType = EditorType::CheckBox;
+    columnMajorReg.defaultValue = m_isColumnMajor;
+    columnMajorReg.propertyName = "isColumnMajor";
+    columnMajorReg.target = this;
+    registerProperty(columnMajorReg);
 }
 
 /**
@@ -312,7 +435,7 @@ void SubplotsFunction::setTitle(const QString& title)
 {
     if (m_title != title) {
         m_title = title;
-        emit titleChanged(title);
+        Q_EMIT titleChanged(title);
         if (m_subplotsNode) {
             m_subplotsNode->setTitle(title);
         }
@@ -323,7 +446,7 @@ void SubplotsFunction::setRows(int rows)
 {
     if (m_rows != rows && rows > 0) {
         m_rows = rows;
-        emit rowsChanged(rows);
+        Q_EMIT rowsChanged(rows);
         // Update subplot grid in real-time
         if (m_subplotsNode) {
             m_subplotsNode->setRows(rows);
@@ -335,7 +458,7 @@ void SubplotsFunction::setCols(int cols)
 {
     if (m_cols != cols && cols > 0) {
         m_cols = cols;
-        emit colsChanged(cols);
+        Q_EMIT colsChanged(cols);
         // Update subplot grid in real-time
         if (m_subplotsNode) {
             m_subplotsNode->setColumns(cols);
@@ -347,7 +470,7 @@ void SubplotsFunction::setLinkAllX(bool enabled)
 {
     if (m_linkAllX != enabled) {
         m_linkAllX = enabled;
-        emit linkAllXChanged(enabled);
+        Q_EMIT linkAllXChanged(enabled);
         if (m_subplotsNode) {
             m_subplotsNode->setLinkAllX(enabled);
         }
@@ -358,7 +481,7 @@ void SubplotsFunction::setLinkAllY(bool enabled)
 {
     if (m_linkAllY != enabled) {
         m_linkAllY = enabled;
-        emit linkAllYChanged(enabled);
+        Q_EMIT linkAllYChanged(enabled);
         if (m_subplotsNode) {
             m_subplotsNode->setLinkAllY(enabled);
         }
@@ -369,7 +492,7 @@ void SubplotsFunction::setLegendEnabled(bool enabled)
 {
     if (m_legendEnabled != enabled) {
         m_legendEnabled = enabled;
-        emit legendEnabledChanged(enabled);
+        Q_EMIT legendEnabledChanged(enabled);
         if (m_subplotsNode) {
             m_subplotsNode->setLegendEnabled(enabled);
         }
@@ -380,9 +503,108 @@ void SubplotsFunction::setResizable(bool enabled)
 {
     if (m_resizable != enabled) {
         m_resizable = enabled;
-        emit resizableChanged(enabled);
+        Q_EMIT resizableChanged(enabled);
         if (m_subplotsNode) {
             m_subplotsNode->setResizable(enabled);
+        }
+    }
+}
+
+void SubplotsFunction::setSubplotWidth(qreal width)
+{
+    if (m_size.width() != width) {
+        m_size.setWidth(width);
+        Q_EMIT subplotWidthChanged(width);
+        if (m_subplotsNode) {
+            m_subplotsNode->setSize(m_size);
+        }
+    }
+}
+
+void SubplotsFunction::setSubplotHeight(qreal height)
+{
+    if (m_size.height() != height) {
+        m_size.setHeight(height);
+        Q_EMIT subplotHeightChanged(height);
+        if (m_subplotsNode) {
+            m_subplotsNode->setSize(m_size);
+        }
+    }
+}
+
+void SubplotsFunction::setTitleEnabled(bool enabled)
+{
+    if (m_isTitleEnabled != enabled) {
+        m_isTitleEnabled = enabled;
+        Q_EMIT titleEnabledChanged(enabled);
+        if (m_subplotsNode) {
+            m_subplotsNode->setTitleEnabled(enabled);
+        }
+    }
+}
+
+void SubplotsFunction::setDefaultMenusEnabled(bool enabled)
+{
+    if (m_isDefaultMenusEnabled != enabled) {
+        m_isDefaultMenusEnabled = enabled;
+        Q_EMIT defaultMenusEnabledChanged(enabled);
+        if (m_subplotsNode) {
+            m_subplotsNode->setDefaultMenusEnabled(enabled);
+        }
+    }
+}
+
+void SubplotsFunction::setAlignedEnabled(bool enabled)
+{
+    if (m_isAlignedEnabled != enabled) {
+        m_isAlignedEnabled = enabled;
+        Q_EMIT alignedEnabledChanged(enabled);
+        if (m_subplotsNode) {
+            m_subplotsNode->setAlignedEnabled(enabled);
+        }
+    }
+}
+
+void SubplotsFunction::setShareItemsEnabled(bool enabled)
+{
+    if (m_isShareItemsEnabled != enabled) {
+        m_isShareItemsEnabled = enabled;
+        Q_EMIT shareItemsEnabledChanged(enabled);
+        if (m_subplotsNode) {
+            m_subplotsNode->setShareItemsEnabled(enabled);
+        }
+    }
+}
+
+void SubplotsFunction::setLinkRows(bool enabled)
+{
+    if (m_isLinkRows != enabled) {
+        m_isLinkRows = enabled;
+        Q_EMIT linkRowsChanged(enabled);
+        if (m_subplotsNode) {
+            m_subplotsNode->setLinkRows(enabled);
+        }
+    }
+}
+
+void SubplotsFunction::setLinkColumns(bool enabled)
+{
+    if (m_isLinkColumns != enabled) {
+        m_isLinkColumns = enabled;
+        Q_EMIT linkColumnsChanged(enabled);
+        if (m_subplotsNode) {
+            m_subplotsNode->setLinkColumns(enabled);
+        }
+    }
+}
+
+void SubplotsFunction::setColumnMajor(bool enabled)
+{
+    if (m_isColumnMajor != enabled) {
+        m_isColumnMajor = enabled;
+        Q_EMIT columnMajorChanged(enabled);
+        if (m_subplotsNode) {
+            m_subplotsNode->setColumnMajor(enabled);
         }
     }
 }

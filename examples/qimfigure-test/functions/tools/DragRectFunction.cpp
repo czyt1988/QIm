@@ -179,9 +179,41 @@ DragRectFunction::DragRectFunction(QObject* parent)
     delayedReg.detailDesc = tr("When enabled, the drag tool uses delayed rendering mode for smoother interaction.");
     delayedReg.editorType = EditorType::CheckBox;
     delayedReg.defaultValue = m_delayed;
-    delayedReg.propertyName = "delayed";
+delayedReg.propertyName = "delayed";
     delayedReg.target = this;
     registerProperty(delayedReg);
+    
+    // Register ID property
+    PropertyRegistration idReg;
+    idReg.category = tr("DragRect");
+    idReg.subcategory = tr("Config");
+    idReg.displayName = tr("ID");
+    idReg.briefDesc = tr("Drag tool identifier");
+    idReg.detailDesc = tr("Sets the unique identifier for the drag tool (0-255)");
+    idReg.editorType = EditorType::SpinBox;
+    idReg.defaultValue = m_id;
+    idReg.minValue = 0;
+    idReg.maxValue = 255;
+    idReg.stepValue = 1;
+    idReg.propertyName = "id";
+    idReg.target = this;
+    registerProperty(idReg);
+    
+    // Register flags property
+    PropertyRegistration flagsReg;
+    flagsReg.category = tr("DragRect");
+    flagsReg.subcategory = tr("Config");
+    flagsReg.displayName = tr("Flags");
+    flagsReg.briefDesc = tr("Drag tool flags");
+    flagsReg.detailDesc = tr("Sets the ImPlotDragToolFlags bitmask for controlling tool behavior (0-255)");
+    flagsReg.editorType = EditorType::SpinBox;
+    flagsReg.defaultValue = m_flags;
+    flagsReg.minValue = 0;
+    flagsReg.maxValue = 255;
+    flagsReg.stepValue = 1;
+    flagsReg.propertyName = "flags";
+    flagsReg.target = this;
+    registerProperty(flagsReg);
 }
 
 /**
@@ -330,6 +362,28 @@ void DragRectFunction::setDelayed(bool on)
         Q_EMIT delayedChanged(on);
         if (m_dragRectNode) {
             m_dragRectNode->setDelayed(on);
+        }
+    }
+}
+
+void DragRectFunction::setId(int id)
+{
+    if (m_id != id) {
+        m_id = id;
+        Q_EMIT idChanged(id);
+        if (m_dragRectNode) {
+            m_dragRectNode->setId(id);
+        }
+    }
+}
+
+void DragRectFunction::setFlags(int flags)
+{
+    if (m_flags != flags) {
+        m_flags = flags;
+        Q_EMIT flagsChanged(flags);
+        if (m_dragRectNode) {
+            m_dragRectNode->setFlags(flags);
         }
     }
 }

@@ -22,7 +22,8 @@ class QImPlot3DTriangleItemNode;
  * - X, Y and Z axis labels
  * - Triangle fill color and visibility
  * - Triangle line color, width and visibility
- * - Triangle markers visibility
+ * - Triangle markers visibility, shape, size, weight, fill/outline color
+ * - Triangle fill alpha
  * 
  * @section usage_example Usage Example
  * 
@@ -46,7 +47,8 @@ class QImPlot3DTriangleItemNode;
  * - X、Y 和 Z 轴标签
  * - 三角形填充颜色和可见性
  * - 三角形线条颜色、宽度和可见性
- * - 三角形标记点可见性
+ * - 三角形标记点可见性、形状、大小、权重、填充/轮廓颜色
+ * - 三角形填充透明度
  * 
  * @section usage_example 使用示例
  * 
@@ -74,6 +76,12 @@ class Plot3DTriangleFunction : public TestFunction {
     Q_PROPERTY(bool linesVisible READ linesVisible WRITE setLinesVisible NOTIFY linesVisibleChanged)
     Q_PROPERTY(bool fillVisible READ fillVisible WRITE setFillVisible NOTIFY fillVisibleChanged)
     Q_PROPERTY(bool markersVisible READ markersVisible WRITE setMarkersVisible NOTIFY markersVisibleChanged)
+    Q_PROPERTY(QString markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
+    Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged)
+    Q_PROPERTY(float markerWeight READ markerWeight WRITE setMarkerWeight NOTIFY markerWeightChanged)
+    Q_PROPERTY(QColor markerFillColor READ markerFillColor WRITE setMarkerFillColor NOTIFY markerFillColorChanged)
+    Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
+    Q_PROPERTY(float fillAlpha READ fillAlpha WRITE setFillAlpha NOTIFY fillAlphaChanged)
     
 public:
     /**
@@ -163,6 +171,30 @@ public:
     // Markers visible property accessors
     bool markersVisible() const { return m_markersVisible; }
     void setMarkersVisible(bool visible);
+    
+    // Marker shape property accessors
+    QString markerShape() const { return m_markerShape; }
+    void setMarkerShape(const QString& shape);
+    
+    // Marker size property accessors
+    float markerSize() const { return m_markerSize; }
+    void setMarkerSize(float size);
+    
+    // Marker weight property accessors
+    float markerWeight() const { return m_markerWeight; }
+    void setMarkerWeight(float weight);
+    
+    // Marker fill color property accessors
+    QColor markerFillColor() const { return m_markerFillColor; }
+    void setMarkerFillColor(const QColor& color);
+    
+    // Marker outline color property accessors
+    QColor markerOutlineColor() const { return m_markerOutlineColor; }
+    void setMarkerOutlineColor(const QColor& color);
+    
+    // Fill alpha property accessors
+    float fillAlpha() const { return m_fillAlpha; }
+    void setFillAlpha(float alpha);
     
 Q_SIGNALS:
     /**
@@ -295,6 +327,18 @@ Q_SIGNALS:
      */
     void markersVisibleChanged(bool visible);
     
+    void markerShapeChanged(const QString& shape);
+    
+    void markerSizeChanged(float size);
+    
+    void markerWeightChanged(float weight);
+    
+    void markerFillColorChanged(const QColor& color);
+    
+    void markerOutlineColorChanged(const QColor& color);
+    
+    void fillAlphaChanged(float alpha);
+    
 private:
     QString m_title = QStringLiteral("3D Triangle - Tetrahedron");
     QString m_xLabel = QStringLiteral("X");
@@ -306,6 +350,12 @@ private:
     bool m_linesVisible = true;
     bool m_fillVisible = true;
     bool m_markersVisible = false;
+    QString m_markerShape = QStringLiteral("Circle");
+    float m_markerSize = 4.0f;
+    float m_markerWeight = 1.5f;
+    QColor m_markerFillColor = QColor(0, 114, 189);
+    QColor m_markerOutlineColor = QColor(0, 0, 0);
+    float m_fillAlpha = 1.0f;
     
     QPointer<QIM::QImPlot3DNode> m_plot3DNode = nullptr;
     QPointer<QIM::QImPlot3DTriangleItemNode> m_triangle3DNode = nullptr;

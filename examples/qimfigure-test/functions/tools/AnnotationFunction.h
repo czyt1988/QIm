@@ -69,6 +69,11 @@ class AnnotationFunction : public TestFunction {
     Q_PROPERTY(QString annotationText READ annotationText WRITE setAnnotationText NOTIFY annotationTextChanged)
     Q_PROPERTY(QColor annotationColor READ annotationColor WRITE setAnnotationColor NOTIFY annotationColorChanged)
     Q_PROPERTY(bool clamp READ clamp WRITE setClamp NOTIFY clampChanged)
+    Q_PROPERTY(double annotationX READ annotationX WRITE setAnnotationX NOTIFY annotationPositionChanged)
+    Q_PROPERTY(double annotationY READ annotationY WRITE setAnnotationY NOTIFY annotationPositionChanged)
+    Q_PROPERTY(double pixelOffsetX READ pixelOffsetX WRITE setPixelOffsetX NOTIFY annotationPixelOffsetChanged)
+    Q_PROPERTY(double pixelOffsetY READ pixelOffsetY WRITE setPixelOffsetY NOTIFY annotationPixelOffsetChanged)
+    Q_PROPERTY(bool annotationRound READ isAnnotationRound WRITE setAnnotationRound NOTIFY annotationRoundChanged)
     
 public:
     /**
@@ -124,6 +129,22 @@ public:
     bool clamp() const { return m_clamp; }
     void setClamp(bool enabled);
     
+    // Annotation position property accessors (split from QPointF position)
+    double annotationX() const { return m_annotationX; }
+    void setAnnotationX(double x);
+    double annotationY() const { return m_annotationY; }
+    void setAnnotationY(double y);
+    
+    // Annotation pixel offset property accessors (split from QPointF pixelOffset)
+    double pixelOffsetX() const { return m_pixelOffsetX; }
+    void setPixelOffsetX(double x);
+    double pixelOffsetY() const { return m_pixelOffsetY; }
+    void setPixelOffsetY(double y);
+    
+    // Annotation round property accessors
+    bool isAnnotationRound() const { return m_annotationRound; }
+    void setAnnotationRound(bool enabled);
+    
 Q_SIGNALS:
     /**
      * \if ENGLISH
@@ -177,6 +198,10 @@ Q_SIGNALS:
      */
     void clampChanged(bool enabled);
     
+    void annotationPositionChanged();
+    void annotationPixelOffsetChanged();
+    void annotationRoundChanged(bool enabled);
+    
 private Q_SLOTS:
     /**
      * \if ENGLISH
@@ -197,6 +222,11 @@ private:
     QColor m_annotationColor = QColor(255, 200, 100);
     bool m_clamp = false;
     QPointF m_pointPosition = QPointF(5.0, 5.0);
+    double m_annotationX = 0.5;
+    double m_annotationY = 0.5;
+    double m_pixelOffsetX = 0.0;
+    double m_pixelOffsetY = 0.0;
+    bool m_annotationRound = false;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotLineItemNode* m_lineNode = nullptr;

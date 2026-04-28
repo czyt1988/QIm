@@ -121,6 +121,45 @@ Plot3DLineFunction::Plot3DLineFunction(QObject* parent)
     weightReg.propertyName = "lineWeight";
     weightReg.target = this;
     registerProperty(weightReg);
+    
+    // Register segments enabled property
+    PropertyRegistration segmentsReg;
+    segmentsReg.category = tr("Line");
+    segmentsReg.subcategory = tr("Flags");
+    segmentsReg.displayName = tr("Segments");
+    segmentsReg.briefDesc = tr("Segments enabled");
+    segmentsReg.detailDesc = tr("Enables segments rendering mode for the 3D line");
+    segmentsReg.editorType = EditorType::CheckBox;
+    segmentsReg.defaultValue = m_segmentsEnabled;
+    segmentsReg.propertyName = "segmentsEnabled";
+    segmentsReg.target = this;
+    registerProperty(segmentsReg);
+    
+    // Register loop enabled property
+    PropertyRegistration loopReg;
+    loopReg.category = tr("Line");
+    loopReg.subcategory = tr("Flags");
+    loopReg.displayName = tr("Loop");
+    loopReg.briefDesc = tr("Loop enabled");
+    loopReg.detailDesc = tr("Enables loop rendering mode for the 3D line");
+    loopReg.editorType = EditorType::CheckBox;
+    loopReg.defaultValue = m_loopEnabled;
+    loopReg.propertyName = "loopEnabled";
+    loopReg.target = this;
+    registerProperty(loopReg);
+    
+    // Register skip NaN enabled property
+    PropertyRegistration skipNaNReg;
+    skipNaNReg.category = tr("Line");
+    skipNaNReg.subcategory = tr("Flags");
+    skipNaNReg.displayName = tr("Skip NaN");
+    skipNaNReg.briefDesc = tr("Skip NaN enabled");
+    skipNaNReg.detailDesc = tr("Enables NaN skipping for the 3D line");
+    skipNaNReg.editorType = EditorType::CheckBox;
+    skipNaNReg.defaultValue = m_skipNaNEnabled;
+    skipNaNReg.propertyName = "skipNaNEnabled";
+    skipNaNReg.target = this;
+    registerProperty(skipNaNReg);
 }
 
 /**
@@ -201,6 +240,9 @@ void Plot3DLineFunction::createPlot(QIM::QImFigureWidget* figure)
     m_line3DNode->setData(xs, ys, zs);
     m_line3DNode->setColor(m_lineColor);
     m_line3DNode->setLineWeight(m_lineWeight);
+    m_line3DNode->setSegmentsEnabled(m_segmentsEnabled);
+    m_line3DNode->setLoopEnabled(m_loopEnabled);
+    m_line3DNode->setSkipNaNEnabled(m_skipNaNEnabled);
 }
 
 void Plot3DLineFunction::setTitle(const QString& title)
@@ -265,6 +307,39 @@ void Plot3DLineFunction::setLineWeight(float weight)
         Q_EMIT lineWeightChanged(weight);
         if (m_line3DNode) {
             m_line3DNode->setLineWeight(weight);
+        }
+    }
+}
+
+void Plot3DLineFunction::setSegmentsEnabled(bool enabled)
+{
+    if (m_segmentsEnabled != enabled) {
+        m_segmentsEnabled = enabled;
+        Q_EMIT segmentsEnabledChanged(enabled);
+        if (m_line3DNode) {
+            m_line3DNode->setSegmentsEnabled(enabled);
+        }
+    }
+}
+
+void Plot3DLineFunction::setLoopEnabled(bool enabled)
+{
+    if (m_loopEnabled != enabled) {
+        m_loopEnabled = enabled;
+        Q_EMIT loopEnabledChanged(enabled);
+        if (m_line3DNode) {
+            m_line3DNode->setLoopEnabled(enabled);
+        }
+    }
+}
+
+void Plot3DLineFunction::setSkipNaNEnabled(bool enabled)
+{
+    if (m_skipNaNEnabled != enabled) {
+        m_skipNaNEnabled = enabled;
+        Q_EMIT skipNaNEnabledChanged(enabled);
+        if (m_line3DNode) {
+            m_line3DNode->setSkipNaNEnabled(enabled);
         }
     }
 }

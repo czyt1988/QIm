@@ -140,6 +140,32 @@ TagsFunction::TagsFunction(QObject* parent)
     tagYColorReg.propertyName = "tagYColor";
     tagYColorReg.target = this;
     registerProperty(tagYColorReg);
+    
+    // Register TagX round property
+    PropertyRegistration tagXRoundReg;
+    tagXRoundReg.category = tr("Tags");
+    tagXRoundReg.subcategory = tr("Style");
+    tagXRoundReg.displayName = tr("X Round");
+    tagXRoundReg.briefDesc = tr("Round X tag position");
+    tagXRoundReg.detailDesc = tr("When enabled, the X-axis tag position is rounded to integer pixel coordinates");
+    tagXRoundReg.editorType = EditorType::CheckBox;
+    tagXRoundReg.defaultValue = m_tagXRound;
+    tagXRoundReg.propertyName = "tagXRound";
+    tagXRoundReg.target = this;
+    registerProperty(tagXRoundReg);
+    
+    // Register TagY round property
+    PropertyRegistration tagYRoundReg;
+    tagYRoundReg.category = tr("Tags");
+    tagYRoundReg.subcategory = tr("Style");
+    tagYRoundReg.displayName = tr("Y Round");
+    tagYRoundReg.briefDesc = tr("Round Y tag position");
+    tagYRoundReg.detailDesc = tr("When enabled, the Y-axis tag position is rounded to integer pixel coordinates");
+    tagYRoundReg.editorType = EditorType::CheckBox;
+    tagYRoundReg.defaultValue = m_tagYRound;
+    tagYRoundReg.propertyName = "tagYRound";
+    tagYRoundReg.target = this;
+    registerProperty(tagYRoundReg);
 }
 
 /**
@@ -291,6 +317,28 @@ void TagsFunction::setTagYColor(const QColor& color)
         emit tagYColorChanged(color);
         if (m_tagYNode) {
             m_tagYNode->setColor(color);
+        }
+    }
+}
+
+void TagsFunction::setTagXRound(bool round)
+{
+    if (m_tagXRound != round) {
+        m_tagXRound = round;
+        Q_EMIT tagXRoundChanged(round);
+        if (m_tagXNode) {
+            m_tagXNode->setRound(round);
+        }
+    }
+}
+
+void TagsFunction::setTagYRound(bool round)
+{
+    if (m_tagYRound != round) {
+        m_tagYRound = round;
+        Q_EMIT tagYRoundChanged(round);
+        if (m_tagYNode) {
+            m_tagYNode->setRound(round);
         }
     }
 }

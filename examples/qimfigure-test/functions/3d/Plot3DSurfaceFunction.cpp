@@ -4,7 +4,7 @@
 #include "plot3d/QImPlot3DAxisInfo.h"
 #include "plot3d/QImPlot3DSurfaceItemNode.h"
 #include "plot3d/QImPlot3DDataSeries.h"
-#include <implot3d.h>
+
 #include <QVector>
 #include <cmath>
 
@@ -193,6 +193,164 @@ Plot3DSurfaceFunction::Plot3DSurfaceFunction(QObject* parent)
     colormapEnabledReg.propertyName = "colormapEnabled";
     colormapEnabledReg.target = this;
     registerProperty(colormapEnabledReg);
+    
+    // Register xCount property
+    PropertyRegistration xCountReg;
+    xCountReg.category = tr("Surface");
+    xCountReg.subcategory = tr("Grid");
+    xCountReg.displayName = tr("X Count");
+    xCountReg.briefDesc = tr("X grid count");
+    xCountReg.detailDesc = tr("Sets the number of grid points along the X axis for the surface");
+    xCountReg.editorType = EditorType::SpinBox;
+    xCountReg.defaultValue = m_xCount;
+    xCountReg.minValue = 2;
+    xCountReg.maxValue = 200;
+    xCountReg.propertyName = "xCount";
+    xCountReg.target = this;
+    registerProperty(xCountReg);
+    
+    // Register yCount property
+    PropertyRegistration yCountReg;
+    yCountReg.category = tr("Surface");
+    yCountReg.subcategory = tr("Grid");
+    yCountReg.displayName = tr("Y Count");
+    yCountReg.briefDesc = tr("Y grid count");
+    yCountReg.detailDesc = tr("Sets the number of grid points along the Y axis for the surface");
+    yCountReg.editorType = EditorType::SpinBox;
+    yCountReg.defaultValue = m_yCount;
+    yCountReg.minValue = 2;
+    yCountReg.maxValue = 200;
+    yCountReg.propertyName = "yCount";
+    yCountReg.target = this;
+    registerProperty(yCountReg);
+    
+    // Register marker shape property
+    PropertyRegistration markerShapeReg;
+    markerShapeReg.category = tr("Surface");
+    markerShapeReg.subcategory = tr("Marker");
+    markerShapeReg.displayName = tr("Shape");
+    markerShapeReg.briefDesc = tr("Marker shape");
+    markerShapeReg.detailDesc = tr("Sets the marker shape for surface vertices");
+    markerShapeReg.editorType = EditorType::ComboBox;
+    markerShapeReg.defaultValue = m_markerShape;
+    markerShapeReg.comboBoxOptions = QStringList{"None", "Circle", "Square", "Diamond", "Up", "Down", "Left", "Right", "Cross", "Plus", "Asterisk"};
+    markerShapeReg.propertyName = "markerShape";
+    markerShapeReg.target = this;
+    registerProperty(markerShapeReg);
+    
+    // Register marker size property
+    PropertyRegistration markerSizeReg;
+    markerSizeReg.category = tr("Surface");
+    markerSizeReg.subcategory = tr("Marker");
+    markerSizeReg.displayName = tr("Size");
+    markerSizeReg.briefDesc = tr("Marker size");
+    markerSizeReg.detailDesc = tr("Sets the marker size in pixels for surface vertices");
+    markerSizeReg.editorType = EditorType::DoubleSpinBox;
+    markerSizeReg.defaultValue = m_markerSize;
+    markerSizeReg.minValue = 1.0;
+    markerSizeReg.maxValue = 20.0;
+    markerSizeReg.stepValue = 0.5;
+    markerSizeReg.propertyName = "markerSize";
+    markerSizeReg.target = this;
+    registerProperty(markerSizeReg);
+    
+    // Register marker weight property
+    PropertyRegistration markerWeightReg;
+    markerWeightReg.category = tr("Surface");
+    markerWeightReg.subcategory = tr("Marker");
+    markerWeightReg.displayName = tr("Weight");
+    markerWeightReg.briefDesc = tr("Marker weight");
+    markerWeightReg.detailDesc = tr("Sets the marker outline weight in pixels for surface vertices");
+    markerWeightReg.editorType = EditorType::DoubleSpinBox;
+    markerWeightReg.defaultValue = m_markerWeight;
+    markerWeightReg.minValue = 0.5;
+    markerWeightReg.maxValue = 10.0;
+    markerWeightReg.stepValue = 0.5;
+    markerWeightReg.propertyName = "markerWeight";
+    markerWeightReg.target = this;
+    registerProperty(markerWeightReg);
+    
+    // Register marker fill color property
+    PropertyRegistration markerFillColorReg;
+    markerFillColorReg.category = tr("Surface");
+    markerFillColorReg.subcategory = tr("Marker");
+    markerFillColorReg.displayName = tr("Fill Color");
+    markerFillColorReg.briefDesc = tr("Marker fill color");
+    markerFillColorReg.detailDesc = tr("Sets the fill color of surface markers");
+    markerFillColorReg.editorType = EditorType::ColorPicker;
+    markerFillColorReg.defaultValue = m_markerFillColor;
+    markerFillColorReg.propertyName = "markerFillColor";
+    markerFillColorReg.target = this;
+    registerProperty(markerFillColorReg);
+    
+    // Register marker outline color property
+    PropertyRegistration markerOutlineColorReg;
+    markerOutlineColorReg.category = tr("Surface");
+    markerOutlineColorReg.subcategory = tr("Marker");
+    markerOutlineColorReg.displayName = tr("Outline Color");
+    markerOutlineColorReg.briefDesc = tr("Marker outline color");
+    markerOutlineColorReg.detailDesc = tr("Sets the outline color of surface markers");
+    markerOutlineColorReg.editorType = EditorType::ColorPicker;
+    markerOutlineColorReg.defaultValue = m_markerOutlineColor;
+    markerOutlineColorReg.propertyName = "markerOutlineColor";
+    markerOutlineColorReg.target = this;
+    registerProperty(markerOutlineColorReg);
+    
+    // Register fill alpha property
+    PropertyRegistration fillAlphaReg;
+    fillAlphaReg.category = tr("Surface");
+    fillAlphaReg.subcategory = tr("Style");
+    fillAlphaReg.displayName = tr("Fill Alpha");
+    fillAlphaReg.briefDesc = tr("Surface fill alpha");
+    fillAlphaReg.detailDesc = tr("Sets the fill transparency of the surface (0.0 = fully transparent, 1.0 = fully opaque)");
+    fillAlphaReg.editorType = EditorType::DoubleSpinBox;
+    fillAlphaReg.defaultValue = m_fillAlpha;
+    fillAlphaReg.minValue = 0.0;
+    fillAlphaReg.maxValue = 1.0;
+    fillAlphaReg.stepValue = 0.1;
+    fillAlphaReg.propertyName = "fillAlpha";
+    fillAlphaReg.target = this;
+    registerProperty(fillAlphaReg);
+    
+    // Register colormap property
+    PropertyRegistration colormapReg;
+    colormapReg.category = tr("Surface");
+    colormapReg.subcategory = tr("Colormap");
+    colormapReg.displayName = tr("Colormap");
+    colormapReg.briefDesc = tr("Colormap type");
+    colormapReg.detailDesc = tr("Sets the colormap used to color the surface based on Z values");
+    colormapReg.editorType = EditorType::EnumComboBox;
+    colormapReg.defaultValue = m_colormap;
+    colormapReg.comboBoxOptions = QStringList{"Deep", "Dark", "Hot", "Cool", "Blues", "Viridis", "Plasma", "Inferno", "Cividis", "Sprint", "Turbo", "Rainbow", "Jet", "Pink", "Magma", "Greys"};
+    colormapReg.propertyName = "colormap";
+    colormapReg.target = this;
+    registerProperty(colormapReg);
+    
+    // Register colormap scale min property
+    PropertyRegistration colormapScaleMinReg;
+    colormapScaleMinReg.category = tr("Surface");
+    colormapScaleMinReg.subcategory = tr("Colormap");
+    colormapScaleMinReg.displayName = tr("Scale Min");
+    colormapScaleMinReg.briefDesc = tr("Colormap scale min");
+    colormapScaleMinReg.detailDesc = tr("Sets the minimum value for the colormap scale range");
+    colormapScaleMinReg.editorType = EditorType::DoubleSpinBox;
+    colormapScaleMinReg.defaultValue = m_colormapScaleMin;
+    colormapScaleMinReg.propertyName = "colormapScaleMin";
+    colormapScaleMinReg.target = this;
+    registerProperty(colormapScaleMinReg);
+    
+    // Register colormap scale max property
+    PropertyRegistration colormapScaleMaxReg;
+    colormapScaleMaxReg.category = tr("Surface");
+    colormapScaleMaxReg.subcategory = tr("Colormap");
+    colormapScaleMaxReg.displayName = tr("Scale Max");
+    colormapScaleMaxReg.briefDesc = tr("Colormap scale max");
+    colormapScaleMaxReg.detailDesc = tr("Sets the maximum value for the colormap scale range");
+    colormapScaleMaxReg.editorType = EditorType::DoubleSpinBox;
+    colormapScaleMaxReg.defaultValue = m_colormapScaleMax;
+    colormapScaleMaxReg.propertyName = "colormapScaleMax";
+    colormapScaleMaxReg.target = this;
+    registerProperty(colormapScaleMaxReg);
 }
 
 /**
@@ -404,8 +562,142 @@ void Plot3DSurfaceFunction::setColormapEnabled(bool enabled)
         if (m_surface3DNode) {
             m_surface3DNode->setColormapEnabled(enabled);
             if (enabled) {
-                m_surface3DNode->setColormap(ImPlot3DColormap_Viridis);
+                m_surface3DNode->setColormap(m_colormap);
             }
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setXCount(int count)
+{
+    if (m_xCount != count) {
+        m_xCount = count;
+        Q_EMIT gridShapeChanged();
+        if (m_surface3DNode) {
+            m_surface3DNode->setXCount(count);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setYCount(int count)
+{
+    if (m_yCount != count) {
+        m_yCount = count;
+        Q_EMIT gridShapeChanged();
+        if (m_surface3DNode) {
+            m_surface3DNode->setYCount(count);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setMarkerShape(const QString& shape)
+{
+    if (m_markerShape != shape) {
+        m_markerShape = shape;
+        Q_EMIT markerShapeChanged(shape);
+        if (m_surface3DNode) {
+            // Map QString to ImPlot3DMarker enum value (None=-1, Circle=0, Square=1, ...)
+            int enumVal = -1;
+            if (shape == tr("None") || shape == "None") enumVal = -1;
+            else if (shape == tr("Circle") || shape == "Circle") enumVal = 0;
+            else if (shape == tr("Square") || shape == "Square") enumVal = 1;
+            else if (shape == tr("Diamond") || shape == "Diamond") enumVal = 2;
+            else if (shape == tr("Up") || shape == "Up") enumVal = 3;
+            else if (shape == tr("Down") || shape == "Down") enumVal = 4;
+            else if (shape == tr("Left") || shape == "Left") enumVal = 5;
+            else if (shape == tr("Right") || shape == "Right") enumVal = 6;
+            else if (shape == tr("Cross") || shape == "Cross") enumVal = 7;
+            else if (shape == tr("Plus") || shape == "Plus") enumVal = 8;
+            else if (shape == tr("Asterisk") || shape == "Asterisk") enumVal = 9;
+            m_surface3DNode->setMarkerShape(enumVal);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setMarkerSize(float size)
+{
+    if (m_markerSize != size) {
+        m_markerSize = size;
+        Q_EMIT markerSizeChanged(size);
+        if (m_surface3DNode) {
+            m_surface3DNode->setMarkerSize(size);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setMarkerWeight(float weight)
+{
+    if (m_markerWeight != weight) {
+        m_markerWeight = weight;
+        Q_EMIT markerWeightChanged(weight);
+        if (m_surface3DNode) {
+            m_surface3DNode->setMarkerWeight(weight);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setMarkerFillColor(const QColor& color)
+{
+    if (m_markerFillColor != color) {
+        m_markerFillColor = color;
+        Q_EMIT markerFillColorChanged(color);
+        if (m_surface3DNode) {
+            m_surface3DNode->setMarkerFillColor(color);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setMarkerOutlineColor(const QColor& color)
+{
+    if (m_markerOutlineColor != color) {
+        m_markerOutlineColor = color;
+        Q_EMIT markerOutlineColorChanged(color);
+        if (m_surface3DNode) {
+            m_surface3DNode->setMarkerOutlineColor(color);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setFillAlpha(float alpha)
+{
+    if (m_fillAlpha != alpha) {
+        m_fillAlpha = alpha;
+        Q_EMIT fillAlphaChanged(alpha);
+        if (m_surface3DNode) {
+            m_surface3DNode->setFillAlpha(alpha);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setColormap(int cmap)
+{
+    if (m_colormap != cmap) {
+        m_colormap = cmap;
+        Q_EMIT colormapChanged(cmap);
+        if (m_surface3DNode) {
+            m_surface3DNode->setColormap(cmap);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setColormapScaleMin(double min)
+{
+    if (m_colormapScaleMin != min) {
+        m_colormapScaleMin = min;
+        Q_EMIT colormapScaleMinChanged(min);
+        if (m_surface3DNode) {
+            m_surface3DNode->setColormapScaleMin(min);
+        }
+    }
+}
+
+void Plot3DSurfaceFunction::setColormapScaleMax(double max)
+{
+    if (m_colormapScaleMax != max) {
+        m_colormapScaleMax = max;
+        Q_EMIT colormapScaleMaxChanged(max);
+        if (m_surface3DNode) {
+            m_surface3DNode->setColormapScaleMax(max);
         }
     }
 }

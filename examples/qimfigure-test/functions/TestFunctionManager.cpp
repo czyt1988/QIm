@@ -4,6 +4,7 @@
 #include "datapoints/ScatterFunction.h"
 #include "datapoints/StairsFunction.h"
 #include "datapoints/BarsFunction.h"
+#include "layout/LegendFunction.h"
 #include "datapoints/BarGroupsFunction.h"
 #include "datapoints/HistogramFunction.h"
 #include "datapoints/Histogram2DFunction.h"
@@ -409,6 +410,17 @@ void TestFunctionManager::create2DFunctions()
         meta.functionId = "2d_layout_subplots";
         m_metadataList.append(meta);
         m_functions[meta.functionId] = new SubplotsFunction(this);
+    }
+    
+    // Layout category - Legend
+    {
+        FunctionMetadata meta;
+        meta.category = tr("2D");
+        meta.subcategory = tr("Layout");
+        meta.displayName = tr("Legend");
+        meta.functionId = "2d_layout_legend";
+        m_metadataList.append(meta);
+        m_functions[meta.functionId] = new LegendFunction(this);
     }
 }
 

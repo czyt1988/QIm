@@ -67,6 +67,8 @@ class DragPointFunction : public TestFunction {
     Q_PROPERTY(bool fitEnabled READ isFitEnabled WRITE setFitEnabled NOTIFY fitEnabledChanged)
     Q_PROPERTY(bool inputsEnabled READ isInputsEnabled WRITE setInputsEnabled NOTIFY inputsEnabledChanged)
     Q_PROPERTY(bool delayed READ isDelayed WRITE setDelayed NOTIFY delayedChanged)
+    Q_PROPERTY(int id READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(int flags READ flags WRITE setFlags NOTIFY flagsChanged)
     
 public:
     /**
@@ -138,6 +140,14 @@ public:
     bool isDelayed() const { return m_delayed; }
     void setDelayed(bool on);
     
+    // ID property accessors
+    int id() const { return m_id; }
+    void setId(int id);
+    
+    // Flags property accessors
+    int flags() const { return m_flags; }
+    void setFlags(int flags);
+    
 Q_SIGNALS:
     /**
      * \if ENGLISH
@@ -194,6 +204,8 @@ Q_SIGNALS:
     void fitEnabledChanged(bool enabled);
     void inputsEnabledChanged(bool enabled);
     void delayedChanged(bool on);
+    void idChanged(int id);
+    void flagsChanged(int flags);
     
 private:
     QString m_title = QStringLiteral("Drag Point Tool");
@@ -204,6 +216,8 @@ private:
     bool m_fitEnabled = true;
     bool m_inputsEnabled = true;
     bool m_delayed = false;
+    int m_id = 0;
+    int m_flags = 0;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotLineItemNode* m_lineNode = nullptr;

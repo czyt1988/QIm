@@ -180,6 +180,70 @@ DragLinesFunction::DragLinesFunction(QObject* parent)
     delayedReg.propertyName = "delayed";
     delayedReg.target = this;
     registerProperty(delayedReg);
+    
+    // Register LineX ID property
+    PropertyRegistration lineXIdReg;
+    lineXIdReg.category = tr("DragLineX");
+    lineXIdReg.subcategory = tr("Config");
+    lineXIdReg.displayName = tr("ID");
+    lineXIdReg.briefDesc = tr("Vertical line drag tool ID");
+    lineXIdReg.detailDesc = tr("Sets the unique identifier for the vertical line drag tool (0-255)");
+    lineXIdReg.editorType = EditorType::SpinBox;
+    lineXIdReg.defaultValue = m_lineXId;
+    lineXIdReg.minValue = 0;
+    lineXIdReg.maxValue = 255;
+    lineXIdReg.stepValue = 1;
+    lineXIdReg.propertyName = "lineXId";
+    lineXIdReg.target = this;
+    registerProperty(lineXIdReg);
+    
+    // Register LineY ID property
+    PropertyRegistration lineYIdReg;
+    lineYIdReg.category = tr("DragLineY");
+    lineYIdReg.subcategory = tr("Config");
+    lineYIdReg.displayName = tr("ID");
+    lineYIdReg.briefDesc = tr("Horizontal line drag tool ID");
+    lineYIdReg.detailDesc = tr("Sets the unique identifier for the horizontal line drag tool (0-255)");
+    lineYIdReg.editorType = EditorType::SpinBox;
+    lineYIdReg.defaultValue = m_lineYId;
+    lineYIdReg.minValue = 0;
+    lineYIdReg.maxValue = 255;
+    lineYIdReg.stepValue = 1;
+    lineYIdReg.propertyName = "lineYId";
+    lineYIdReg.target = this;
+    registerProperty(lineYIdReg);
+    
+    // Register LineX flags property
+    PropertyRegistration lineXFlagsReg;
+    lineXFlagsReg.category = tr("DragLineX");
+    lineXFlagsReg.subcategory = tr("Config");
+    lineXFlagsReg.displayName = tr("Flags");
+    lineXFlagsReg.briefDesc = tr("Vertical line drag tool flags");
+    lineXFlagsReg.detailDesc = tr("Sets the ImPlotDragToolFlags bitmask for the vertical line (0-255)");
+    lineXFlagsReg.editorType = EditorType::SpinBox;
+    lineXFlagsReg.defaultValue = m_lineXFlags;
+    lineXFlagsReg.minValue = 0;
+    lineXFlagsReg.maxValue = 255;
+    lineXFlagsReg.stepValue = 1;
+    lineXFlagsReg.propertyName = "lineXFlags";
+    lineXFlagsReg.target = this;
+    registerProperty(lineXFlagsReg);
+    
+    // Register LineY flags property
+    PropertyRegistration lineYFlagsReg;
+    lineYFlagsReg.category = tr("DragLineY");
+    lineYFlagsReg.subcategory = tr("Config");
+    lineYFlagsReg.displayName = tr("Flags");
+    lineYFlagsReg.briefDesc = tr("Horizontal line drag tool flags");
+    lineYFlagsReg.detailDesc = tr("Sets the ImPlotDragToolFlags bitmask for the horizontal line (0-255)");
+    lineYFlagsReg.editorType = EditorType::SpinBox;
+    lineYFlagsReg.defaultValue = m_lineYFlags;
+    lineYFlagsReg.minValue = 0;
+    lineYFlagsReg.maxValue = 255;
+    lineYFlagsReg.stepValue = 1;
+    lineYFlagsReg.propertyName = "lineYFlags";
+    lineYFlagsReg.target = this;
+    registerProperty(lineYFlagsReg);
 }
 
 /**
@@ -389,6 +453,50 @@ void DragLinesFunction::setDelayed(bool on)
         }
         if (m_dragLineYNode) {
             m_dragLineYNode->setDelayed(on);
+        }
+    }
+}
+
+void DragLinesFunction::setLineXId(int id)
+{
+    if (m_lineXId != id) {
+        m_lineXId = id;
+        Q_EMIT lineXIdChanged(id);
+        if (m_dragLineXNode) {
+            m_dragLineXNode->setId(id);
+        }
+    }
+}
+
+void DragLinesFunction::setLineYId(int id)
+{
+    if (m_lineYId != id) {
+        m_lineYId = id;
+        Q_EMIT lineYIdChanged(id);
+        if (m_dragLineYNode) {
+            m_dragLineYNode->setId(id);
+        }
+    }
+}
+
+void DragLinesFunction::setLineXFlags(int flags)
+{
+    if (m_lineXFlags != flags) {
+        m_lineXFlags = flags;
+        Q_EMIT lineXFlagsChanged(flags);
+        if (m_dragLineXNode) {
+            m_dragLineXNode->setFlags(flags);
+        }
+    }
+}
+
+void DragLinesFunction::setLineYFlags(int flags)
+{
+    if (m_lineYFlags != flags) {
+        m_lineYFlags = flags;
+        Q_EMIT lineYFlagsChanged(flags);
+        if (m_dragLineYNode) {
+            m_dragLineYNode->setFlags(flags);
         }
     }
 }

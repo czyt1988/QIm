@@ -11,34 +11,12 @@
  * @brief Constructor for Plot3DTriangleFunction
  * @param parent Parent object
  * @details Initializes the test function and registers properties for interactive editing.
- * Properties are organized in categories:
- * - "Plot"/"Basic Info"/"Title" - Plot title
- * - "Plot"/"Axis"/"X Label" - X axis label
- * - "Plot"/"Axis"/"Y Label" - Y axis label
- * - "Plot"/"Axis"/"Z Label" - Z axis label
- * - "Triangle"/"Fill"/"Color" - Triangle fill color
- * - "Triangle"/"Fill"/"Visible" - Triangle fill visibility
- * - "Triangle"/"Line"/"Color" - Triangle line color
- * - "Triangle"/"Line"/"Width" - Triangle line width
- * - "Triangle"/"Line"/"Visible" - Triangle line visibility
- * - "Triangle"/"Markers"/"Visible" - Triangle markers visibility
  * \endif
  * 
  * \if CHINESE
  * @brief Plot3DTriangleFunction 构造函数
  * @param parent 父对象
  * @details 初始化测试函数并注册属性用于交互式编辑。
- * 属性按类别组织：
- * - "Plot"/"Basic Info"/"Title" - 图表标题
- * - "Plot"/"Axis"/"X Label" - X 轴标签
- * - "Plot"/"Axis"/"Y Label" - Y 轴标签
- * - "Plot"/"Axis"/"Z Label" - Z 轴标签
- * - "Triangle"/"Fill"/"Color" - 三角形填充颜色
- * - "Triangle"/"Fill"/"Visible" - 三角形填充可见性
- * - "Triangle"/"Line"/"Color" - 三角形线条颜色
- * - "Triangle"/"Line"/"Width" - 三角形线条宽度
- * - "Triangle"/"Line"/"Visible" - 三角形线条可见性
- * - "Triangle"/"Markers"/"Visible" - 三角形标记点可见性
  * \endif
  */
 Plot3DTriangleFunction::Plot3DTriangleFunction(QObject* parent)
@@ -57,7 +35,7 @@ Plot3DTriangleFunction::Plot3DTriangleFunction(QObject* parent)
     titleReg.target = this;
     registerProperty(titleReg);
     
-    // Register X axis label property
+    // Register axis labels
     PropertyRegistration xLabelReg;
     xLabelReg.category = tr("Plot");
     xLabelReg.subcategory = tr("Axis");
@@ -70,7 +48,6 @@ Plot3DTriangleFunction::Plot3DTriangleFunction(QObject* parent)
     xLabelReg.target = this;
     registerProperty(xLabelReg);
     
-    // Register Y axis label property
     PropertyRegistration yLabelReg;
     yLabelReg.category = tr("Plot");
     yLabelReg.subcategory = tr("Axis");
@@ -83,7 +60,6 @@ Plot3DTriangleFunction::Plot3DTriangleFunction(QObject* parent)
     yLabelReg.target = this;
     registerProperty(yLabelReg);
     
-    // Register Z axis label property
     PropertyRegistration zLabelReg;
     zLabelReg.category = tr("Plot");
     zLabelReg.subcategory = tr("Axis");
@@ -96,25 +72,24 @@ Plot3DTriangleFunction::Plot3DTriangleFunction(QObject* parent)
     zLabelReg.target = this;
     registerProperty(zLabelReg);
     
-    // Register fill color property
-    PropertyRegistration fillColorReg;
-    fillColorReg.category = tr("Triangle");
-    fillColorReg.subcategory = tr("Fill");
-    fillColorReg.displayName = tr("Color");
-    fillColorReg.briefDesc = tr("Triangle fill color");
-    fillColorReg.detailDesc = tr("Sets the fill color of the 3D triangle faces");
-    fillColorReg.editorType = EditorType::ColorPicker;
-    fillColorReg.defaultValue = m_fillColor;
-    fillColorReg.propertyName = "fillColor";
-    fillColorReg.target = this;
-    registerProperty(fillColorReg);
+    // Register visibility properties
+    PropertyRegistration linesVisibleReg;
+    linesVisibleReg.category = tr("Triangle");
+    linesVisibleReg.subcategory = tr("Visibility");
+    linesVisibleReg.displayName = tr("Lines");
+    linesVisibleReg.briefDesc = tr("Lines visible");
+    linesVisibleReg.detailDesc = tr("Controls whether triangle edges are visible");
+    linesVisibleReg.editorType = EditorType::CheckBox;
+    linesVisibleReg.defaultValue = m_linesVisible;
+    linesVisibleReg.propertyName = "linesVisible";
+    linesVisibleReg.target = this;
+    registerProperty(linesVisibleReg);
     
-    // Register fill visible property
     PropertyRegistration fillVisibleReg;
     fillVisibleReg.category = tr("Triangle");
-    fillVisibleReg.subcategory = tr("Fill");
-    fillVisibleReg.displayName = tr("Visible");
-    fillVisibleReg.briefDesc = tr("Triangle fill visibility");
+    fillVisibleReg.subcategory = tr("Visibility");
+    fillVisibleReg.displayName = tr("Fill");
+    fillVisibleReg.briefDesc = tr("Fill visible");
     fillVisibleReg.detailDesc = tr("Controls whether triangle faces are filled");
     fillVisibleReg.editorType = EditorType::CheckBox;
     fillVisibleReg.defaultValue = m_fillVisible;
@@ -122,12 +97,36 @@ Plot3DTriangleFunction::Plot3DTriangleFunction(QObject* parent)
     fillVisibleReg.target = this;
     registerProperty(fillVisibleReg);
     
-    // Register line color property
+    PropertyRegistration markersVisibleReg;
+    markersVisibleReg.category = tr("Triangle");
+    markersVisibleReg.subcategory = tr("Visibility");
+    markersVisibleReg.displayName = tr("Markers");
+    markersVisibleReg.briefDesc = tr("Markers visible");
+    markersVisibleReg.detailDesc = tr("Controls whether markers are shown at triangle vertices");
+    markersVisibleReg.editorType = EditorType::CheckBox;
+    markersVisibleReg.defaultValue = m_markersVisible;
+    markersVisibleReg.propertyName = "markersVisible";
+    markersVisibleReg.target = this;
+    registerProperty(markersVisibleReg);
+    
+    // Register style properties
+    PropertyRegistration fillColorReg;
+    fillColorReg.category = tr("Triangle");
+    fillColorReg.subcategory = tr("Style");
+    fillColorReg.displayName = tr("Fill Color");
+    fillColorReg.briefDesc = tr("Fill color");
+    fillColorReg.detailDesc = tr("Sets the fill color of the 3D triangle faces");
+    fillColorReg.editorType = EditorType::ColorPicker;
+    fillColorReg.defaultValue = m_fillColor;
+    fillColorReg.propertyName = "fillColor";
+    fillColorReg.target = this;
+    registerProperty(fillColorReg);
+    
     PropertyRegistration lineColorReg;
     lineColorReg.category = tr("Triangle");
-    lineColorReg.subcategory = tr("Line");
-    lineColorReg.displayName = tr("Color");
-    lineColorReg.briefDesc = tr("Triangle line color");
+    lineColorReg.subcategory = tr("Style");
+    lineColorReg.displayName = tr("Line Color");
+    lineColorReg.briefDesc = tr("Line color");
     lineColorReg.detailDesc = tr("Sets the color of the triangle edges");
     lineColorReg.editorType = EditorType::ColorPicker;
     lineColorReg.defaultValue = m_lineColor;
@@ -135,12 +134,11 @@ Plot3DTriangleFunction::Plot3DTriangleFunction(QObject* parent)
     lineColorReg.target = this;
     registerProperty(lineColorReg);
     
-    // Register line width property
     PropertyRegistration lineWidthReg;
     lineWidthReg.category = tr("Triangle");
-    lineWidthReg.subcategory = tr("Line");
-    lineWidthReg.displayName = tr("Width");
-    lineWidthReg.briefDesc = tr("Triangle line width");
+    lineWidthReg.subcategory = tr("Style");
+    lineWidthReg.displayName = tr("Line Width");
+    lineWidthReg.briefDesc = tr("Line width");
     lineWidthReg.detailDesc = tr("Sets the line width (thickness) of triangle edges in pixels");
     lineWidthReg.editorType = EditorType::DoubleSpinBox;
     lineWidthReg.defaultValue = m_lineWidth;
@@ -151,31 +149,88 @@ Plot3DTriangleFunction::Plot3DTriangleFunction(QObject* parent)
     lineWidthReg.target = this;
     registerProperty(lineWidthReg);
     
-    // Register lines visible property
-    PropertyRegistration linesVisibleReg;
-    linesVisibleReg.category = tr("Triangle");
-    linesVisibleReg.subcategory = tr("Line");
-    linesVisibleReg.displayName = tr("Visible");
-    linesVisibleReg.briefDesc = tr("Triangle lines visibility");
-    linesVisibleReg.detailDesc = tr("Controls whether triangle edges are visible");
-    linesVisibleReg.editorType = EditorType::CheckBox;
-    linesVisibleReg.defaultValue = m_linesVisible;
-    linesVisibleReg.propertyName = "linesVisible";
-    linesVisibleReg.target = this;
-    registerProperty(linesVisibleReg);
+    PropertyRegistration fillAlphaReg;
+    fillAlphaReg.category = tr("Triangle");
+    fillAlphaReg.subcategory = tr("Style");
+    fillAlphaReg.displayName = tr("Fill Alpha");
+    fillAlphaReg.briefDesc = tr("Fill alpha");
+    fillAlphaReg.detailDesc = tr("Sets the fill transparency (0.0 = transparent, 1.0 = opaque)");
+    fillAlphaReg.editorType = EditorType::DoubleSpinBox;
+    fillAlphaReg.defaultValue = m_fillAlpha;
+    fillAlphaReg.minValue = 0.0;
+    fillAlphaReg.maxValue = 1.0;
+    fillAlphaReg.stepValue = 0.1;
+    fillAlphaReg.propertyName = "fillAlpha";
+    fillAlphaReg.target = this;
+    registerProperty(fillAlphaReg);
     
-    // Register markers visible property
-    PropertyRegistration markersVisibleReg;
-    markersVisibleReg.category = tr("Triangle");
-    markersVisibleReg.subcategory = tr("Markers");
-    markersVisibleReg.displayName = tr("Visible");
-    markersVisibleReg.briefDesc = tr("Triangle markers visibility");
-    markersVisibleReg.detailDesc = tr("Controls whether markers are shown at triangle vertices");
-    markersVisibleReg.editorType = EditorType::CheckBox;
-    markersVisibleReg.defaultValue = m_markersVisible;
-    markersVisibleReg.propertyName = "markersVisible";
-    markersVisibleReg.target = this;
-    registerProperty(markersVisibleReg);
+    // Register marker properties
+    PropertyRegistration markerShapeReg;
+    markerShapeReg.category = tr("Triangle");
+    markerShapeReg.subcategory = tr("Marker");
+    markerShapeReg.displayName = tr("Shape");
+    markerShapeReg.briefDesc = tr("Marker shape");
+    markerShapeReg.detailDesc = tr("Sets the marker shape for triangle vertices");
+    markerShapeReg.editorType = EditorType::ComboBox;
+    markerShapeReg.defaultValue = m_markerShape;
+    markerShapeReg.comboBoxOptions = QStringList{"None", "Circle", "Square", "Diamond", "Up", "Down", "Left", "Right", "Cross", "Plus", "Asterisk"};
+    markerShapeReg.propertyName = "markerShape";
+    markerShapeReg.target = this;
+    registerProperty(markerShapeReg);
+    
+    PropertyRegistration markerSizeReg;
+    markerSizeReg.category = tr("Triangle");
+    markerSizeReg.subcategory = tr("Marker");
+    markerSizeReg.displayName = tr("Size");
+    markerSizeReg.briefDesc = tr("Marker size");
+    markerSizeReg.detailDesc = tr("Sets the marker size in pixels");
+    markerSizeReg.editorType = EditorType::DoubleSpinBox;
+    markerSizeReg.defaultValue = m_markerSize;
+    markerSizeReg.minValue = 1.0;
+    markerSizeReg.maxValue = 20.0;
+    markerSizeReg.stepValue = 0.5;
+    markerSizeReg.propertyName = "markerSize";
+    markerSizeReg.target = this;
+    registerProperty(markerSizeReg);
+    
+    PropertyRegistration markerWeightReg;
+    markerWeightReg.category = tr("Triangle");
+    markerWeightReg.subcategory = tr("Marker");
+    markerWeightReg.displayName = tr("Weight");
+    markerWeightReg.briefDesc = tr("Marker weight");
+    markerWeightReg.detailDesc = tr("Sets the marker outline weight in pixels");
+    markerWeightReg.editorType = EditorType::DoubleSpinBox;
+    markerWeightReg.defaultValue = m_markerWeight;
+    markerWeightReg.minValue = 0.5;
+    markerWeightReg.maxValue = 10.0;
+    markerWeightReg.stepValue = 0.5;
+    markerWeightReg.propertyName = "markerWeight";
+    markerWeightReg.target = this;
+    registerProperty(markerWeightReg);
+    
+    PropertyRegistration markerFillColorReg;
+    markerFillColorReg.category = tr("Triangle");
+    markerFillColorReg.subcategory = tr("Marker");
+    markerFillColorReg.displayName = tr("Fill Color");
+    markerFillColorReg.briefDesc = tr("Marker fill color");
+    markerFillColorReg.detailDesc = tr("Sets the fill color of markers");
+    markerFillColorReg.editorType = EditorType::ColorPicker;
+    markerFillColorReg.defaultValue = m_markerFillColor;
+    markerFillColorReg.propertyName = "markerFillColor";
+    markerFillColorReg.target = this;
+    registerProperty(markerFillColorReg);
+    
+    PropertyRegistration markerOutlineColorReg;
+    markerOutlineColorReg.category = tr("Triangle");
+    markerOutlineColorReg.subcategory = tr("Marker");
+    markerOutlineColorReg.displayName = tr("Outline Color");
+    markerOutlineColorReg.briefDesc = tr("Marker outline color");
+    markerOutlineColorReg.detailDesc = tr("Sets the outline color of markers");
+    markerOutlineColorReg.editorType = EditorType::ColorPicker;
+    markerOutlineColorReg.defaultValue = m_markerOutlineColor;
+    markerOutlineColorReg.propertyName = "markerOutlineColor";
+    markerOutlineColorReg.target = this;
+    registerProperty(markerOutlineColorReg);
 }
 
 /**
@@ -195,43 +250,11 @@ Plot3DTriangleFunction::~Plot3DTriangleFunction()
  * \if ENGLISH
  * @brief Create plot nodes in the given figure widget
  * @param figure Pointer to the figure widget where plots will be created
- * @details Creates a 3D plot with a tetrahedron (4 triangular faces),
- * configures axes, and adds a 3D triangle item.
- * 
- * Tetrahedron vertices:
- * - V0 = (0, 0, 1)           (top)
- * - V1 = (0.943, 0, -0.333)  (base right)
- * - V2 = (-0.471, 0.816, -0.333)  (base back-left)
- * - V3 = (-0.471, -0.816, -0.333) (base front-left)
- * 
- * Faces (3 points each, counter-clockwise from outside):
- * - Face 0: V0-V1-V2
- * - Face 1: V0-V2-V3
- * - Face 2: V0-V3-V1
- * - Face 3: V1-V3-V2 (base)
- * 
- * Total: 12 points (4 faces * 3 points each)
  * \endif
  * 
  * \if CHINESE
  * @brief 在指定的图表控件中创建绘图节点
  * @param figure 将要创建绘图的图表控件指针
- * @details 创建一个包含四面体（4 个三角形面）的 3D 图表，
- * 配置坐标轴，并添加 3D 三角形元素。
- * 
- * 四面体顶点：
- * - V0 = (0, 0, 1)           (顶部)
- * - V1 = (0.943, 0, -0.333)  (底部右侧)
- * - V2 = (-0.471, 0.816, -0.333)  (底部后左)
- * - V3 = (-0.471, -0.816, -0.333) (底部前左)
- * 
- * 面（每个面 3 个点，从外部看逆时针）：
- * - 面 0: V0-V1-V2
- * - 面 1: V0-V2-V3
- * - 面 2: V0-V3-V1
- * - 面 3: V1-V3-V2 (底面)
- * 
- * 总计：12 个点（4 个面 * 每个面 3 个点）
  * \endif
  */
 void Plot3DTriangleFunction::createPlot(QIM::QImFigureWidget* figure)
@@ -240,55 +263,41 @@ void Plot3DTriangleFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
-    // Reset to single-plot mode to clear any previous subplot configuration
     figure->setSubplot3DGrid(1, 1);
-    
-    // Create 3D plot node as a top-level render node via QImFigureWidget API
     m_plot3DNode = figure->createPlot3DNode();
     
-    // Configure axes and title
     m_plot3DNode->xAxis()->setLabel(m_xLabel);
     m_plot3DNode->yAxis()->setLabel(m_yLabel);
     m_plot3DNode->zAxis()->setLabel(m_zLabel);
     m_plot3DNode->setTitle(m_title);
-    
-    // Set default isometric view for better 3D visualization
-    m_plot3DNode->setBoxRotation(35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
+    m_plot3DNode->setBoxRotation(35.264, 45.0);
     
     // Generate tetrahedron data
-    // Vertices:
-    // V0 = (0, 0, 1)           (top)
-    // V1 = (0.943, 0, -0.333)  (base right)
-    // V2 = (-0.471, 0.816, -0.333)  (base back-left)
-    // V3 = (-0.471, -0.816, -0.333) (base front-left)
-    // Faces (3 points each): V0-V1-V2, V0-V2-V3, V0-V3-V1, V1-V3-V2
-    // Total: 12 points (4 faces * 3 points each)
     QVector<double> xs, ys, zs;
     xs.reserve(12);
     ys.reserve(12);
     zs.reserve(12);
     
     // Face 0: V0-V1-V2
-    xs.append(0.0);      ys.append(0.0);       zs.append(1.0);      // V0
-    xs.append(0.943);    ys.append(0.0);       zs.append(-0.333);   // V1
-    xs.append(-0.471);   ys.append(0.816);     zs.append(-0.333);   // V2
+    xs.append(0.0);      ys.append(0.0);       zs.append(1.0);
+    xs.append(0.943);    ys.append(0.0);       zs.append(-0.333);
+    xs.append(-0.471);   ys.append(0.816);     zs.append(-0.333);
     
     // Face 1: V0-V2-V3
-    xs.append(0.0);      ys.append(0.0);       zs.append(1.0);      // V0
-    xs.append(-0.471);   ys.append(0.816);     zs.append(-0.333);   // V2
-    xs.append(-0.471);   ys.append(-0.816);    zs.append(-0.333);   // V3
+    xs.append(0.0);      ys.append(0.0);       zs.append(1.0);
+    xs.append(-0.471);   ys.append(0.816);     zs.append(-0.333);
+    xs.append(-0.471);   ys.append(-0.816);    zs.append(-0.333);
     
     // Face 2: V0-V3-V1
-    xs.append(0.0);      ys.append(0.0);       zs.append(1.0);      // V0
-    xs.append(-0.471);   ys.append(-0.816);    zs.append(-0.333);   // V3
-    xs.append(0.943);    ys.append(0.0);       zs.append(-0.333);   // V1
+    xs.append(0.0);      ys.append(0.0);       zs.append(1.0);
+    xs.append(-0.471);   ys.append(-0.816);    zs.append(-0.333);
+    xs.append(0.943);    ys.append(0.0);       zs.append(-0.333);
     
     // Face 3: V1-V3-V2 (base)
-    xs.append(0.943);    ys.append(0.0);       zs.append(-0.333);   // V1
-    xs.append(-0.471);   ys.append(-0.816);    zs.append(-0.333);   // V3
-    xs.append(-0.471);   ys.append(0.816);     zs.append(-0.333);   // V2
+    xs.append(0.943);    ys.append(0.0);       zs.append(-0.333);
+    xs.append(-0.471);   ys.append(-0.816);    zs.append(-0.333);
+    xs.append(-0.471);   ys.append(0.816);     zs.append(-0.333);
     
-    // Create 3D triangle item node and set data
     m_triangle3DNode = new QIM::QImPlot3DTriangleItemNode(m_plot3DNode);
     m_triangle3DNode->setData(xs, ys, zs);
     m_triangle3DNode->setFillColor(m_fillColor);
@@ -297,6 +306,7 @@ void Plot3DTriangleFunction::createPlot(QIM::QImFigureWidget* figure)
     m_triangle3DNode->setLinesVisible(m_linesVisible);
     m_triangle3DNode->setFillVisible(m_fillVisible);
     m_triangle3DNode->setMarkersVisible(m_markersVisible);
+    m_triangle3DNode->setFillAlpha(m_fillAlpha);
 }
 
 void Plot3DTriangleFunction::setTitle(const QString& title)
@@ -304,9 +314,7 @@ void Plot3DTriangleFunction::setTitle(const QString& title)
     if (m_title != title) {
         m_title = title;
         Q_EMIT titleChanged(title);
-        if (m_plot3DNode) {
-            m_plot3DNode->setTitle(title);
-        }
+        if (m_plot3DNode) { m_plot3DNode->setTitle(title); }
     }
 }
 
@@ -315,9 +323,7 @@ void Plot3DTriangleFunction::setXLabel(const QString& label)
     if (m_xLabel != label) {
         m_xLabel = label;
         Q_EMIT xLabelChanged(label);
-        if (m_plot3DNode) {
-            m_plot3DNode->xAxis()->setLabel(label);
-        }
+        if (m_plot3DNode) { m_plot3DNode->xAxis()->setLabel(label); }
     }
 }
 
@@ -326,9 +332,7 @@ void Plot3DTriangleFunction::setYLabel(const QString& label)
     if (m_yLabel != label) {
         m_yLabel = label;
         Q_EMIT yLabelChanged(label);
-        if (m_plot3DNode) {
-            m_plot3DNode->yAxis()->setLabel(label);
-        }
+        if (m_plot3DNode) { m_plot3DNode->yAxis()->setLabel(label); }
     }
 }
 
@@ -337,9 +341,7 @@ void Plot3DTriangleFunction::setZLabel(const QString& label)
     if (m_zLabel != label) {
         m_zLabel = label;
         Q_EMIT zLabelChanged(label);
-        if (m_plot3DNode) {
-            m_plot3DNode->zAxis()->setLabel(label);
-        }
+        if (m_plot3DNode) { m_plot3DNode->zAxis()->setLabel(label); }
     }
 }
 
@@ -348,9 +350,7 @@ void Plot3DTriangleFunction::setFillColor(const QColor& color)
     if (m_fillColor != color) {
         m_fillColor = color;
         Q_EMIT fillColorChanged(color);
-        if (m_triangle3DNode) {
-            m_triangle3DNode->setFillColor(color);
-        }
+        if (m_triangle3DNode) { m_triangle3DNode->setFillColor(color); }
     }
 }
 
@@ -359,9 +359,7 @@ void Plot3DTriangleFunction::setLineColor(const QColor& color)
     if (m_lineColor != color) {
         m_lineColor = color;
         Q_EMIT lineColorChanged(color);
-        if (m_triangle3DNode) {
-            m_triangle3DNode->setLineColor(color);
-        }
+        if (m_triangle3DNode) { m_triangle3DNode->setLineColor(color); }
     }
 }
 
@@ -370,9 +368,7 @@ void Plot3DTriangleFunction::setLineWidth(float width)
     if (m_lineWidth != width) {
         m_lineWidth = width;
         Q_EMIT lineWidthChanged(width);
-        if (m_triangle3DNode) {
-            m_triangle3DNode->setLineWidth(width);
-        }
+        if (m_triangle3DNode) { m_triangle3DNode->setLineWidth(width); }
     }
 }
 
@@ -381,9 +377,7 @@ void Plot3DTriangleFunction::setLinesVisible(bool visible)
     if (m_linesVisible != visible) {
         m_linesVisible = visible;
         Q_EMIT linesVisibleChanged(visible);
-        if (m_triangle3DNode) {
-            m_triangle3DNode->setLinesVisible(visible);
-        }
+        if (m_triangle3DNode) { m_triangle3DNode->setLinesVisible(visible); }
     }
 }
 
@@ -392,9 +386,7 @@ void Plot3DTriangleFunction::setFillVisible(bool visible)
     if (m_fillVisible != visible) {
         m_fillVisible = visible;
         Q_EMIT fillVisibleChanged(visible);
-        if (m_triangle3DNode) {
-            m_triangle3DNode->setFillVisible(visible);
-        }
+        if (m_triangle3DNode) { m_triangle3DNode->setFillVisible(visible); }
     }
 }
 
@@ -403,9 +395,75 @@ void Plot3DTriangleFunction::setMarkersVisible(bool visible)
     if (m_markersVisible != visible) {
         m_markersVisible = visible;
         Q_EMIT markersVisibleChanged(visible);
+        if (m_triangle3DNode) { m_triangle3DNode->setMarkersVisible(visible); }
+    }
+}
+
+void Plot3DTriangleFunction::setMarkerShape(const QString& shape)
+{
+    if (m_markerShape != shape) {
+        m_markerShape = shape;
+        Q_EMIT markerShapeChanged(shape);
         if (m_triangle3DNode) {
-            m_triangle3DNode->setMarkersVisible(visible);
+            int enumVal = -1;
+            if (shape == tr("None") || shape == "None") enumVal = -1;
+            else if (shape == tr("Circle") || shape == "Circle") enumVal = 0;
+            else if (shape == tr("Square") || shape == "Square") enumVal = 1;
+            else if (shape == tr("Diamond") || shape == "Diamond") enumVal = 2;
+            else if (shape == tr("Up") || shape == "Up") enumVal = 3;
+            else if (shape == tr("Down") || shape == "Down") enumVal = 4;
+            else if (shape == tr("Left") || shape == "Left") enumVal = 5;
+            else if (shape == tr("Right") || shape == "Right") enumVal = 6;
+            else if (shape == tr("Cross") || shape == "Cross") enumVal = 7;
+            else if (shape == tr("Plus") || shape == "Plus") enumVal = 8;
+            else if (shape == tr("Asterisk") || shape == "Asterisk") enumVal = 9;
+            m_triangle3DNode->setMarkerShape(enumVal);
         }
+    }
+}
+
+void Plot3DTriangleFunction::setMarkerSize(float size)
+{
+    if (m_markerSize != size) {
+        m_markerSize = size;
+        Q_EMIT markerSizeChanged(size);
+        if (m_triangle3DNode) { m_triangle3DNode->setMarkerSize(size); }
+    }
+}
+
+void Plot3DTriangleFunction::setMarkerWeight(float weight)
+{
+    if (m_markerWeight != weight) {
+        m_markerWeight = weight;
+        Q_EMIT markerWeightChanged(weight);
+        if (m_triangle3DNode) { m_triangle3DNode->setMarkerWeight(weight); }
+    }
+}
+
+void Plot3DTriangleFunction::setMarkerFillColor(const QColor& color)
+{
+    if (m_markerFillColor != color) {
+        m_markerFillColor = color;
+        Q_EMIT markerFillColorChanged(color);
+        if (m_triangle3DNode) { m_triangle3DNode->setMarkerFillColor(color); }
+    }
+}
+
+void Plot3DTriangleFunction::setMarkerOutlineColor(const QColor& color)
+{
+    if (m_markerOutlineColor != color) {
+        m_markerOutlineColor = color;
+        Q_EMIT markerOutlineColorChanged(color);
+        if (m_triangle3DNode) { m_triangle3DNode->setMarkerOutlineColor(color); }
+    }
+}
+
+void Plot3DTriangleFunction::setFillAlpha(float alpha)
+{
+    if (m_fillAlpha != alpha) {
+        m_fillAlpha = alpha;
+        Q_EMIT fillAlphaChanged(alpha);
+        if (m_triangle3DNode) { m_triangle3DNode->setFillAlpha(alpha); }
     }
 }
 

@@ -67,6 +67,7 @@ class BarsFunction : public TestFunction {
     Q_PROPERTY(QString yLabel READ yLabel WRITE setYLabel NOTIFY yLabelChanged)
     Q_PROPERTY(double barWidth READ barWidth WRITE setBarWidth NOTIFY barWidthChanged)
     Q_PROPERTY(QColor barColor READ barColor WRITE setBarColor NOTIFY barColorChanged)
+    Q_PROPERTY(bool horizontal READ isHorizontal WRITE setHorizontal NOTIFY horizontalChanged)
     
 public:
     /**
@@ -125,6 +126,10 @@ public:
     // Bar color property accessors
     QColor barColor() const { return m_barColor; }
     void setBarColor(const QColor& color);
+    
+    // Horizontal orientation property accessors
+    bool isHorizontal() const { return m_horizontal; }
+    void setHorizontal(bool enabled);
     
 Q_SIGNALS:
     /**
@@ -192,12 +197,26 @@ Q_SIGNALS:
      */
     void barColorChanged(const QColor& color);
     
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when horizontal orientation changes
+     * @param enabled New horizontal orientation state
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 水平方向改变时发出的信号
+     * @param enabled 新的水平方向状态
+     * \endif
+     */
+    void horizontalChanged(bool enabled);
+    
 private:
     QString m_title = QStringLiteral("Bar Chart");
     QString m_xLabel = QStringLiteral("x");
     QString m_yLabel = QStringLiteral("y");
     double m_barWidth = 0.6;
     QColor m_barColor = Qt::green;
+    bool m_horizontal = false;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotBarsItemNode* m_barsNode = nullptr;

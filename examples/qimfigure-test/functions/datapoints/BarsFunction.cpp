@@ -101,6 +101,19 @@ BarsFunction::BarsFunction(QObject* parent)
     colorReg.propertyName = "barColor";
     colorReg.target = this;
     registerProperty(colorReg);
+    
+    // Register horizontal orientation property
+    PropertyRegistration horizontalReg;
+    horizontalReg.category = tr("Bars");
+    horizontalReg.subcategory = tr("Orientation");
+    horizontalReg.displayName = tr("Horizontal");
+    horizontalReg.briefDesc = tr("Horizontal orientation");
+    horizontalReg.detailDesc = tr("When enabled, bars are drawn horizontally instead of vertically");
+    horizontalReg.editorType = EditorType::CheckBox;
+    horizontalReg.defaultValue = m_horizontal;
+    horizontalReg.propertyName = "horizontal";
+    horizontalReg.target = this;
+    registerProperty(horizontalReg);
 }
 
 /**
@@ -223,6 +236,17 @@ void BarsFunction::setBarColor(const QColor& color)
         emit barColorChanged(color);
         if (m_barsNode) {
             m_barsNode->setColor(color);
+        }
+    }
+}
+
+void BarsFunction::setHorizontal(bool enabled)
+{
+    if (m_horizontal != enabled) {
+        m_horizontal = enabled;
+        Q_EMIT horizontalChanged(enabled);
+        if (m_barsNode) {
+            m_barsNode->setHorizontal(enabled);
         }
     }
 }

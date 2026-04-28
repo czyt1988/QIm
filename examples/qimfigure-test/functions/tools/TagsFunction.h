@@ -70,6 +70,8 @@ class TagsFunction : public TestFunction {
     Q_PROPERTY(double tagYValue READ tagYValue WRITE setTagYValue NOTIFY tagYValueChanged)
     Q_PROPERTY(QString tagYText READ tagYText WRITE setTagYText NOTIFY tagYTextChanged)
     Q_PROPERTY(QColor tagYColor READ tagYColor WRITE setTagYColor NOTIFY tagYColorChanged)
+    Q_PROPERTY(bool tagXRound READ isTagXRound WRITE setTagXRound NOTIFY tagXRoundChanged)
+    Q_PROPERTY(bool tagYRound READ isTagYRound WRITE setTagYRound NOTIFY tagYRoundChanged)
     
 public:
     /**
@@ -136,6 +138,14 @@ public:
     // TagY color property accessors
     QColor tagYColor() const { return m_tagYColor; }
     void setTagYColor(const QColor& color);
+    
+    // TagX round property accessors
+    bool isTagXRound() const { return m_tagXRound; }
+    void setTagXRound(bool round);
+    
+    // TagY round property accessors
+    bool isTagYRound() const { return m_tagYRound; }
+    void setTagYRound(bool round);
     
 Q_SIGNALS:
     /**
@@ -229,6 +239,32 @@ Q_SIGNALS:
      */
     void tagYColorChanged(const QColor& color);
     
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when TagX round setting changes
+     * @param round New round setting
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief TagX舍入设置改变时发出的信号
+     * @param round 新的舍入设置
+     * \endif
+     */
+    void tagXRoundChanged(bool round);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when TagY round setting changes
+     * @param round New round setting
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief TagY舍入设置改变时发出的信号
+     * @param round 新的舍入设置
+     * \endif
+     */
+    void tagYRoundChanged(bool round);
+    
 private:
     QString m_title = QStringLiteral("Tags Tool");
     double m_tagXValue = 5.0;
@@ -237,6 +273,8 @@ private:
     double m_tagYValue = 5.0;
     QString m_tagYText = QStringLiteral("Y=5.0");
     QColor m_tagYColor = QColor(100, 255, 100);
+    bool m_tagXRound = false;
+    bool m_tagYRound = false;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotLineItemNode* m_lineNode = nullptr;

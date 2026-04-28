@@ -16,12 +16,20 @@
  * - "Plot"/"Axis"/"X Label" - X axis label
  * - "Plot"/"Axis"/"Y Label" - Y axis label
  * - "Plot"/"Axis"/"Z Label" - Z axis label
- * - "Mesh"/"Fill"/"Color" - Mesh fill color
- * - "Mesh"/"Fill"/"Visible" - Mesh fill visibility
- * - "Mesh"/"Line"/"Color" - Mesh line color
- * - "Mesh"/"Line"/"Width" - Mesh line width
- * - "Mesh"/"Line"/"Visible" - Mesh line visibility
- * - "Mesh"/"Markers"/"Visible" - Mesh markers visibility
+ * - "Mesh"/"Style"/"Fill Color" - Mesh fill color
+ * - "Mesh"/"Visibility"/"Fill Visible" - Mesh fill visibility
+ * - "Mesh"/"Style"/"Line Color" - Mesh line color
+ * - "Mesh"/"Style"/"Line Width" - Mesh line width
+ * - "Mesh"/"Visibility"/"Lines Visible" - Mesh lines visibility
+ * - "Mesh"/"Visibility"/"Markers Visible" - Mesh markers visibility
+ * - "Mesh"/"Marker"/"Shape" - Marker shape
+ * - "Mesh"/"Marker"/"Size" - Marker size
+ * - "Mesh"/"Marker"/"Weight" - Marker weight
+ * - "Mesh"/"Marker"/"Fill Color" - Marker fill color
+ * - "Mesh"/"Marker"/"Outline Color" - Marker outline color
+ * - "Mesh"/"Style"/"Fill Alpha" - Fill alpha
+ * - "Mesh"/"Style"/"Per-Triangle Fill Color" - Per-triangle fill coloring
+ * - "Mesh"/"Style"/"Per-Triangle Line Color" - Per-triangle line coloring
  * \endif
  * 
  * \if CHINESE
@@ -33,12 +41,20 @@
  * - "Plot"/"Axis"/"X Label" - X 轴标签
  * - "Plot"/"Axis"/"Y Label" - Y 轴标签
  * - "Plot"/"Axis"/"Z Label" - Z 轴标签
- * - "Mesh"/"Fill"/"Color" - 网格填充颜色
- * - "Mesh"/"Fill"/"Visible" - 网格填充可见性
- * - "Mesh"/"Line"/"Color" - 网格线条颜色
- * - "Mesh"/"Line"/"Width" - 网格线宽
- * - "Mesh"/"Line"/"Visible" - 网格线条可见性
- * - "Mesh"/"Markers"/"Visible" - 网格标记点可见性
+ * - "Mesh"/"Style"/"Fill Color" - 网格填充颜色
+ * - "Mesh"/"Visibility"/"Fill Visible" - 网格填充可见性
+ * - "Mesh"/"Style"/"Line Color" - 网格线条颜色
+ * - "Mesh"/"Style"/"Line Width" - 网格线宽
+ * - "Mesh"/"Visibility"/"Lines Visible" - 网格线条可见性
+ * - "Mesh"/"Visibility"/"Markers Visible" - 网格标记点可见性
+ * - "Mesh"/"Marker"/"Shape" - 标记点形状
+ * - "Mesh"/"Marker"/"Size" - 标记点大小
+ * - "Mesh"/"Marker"/"Weight" - 标记点权重
+ * - "Mesh"/"Marker"/"Fill Color" - 标记点填充颜色
+ * - "Mesh"/"Marker"/"Outline Color" - 标记点轮廓颜色
+ * - "Mesh"/"Style"/"Fill Alpha" - 填充透明度
+ * - "Mesh"/"Style"/"Per-Triangle Fill Color" - 逐三角面填充颜色
+ * - "Mesh"/"Style"/"Per-Triangle Line Color" - 逐三角面线条颜色
  * \endif
  */
 Plot3DMeshFunction::Plot3DMeshFunction(QObject* parent)
@@ -99,8 +115,8 @@ Plot3DMeshFunction::Plot3DMeshFunction(QObject* parent)
     // Register fill color property
     PropertyRegistration fillColorReg;
     fillColorReg.category = tr("Mesh");
-    fillColorReg.subcategory = tr("Fill");
-    fillColorReg.displayName = tr("Color");
+    fillColorReg.subcategory = tr("Style");
+    fillColorReg.displayName = tr("Fill Color");
     fillColorReg.briefDesc = tr("Fill color");
     fillColorReg.detailDesc = tr("Sets the fill color of the mesh faces");
     fillColorReg.editorType = EditorType::ColorPicker;
@@ -112,8 +128,8 @@ Plot3DMeshFunction::Plot3DMeshFunction(QObject* parent)
     // Register fill visible property
     PropertyRegistration fillVisibleReg;
     fillVisibleReg.category = tr("Mesh");
-    fillVisibleReg.subcategory = tr("Fill");
-    fillVisibleReg.displayName = tr("Visible");
+    fillVisibleReg.subcategory = tr("Visibility");
+    fillVisibleReg.displayName = tr("Fill Visible");
     fillVisibleReg.briefDesc = tr("Fill visible");
     fillVisibleReg.detailDesc = tr("Sets whether mesh faces are visible");
     fillVisibleReg.editorType = EditorType::CheckBox;
@@ -125,8 +141,8 @@ Plot3DMeshFunction::Plot3DMeshFunction(QObject* parent)
     // Register line color property
     PropertyRegistration lineColorReg;
     lineColorReg.category = tr("Mesh");
-    lineColorReg.subcategory = tr("Line");
-    lineColorReg.displayName = tr("Color");
+    lineColorReg.subcategory = tr("Style");
+    lineColorReg.displayName = tr("Line Color");
     lineColorReg.briefDesc = tr("Line color");
     lineColorReg.detailDesc = tr("Sets the color of the mesh edge lines");
     lineColorReg.editorType = EditorType::ColorPicker;
@@ -138,8 +154,8 @@ Plot3DMeshFunction::Plot3DMeshFunction(QObject* parent)
     // Register line width property
     PropertyRegistration lineWidthReg;
     lineWidthReg.category = tr("Mesh");
-    lineWidthReg.subcategory = tr("Line");
-    lineWidthReg.displayName = tr("Width");
+    lineWidthReg.subcategory = tr("Style");
+    lineWidthReg.displayName = tr("Line Width");
     lineWidthReg.briefDesc = tr("Line width");
     lineWidthReg.detailDesc = tr("Sets the width of the mesh edge lines in pixels");
     lineWidthReg.editorType = EditorType::DoubleSpinBox;
@@ -154,8 +170,8 @@ Plot3DMeshFunction::Plot3DMeshFunction(QObject* parent)
     // Register lines visible property
     PropertyRegistration linesVisibleReg;
     linesVisibleReg.category = tr("Mesh");
-    linesVisibleReg.subcategory = tr("Line");
-    linesVisibleReg.displayName = tr("Visible");
+    linesVisibleReg.subcategory = tr("Visibility");
+    linesVisibleReg.displayName = tr("Lines Visible");
     linesVisibleReg.briefDesc = tr("Lines visible");
     linesVisibleReg.detailDesc = tr("Sets whether mesh edge lines are visible");
     linesVisibleReg.editorType = EditorType::CheckBox;
@@ -167,8 +183,8 @@ Plot3DMeshFunction::Plot3DMeshFunction(QObject* parent)
     // Register markers visible property
     PropertyRegistration markersVisibleReg;
     markersVisibleReg.category = tr("Mesh");
-    markersVisibleReg.subcategory = tr("Markers");
-    markersVisibleReg.displayName = tr("Visible");
+    markersVisibleReg.subcategory = tr("Visibility");
+    markersVisibleReg.displayName = tr("Markers Visible");
     markersVisibleReg.briefDesc = tr("Markers visible");
     markersVisibleReg.detailDesc = tr("Sets whether mesh vertex markers are visible");
     markersVisibleReg.editorType = EditorType::CheckBox;
@@ -176,6 +192,120 @@ Plot3DMeshFunction::Plot3DMeshFunction(QObject* parent)
     markersVisibleReg.propertyName = "markersVisible";
     markersVisibleReg.target = this;
     registerProperty(markersVisibleReg);
+    
+    // Register marker shape property
+    PropertyRegistration markerShapeReg;
+    markerShapeReg.category = tr("Mesh");
+    markerShapeReg.subcategory = tr("Marker");
+    markerShapeReg.displayName = tr("Shape");
+    markerShapeReg.briefDesc = tr("Marker shape");
+    markerShapeReg.detailDesc = tr("Sets the marker shape for mesh vertices");
+    markerShapeReg.editorType = EditorType::ComboBox;
+    markerShapeReg.defaultValue = m_markerShape;
+    markerShapeReg.comboBoxOptions = QStringList{"None", "Circle", "Square", "Diamond", "Up", "Down", "Left", "Right", "Cross", "Plus", "Asterisk"};
+    markerShapeReg.propertyName = "markerShape";
+    markerShapeReg.target = this;
+    registerProperty(markerShapeReg);
+    
+    // Register marker size property
+    PropertyRegistration markerSizeReg;
+    markerSizeReg.category = tr("Mesh");
+    markerSizeReg.subcategory = tr("Marker");
+    markerSizeReg.displayName = tr("Size");
+    markerSizeReg.briefDesc = tr("Marker size");
+    markerSizeReg.detailDesc = tr("Sets the marker size in pixels for mesh vertices");
+    markerSizeReg.editorType = EditorType::DoubleSpinBox;
+    markerSizeReg.defaultValue = m_markerSize;
+    markerSizeReg.minValue = 1.0;
+    markerSizeReg.maxValue = 20.0;
+    markerSizeReg.stepValue = 0.5;
+    markerSizeReg.propertyName = "markerSize";
+    markerSizeReg.target = this;
+    registerProperty(markerSizeReg);
+    
+    // Register marker weight property
+    PropertyRegistration markerWeightReg;
+    markerWeightReg.category = tr("Mesh");
+    markerWeightReg.subcategory = tr("Marker");
+    markerWeightReg.displayName = tr("Weight");
+    markerWeightReg.briefDesc = tr("Marker weight");
+    markerWeightReg.detailDesc = tr("Sets the marker outline weight in pixels for mesh vertices");
+    markerWeightReg.editorType = EditorType::DoubleSpinBox;
+    markerWeightReg.defaultValue = m_markerWeight;
+    markerWeightReg.minValue = 0.5;
+    markerWeightReg.maxValue = 10.0;
+    markerWeightReg.stepValue = 0.5;
+    markerWeightReg.propertyName = "markerWeight";
+    markerWeightReg.target = this;
+    registerProperty(markerWeightReg);
+    
+    // Register marker fill color property
+    PropertyRegistration markerFillColorReg;
+    markerFillColorReg.category = tr("Mesh");
+    markerFillColorReg.subcategory = tr("Marker");
+    markerFillColorReg.displayName = tr("Fill Color");
+    markerFillColorReg.briefDesc = tr("Marker fill color");
+    markerFillColorReg.detailDesc = tr("Sets the fill color of mesh markers");
+    markerFillColorReg.editorType = EditorType::ColorPicker;
+    markerFillColorReg.defaultValue = m_markerFillColor;
+    markerFillColorReg.propertyName = "markerFillColor";
+    markerFillColorReg.target = this;
+    registerProperty(markerFillColorReg);
+    
+    // Register marker outline color property
+    PropertyRegistration markerOutlineColorReg;
+    markerOutlineColorReg.category = tr("Mesh");
+    markerOutlineColorReg.subcategory = tr("Marker");
+    markerOutlineColorReg.displayName = tr("Outline Color");
+    markerOutlineColorReg.briefDesc = tr("Marker outline color");
+    markerOutlineColorReg.detailDesc = tr("Sets the outline color of mesh markers");
+    markerOutlineColorReg.editorType = EditorType::ColorPicker;
+    markerOutlineColorReg.defaultValue = m_markerOutlineColor;
+    markerOutlineColorReg.propertyName = "markerOutlineColor";
+    markerOutlineColorReg.target = this;
+    registerProperty(markerOutlineColorReg);
+    
+    // Register fill alpha property
+    PropertyRegistration fillAlphaReg;
+    fillAlphaReg.category = tr("Mesh");
+    fillAlphaReg.subcategory = tr("Style");
+    fillAlphaReg.displayName = tr("Fill Alpha");
+    fillAlphaReg.briefDesc = tr("Fill alpha");
+    fillAlphaReg.detailDesc = tr("Sets the fill transparency of the mesh (0.0 = fully transparent, 1.0 = fully opaque)");
+    fillAlphaReg.editorType = EditorType::DoubleSpinBox;
+    fillAlphaReg.defaultValue = m_fillAlpha;
+    fillAlphaReg.minValue = 0.0;
+    fillAlphaReg.maxValue = 1.0;
+    fillAlphaReg.stepValue = 0.1;
+    fillAlphaReg.propertyName = "fillAlpha";
+    fillAlphaReg.target = this;
+    registerProperty(fillAlphaReg);
+    
+    // Register per-triangle fill color enabled property
+    PropertyRegistration perTriFillReg;
+    perTriFillReg.category = tr("Mesh");
+    perTriFillReg.subcategory = tr("Style");
+    perTriFillReg.displayName = tr("Per-Triangle Fill");
+    perTriFillReg.briefDesc = tr("Per-triangle fill color");
+    perTriFillReg.detailDesc = tr("Enables per-triangle fill coloring for the mesh");
+    perTriFillReg.editorType = EditorType::CheckBox;
+    perTriFillReg.defaultValue = m_perTriangleFillColorEnabled;
+    perTriFillReg.propertyName = "perTriangleFillColorEnabled";
+    perTriFillReg.target = this;
+    registerProperty(perTriFillReg);
+    
+    // Register per-triangle line color enabled property
+    PropertyRegistration perTriLineReg;
+    perTriLineReg.category = tr("Mesh");
+    perTriLineReg.subcategory = tr("Style");
+    perTriLineReg.displayName = tr("Per-Triangle Line");
+    perTriLineReg.briefDesc = tr("Per-triangle line color");
+    perTriLineReg.detailDesc = tr("Enables per-triangle line coloring for the mesh");
+    perTriLineReg.editorType = EditorType::CheckBox;
+    perTriLineReg.defaultValue = m_perTriangleLineColorEnabled;
+    perTriLineReg.propertyName = "perTriangleLineColorEnabled";
+    perTriLineReg.target = this;
+    registerProperty(perTriLineReg);
 }
 
 /**
@@ -266,6 +396,7 @@ void Plot3DMeshFunction::createPlot(QIM::QImFigureWidget* figure)
     m_mesh3DNode->setLinesVisible(m_linesVisible);
     m_mesh3DNode->setFillVisible(m_fillVisible);
     m_mesh3DNode->setMarkersVisible(m_markersVisible);
+    m_mesh3DNode->setFillAlpha(m_fillAlpha);
 }
 
 void Plot3DMeshFunction::setTitle(const QString& title)
@@ -374,6 +505,106 @@ void Plot3DMeshFunction::setMarkersVisible(bool visible)
         Q_EMIT markersVisibleChanged(visible);
         if (m_mesh3DNode) {
             m_mesh3DNode->setMarkersVisible(visible);
+        }
+    }
+}
+
+void Plot3DMeshFunction::setMarkerShape(const QString& shape)
+{
+    if (m_markerShape != shape) {
+        m_markerShape = shape;
+        Q_EMIT markerShapeChanged(shape);
+        if (m_mesh3DNode) {
+            int enumVal = -1;
+            if (shape == tr("None") || shape == "None") enumVal = -1;
+            else if (shape == tr("Circle") || shape == "Circle") enumVal = 0;
+            else if (shape == tr("Square") || shape == "Square") enumVal = 1;
+            else if (shape == tr("Diamond") || shape == "Diamond") enumVal = 2;
+            else if (shape == tr("Up") || shape == "Up") enumVal = 3;
+            else if (shape == tr("Down") || shape == "Down") enumVal = 4;
+            else if (shape == tr("Left") || shape == "Left") enumVal = 5;
+            else if (shape == tr("Right") || shape == "Right") enumVal = 6;
+            else if (shape == tr("Cross") || shape == "Cross") enumVal = 7;
+            else if (shape == tr("Plus") || shape == "Plus") enumVal = 8;
+            else if (shape == tr("Asterisk") || shape == "Asterisk") enumVal = 9;
+            m_mesh3DNode->setMarkerShape(enumVal);
+        }
+    }
+}
+
+void Plot3DMeshFunction::setMarkerSize(float size)
+{
+    if (m_markerSize != size) {
+        m_markerSize = size;
+        Q_EMIT markerSizeChanged(size);
+        if (m_mesh3DNode) {
+            m_mesh3DNode->setMarkerSize(size);
+        }
+    }
+}
+
+void Plot3DMeshFunction::setMarkerWeight(float weight)
+{
+    if (m_markerWeight != weight) {
+        m_markerWeight = weight;
+        Q_EMIT markerWeightChanged(weight);
+        if (m_mesh3DNode) {
+            m_mesh3DNode->setMarkerWeight(weight);
+        }
+    }
+}
+
+void Plot3DMeshFunction::setMarkerFillColor(const QColor& color)
+{
+    if (m_markerFillColor != color) {
+        m_markerFillColor = color;
+        Q_EMIT markerFillColorChanged(color);
+        if (m_mesh3DNode) {
+            m_mesh3DNode->setMarkerFillColor(color);
+        }
+    }
+}
+
+void Plot3DMeshFunction::setMarkerOutlineColor(const QColor& color)
+{
+    if (m_markerOutlineColor != color) {
+        m_markerOutlineColor = color;
+        Q_EMIT markerOutlineColorChanged(color);
+        if (m_mesh3DNode) {
+            m_mesh3DNode->setMarkerOutlineColor(color);
+        }
+    }
+}
+
+void Plot3DMeshFunction::setFillAlpha(float alpha)
+{
+    if (m_fillAlpha != alpha) {
+        m_fillAlpha = alpha;
+        Q_EMIT fillAlphaChanged(alpha);
+        if (m_mesh3DNode) {
+            m_mesh3DNode->setFillAlpha(alpha);
+        }
+    }
+}
+
+void Plot3DMeshFunction::setPerTriangleFillColorEnabled(bool enabled)
+{
+    if (m_perTriangleFillColorEnabled != enabled) {
+        m_perTriangleFillColorEnabled = enabled;
+        Q_EMIT perTriangleFillColorEnabledChanged(enabled);
+        if (m_mesh3DNode) {
+            m_mesh3DNode->setPerTriangleFillColorEnabled(enabled);
+        }
+    }
+}
+
+void Plot3DMeshFunction::setPerTriangleLineColorEnabled(bool enabled)
+{
+    if (m_perTriangleLineColorEnabled != enabled) {
+        m_perTriangleLineColorEnabled = enabled;
+        Q_EMIT perTriangleLineColorEnabledChanged(enabled);
+        if (m_mesh3DNode) {
+            m_mesh3DNode->setPerTriangleLineColorEnabled(enabled);
         }
     }
 }

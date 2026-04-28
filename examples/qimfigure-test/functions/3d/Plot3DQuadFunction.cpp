@@ -11,34 +11,12 @@
  * @brief Constructor for Plot3DQuadFunction
  * @param parent Parent object
  * @details Initializes the test function and registers properties for interactive editing.
- * Properties are organized in categories:
- * - "Plot"/"Basic Info"/"Title" - Plot title
- * - "Plot"/"Axis"/"X Label" - X axis label
- * - "Plot"/"Axis"/"Y Label" - Y axis label
- * - "Plot"/"Axis"/"Z Label" - Z axis label
- * - "Quad"/"Fill"/"Color" - Fill color
- * - "Quad"/"Line"/"Color" - Line color
- * - "Quad"/"Line"/"Width" - Line width
- * - "Quad"/"Visibility"/"Lines" - Lines visibility
- * - "Quad"/"Visibility"/"Fill" - Fill visibility
- * - "Quad"/"Visibility"/"Markers" - Markers visibility
  * \endif
  * 
  * \if CHINESE
  * @brief Plot3DQuadFunction 构造函数
  * @param parent 父对象
  * @details 初始化测试函数并注册属性用于交互式编辑。
- * 属性按类别组织：
- * - "Plot"/"Basic Info"/"Title" - 图表标题
- * - "Plot"/"Axis"/"X Label" - X 轴标签
- * - "Plot"/"Axis"/"Y Label" - Y 轴标签
- * - "Plot"/"Axis"/"Z Label" - Z 轴标签
- * - "Quad"/"Fill"/"Color" - 填充颜色
- * - "Quad"/"Line"/"Color" - 线条颜色
- * - "Quad"/"Line"/"Width" - 线宽
- * - "Quad"/"Visibility"/"Lines" - 线条可见性
- * - "Quad"/"Visibility"/"Fill" - 填充可见性
- * - "Quad"/"Visibility"/"Markers" - 标记点可见性
  * \endif
  */
 Plot3DQuadFunction::Plot3DQuadFunction(QObject* parent)
@@ -57,7 +35,7 @@ Plot3DQuadFunction::Plot3DQuadFunction(QObject* parent)
     titleReg.target = this;
     registerProperty(titleReg);
     
-    // Register X axis label property
+    // Register axis labels
     PropertyRegistration xLabelReg;
     xLabelReg.category = tr("Plot");
     xLabelReg.subcategory = tr("Axis");
@@ -70,7 +48,6 @@ Plot3DQuadFunction::Plot3DQuadFunction(QObject* parent)
     xLabelReg.target = this;
     registerProperty(xLabelReg);
     
-    // Register Y axis label property
     PropertyRegistration yLabelReg;
     yLabelReg.category = tr("Plot");
     yLabelReg.subcategory = tr("Axis");
@@ -83,7 +60,6 @@ Plot3DQuadFunction::Plot3DQuadFunction(QObject* parent)
     yLabelReg.target = this;
     registerProperty(yLabelReg);
     
-    // Register Z axis label property
     PropertyRegistration zLabelReg;
     zLabelReg.category = tr("Plot");
     zLabelReg.subcategory = tr("Axis");
@@ -96,24 +72,60 @@ Plot3DQuadFunction::Plot3DQuadFunction(QObject* parent)
     zLabelReg.target = this;
     registerProperty(zLabelReg);
     
-    // Register fill color property
-    PropertyRegistration fillReg;
-    fillReg.category = tr("Quad");
-    fillReg.subcategory = tr("Fill");
-    fillReg.displayName = tr("Color");
-    fillReg.briefDesc = tr("Fill color");
-    fillReg.detailDesc = tr("Sets the fill color of the 3D quad faces");
-    fillReg.editorType = EditorType::ColorPicker;
-    fillReg.defaultValue = m_fillColor;
-    fillReg.propertyName = "fillColor";
-    fillReg.target = this;
-    registerProperty(fillReg);
+    // Register visibility properties
+    PropertyRegistration linesVisibleReg;
+    linesVisibleReg.category = tr("Quad");
+    linesVisibleReg.subcategory = tr("Visibility");
+    linesVisibleReg.displayName = tr("Lines");
+    linesVisibleReg.briefDesc = tr("Lines visible");
+    linesVisibleReg.detailDesc = tr("Controls whether quad edges are visible");
+    linesVisibleReg.editorType = EditorType::CheckBox;
+    linesVisibleReg.defaultValue = m_linesVisible;
+    linesVisibleReg.propertyName = "linesVisible";
+    linesVisibleReg.target = this;
+    registerProperty(linesVisibleReg);
     
-    // Register line color property
+    PropertyRegistration fillVisibleReg;
+    fillVisibleReg.category = tr("Quad");
+    fillVisibleReg.subcategory = tr("Visibility");
+    fillVisibleReg.displayName = tr("Fill");
+    fillVisibleReg.briefDesc = tr("Fill visible");
+    fillVisibleReg.detailDesc = tr("Controls whether quad faces are filled");
+    fillVisibleReg.editorType = EditorType::CheckBox;
+    fillVisibleReg.defaultValue = m_fillVisible;
+    fillVisibleReg.propertyName = "fillVisible";
+    fillVisibleReg.target = this;
+    registerProperty(fillVisibleReg);
+    
+    PropertyRegistration markersVisibleReg;
+    markersVisibleReg.category = tr("Quad");
+    markersVisibleReg.subcategory = tr("Visibility");
+    markersVisibleReg.displayName = tr("Markers");
+    markersVisibleReg.briefDesc = tr("Markers visible");
+    markersVisibleReg.detailDesc = tr("Controls whether quad vertex markers are visible");
+    markersVisibleReg.editorType = EditorType::CheckBox;
+    markersVisibleReg.defaultValue = m_markersVisible;
+    markersVisibleReg.propertyName = "markersVisible";
+    markersVisibleReg.target = this;
+    registerProperty(markersVisibleReg);
+    
+    // Register style properties
+    PropertyRegistration fillColorReg;
+    fillColorReg.category = tr("Quad");
+    fillColorReg.subcategory = tr("Style");
+    fillColorReg.displayName = tr("Fill Color");
+    fillColorReg.briefDesc = tr("Fill color");
+    fillColorReg.detailDesc = tr("Sets the fill color of the 3D quad faces");
+    fillColorReg.editorType = EditorType::ColorPicker;
+    fillColorReg.defaultValue = m_fillColor;
+    fillColorReg.propertyName = "fillColor";
+    fillColorReg.target = this;
+    registerProperty(fillColorReg);
+    
     PropertyRegistration lineColorReg;
     lineColorReg.category = tr("Quad");
-    lineColorReg.subcategory = tr("Line");
-    lineColorReg.displayName = tr("Color");
+    lineColorReg.subcategory = tr("Style");
+    lineColorReg.displayName = tr("Line Color");
     lineColorReg.briefDesc = tr("Line color");
     lineColorReg.detailDesc = tr("Sets the color of the 3D quad edges");
     lineColorReg.editorType = EditorType::ColorPicker;
@@ -122,11 +134,10 @@ Plot3DQuadFunction::Plot3DQuadFunction(QObject* parent)
     lineColorReg.target = this;
     registerProperty(lineColorReg);
     
-    // Register line width property
     PropertyRegistration lineWidthReg;
     lineWidthReg.category = tr("Quad");
-    lineWidthReg.subcategory = tr("Line");
-    lineWidthReg.displayName = tr("Width");
+    lineWidthReg.subcategory = tr("Style");
+    lineWidthReg.displayName = tr("Line Width");
     lineWidthReg.briefDesc = tr("Line width");
     lineWidthReg.detailDesc = tr("Sets the line width (thickness) of the 3D quad edges in pixels");
     lineWidthReg.editorType = EditorType::DoubleSpinBox;
@@ -138,44 +149,88 @@ Plot3DQuadFunction::Plot3DQuadFunction(QObject* parent)
     lineWidthReg.target = this;
     registerProperty(lineWidthReg);
     
-    // Register lines visibility property
-    PropertyRegistration linesVisReg;
-    linesVisReg.category = tr("Quad");
-    linesVisReg.subcategory = tr("Visibility");
-    linesVisReg.displayName = tr("Lines");
-    linesVisReg.briefDesc = tr("Lines visibility");
-    linesVisReg.detailDesc = tr("Controls whether the quad edges are visible");
-    linesVisReg.editorType = EditorType::CheckBox;
-    linesVisReg.defaultValue = m_linesVisible;
-    linesVisReg.propertyName = "linesVisible";
-    linesVisReg.target = this;
-    registerProperty(linesVisReg);
+    PropertyRegistration fillAlphaReg;
+    fillAlphaReg.category = tr("Quad");
+    fillAlphaReg.subcategory = tr("Style");
+    fillAlphaReg.displayName = tr("Fill Alpha");
+    fillAlphaReg.briefDesc = tr("Fill alpha");
+    fillAlphaReg.detailDesc = tr("Sets the fill transparency (0.0 = transparent, 1.0 = opaque)");
+    fillAlphaReg.editorType = EditorType::DoubleSpinBox;
+    fillAlphaReg.defaultValue = m_fillAlpha;
+    fillAlphaReg.minValue = 0.0;
+    fillAlphaReg.maxValue = 1.0;
+    fillAlphaReg.stepValue = 0.1;
+    fillAlphaReg.propertyName = "fillAlpha";
+    fillAlphaReg.target = this;
+    registerProperty(fillAlphaReg);
     
-    // Register fill visibility property
-    PropertyRegistration fillVisReg;
-    fillVisReg.category = tr("Quad");
-    fillVisReg.subcategory = tr("Visibility");
-    fillVisReg.displayName = tr("Fill");
-    fillVisReg.briefDesc = tr("Fill visibility");
-    fillVisReg.detailDesc = tr("Controls whether the quad faces are filled");
-    fillVisReg.editorType = EditorType::CheckBox;
-    fillVisReg.defaultValue = m_fillVisible;
-    fillVisReg.propertyName = "fillVisible";
-    fillVisReg.target = this;
-    registerProperty(fillVisReg);
+    // Register marker properties
+    PropertyRegistration markerShapeReg;
+    markerShapeReg.category = tr("Quad");
+    markerShapeReg.subcategory = tr("Marker");
+    markerShapeReg.displayName = tr("Shape");
+    markerShapeReg.briefDesc = tr("Marker shape");
+    markerShapeReg.detailDesc = tr("Sets the marker shape for quad vertices");
+    markerShapeReg.editorType = EditorType::ComboBox;
+    markerShapeReg.defaultValue = m_markerShape;
+    markerShapeReg.comboBoxOptions = QStringList{"None", "Circle", "Square", "Diamond", "Up", "Down", "Left", "Right", "Cross", "Plus", "Asterisk"};
+    markerShapeReg.propertyName = "markerShape";
+    markerShapeReg.target = this;
+    registerProperty(markerShapeReg);
     
-    // Register markers visibility property
-    PropertyRegistration markersVisReg;
-    markersVisReg.category = tr("Quad");
-    markersVisReg.subcategory = tr("Visibility");
-    markersVisReg.displayName = tr("Markers");
-    markersVisReg.briefDesc = tr("Markers visibility");
-    markersVisReg.detailDesc = tr("Controls whether the quad vertex markers are visible");
-    markersVisReg.editorType = EditorType::CheckBox;
-    markersVisReg.defaultValue = m_markersVisible;
-    markersVisReg.propertyName = "markersVisible";
-    markersVisReg.target = this;
-    registerProperty(markersVisReg);
+    PropertyRegistration markerSizeReg;
+    markerSizeReg.category = tr("Quad");
+    markerSizeReg.subcategory = tr("Marker");
+    markerSizeReg.displayName = tr("Size");
+    markerSizeReg.briefDesc = tr("Marker size");
+    markerSizeReg.detailDesc = tr("Sets the marker size in pixels");
+    markerSizeReg.editorType = EditorType::DoubleSpinBox;
+    markerSizeReg.defaultValue = m_markerSize;
+    markerSizeReg.minValue = 1.0;
+    markerSizeReg.maxValue = 20.0;
+    markerSizeReg.stepValue = 0.5;
+    markerSizeReg.propertyName = "markerSize";
+    markerSizeReg.target = this;
+    registerProperty(markerSizeReg);
+    
+    PropertyRegistration markerWeightReg;
+    markerWeightReg.category = tr("Quad");
+    markerWeightReg.subcategory = tr("Marker");
+    markerWeightReg.displayName = tr("Weight");
+    markerWeightReg.briefDesc = tr("Marker weight");
+    markerWeightReg.detailDesc = tr("Sets the marker outline weight in pixels");
+    markerWeightReg.editorType = EditorType::DoubleSpinBox;
+    markerWeightReg.defaultValue = m_markerWeight;
+    markerWeightReg.minValue = 0.5;
+    markerWeightReg.maxValue = 10.0;
+    markerWeightReg.stepValue = 0.5;
+    markerWeightReg.propertyName = "markerWeight";
+    markerWeightReg.target = this;
+    registerProperty(markerWeightReg);
+    
+    PropertyRegistration markerFillColorReg;
+    markerFillColorReg.category = tr("Quad");
+    markerFillColorReg.subcategory = tr("Marker");
+    markerFillColorReg.displayName = tr("Fill Color");
+    markerFillColorReg.briefDesc = tr("Marker fill color");
+    markerFillColorReg.detailDesc = tr("Sets the fill color of markers");
+    markerFillColorReg.editorType = EditorType::ColorPicker;
+    markerFillColorReg.defaultValue = m_markerFillColor;
+    markerFillColorReg.propertyName = "markerFillColor";
+    markerFillColorReg.target = this;
+    registerProperty(markerFillColorReg);
+    
+    PropertyRegistration markerOutlineColorReg;
+    markerOutlineColorReg.category = tr("Quad");
+    markerOutlineColorReg.subcategory = tr("Marker");
+    markerOutlineColorReg.displayName = tr("Outline Color");
+    markerOutlineColorReg.briefDesc = tr("Marker outline color");
+    markerOutlineColorReg.detailDesc = tr("Sets the outline color of markers");
+    markerOutlineColorReg.editorType = EditorType::ColorPicker;
+    markerOutlineColorReg.defaultValue = m_markerOutlineColor;
+    markerOutlineColorReg.propertyName = "markerOutlineColor";
+    markerOutlineColorReg.target = this;
+    registerProperty(markerOutlineColorReg);
 }
 
 /**
@@ -196,26 +251,12 @@ Plot3DQuadFunction::~Plot3DQuadFunction()
  * @brief Create plot nodes in the given figure widget
  * @param figure Pointer to the figure widget where plots will be created
  * @details Creates a 3D plot with a quad item (unit cube with 6 faces).
- * The cube is defined by 24 points (4 points per face × 6 faces):
- * - Face 1 (front): (-1,-1,1), (1,-1,1), (1,1,1), (-1,1,1)
- * - Face 2 (back): (1,-1,-1), (-1,-1,-1), (-1,1,-1), (1,1,-1)
- * - Face 3 (top): (-1,1,1), (1,1,1), (1,1,-1), (-1,1,-1)
- * - Face 4 (bottom): (-1,-1,-1), (1,-1,-1), (1,-1,1), (-1,-1,1)
- * - Face 5 (right): (1,-1,1), (1,-1,-1), (1,1,-1), (1,1,1)
- * - Face 6 (left): (-1,-1,-1), (-1,-1,1), (-1,1,1), (-1,1,-1)
  * \endif
  * 
  * \if CHINESE
  * @brief 在指定的图表控件中创建绘图节点
  * @param figure 将要创建绘图的图表控件指针
  * @details 创建一个包含四边形元素（单位立方体，6 个面）的 3D 图表。
- * 立方体由 24 个点定义（每个面 4 个点 × 6 个面）：
- * - 面 1（前）：(-1,-1,1), (1,-1,1), (1,1,1), (-1,1,1)
- * - 面 2（后）：(1,-1,-1), (-1,-1,-1), (-1,1,-1), (1,1,-1)
- * - 面 3（上）：(-1,1,1), (1,1,1), (1,1,-1), (-1,1,-1)
- * - 面 4（下）：(-1,-1,-1), (1,-1,-1), (1,-1,1), (-1,-1,1)
- * - 面 5（右）：(1,-1,1), (1,-1,-1), (1,1,-1), (1,1,1)
- * - 面 6（左）：(-1,-1,-1), (-1,-1,1), (-1,1,1), (-1,1,-1)
  * \endif
  */
 void Plot3DQuadFunction::createPlot(QIM::QImFigureWidget* figure)
@@ -224,20 +265,14 @@ void Plot3DQuadFunction::createPlot(QIM::QImFigureWidget* figure)
         return;
     }
     
-    // Reset to single-plot mode to clear any previous subplot configuration
     figure->setSubplot3DGrid(1, 1);
-    
-    // Create 3D plot node as a top-level render node via QImFigureWidget API
     m_plot3DNode = figure->createPlot3DNode();
     
-    // Configure axes and title
     m_plot3DNode->xAxis()->setLabel(m_xLabel);
     m_plot3DNode->yAxis()->setLabel(m_yLabel);
     m_plot3DNode->zAxis()->setLabel(m_zLabel);
     m_plot3DNode->setTitle(m_title);
-    
-    // Set default isometric view for better 3D visualization
-    m_plot3DNode->setBoxRotation(35.264, 45.0);  // Isometric view (elevation: -35.264°, azimuth: 45°)
+    m_plot3DNode->setBoxRotation(35.264, 45.0);
     
     // Generate unit cube data: 6 faces × 4 vertices = 24 points
     QVector<double> xs, ys, zs;
@@ -275,7 +310,6 @@ void Plot3DQuadFunction::createPlot(QIM::QImFigureWidget* figure)
     ys << -1 << -1 <<  1 <<  1;
     zs << -1 <<  1 <<  1 << -1;
     
-    // Create 3D quad item node and set data
     m_quad3DNode = new QIM::QImPlot3DQuadItemNode(m_plot3DNode);
     m_quad3DNode->setData(xs, ys, zs);
     m_quad3DNode->setFillColor(m_fillColor);
@@ -284,6 +318,7 @@ void Plot3DQuadFunction::createPlot(QIM::QImFigureWidget* figure)
     m_quad3DNode->setLinesVisible(m_linesVisible);
     m_quad3DNode->setFillVisible(m_fillVisible);
     m_quad3DNode->setMarkersVisible(m_markersVisible);
+    m_quad3DNode->setFillAlpha(m_fillAlpha);
 }
 
 void Plot3DQuadFunction::setTitle(const QString& title)
@@ -291,9 +326,7 @@ void Plot3DQuadFunction::setTitle(const QString& title)
     if (m_title != title) {
         m_title = title;
         Q_EMIT titleChanged(title);
-        if (m_plot3DNode) {
-            m_plot3DNode->setTitle(title);
-        }
+        if (m_plot3DNode) { m_plot3DNode->setTitle(title); }
     }
 }
 
@@ -302,9 +335,7 @@ void Plot3DQuadFunction::setXLabel(const QString& label)
     if (m_xLabel != label) {
         m_xLabel = label;
         Q_EMIT xLabelChanged(label);
-        if (m_plot3DNode) {
-            m_plot3DNode->xAxis()->setLabel(label);
-        }
+        if (m_plot3DNode) { m_plot3DNode->xAxis()->setLabel(label); }
     }
 }
 
@@ -313,9 +344,7 @@ void Plot3DQuadFunction::setYLabel(const QString& label)
     if (m_yLabel != label) {
         m_yLabel = label;
         Q_EMIT yLabelChanged(label);
-        if (m_plot3DNode) {
-            m_plot3DNode->yAxis()->setLabel(label);
-        }
+        if (m_plot3DNode) { m_plot3DNode->yAxis()->setLabel(label); }
     }
 }
 
@@ -324,9 +353,7 @@ void Plot3DQuadFunction::setZLabel(const QString& label)
     if (m_zLabel != label) {
         m_zLabel = label;
         Q_EMIT zLabelChanged(label);
-        if (m_plot3DNode) {
-            m_plot3DNode->zAxis()->setLabel(label);
-        }
+        if (m_plot3DNode) { m_plot3DNode->zAxis()->setLabel(label); }
     }
 }
 
@@ -335,9 +362,7 @@ void Plot3DQuadFunction::setFillColor(const QColor& color)
     if (m_fillColor != color) {
         m_fillColor = color;
         Q_EMIT fillColorChanged(color);
-        if (m_quad3DNode) {
-            m_quad3DNode->setFillColor(color);
-        }
+        if (m_quad3DNode) { m_quad3DNode->setFillColor(color); }
     }
 }
 
@@ -346,9 +371,7 @@ void Plot3DQuadFunction::setLineColor(const QColor& color)
     if (m_lineColor != color) {
         m_lineColor = color;
         Q_EMIT lineColorChanged(color);
-        if (m_quad3DNode) {
-            m_quad3DNode->setLineColor(color);
-        }
+        if (m_quad3DNode) { m_quad3DNode->setLineColor(color); }
     }
 }
 
@@ -357,9 +380,7 @@ void Plot3DQuadFunction::setLineWidth(float width)
     if (m_lineWidth != width) {
         m_lineWidth = width;
         Q_EMIT lineWidthChanged(width);
-        if (m_quad3DNode) {
-            m_quad3DNode->setLineWidth(width);
-        }
+        if (m_quad3DNode) { m_quad3DNode->setLineWidth(width); }
     }
 }
 
@@ -368,9 +389,7 @@ void Plot3DQuadFunction::setLinesVisible(bool visible)
     if (m_linesVisible != visible) {
         m_linesVisible = visible;
         Q_EMIT linesVisibleChanged(visible);
-        if (m_quad3DNode) {
-            m_quad3DNode->setLinesVisible(visible);
-        }
+        if (m_quad3DNode) { m_quad3DNode->setLinesVisible(visible); }
     }
 }
 
@@ -379,9 +398,7 @@ void Plot3DQuadFunction::setFillVisible(bool visible)
     if (m_fillVisible != visible) {
         m_fillVisible = visible;
         Q_EMIT fillVisibleChanged(visible);
-        if (m_quad3DNode) {
-            m_quad3DNode->setFillVisible(visible);
-        }
+        if (m_quad3DNode) { m_quad3DNode->setFillVisible(visible); }
     }
 }
 
@@ -390,9 +407,75 @@ void Plot3DQuadFunction::setMarkersVisible(bool visible)
     if (m_markersVisible != visible) {
         m_markersVisible = visible;
         Q_EMIT markersVisibleChanged(visible);
+        if (m_quad3DNode) { m_quad3DNode->setMarkersVisible(visible); }
+    }
+}
+
+void Plot3DQuadFunction::setMarkerShape(const QString& shape)
+{
+    if (m_markerShape != shape) {
+        m_markerShape = shape;
+        Q_EMIT markerShapeChanged(shape);
         if (m_quad3DNode) {
-            m_quad3DNode->setMarkersVisible(visible);
+            int enumVal = -1;
+            if (shape == tr("None") || shape == "None") enumVal = -1;
+            else if (shape == tr("Circle") || shape == "Circle") enumVal = 0;
+            else if (shape == tr("Square") || shape == "Square") enumVal = 1;
+            else if (shape == tr("Diamond") || shape == "Diamond") enumVal = 2;
+            else if (shape == tr("Up") || shape == "Up") enumVal = 3;
+            else if (shape == tr("Down") || shape == "Down") enumVal = 4;
+            else if (shape == tr("Left") || shape == "Left") enumVal = 5;
+            else if (shape == tr("Right") || shape == "Right") enumVal = 6;
+            else if (shape == tr("Cross") || shape == "Cross") enumVal = 7;
+            else if (shape == tr("Plus") || shape == "Plus") enumVal = 8;
+            else if (shape == tr("Asterisk") || shape == "Asterisk") enumVal = 9;
+            m_quad3DNode->setMarkerShape(enumVal);
         }
+    }
+}
+
+void Plot3DQuadFunction::setMarkerSize(float size)
+{
+    if (m_markerSize != size) {
+        m_markerSize = size;
+        Q_EMIT markerSizeChanged(size);
+        if (m_quad3DNode) { m_quad3DNode->setMarkerSize(size); }
+    }
+}
+
+void Plot3DQuadFunction::setMarkerWeight(float weight)
+{
+    if (m_markerWeight != weight) {
+        m_markerWeight = weight;
+        Q_EMIT markerWeightChanged(weight);
+        if (m_quad3DNode) { m_quad3DNode->setMarkerWeight(weight); }
+    }
+}
+
+void Plot3DQuadFunction::setMarkerFillColor(const QColor& color)
+{
+    if (m_markerFillColor != color) {
+        m_markerFillColor = color;
+        Q_EMIT markerFillColorChanged(color);
+        if (m_quad3DNode) { m_quad3DNode->setMarkerFillColor(color); }
+    }
+}
+
+void Plot3DQuadFunction::setMarkerOutlineColor(const QColor& color)
+{
+    if (m_markerOutlineColor != color) {
+        m_markerOutlineColor = color;
+        Q_EMIT markerOutlineColorChanged(color);
+        if (m_quad3DNode) { m_quad3DNode->setMarkerOutlineColor(color); }
+    }
+}
+
+void Plot3DQuadFunction::setFillAlpha(float alpha)
+{
+    if (m_fillAlpha != alpha) {
+        m_fillAlpha = alpha;
+        Q_EMIT fillAlphaChanged(alpha);
+        if (m_quad3DNode) { m_quad3DNode->setFillAlpha(alpha); }
     }
 }
 

@@ -4,6 +4,7 @@
 #include "../TestFunction.h"
 #include <QObject>
 #include <QColor>
+#include "plot/QImPlot.h"
 
 namespace QIM {
 class QImFigureWidget;
@@ -68,6 +69,16 @@ class Line10KFunction : public TestFunction {
     Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor NOTIFY lineColorChanged)
     Q_PROPERTY(QString lineLabel READ lineLabel WRITE setLineLabel NOTIFY lineLabelChanged)
     
+    // Line flags (affirmative semantics)
+    Q_PROPERTY(bool segments READ isSegments WRITE setSegments NOTIFY segmentsChanged)
+    Q_PROPERTY(bool loop READ isLoop WRITE setLoop NOTIFY loopChanged)
+    Q_PROPERTY(bool skipNaN READ isSkipNaN WRITE setSkipNaN NOTIFY skipNaNChanged)
+    Q_PROPERTY(bool clippingEnabled READ isClippingEnabled WRITE setClippingEnabled NOTIFY clippingEnabledChanged)
+    Q_PROPERTY(bool shaded READ isShaded WRITE setShaded NOTIFY shadedChanged)
+    // Downsampling
+    Q_PROPERTY(int downsampleAlgorithm READ downsampleAlgorithm WRITE setDownsampleAlgorithm NOTIFY downsampleAlgorithmChanged)
+    Q_PROPERTY(int downsampleThreshold READ downsampleThreshold WRITE setDownsampleThreshold NOTIFY downsampleThresholdChanged)
+    
 public:
     /**
      * \if ENGLISH
@@ -125,6 +136,29 @@ public:
     // Line label property accessors
     QString lineLabel() const { return m_lineLabel; }
     void setLineLabel(const QString& label);
+    
+    // Line flag accessors (affirmative semantics)
+    bool isSegments() const { return m_segments; }
+    void setSegments(bool on);
+    
+    bool isLoop() const { return m_loop; }
+    void setLoop(bool on);
+    
+    bool isSkipNaN() const { return m_skipNaN; }
+    void setSkipNaN(bool on);
+    
+    bool isClippingEnabled() const { return m_clippingEnabled; }
+    void setClippingEnabled(bool enabled);
+    
+    bool isShaded() const { return m_shaded; }
+    void setShaded(bool on);
+    
+    // Downsampling accessors
+    int downsampleAlgorithm() const { return static_cast<int>(m_downsampleAlgorithm); }
+    void setDownsampleAlgorithm(int algo);
+    
+    int downsampleThreshold() const { return m_downsampleThreshold; }
+    void setDownsampleThreshold(int threshold);
     
 Q_SIGNALS:
     /**
@@ -192,12 +226,114 @@ Q_SIGNALS:
      */
     void lineLabelChanged(const QString& label);
     
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when segments flag changes
+     * @param on New segments value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 分段标志改变时发出的信号
+     * @param on 新的分段值
+     * \endif
+     */
+    void segmentsChanged(bool on);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when loop flag changes
+     * @param on New loop value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 循环标志改变时发出的信号
+     * @param on 新的循环值
+     * \endif
+     */
+    void loopChanged(bool on);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when skipNaN flag changes
+     * @param on New skipNaN value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 跳过NaN标志改变时发出的信号
+     * @param on 新的跳过NaN值
+     * \endif
+     */
+    void skipNaNChanged(bool on);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when clippingEnabled flag changes
+     * @param enabled New clippingEnabled value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 裁剪启用标志改变时发出的信号
+     * @param enabled 新的裁剪启用值
+     * \endif
+     */
+    void clippingEnabledChanged(bool enabled);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when shaded flag changes
+     * @param on New shaded value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 阴影标志改变时发出的信号
+     * @param on 新的阴影值
+     * \endif
+     */
+    void shadedChanged(bool on);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when downsample algorithm changes
+     * @param algo New downsample algorithm value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 降采样算法改变时发出的信号
+     * @param algo 新的降采样算法值
+     * \endif
+     */
+    void downsampleAlgorithmChanged(int algo);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when downsample threshold changes
+     * @param threshold New downsample threshold value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 降采样阈值改变时发出的信号
+     * @param threshold 新的降采样阈值值
+     * \endif
+     */
+    void downsampleThresholdChanged(int threshold);
+    
 private:
     QString m_title = QStringLiteral("10K Points");
     QString m_xLabel = QStringLiteral("x1");
     QString m_yLabel = QStringLiteral("y1");
     QColor m_lineColor = Qt::blue;
     QString m_lineLabel = QStringLiteral("curve a");
+    
+    // Line flags
+    bool m_segments = false;
+    bool m_loop = false;
+    bool m_skipNaN = false;
+    bool m_clippingEnabled = true;
+    bool m_shaded = false;
+    
+    // Downsampling
+    QIM::QImDownsampleAlgorithm m_downsampleAlgorithm = QIM::QImDownsampleAlgorithm::Auto;
+    int m_downsampleThreshold = 1000;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotLineItemNode* m_lineNode = nullptr;

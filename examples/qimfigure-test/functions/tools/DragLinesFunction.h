@@ -73,6 +73,10 @@ class DragLinesFunction : public TestFunction {
     Q_PROPERTY(bool fitEnabled READ isFitEnabled WRITE setFitEnabled NOTIFY fitEnabledChanged)
     Q_PROPERTY(bool inputsEnabled READ isInputsEnabled WRITE setInputsEnabled NOTIFY inputsEnabledChanged)
     Q_PROPERTY(bool delayed READ isDelayed WRITE setDelayed NOTIFY delayedChanged)
+    Q_PROPERTY(int lineXId READ lineXId WRITE setLineXId NOTIFY lineXIdChanged)
+    Q_PROPERTY(int lineYId READ lineYId WRITE setLineYId NOTIFY lineYIdChanged)
+    Q_PROPERTY(int lineXFlags READ lineXFlags WRITE setLineXFlags NOTIFY lineXFlagsChanged)
+    Q_PROPERTY(int lineYFlags READ lineYFlags WRITE setLineYFlags NOTIFY lineYFlagsChanged)
     
 public:
     /**
@@ -151,6 +155,22 @@ public:
     // Delayed property accessors
     bool isDelayed() const { return m_delayed; }
     void setDelayed(bool on);
+    
+    // LineX ID property accessors
+    int lineXId() const { return m_lineXId; }
+    void setLineXId(int id);
+    
+    // LineY ID property accessors
+    int lineYId() const { return m_lineYId; }
+    void setLineYId(int id);
+    
+    // LineX flags property accessors
+    int lineXFlags() const { return m_lineXFlags; }
+    void setLineXFlags(int flags);
+    
+    // LineY flags property accessors
+    int lineYFlags() const { return m_lineYFlags; }
+    void setLineYFlags(int flags);
     
 Q_SIGNALS:
     /**
@@ -234,6 +254,10 @@ Q_SIGNALS:
     void fitEnabledChanged(bool enabled);
     void inputsEnabledChanged(bool enabled);
     void delayedChanged(bool on);
+    void lineXIdChanged(int id);
+    void lineYIdChanged(int id);
+    void lineXFlagsChanged(int flags);
+    void lineYFlagsChanged(int flags);
     
 private:
     QString m_title = QStringLiteral("Drag Lines Tool");
@@ -246,6 +270,10 @@ private:
     bool m_fitEnabled = true;
     bool m_inputsEnabled = true;
     bool m_delayed = false;
+    int m_lineXId = 0;
+    int m_lineYId = 1;
+    int m_lineXFlags = 0;
+    int m_lineYFlags = 0;
     
     QIM::QImPlotNode* m_plotNode = nullptr;
     QIM::QImPlotLineItemNode* m_lineNode = nullptr;

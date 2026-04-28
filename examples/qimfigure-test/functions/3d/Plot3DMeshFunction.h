@@ -22,7 +22,9 @@ class QImPlot3DMeshItemNode;
  * - X, Y and Z axis labels
  * - Fill color and visibility
  * - Line color, width and visibility
- * - Markers visibility
+ * - Markers shape, size, weight, fill and outline colors
+ * - Fill alpha
+ * - Per-triangle coloring options
  * 
  * @section usage_example Usage Example
  * 
@@ -46,7 +48,9 @@ class QImPlot3DMeshItemNode;
  * - X、Y 和 Z 轴标签
  * - 填充颜色和可见性
  * - 线条颜色、宽度和可见性
- * - 标记点可见性
+ * - 标记点形状、大小、权重、填充和轮廓颜色
+ * - 填充透明度
+ * - 逐三角面颜色选项
  * 
  * @section usage_example 使用示例
  * 
@@ -74,6 +78,14 @@ class Plot3DMeshFunction : public TestFunction {
     Q_PROPERTY(bool linesVisible READ isLinesVisible WRITE setLinesVisible NOTIFY linesVisibleChanged)
     Q_PROPERTY(bool fillVisible READ isFillVisible WRITE setFillVisible NOTIFY fillVisibleChanged)
     Q_PROPERTY(bool markersVisible READ isMarkersVisible WRITE setMarkersVisible NOTIFY markersVisibleChanged)
+    Q_PROPERTY(QString markerShape READ markerShape WRITE setMarkerShape NOTIFY markerShapeChanged)
+    Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged)
+    Q_PROPERTY(float markerWeight READ markerWeight WRITE setMarkerWeight NOTIFY markerWeightChanged)
+    Q_PROPERTY(QColor markerFillColor READ markerFillColor WRITE setMarkerFillColor NOTIFY markerFillColorChanged)
+    Q_PROPERTY(QColor markerOutlineColor READ markerOutlineColor WRITE setMarkerOutlineColor NOTIFY markerOutlineColorChanged)
+    Q_PROPERTY(float fillAlpha READ fillAlpha WRITE setFillAlpha NOTIFY fillAlphaChanged)
+    Q_PROPERTY(bool perTriangleFillColorEnabled READ isPerTriangleFillColorEnabled WRITE setPerTriangleFillColorEnabled NOTIFY perTriangleFillColorEnabledChanged)
+    Q_PROPERTY(bool perTriangleLineColorEnabled READ isPerTriangleLineColorEnabled WRITE setPerTriangleLineColorEnabled NOTIFY perTriangleLineColorEnabledChanged)
     
 public:
     /**
@@ -163,6 +175,38 @@ public:
     // Markers visible property accessors
     bool isMarkersVisible() const { return m_markersVisible; }
     void setMarkersVisible(bool visible);
+    
+    // Marker shape property accessors
+    QString markerShape() const { return m_markerShape; }
+    void setMarkerShape(const QString& shape);
+    
+    // Marker size property accessors
+    float markerSize() const { return m_markerSize; }
+    void setMarkerSize(float size);
+    
+    // Marker weight property accessors
+    float markerWeight() const { return m_markerWeight; }
+    void setMarkerWeight(float weight);
+    
+    // Marker fill color property accessors
+    QColor markerFillColor() const { return m_markerFillColor; }
+    void setMarkerFillColor(const QColor& color);
+    
+    // Marker outline color property accessors
+    QColor markerOutlineColor() const { return m_markerOutlineColor; }
+    void setMarkerOutlineColor(const QColor& color);
+    
+    // Fill alpha property accessors
+    float fillAlpha() const { return m_fillAlpha; }
+    void setFillAlpha(float alpha);
+    
+    // Per-triangle fill color enabled property accessors
+    bool isPerTriangleFillColorEnabled() const { return m_perTriangleFillColorEnabled; }
+    void setPerTriangleFillColorEnabled(bool enabled);
+    
+    // Per-triangle line color enabled property accessors
+    bool isPerTriangleLineColorEnabled() const { return m_perTriangleLineColorEnabled; }
+    void setPerTriangleLineColorEnabled(bool enabled);
     
 Q_SIGNALS:
     /**
@@ -295,6 +339,22 @@ Q_SIGNALS:
      */
     void markersVisibleChanged(bool visible);
     
+    void markerShapeChanged(const QString& shape);
+    
+    void markerSizeChanged(float size);
+    
+    void markerWeightChanged(float weight);
+    
+    void markerFillColorChanged(const QColor& color);
+    
+    void markerOutlineColorChanged(const QColor& color);
+    
+    void fillAlphaChanged(float alpha);
+    
+    void perTriangleFillColorEnabledChanged(bool enabled);
+    
+    void perTriangleLineColorEnabledChanged(bool enabled);
+    
 private:
     QString m_title = QStringLiteral("3D Mesh - Cube");
     QString m_xLabel = QStringLiteral("X");
@@ -306,6 +366,14 @@ private:
     bool m_linesVisible = true;
     bool m_fillVisible = true;
     bool m_markersVisible = false;
+    QString m_markerShape = QStringLiteral("Circle");
+    float m_markerSize = 4.0f;
+    float m_markerWeight = 1.5f;
+    QColor m_markerFillColor = QColor(0, 114, 189);
+    QColor m_markerOutlineColor = QColor(0, 0, 0);
+    float m_fillAlpha = 1.0f;
+    bool m_perTriangleFillColorEnabled = false;
+    bool m_perTriangleLineColorEnabled = false;
     
     QPointer<QIM::QImPlot3DNode> m_plot3DNode = nullptr;
     QPointer<QIM::QImPlot3DMeshItemNode> m_mesh3DNode = nullptr;

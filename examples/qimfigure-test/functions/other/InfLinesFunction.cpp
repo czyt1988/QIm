@@ -148,6 +148,19 @@ InfLinesFunction::InfLinesFunction(QObject* parent)
     horizontalValuesReg.propertyName = "horizontalValues";
     horizontalValuesReg.target = this;
     registerProperty(horizontalValuesReg);
+    
+    // Register horizontal orientation property
+    PropertyRegistration horizontalReg;
+    horizontalReg.category = tr("InfLines");
+    horizontalReg.subcategory = tr("Orientation");
+    horizontalReg.displayName = tr("Horizontal");
+    horizontalReg.briefDesc = tr("Horizontal orientation");
+    horizontalReg.detailDesc = tr("When enabled, infinite lines are drawn horizontally instead of vertically");
+    horizontalReg.editorType = EditorType::CheckBox;
+    horizontalReg.defaultValue = m_horizontal;
+    horizontalReg.propertyName = "horizontal";
+    horizontalReg.target = this;
+    registerProperty(horizontalReg);
 }
 
 /**
@@ -332,6 +345,20 @@ void InfLinesFunction::setHorizontalValues(const QVector<double>& values)
                 valuesStd.push_back(val);
             }
             m_horizontalInfLinesNode->setValues(valuesStd);
+        }
+    }
+}
+
+void InfLinesFunction::setHorizontal(bool enabled)
+{
+    if (m_horizontal != enabled) {
+        m_horizontal = enabled;
+        Q_EMIT horizontalChanged(enabled);
+        if (m_verticalInfLinesNode) {
+            m_verticalInfLinesNode->setHorizontal(enabled);
+        }
+        if (m_horizontalInfLinesNode) {
+            m_horizontalInfLinesNode->setHorizontal(enabled);
         }
     }
 }

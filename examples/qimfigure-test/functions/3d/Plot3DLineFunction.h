@@ -68,6 +68,9 @@ class Plot3DLineFunction : public TestFunction {
     Q_PROPERTY(QString zLabel READ zLabel WRITE setZLabel NOTIFY zLabelChanged)
     Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor NOTIFY lineColorChanged)
     Q_PROPERTY(float lineWeight READ lineWeight WRITE setLineWeight NOTIFY lineWeightChanged)
+    Q_PROPERTY(bool segmentsEnabled READ segmentsEnabled WRITE setSegmentsEnabled NOTIFY segmentsEnabledChanged)
+    Q_PROPERTY(bool loopEnabled READ loopEnabled WRITE setLoopEnabled NOTIFY loopEnabledChanged)
+    Q_PROPERTY(bool skipNaNEnabled READ skipNaNEnabled WRITE setSkipNaNEnabled NOTIFY skipNaNEnabledChanged)
     
 public:
     /**
@@ -141,6 +144,18 @@ public:
     // Line weight property accessors
     float lineWeight() const { return m_lineWeight; }
     void setLineWeight(float weight);
+    
+    // Segments enabled property accessors
+    bool segmentsEnabled() const { return m_segmentsEnabled; }
+    void setSegmentsEnabled(bool enabled);
+    
+    // Loop enabled property accessors
+    bool loopEnabled() const { return m_loopEnabled; }
+    void setLoopEnabled(bool enabled);
+    
+    // Skip NaN enabled property accessors
+    bool skipNaNEnabled() const { return m_skipNaNEnabled; }
+    void setSkipNaNEnabled(bool enabled);
     
 Q_SIGNALS:
     /**
@@ -221,6 +236,45 @@ Q_SIGNALS:
      */
     void lineWeightChanged(float weight);
     
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when segments enabled changes
+     * @param enabled New segments enabled value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 线段模式启用改变时发出的信号
+     * @param enabled 新的线段模式启用值
+     * \endif
+     */
+    void segmentsEnabledChanged(bool enabled);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when loop enabled changes
+     * @param enabled New loop enabled value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 循环模式启用改变时发出的信号
+     * @param enabled 新的循环模式启用值
+     * \endif
+     */
+    void loopEnabledChanged(bool enabled);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when skip NaN enabled changes
+     * @param enabled New skip NaN enabled value
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 跳过NaN模式启用改变时发出的信号
+     * @param enabled 新的跳过NaN模式启用值
+     * \endif
+     */
+    void skipNaNEnabledChanged(bool enabled);
+    
 private:
     QString m_title = QStringLiteral("3D Line - Spiral");
     QString m_xLabel = QStringLiteral("X");
@@ -228,6 +282,9 @@ private:
     QString m_zLabel = QStringLiteral("Z");
     QColor m_lineColor = Qt::blue;
     float m_lineWeight = 1.0f;
+    bool m_segmentsEnabled = false;
+    bool m_loopEnabled = false;
+    bool m_skipNaNEnabled = false;
     
     QPointer<QIM::QImPlot3DNode> m_plot3DNode = nullptr;
     QPointer<QIM::QImPlot3DLineItemNode> m_line3DNode = nullptr;
