@@ -329,8 +329,9 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
                 int local_max_idx = result.max_idx + sub_pos;
                 int local_min_idx = result.min_idx + sub_pos;
 
-                candidate_stack[candidate_count++] = local_max_idx;
-                if (local_max_idx != local_min_idx)
+                if (candidate_count < MAX_CANDIDATES)
+                    candidate_stack[candidate_count++] = local_max_idx;
+                if (local_max_idx != local_min_idx && candidate_count < MAX_CANDIDATES)
                     candidate_stack[candidate_count++] = local_min_idx;
 
                 // 平均值简化（无NaN，直接累加）
@@ -360,8 +361,9 @@ void QImMinMaxLTTBDownsampler::minMaxLTTB(const double* x_data, const double* y_
                     if (y < min_val) { min_val = y; min_idx = j; }
                 }
 
-                candidate_stack[candidate_count++] = max_idx;
-                if (max_idx != min_idx)
+                if (candidate_count < MAX_CANDIDATES)
+                    candidate_stack[candidate_count++] = max_idx;
+                if (max_idx != min_idx && candidate_count < MAX_CANDIDATES)
                     candidate_stack[candidate_count++] = min_idx;
             }
 
