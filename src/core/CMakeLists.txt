@@ -121,6 +121,17 @@ if(QIM_ENABLE_DEBUG_PRINT)
     )
 endif()
 
+# ================================================================
+# SIMD optimization: Enable AVX2 intrinsics for QImSimdArgMinMax.cpp only
+# Runtime CPU detection ensures AVX2 code is only called on AVX2-capable CPUs
+# ================================================================
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    set_source_files_properties(
+        "${QIMCORE_SRC_DIR}/plot/QImSimdArgMinMax.cpp"
+        PROPERTIES COMPILE_FLAGS "-mavx2 -msse4.2"
+    )
+endif()
+
 # 链接依赖
 target_link_libraries(${QIMCORE_PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::Core
