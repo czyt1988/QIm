@@ -52,8 +52,8 @@ public:
     // Force re-downsample on next resolve() call (call after source data changes)
     void invalidate();
 
-    // Pixel-to-target-points conversion (kPixelToPointRatio = 1.5)
-    static constexpr double kPixelToPointRatio = 1.5;
+    // Pixel-to-target-points conversion (kPixelToPointRatio = 5)
+    static constexpr double kPixelToPointRatio = 5;
     static int pixelAwareTargetPoints(int pixelWidth);
 
 private:

@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "QImMinMaxLTTBDownsampler.h"
+#include "QImSimdArgMinMax.h"
 #include "QImPlotLineItemNode.h"
 
 using namespace QIM;
@@ -41,6 +42,13 @@ private Q_SLOTS:
     // 2 new tests for autoDownsample and full-range global extent
     void testConstructorAutoDownsampleFalse();
     void testFullRangeDownsamplePreservesGlobalExtent();
+
+    // 5 SIMD-specific tests for simdArgMinMax
+    void testSimdArgMinMaxSmallArray();
+    void testSimdArgMinMaxExactMultiple();
+    void testSimdArgMinMaxNaNHandling();
+    void testSimdArgMinMaxAllNaN();
+    void testSimdArgMinMaxResultMatchesScalar();
 
 private:
     // Helper: create linearly spaced X values 0, 1, 2, ..., n-1
@@ -441,6 +449,131 @@ void TestDownsampler::testFullRangeDownsamplePreservesGlobalExtent()
 
     // Output count should be exactly target_points
     QCOMPARE(ds.size(), 1000);
+}
+
+// ============================================================================
+// SIMD test 1: Small array (count < 4) — scalar tail must work correctly
+// ============================================================================
+void TestDownsampler::testSimdArgMinMaxSmallArray()
+{
+    // 1 element
+    {
+        std::vector<double> data = {42.0};
+        auto result = QIM::simdArgMinMax(data.data(), 1);
+        QCOMPARE(result.min_idx, 0);
+        QCOMPARE(result.max_idx, 0);
+        QCOMPARE(result.min_val, 42.0);
+        QCOMPARE(result.max_val, 42.0);
+    }
+    // 2 elements
+    {
+        std::vector<double> data = {10.0, 20.0};
+        auto result = QIM::simdArgMinMax(data.data(), 2);
+        QCOMPARE(result.min_idx, 0);
+        QCOMPARE(result.max_idx, 1);
+        QCOMPARE(result.min_val, 10.0);
+        QCOMPARE(result.max_val, 20.0);
+    }
+    // 3 elements (AVX2 tail case: 4 - 3 = 1 remaining)
+    {
+        std::vector<double> data = {5.0, -3.0, 7.0};
+        auto result = QIM::simdArgMinMax(data.data(), 3);
+        QCOMPARE(result.min_idx, 1);
+        QCOMPARE(result.max_idx, 2);
+        QCOMPARE(result.min_val, -3.0);
+        QCOMPARE(result.max_val, 7.0);
+    }
+}
+
+// ============================================================================
+// SIMD test 2: Exact SIMD-aligned sizes (4, 8, 16) — results match scalar
+// ============================================================================
+void TestDownsampler::testSimdArgMinMaxExactMultiple()
+{
+    const int sizes[] = {4, 8, 16, 32, 64};
+
+    for (int size : sizes) {
+        std::vector<double> data(size);
+        for (int i = 0; i < size; ++i) {
+            data[i] = std::sin(i * 0.1) + (i % 7) * 0.01;
+        }
+
+        auto simd_result = QIM::simdArgMinMax(data.data(), size);
+
+        // Compute expected scalar result
+        int expected_min_idx = 0, expected_max_idx = 0;
+        double expected_min_val = data[0], expected_max_val = data[0];
+        for (int i = 1; i < size; ++i) {
+            if (data[i] < expected_min_val) { expected_min_val = data[i]; expected_min_idx = i; }
+            if (data[i] > expected_max_val) { expected_max_val = data[i]; expected_max_idx = i; }
+        }
+
+        QCOMPARE(simd_result.min_idx, expected_min_idx);
+        QCOMPARE(simd_result.max_idx, expected_max_idx);
+        QCOMPARE(simd_result.min_val, expected_min_val);
+        QCOMPARE(simd_result.max_val, expected_max_val);
+    }
+}
+
+// ============================================================================
+// SIMD test 3: NaN handling — NaN values must not be selected as min/max
+// ============================================================================
+void TestDownsampler::testSimdArgMinMaxNaNHandling()
+{
+    // Data with NaN at various positions
+    std::vector<double> data = {1.0, std::numeric_limits<double>::quiet_NaN(),
+                                -5.0, 3.0, std::numeric_limits<double>::quiet_NaN(),
+                                10.0, -2.0, 8.0};
+
+    auto result = QIM::simdArgMinMax(data.data(), static_cast<int>(data.size()));
+
+    QCOMPARE(result.min_idx, 2);   // -5.0 at index 2
+    QCOMPARE(result.max_idx, 5);   // 10.0 at index 5
+    QCOMPARE(result.min_val, -5.0);
+    QCOMPARE(result.max_val, 10.0);
+}
+
+// ============================================================================
+// SIMD test 4: All-NaN data — returns initial values {0, 0, DBL_MAX, -DBL_MAX}
+// ============================================================================
+void TestDownsampler::testSimdArgMinMaxAllNaN()
+{
+    const int count = 8;
+    std::vector<double> data(count, std::numeric_limits<double>::quiet_NaN());
+
+    auto result = QIM::simdArgMinMax(data.data(), count);
+
+    QCOMPARE(result.min_idx, 0);
+    QCOMPARE(result.max_idx, 0);
+    QCOMPARE(result.min_val, DBL_MAX);
+    QCOMPARE(result.max_val, -DBL_MAX);
+}
+
+// ============================================================================
+// SIMD test 5: Large random data — SIMD result must exactly match scalar
+// ============================================================================
+void TestDownsampler::testSimdArgMinMaxResultMatchesScalar()
+{
+    const int count = 10000;
+    std::vector<double> data(count);
+    for (int i = 0; i < count; ++i) {
+        data[i] = std::sin(i * 0.1) + (i % 7) * 0.01 + std::cos(i * 0.03);
+    }
+
+    auto simd_result = QIM::simdArgMinMax(data.data(), count);
+
+    // Compute expected scalar result
+    int expected_min_idx = 0, expected_max_idx = 0;
+    double expected_min_val = data[0], expected_max_val = data[0];
+    for (int i = 1; i < count; ++i) {
+        if (data[i] < expected_min_val) { expected_min_val = data[i]; expected_min_idx = i; }
+        if (data[i] > expected_max_val) { expected_max_val = data[i]; expected_max_idx = i; }
+    }
+
+    QCOMPARE(simd_result.min_idx, expected_min_idx);
+    QCOMPARE(simd_result.max_idx, expected_max_idx);
+    QCOMPARE(simd_result.min_val, expected_min_val);
+    QCOMPARE(simd_result.max_val, expected_max_val);
 }
 
 QTEST_MAIN(TestDownsampler)

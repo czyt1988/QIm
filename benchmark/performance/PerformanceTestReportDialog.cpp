@@ -293,7 +293,7 @@ QString PerformanceTestReportDialog::generateMermaidCharts() const
     // --- FPS Chart ---
     mermaid += "## ";
     mermaid += chinese ? "FPS 对比\n" : "FPS Comparison\n";
-    mermaid += "```mermaid\n";
+    mermaid += "\n```mermaid\n";
     mermaid += "xychart-beta\n";
     mermaid += QString("    title \"%1\"\n").arg(chinese ? "FPS 对比" : "FPS Comparison");
     mermaid += QString("    x-axis [%1]\n").arg(xLabels.join(", "));
@@ -417,19 +417,12 @@ QString PerformanceTestReportDialog::formatResultsTable(const QVector<TestResult
         }
 
         QString setupTime = QString::number(r.setupTime, 'f', 2);
-        QString openglStr = r.usedOpenGL ? "Yes" : "No";
-        QString downsampleStr = r.usedDownsampling ? "Yes" : "No";
-
-        if (chinese) {
-            md += QString("| %1 | %2 | %3 | %4 | %5 | %6 | %7 |\n")
-                      .arg(r.libraryName).arg(setupTime).arg(renderTime).arg(fps).arg(memory)
-                      .arg(m_config.useOpenGL ? "✓" : "×")
-                      .arg(m_config.useDownsampling ? "✓" : "×");
-        } else {
-            md += QString("| %1 | %2 | %3 | %4 | %5 | %6 | %7 |\n")
-                      .arg(r.libraryName).arg(setupTime).arg(renderTime).arg(fps).arg(memory)
-                      .arg(openglStr).arg(downsampleStr);
-        }
+        QString openglStr = r.usedOpenGL ? "✓" : "×";
+        QString downsampleStr = r.usedDownsampling ? "✓" : "×";
+        md += QString("| %1 | %2 | %3 | %4 | %5 | %6 | %7 |\n")
+                    .arg(r.libraryName).arg(setupTime).arg(renderTime).arg(fps).arg(memory)
+                    .arg(openglStr).arg(downsampleStr);
+        
     }
     md += "\n";
     return md;

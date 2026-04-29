@@ -13,7 +13,7 @@ static constexpr double kZoomOutThreshold = 1.5;
 static constexpr double kPixelChangeRatio = 0.1;
 
 static constexpr int kMinTargetPoints = 100;
-static constexpr int kMaxTargetPoints = 10000;
+static constexpr int kMaxTargetPoints = 50000;
 
 // ===== public =====
 

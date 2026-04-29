@@ -295,7 +295,7 @@ TestResult PerformanceTestController::testQImPlot(int pointCount)
         QVector< double >(m_testDataY.constData(), m_testDataY.constData() + pointCount),
         "Test Curve"
     );
-    lineNode->setDownsampleAlgorithm(result.usedDownsampling ? QIM::QImDownsampleAlgorithm::LTTB : QIM::QImDownsampleAlgorithm::None);
+    lineNode->setDownsampleAlgorithm(result.usedDownsampling ? QIM::QImDownsampleAlgorithm::MinMaxLTTB : QIM::QImDownsampleAlgorithm::None);
     result.setupTime = timer.elapsed();
 
     // ---------- 预热（包含数据更新）----------
