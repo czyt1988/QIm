@@ -1,20 +1,31 @@
-# QIm：把 ImGui 的渲染能力搬进 Qt 生态
+# Vibe Coding——Qt高性能绘图库QIm
 
-> **作者**：[czt1988](https://github.com/czyt1988)　|　**项目地址**：[github.com/czyt1988/QIm](https://github.com/czyt1988/QIm)
+这个项目80%都是AI干活，工具是`OpenCode` + `Oh-My-Openagent`，主力模型是`glm-5.1` + `kimi-k2.5` + `qwen3.6`
 
-在 Qt 里做数据可视化，选型向来有点尴尬。
+> **项目地址**：
+>
+>[https://github.com/czyt1988/QIm](https://github.com/czyt1988/QIm)
+>[https://gitee.com/czyt1988/qim](https://gitee.com/czyt1988/qim)
 
-`QCustomPlot` 和 `Qwt` 是老牌选手，该有的功能都有，文档也算齐全。但它们的底层走的是 `QPainter` 管线，数据量一上百万帧率就往下掉。`Qt Charts` 和 `KDChart` 就更不用说了，性能完全不在一个量级。
+在 Qt 里做高性能数据可视化目前只有两种选择：`QCustomPlot` 和 `Qwt`，这两个库该有的2D功能都有，文档也算齐全，有降采样算法支撑百万点绘制，但`QCustomPlot`是GPL协议，你的项目使用也要使用GPL协议，`Qwt`协议和性能都比`QCustomPlot`好，但不够美观，所以目前我也针对`Qwt`进行了改进，可参考:[...]()。`Qt Charts` 和 `KDChart` 就更不用说了，性能完全不在一个量级
 
-另一头，`Dear ImGui` 生态走了完全不同的路子——GPU 加速、即时模式渲染，帧率稳得像钉子。游戏引擎、调试工具、实时监控领域早就证明了这套东西能打。问题在于它的编程范式跟 Qt 开发者习惯的保留模式差了十万八千里。每帧都要重新构建 UI 结构，信号槽没有、属性系统没有、对象树也没有。
+在`Qwt`项目中，有一个Issues，提出了Qt另一种高性能绘图的方案：基于`Dear ImGui`的 `ImPlot`,它是MIT协议、GPU 加速、即时模式渲染，支持多种绘图，还有3D版的`ImPlot3D`,目前用于游戏引擎、调试工具
 
-**QIm 做的事很简单：把 ImGui 生态里最能打的东西——ImPlot 和 ImPlot3D 的 GPU 渲染能力——用 Qt 开发者最熟悉的方式包装起来。**
+在了解后今年过年的时候自己上手试了发现的确效果很好，但它也有一些问题，主要是`ImGui`的编程范式跟 Qt 开发者习惯的保留模式差的较远，和Qt的信号槽对接需要做较多的工作，于是我就把它进行二次封装，形成了QIm这个库
 
-具体来说，就是把 ImGui 的绘图组件映射为 Qt 对象树上的节点，ImGui 属性映射为 `Q_PROPERTY`，交互事件通过 Qt 信号槽传递。你不需要学 ImGui 那一套即时模式的写法，直接用你熟悉的 Qt 范式就能构建高性能的数据可视化应用。
+**QIm 做的事很简单：把 ImGui 生态里 ImPlot 和 ImPlot3D  用 Qt 开发者最熟悉的方式包装起来。**
+
+具体来说，就是把 ImGui 的绘图函数用渲染节点进行抽象，整个渲染过程就是对渲染树的遍历，每个节点有对应的开始渲染和结束渲染方法，节点之间会有父子关系，也能更好的匹配ImGui的begin/end方法。同时ImGui 属性映射为 `Q_PROPERTY`，交互事件通过 Qt 信号槽传递。这样就不需要学 ImGui 那一套即时模式的写法，直接用最熟悉的 Qt 范式就能构建高性能的数据可视化图表
+
+下面是一些效果图
+
+![figure测试界面](./assets/screenshots/QImFigureTest-01.png)
+
+![split分割界面](./assets/screenshots/QImFigureTestSplitWidget.png)
 
 ## 从即时模式到保留模式
 
-原生 ImGui 的写法是这样的——这段代码每帧都要完整跑一遍：
+原生 ImGui 的写法是这样的——这段代码在OpenGL的`paintGL`函数里，每帧都要完整跑一遍：
 
 ```cpp
 if (ImGui::Begin("Window")) {
@@ -28,21 +39,21 @@ if (ImGui::Begin("Window")) {
 
 你会发现你没办法"持有"一个绘图对象。每次渲染都得重新声明，属性不能持久保存，也没有信号通知你数据变了。
 
-QIm 把这套逻辑换成了面向对象加对象树的方式：
+QIm 把这套逻辑换成了面向对象加对象树的方式,把各种功能封装成`QIm**Node`：
 
 ```cpp
 auto window = new QImWidgetNode(root);
 window->setWindowTitle("Window");
 
-auto plot = new QImPlotNode(window);  // 自动成为 window 的子节点
+auto plot = new QImPlotNode(window);  
 plot->setTitle("Plot");
 
-auto line = new QImPlotLineItemNode(plot);
-line->setData(x, y);                  // 数据设一次就行
-line->setColor(Qt::red);              // 属性随时改
+auto line = new QImPlotLineItemNode(plot);// 自动成为 plot 的子节点,等效plot->addChildNode(line)
+line->setData(x, y);                  // 设置数据
+line->setColor(Qt::red);              // 属性直接使用Qt的类
 ```
 
-这么一换，ImGui 的每帧声明变成了 Qt 开发者最熟悉的对象创建、属性设置、信号连接三板斧。对象树自动管理生命周期——父节点析构时子节点跟着销毁，不用你操心内存。
+这么一换，ImGui 的每帧声明变成了 Qt 开发者最熟悉的样子。对象树自动管理生命周期——父节点析构时子节点跟着销毁，不用你操心内存。
 
 ## 对象树是核心设计
 
@@ -64,82 +75,8 @@ QImFigureWidget (顶层 QWidget)
 这套结构带来的好处：
 
 - 子节点顺序就是渲染顺序，控制 Z-Order 非常直接
-- 想加自定义组件？继承 `QImAbstractNode`，实现 `beginDraw()` 和 `endDraw()` 就行
+- 如果想加自定义组件，只要继承 `QImAbstractNode`，实现 `beginDraw()` 和 `endDraw()` 就行
 - 树遍历由基类搞定，你只关心自己的渲染逻辑
-
-## 2D 绘图：12 种图表类型，6 条坐标轴
-
-QIm 目前已经封装了 ImPlot 上你能用到的所有主流图型。折线图、散点图、阶梯图这些基础的不说了，柱状图（包括分组柱状）、饼图、热力图、二维直方图、填充区域、误差棒、茎叶图……你大概率需要的都有。
-
-每种子图支持最多 6 条坐标轴（x1/y1/x2/y2/x3/y3），坐标轴范围约束有 `Always`（刚性锁定）和 `Once`（首次自适应）两种模式。轴标签、刻度、网格线、图例这些细节都能精细控制。
-
-![柱状图](assets/plot2D/bars.gif)  ![热力图](assets/plot2D/heat.gif)  ![实时绘图](assets/plot2D/rt.gif)
-
-## 3D 绘图
-
-三维这块封装了 ImPlot3D，支持曲线图、散点图、曲面图、曲面网格、三角剖分、四边形、图像贴图、文本标注。曲面图内置了 Viridis、Plasma、Inferno 等科学配色方案，做热力分布、地形高程这种场景很顺手。
-
-交互方式和 ImPlot3D 原生一致：
-
-- 左键拖拽平移视角
-- 右键拖拽旋转视角
-- 滚轮或中键缩放
-- 右键双击重置旋转
-
-![3D Demo](assets/plot3D/plot3d-demo1.gif)
-
-## 大数据量的处理：降采样 + SIMD 加速
-
-超过 50 万点的场景，不管哪个渲染引擎都得降采样。你的屏幕只有一千多个像素宽，但数据可能有上百万个点——绝大多数点都挤在同一个像素列里互相重叠，GPU 却在拼命渲染那些永远不可能被眼睛分辨的点。
-
-QIm 内置了两套降采样算法：**LTTB** 和 **MinMaxLTTB**。
-
-LTTB（Largest Triangle Three Buckets）是时序数据降采样里公认视觉保真最好的。它的思路很巧妙：把数据分成桶，对每个桶选一个点——选那个与前后桶构成"面积最大三角形"的点。面积越大意味着偏离直线插值越远，也就是视觉上最"醒目"的点——峰值、谷值、拐点都被优先保留。
-
-MinMaxLTTB 是 LTTB 的加速版，思路是在每个桶里先用极值查找筛出一批候选点，再在这些候选点上做 LTTB 的面积选择。因为候选点通常只有原始点数的 1/2 到 1/4，面积计算量大幅减少，视觉质量和纯 LTTB 几乎没有区别。
-
-不过 MinMaxLTTB 里面还有一个瓶颈——极值查找（argmin/argmax）本身是个标量循环：逐个比较，一次处理一个 double，只用了现代 CPU 计算能力的 1/4。
-
-### SIMD 加速
-
-QIm 为此专门实现了一个 SIMD 加速的极值查找模块 `QImSimdArgMinMax`，在一条遍历里同时找出最小值和最大值。核心思路是用 CPU 的 SIMD 寄存器一次处理多个 double（这是最新C++26才提供的std::simd的内容）：
-
-| 执行路径 | SIMD 宽度 | 覆盖 CPU | 加速比 |
-|---------|-----------|---------|--------|
-| AVX2 | 4 doubles/条指令 | 2013年后的 x86（Haswell+） | 3-5x |
-| SSE4.2 | 2 doubles/条指令 | 2010年后的 x86（几乎全部） | 2-3x |
-| 标量 | 1 double/条指令 | 兜底 | 1x |
-
-运行时通过 CPUID 检测当前 CPU 支持的指令集，用函数指针锁定最优路径。同一个 exe 在老 CPU 上走标量、在新 CPU 上走 AVX2，不需要分发多个版本。
-
-加上栈数组替代 vector、消除 lambda 间接访问等几项微优化，MinMaxLTTB 的实测数据：
-
-| 算法 | 100 万点降采样耗时 | 相比 LTTB |
-|------|-------------------|-----------|
-| 标准 LTTB | ~500ms | 基准 |
-| MinMaxLTTB（标量） | ~60ms | 快 8x |
-| MinMaxLTTB（SIMD） | ~20ms | **快 25x** |
-
-每条折线可以单独设置降采样算法和阈值：
-
-```cpp
-line->setDownsampleAlgorithm(QIM::QImDownsampleAlgorithm::MinMaxLTTB);
-line->setDownsampleThreshold(20000);  // 超过 2 万点自动触发
-```
-
-默认的 `Auto` 模式会根据数据量自动选择——小于 1 万点不降采样，1 万到 10 万用 LTTB，超过 10 万自动切到 MinMaxLTTB 走 SIMD 加速路径。
-
-## 三种渲染模式
-
-`QImWidget` 提供了三种渲染策略：
-
-```cpp
-widget->setRenderMode(QIM::QImWidget::RenderAdaptive);     // 默认：交互时高帧率，静止时低帧率
-widget->setRenderMode(QIM::QImWidget::RenderContinuous);    // 持续 18 FPS，适合动画
-widget->setRenderMode(QIM::QImWidget::RenderOnDemand);      // 仅在事件触发时刷新，最省资源
-```
-
-默认的 `RenderAdaptive` 在大多数场景下体验最好——你在拖拽、缩放的时候帧率拉满，停下来以后降到 1 FPS 省资源。
 
 ## Qt 生态集成
 
@@ -166,33 +103,42 @@ auto plot1 = figure->createPlotNode();    // 2D 子图
 auto plot2 = figure->createPlot3DNode();  // 3D 子图
 ```
 
-## 性能：跟 QCustomPlot 和 Qwt 比一比
+## 2D 绘图：12 种图表类型，6 条坐标轴
 
-拿 100 万数据点的折线图做基准，渲染 100 次取均值。分四种配置组合测下来，结果是这样的：
+QIm 目前已经封装了 ImPlot 上你能用到的所有主流图型。折线图、散点图、阶梯图这些基础的不说了，柱状图（包括分组柱状）、饼图、热力图、二维直方图、填充区域、误差棒、茎叶图……你大概率需要的都有
 
-没开降采样也没开 OpenGL 的时候，QIm 跑 92.5ms（约 10.8 FPS），QCustomPlot 是 249.3ms，Qwt 是 144.1ms。QIm 的优势大概 1.5 到 2.7 倍，这主要来自 OpenGL 渲染管线的底子。
+每种子图支持最多 6 条坐标轴（x1/y1/x2/y2/x3/y3），坐标轴范围约束有 `Always`（刚性锁定）和 `Once`（首次自适应）两种模式。轴标签、刻度、网格线、图例这些细节都能精细控制
 
-但一旦开了降采样，三家的差距就急剧缩小到 10% 以内——大家都 36-44ms 之间。这说明降采样才是大数据量渲染的瓶颈所在，选哪家的库差别不大。
+![柱状图](assets/plot2D/bars.gif)  ![热力图](assets/plot2D/heat.gif)  ![实时绘图](assets/plot2D/rt.gif)
 
-内存方面 QIm 就老实承认吧——460MB（100万点），Qwt 和 QCustomPlot 只要 21MB。这是双缓冲加 GPU 资源的架构代价。如果你的应用跑在内存受限的嵌入式设备上，QIm 可能不是最佳选择。但桌面应用场景下，这点内存换来的渲染性能提升是值得的。
+## 3D 绘图
 
-完整测试代码在 `benchmark/performance` 目录下。
+三维这块封装了 ImPlot3D，支持曲线图、散点图、曲面图、曲面网格、三角剖分、四边形、图像贴图、文本标注。曲面图内置了 Viridis、Plasma、Inferno 等科学配色方案，做热力分布、地形高程这种场景都能满足。
 
-## 快速上手
+交互方式和 ImPlot3D 原生一致：
 
-环境要求：CMake 3.15+，C++17，Qt 5.14+（需要 Core、Gui、Widgets、OpenGL）。Qt 6 的话额外加一个 `OpenGLWidgets`。
+- 左键拖拽平移视角
+- 右键拖拽旋转视角
+- 滚轮或中键缩放
+- 右键双击重置旋转
 
-编译安装：
+![3D Demo](./assets/plot3D/plot3d-demo2.gif)
+![](./assets/screenshots/QImReadme3DExample.png)
+
+## 简单的代码演示
+
+QIm 环境要求：CMake 3.15+，C++17，Qt 5.14+（需要 Core、Gui、Widgets、OpenGL）。Qt 6 的话额外加一个 `OpenGLWidgets`。
+
+编译安装直接CMake：
 
 ```bash
 mkdir build && cd build
-cmake .. -G "Visual Studio 17 2022" -A x64 \
-         -DCMAKE_PREFIX_PATH="C:/Qt/6.5.0/msvc2019_64"
-cmake --build . --config Release
+cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
+cmake --build build --config Release
 cmake --install .
 ```
 
-在你的项目里集成：
+项目直接通过`find_package`集成：
 
 ```cmake
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
@@ -240,46 +186,80 @@ public:
 };
 ```
 
-## 自定义节点
+## 大数据量的处理：降采样 + SIMD 加速
 
-QIm 的节点体系是开放的。继承 `QImAbstractNode`，实现 `beginDraw()` 和 `endDraw()`，你就能创建一个自己的组件并融入对象树和渲染管线：
+超过 50 万点的场景，不管哪个渲染引擎都得降采样。你的屏幕只有一千多个像素宽，但数据可能有上百万个点——绝大多数点都挤在同一个像素列里互相重叠，GPU 却在拼命渲染那些永远不可能被眼睛分辨的点。QCustomPlot和Qwt都提供了降采样算法，其中`QCustomPlot`是默认开启，`Qwt`是需要手动指定，这就是导致好多人使用感觉`QCustomPlot`性能比`Qwt`好的原因，实测同样开启降采样，`Qwt`性能好于`QCustomPlot`
+
+`ImPlot`在大数据量渲染也会有很大压力，如果不启用降采样，大数据量下的渲染性能还不如开启了降采样的`Qwt`和`QCustomPlot`（CPU）
+
+很可惜的是`ImPlot`并没有内置降采样算法，为了解决超大规模点渲染问题，QIm 内置了两套降采样算法：**LTTB** 和 **MinMaxLTTB**
+
+LTTB（Largest Triangle Three Buckets）是时序数据降采样里公认视觉保真最好的。它的思路是：把数据分成桶，对每个桶选一个点——选那个与前后桶构成"面积最大三角形"的点。面积越大意味着偏离直线插值越远，也就是视觉上最"醒目"的点——峰值、谷值、拐点都被优先保留
+
+MinMaxLTTB 是 LTTB 的加速版，思路是在每个桶里先用极值查找筛出一批候选点，再在这些候选点上做 LTTB 的面积选择。因为候选点通常只有原始点数的 1/2 到 1/4，面积计算量大幅减少，视觉质量和纯 LTTB 几乎没有区别
+
+不过 MinMaxLTTB 里面还有一个瓶颈——极值查找（argmin/argmax）本身是个标量循环：逐个比较，一次处理一个 double，只用了现代 CPU 计算能力的 1/4。为此专门为极值查找进行了CPU指令集优化
+
+### SIMD 加速
+
+QIm 为此专门实现了一个 SIMD 加速的极值查找模块 `QImSimdArgMinMax`，在一条遍历里同时找出最小值和最大值。核心思路是用 CPU 的 SIMD 寄存器一次处理多个 double（这是最新C++26标准才提出的std::simd的内容）：
+
+| 执行路径 | SIMD 宽度 | 覆盖 CPU | 加速比 |
+|---------|-----------|---------|--------|
+| AVX2 | 4 doubles/条指令 | 2013年后的 x86（Haswell+） | 3-5x |
+| SSE4.2 | 2 doubles/条指令 | 2010年后的 x86（几乎全部） | 2-3x |
+| 标量 | 1 double/条指令 | 兜底 | 1x |
+
+运行时通过 CPUID 检测当前 CPU 支持的指令集，用函数指针锁定最优路径。同一个 exe 在老 CPU 上走标量、在新 CPU 上走 AVX2，不需要分发多个版本
+
+每条折线可以单独设置降采样算法和阈值：
 
 ```cpp
-class CustomPlotNode : public QIM::QImAbstractNode {
-    Q_OBJECT
-public:
-    CustomPlotNode(QObject* parent = nullptr) : QIM::QImAbstractNode(parent) {}
-
-protected:
-    bool beginDraw() override {
-        return ImGui::Begin("MyCustomWindow", nullptr, m_flags);
-    }
-    void endDraw() override {
-        ImGui::End();
-    }
-private:
-    ImGuiWindowFlags m_flags = 0;
-};
+line->setDownsampleAlgorithm(QIM::QImDownsampleAlgorithm::MinMaxLTTB);
+line->setDownsampleThreshold(20000);  // 超过 2 万点自动触发
 ```
 
-这套设计意味着——任何 ImGui 生态里的现有组件，都能用这个模式封装成 QIm 节点。拓展潜力不在库本身，在它背后整个 ImGui 社区。
+默认的 `Auto` 模式会根据数据量自动选择——小于 1 万点不降采样，1 万到 10 万用 LTTB，超过 10 万自动切到 MinMaxLTTB 走 SIMD 加速路径
+
+## OpenGL渲染模式
+
+Qt的OpenGL窗口需要手动触发OpenGL的刷新，在封装QIm库时，基础窗口`QImWidget` 提供了三种渲染策略：
+
+```cpp
+widget->setRenderMode(QIM::QImWidget::RenderAdaptive);     // 默认：交互时高帧率，静止时低帧率
+widget->setRenderMode(QIM::QImWidget::RenderContinuous);    // 持续 18 FPS，适合动画
+widget->setRenderMode(QIM::QImWidget::RenderOnDemand);      // 仅在事件触发时刷新，最省资源
+```
+
+默认的 `RenderAdaptive` 在大多数场景下综合性能最好的一种策略，它结合Qt的事件来判断是否需要刷新，如果你在OpenGL窗口有事件，包括鼠标、键盘、等事件它就会处于高频刷新状态，没有任何事件它会降到 1 FPS 用来节省资源
+
+## 性能：跟 QCustomPlot 和 Qwt 对比
+
+拿 100 万数据点的折线图做基准，渲染 100 次取均值。分四种配置组合测下来，结果是这样的：
+
+---
+
+完整测试代码在 `benchmark/performance` 目录下，不同GPU有不同的结果，我的电脑GPU较弱，CPU较强，得出的结果，如果你的电脑GPU强的话，QIm的表现会更强
 
 ## 当前进展和已知限制
 
 2D 方面目前 Line、Scatter、Stairs、Bars、BarGroups、Shaded、ErrorBars、Stems、InfLines、PieChart、Text、Dummy、Histogram、Heatmap、Histogram2D、Digital、Image 都已经完成。3D 方面 Line、Scatter、Surface、Mesh、Triangle、Quad、Image、Text 都已可用。
 
-说白了，主流的图表类型基本都覆盖了，剩下的主要是些补充性的——分组/堆叠柱状图的增强、蜡烛图、QML 集成还在计划中。
+主流的图表类型基本都覆盖了，剩下的主要是些补充性的功能，QML 集成还在计划中。
 
 已知的限制主要有三个：
 
 - 字体不能随便用，需要先 `AddFontFromFileTTF` 加载字体文件
-- 不支持虚线、点划线这样的线型
-- 内存开销比 Qwt/QCustomPlot 大 5-15 倍（架构特性决定的）
-
-反正在实际项目里用起来，前两个限制一般不影响，第三个就看你的场景了——桌面应用基本不用担心这点开销。
+- 不支持虚线、点划线这样的线型（这里受限于ImGui,目前最新版已经提供，ImPlot正在规划中）
+- 内存开销比 Qwt/QCustomPlot 大 （架构特性决定的）
 
 ---
 
-> **项目地址**：[github.com/czyt1988/QIm](https://github.com/czyt1988/QIm)
+虽然这个项目80%的活都是AI完成，但能做好的前提是我做了20%的框架搭建和约束制定，后面有空会讲讲大型项目AI Coding的一些经验
+
+> **项目地址**：
+>
+>[https://github.com/czyt1988/QIm](https://github.com/czyt1988/QIm)
+>[https://gitee.com/czyt1988/qim](https://gitee.com/czyt1988/qim)
 >
 > 欢迎 Star、Issue、PR。如果你正在找一个高性能、Qt 原生的绘图方案，不妨试试。
