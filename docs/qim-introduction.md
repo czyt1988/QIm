@@ -7,9 +7,9 @@
 >[https://github.com/czyt1988/QIm](https://github.com/czyt1988/QIm)
 >[https://gitee.com/czyt1988/qim](https://gitee.com/czyt1988/qim)
 
-在 Qt 里做高性能数据可视化目前只有两种选择：`QCustomPlot` 和 `Qwt`，这两个库该有的2D功能都有，文档也算齐全，有降采样算法支撑百万点绘制，但`QCustomPlot`是GPL协议，你的项目使用也要使用GPL协议，`Qwt`协议和性能都比`QCustomPlot`好，但不够美观，所以目前我也针对`Qwt`进行了改进，可参考:[...]()。`Qt Charts` 和 `KDChart` 就更不用说了，性能完全不在一个量级
+在 Qt 里做高性能数据可视化目前只有两种选择：`QCustomPlot` 和 `Qwt`（`Qt Charts`性能完全不在一个量级），这两个库该有的2D功能都有，文档也算齐全，有降采样算法支撑百万点绘制，但`QCustomPlot`是GPL协议，你的项目使用也要使用GPL协议，`Qwt`协议和性能都比`QCustomPlot`好，但不够美观，所以目前我也针对`Qwt`进行了改进，可参考:[Qwt 7.0 新特性介绍 — 更现代、更强大的Qt数据可视化库](https://zhuanlan.zhihu.com/p/2027883844636779917)。
 
-在`Qwt`项目中，有一个Issues，提出了Qt另一种高性能绘图的方案：基于`Dear ImGui`的 `ImPlot`,它是MIT协议、GPU 加速、即时模式渲染，支持多种绘图，还有3D版的`ImPlot3D`,目前用于游戏引擎、调试工具
+在`Qwt`项目中，有一个[Issues](https://github.com/czyt1988/QWT/issues/2)，提出了Qt另一种高性能绘图的方案：基于`Dear ImGui`的 `ImPlot`,它是MIT协议、GPU 加速、即时模式渲染，支持多种绘图，还有3D版的`ImPlot3D`,目前用于游戏引擎、调试工具
 
 在了解后今年过年的时候自己上手试了发现的确效果很好，但它也有一些问题，主要是`ImGui`的编程范式跟 Qt 开发者习惯的保留模式差的较远，和Qt的信号槽对接需要做较多的工作，于是我就把它进行二次封装，形成了QIm这个库
 
@@ -23,9 +23,11 @@
 
 ![split分割界面](./assets/screenshots/QImFigureTestSplitWidget.png)
 
+通过QIm，你能在任意窗口嵌入ImPlot/ImPlot3D，实现数据可视化
+
 ## 从即时模式到保留模式
 
-原生 ImGui 的写法是这样的——这段代码在OpenGL的`paintGL`函数里，每帧都要完整跑一遍：
+原生 ImGui 的写法是下面这样的，——这段代码在OpenGL的`paintGL`函数里，每帧都要完整跑一遍：
 
 ```cpp
 if (ImGui::Begin("Window")) {
@@ -110,6 +112,10 @@ QIm 目前已经封装了 ImPlot 上你能用到的所有主流图型。折线�
 每种子图支持最多 6 条坐标轴（x1/y1/x2/y2/x3/y3），坐标轴范围约束有 `Always`（刚性锁定）和 `Once`（首次自适应）两种模式。轴标签、刻度、网格线、图例这些细节都能精细控制
 
 ![柱状图](assets/plot2D/bars.gif)  ![热力图](assets/plot2D/heat.gif)  ![实时绘图](assets/plot2D/rt.gif)
+
+也支持ImPlot里的各种鼠标操作事件
+
+![鼠标操作](assets/plot2D/query.gif)
 
 ## 3D 绘图
 
@@ -221,25 +227,59 @@ line->setDownsampleThreshold(20000);  // 超过 2 万点自动触发
 
 默认的 `Auto` 模式会根据数据量自动选择——小于 1 万点不降采样，1 万到 10 万用 LTTB，超过 10 万自动切到 MinMaxLTTB 走 SIMD 加速路径
 
-## OpenGL渲染模式
-
-Qt的OpenGL窗口需要手动触发OpenGL的刷新，在封装QIm库时，基础窗口`QImWidget` 提供了三种渲染策略：
-
-```cpp
-widget->setRenderMode(QIM::QImWidget::RenderAdaptive);     // 默认：交互时高帧率，静止时低帧率
-widget->setRenderMode(QIM::QImWidget::RenderContinuous);    // 持续 18 FPS，适合动画
-widget->setRenderMode(QIM::QImWidget::RenderOnDemand);      // 仅在事件触发时刷新，最省资源
-```
-
-默认的 `RenderAdaptive` 在大多数场景下综合性能最好的一种策略，它结合Qt的事件来判断是否需要刷新，如果你在OpenGL窗口有事件，包括鼠标、键盘、等事件它就会处于高频刷新状态，没有任何事件它会降到 1 FPS 用来节省资源
-
 ## 性能：跟 QCustomPlot 和 Qwt 对比
 
-拿 100 万数据点的折线图做基准，渲染 100 次取均值。分四种配置组合测下来，结果是这样的：
+这是我个人电脑的测试结果，我个人电脑是一个小mini主机，配置一般，集成显卡，在100万点的实时刷新模式下，QIm比Qwt和QCustomplot最优的性能还快3倍
 
----
+### 系统信息
+
+| 项目 | 值 |
+|---|---|
+| 操作系统 | Windows 11 Version 25H2 |
+| CPU | 12th Gen Intel(R) Core(TM) i7-1260P (16 核) |
+| 内存 | 32536 MB |
+| GPU | Intel(R) Iris(R) Xe Graphics |
+| 显存 | 未知 |
+| OpenGL | 4.6.0 - Build 30.0.101.3111 |
+| 屏幕 | 2560x1440 |
+| 磁盘 | Unknown |
+| Qt | 6.7.3 (runtime: 6.7.3) |
+| 编译器 | MSVC 1929 |
+
+### 测试选项
+
+- 降采样: 可配置渲染是否开启降采样，三个库都支持降采样
+- OpenGL: 配置是否开启OpenGL加速，主要针对Qwt和QCustomPlot
+
+下面只放100万点的测试结果，专门的对比测试我会专门一个文档里介绍
+
+### 1M（100万） 数据点测试结果
+
+#### 开启降采样
+
+| 库 | 设置时间 (ms) | 渲染时间 (ms) | FPS | 内存 (MB) | OpenGL | 降采样 |
+|:---|:---|:---|:---|:---|:---|:---|
+| QIm | 6.00 | 16.84 | 59.3824 | 64.04 | ✓ | ✓ |
+| Qwt | 7.00 | 44.14 | 22.6552 | 20.22 | × | ✓ |
+| Qwt(OpenGL) | 7.00 | 153.92 | 6.4969 | 91.92 | ✓ | ✓ |
+| QCustomPlot | 45.00 | 45.60 | 21.9298 | 20.83 | × | ✓ |
+| QCustomPlot(OpenGL) | 42.00 | 50.48 | 19.8098 | 31.32 | ✓ | ✓ |
+
+Qwt和QCustomplot都提供了OpenGL加速，但实际加速效果一般
+
+#### 不开启降采样
+
+| 库 | 设置时间 (ms) | 渲染时间 (ms) | FPS | 内存 (MB) | OpenGL | 降采样 |
+|:---|:---|:---|:---|:---|:---|:---|
+| QIm | 7.00 | 85.50 | 11.6959 | 658.96 | ✓ | × |
+| Qwt | 7.00 | 125.12 | 7.9923 | 21.30 | × | × |
+| Qwt(OpenGL) | 9.00 | 140.50 | 7.1174 | 47.56 | ✓ | × |
+| QCustomPlot | 44.00 | 179.46 | 5.5723 | 20.80 | × | × |
+| QCustomPlot(OpenGL) | 44.00 | 174.98 | 5.7149 | 38.64 | ✓ | × |
 
 完整测试代码在 `benchmark/performance` 目录下，不同GPU有不同的结果，我的电脑GPU较弱，CPU较强，得出的结果，如果你的电脑GPU强的话，QIm的表现会更强
+
+> 从上面的测试也能看出，降采样在提升绘图性能起了至关重要的作用
 
 ## 当前进展和已知限制
 
