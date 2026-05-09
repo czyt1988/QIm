@@ -4,16 +4,37 @@ QIm 是一个将 Dear ImGui、ImPlot、ImPlot3D 以保留模式（Retained Mode�
 
 ## 构建
 
-必须使用 Visual Studio 生成器，不要使用 Ninja（PowerShell 中 MSVC 环境无法通过 vcvars64.bat 注入）：
+**推荐使用一键构建脚本**（自动探测 Qt、VS、CMake 路径，无需手动指定）：
 
 ```powershell
-cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
+# 一键构建（默认 Release + Examples ON）
+.\build.ps1
+
+# 常用操作
+.\build.ps1 build            # 增量编译
+.\build.ps1 rebuild          # 清除 + 重配 + 编译
+.\build.ps1 configure -Examples OFF -Benchmark OFF  # 最小化配置（仅主库）
+.\build.ps1 help             # 查看所有选项
+```
+
+脚本会自动搜索 `D:\Qt`、`C:\Qt` 等目录下的 Qt MSVC 安装，自动检测 VS 版本和 CMake 位置。
+
+**手动构建**（不使用脚本时）：
+
+```powershell
+cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="<Qt安装路径>"
 cmake --build build --config Release
 ```
 
-Qt 6 需额外链接 `OpenGLWidgets` 组件。macOS 必须设 `OpenGL 3.3 Core Profile` 默认格式，否则窗口空白。构建损坏时先关掉 `build/bin` 下占用的程序，再 `Remove-Item -Recurse -Force build` 重配。
+**关键注意事项**：
+- **必须使用 Visual Studio 生成器**，不要用 Ninja（PowerShell 中 MSVC 环境无法通过 vcvars64.bat 注入）
+- **Qt 版本必须与 VS 编译器匹配**：Qt msvc2019 对应 VS2019，Qt msvc2022 对应 VS2022
+- Qt 6 需额外链接 `OpenGLWidgets` 组件
+- macOS 必须设 `OpenGL 3.3 Core Profile` 默认格式，否则窗口空白
+- 构建损坏时先关掉 `build/bin` 下占用的程序，再 `.\build.ps1 rebuild` 重配
+- CMake 可能不在 PATH 中（VS2019 内嵌的 CMake 在特殊路径），脚本会自动处理
 
-CMake 选项：`QIM_BUILD_EXAMPLES`(ON)、`QIM_BUILD_TESTS`(OFF)、`QIM_ENABLE_BENCHMARK`(ON)、`QIM_BUILD_QML`(OFF,未完成)。只验主库时加 `-DQIM_BUILD_EXAMPLES=OFF -DQIM_ENABLE_BENCHMARK=OFF`。
+CMake 选项：`QIM_BUILD_EXAMPLES`(ON)、`QIM_BUILD_TESTS`(OFF)、`QIM_ENABLE_BENCHMARK`(ON)、`QIM_BUILD_QML`(OFF,未完成)。只验主库时用 `.\build.ps1 configure -Examples OFF -Benchmark OFF`。
 
 CI 测试（Ubuntu）需要 `-DQIM_BUILD_TESTS=ON`，运行 `ctest --output-on-failure -R plot`。
 

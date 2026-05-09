@@ -265,14 +265,27 @@ line->setData(...);
 
 ### 编译和安装
 
-项目使用`cmake`构建,建议执行安装(install)后使用
+项目使用 `CMake` 构建，推荐使用一键构建脚本（自动探测 Qt、VS、CMake 路径）：
+
+```powershell
+# 一键构建（默认 Release + Examples ON）
+.\build.ps1
+
+# 常用操作
+.\build.ps1 build            # 增量编译
+.\build.ps1 rebuild          # 清除 + 重配 + 编译
+.\build.ps1 configure -Examples OFF -Benchmark OFF  # 最小化配置（仅主库）
+.\build.ps1 help             # 查看所有选项
+```
+
+手动构建（不使用脚本时）：
 
 ```cmake
 # 创建构建目录
 mkdir build && cd build
 # 配置（指定 Qt 安装路径，或确保 Qt 已加入环境变量）
-cmake .. -G "Visual Studio 17 2022" -A x64 ^
-         -DCMAKE_PREFIX_PATH="C:/Qt/6.5.0/msvc2019_64" ^
+cmake .. -G "Visual Studio 16 2019" -A x64 ^
+         -DCMAKE_PREFIX_PATH="<Qt安装路径>" ^
          -DCMAKE_BUILD_TYPE=Release
 # 构建
 cmake --build . --config Release
