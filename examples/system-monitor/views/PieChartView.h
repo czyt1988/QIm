@@ -15,11 +15,9 @@ public:
 private:
     QIM::QImPlotNode* cpuPlot_ = nullptr;
     QIM::QImPlotNode* memPlot_ = nullptr;
-    QIM::QImPlotNode* gpuPlot_ = nullptr;
     QIM::QImPlotNode* diskPlot_ = nullptr;
     QIM::QImPlotPieChartItemNode* cpuPie_ = nullptr;
     QIM::QImPlotPieChartItemNode* memPie_ = nullptr;
-    QIM::QImPlotPieChartItemNode* gpuPie_ = nullptr;
     QIM::QImPlotPieChartItemNode* diskPie_ = nullptr;
 
     void setupPiePlot(QIM::QImPlotNode* plot, const QString& title);

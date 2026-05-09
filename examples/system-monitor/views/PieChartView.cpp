@@ -16,26 +16,22 @@ static constexpr int kTopN = 8;
 void PieChartView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data)
 {
     figure->clearSubplotGrid();
-    figure->setSubplotGrid(2, 2);
+    figure->setSubplotGrid(1, 3);
 
     auto plots = figure->plotNodes();
 
-    // Ensure 4 plot nodes exist
+    // Ensure 3 plot nodes exist
     if (plots.size() < 1) { cpuPlot_ = figure->createPlotNode(); }
     else { cpuPlot_ = plots[0]; }
 
     if (plots.size() < 2) { memPlot_ = figure->createPlotNode(); }
     else { memPlot_ = plots[1]; }
 
-    if (plots.size() < 3) { gpuPlot_ = figure->createPlotNode(); }
-    else { gpuPlot_ = plots[2]; }
-
-    if (plots.size() < 4) { diskPlot_ = figure->createPlotNode(); }
-    else { diskPlot_ = plots[3]; }
+    if (plots.size() < 3) { diskPlot_ = figure->createPlotNode(); }
+    else { diskPlot_ = plots[2]; }
 
     setupPiePlot(cpuPlot_, QStringLiteral("CPU Usage"));
     setupPiePlot(memPlot_, QStringLiteral("Memory Usage"));
-    setupPiePlot(gpuPlot_, QStringLiteral("GPU Usage"));
     setupPiePlot(diskPlot_, QStringLiteral("Disk I/O"));
 
     cpuPie_ = new QIM::QImPlotPieChartItemNode(cpuPlot_);
@@ -46,17 +42,12 @@ void PieChartView::buildView(QIM::QImFigureWidget* figure, const QList<Aggregate
     memPie_ = new QIM::QImPlotPieChartItemNode(memPlot_);
     memPie_->setCenter(QPointF(0.5, 0.5));
     memPie_->setRadius(0.40);
-    memPie_->setLabelFormat(QStringLiteral("%.1f%%"));
-
-    gpuPie_ = new QIM::QImPlotPieChartItemNode(gpuPlot_);
-    gpuPie_->setCenter(QPointF(0.5, 0.5));
-    gpuPie_->setRadius(0.40);
-    gpuPie_->setLabelFormat(QStringLiteral("%.1f%%"));
+    memPie_->setLabelFormat(QStringLiteral("%.0f MB"));
 
     diskPie_ = new QIM::QImPlotPieChartItemNode(diskPlot_);
     diskPie_->setCenter(QPointF(0.5, 0.5));
     diskPie_->setRadius(0.40);
-    diskPie_->setLabelFormat(QStringLiteral("%.1f%%"));
+    diskPie_->setLabelFormat(QStringLiteral("%.1f MB/s"));
 
     updateData(data);
 }
@@ -74,7 +65,7 @@ void PieChartView::setupPiePlot(QIM::QImPlotNode* plot, const QString& title)
 
 void PieChartView::updateData(const QList<AggregatedProcessInfo>& data)
 {
-    if (!cpuPie_ || !memPie_ || !gpuPie_ || !diskPie_)
+    if (!cpuPie_ || !memPie_ || !diskPie_)
         return;
 
     // CPU pie: top N by CPU + Others
@@ -104,20 +95,6 @@ void PieChartView::updateData(const QList<AggregatedProcessInfo>& data)
         memValues.push_back(static_cast<double>(p.totalWorkingSetBytes) / (1024.0 * 1024.0));
     }
     memPie_->setData(memLabels, memValues);
-
-    // GPU pie: top N by GPU + Others
-    QList<AggregatedProcessInfo> topGpu = ProcessAggregator().getTopN(data, kTopN, SortBy::ByGpu);
-    AggregatedProcessInfo gpuOthers = ProcessAggregator().getOthers(topGpu, data);
-    if (gpuOthers.instanceCount > 0)
-        topGpu.append(gpuOthers);
-
-    QStringList gpuLabels;
-    std::vector<double> gpuValues;
-    for (const auto& p : topGpu) {
-        gpuLabels << p.processName;
-        gpuValues.push_back(p.avgGpuPercent);
-    }
-    gpuPie_->setData(gpuLabels, gpuValues);
 
     // Disk I/O pie: top N by combined disk read+write rate (MB/s) + Others
     QList<AggregatedProcessInfo> topDisk = ProcessAggregator().getTopN(data, kTopN, SortBy::ByDiskRead);

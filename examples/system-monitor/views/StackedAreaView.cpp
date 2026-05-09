@@ -5,14 +5,13 @@
 
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
-#include "plot/QImPlotLineItemNode.h"
+#include "plot/QImPlotShadedItemNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlot.h"
 #include "core/ColorPalette.h"
 #include "aggregator/HistoryBuffer.h"
 #include "aggregator/ProcessAggregator.h"
 
-static constexpr int kMaxVisibleProcesses = 20;       // Show up to 20 processes
 static constexpr int kHistoryDurationSec  = 600;       // 10 minutes
 static constexpr int kWindowDurationSec   = 600;       // X-axis window: 10 minutes
 
@@ -29,8 +28,8 @@ void StackedAreaView::buildView(QIM::QImFigureWidget* figure, const QList<Aggreg
     if (!figure)
         return;
 
-    lineItems_.clear();
-    lastActiveNames_.clear();
+    shadedItems_.clear();
+    orderedNames_.clear();
 
     figure->setSubplotGrid(1, 1);
     plotNode_ = figure->createPlotNode();
@@ -62,61 +61,66 @@ void StackedAreaView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
 
     qint64 firstTimestamp = ts.timestamps.front();
 
-    // Select which processes to show (top N by latest CPU value)
-    // Build a list of (name, latestCpu) for sorting
-    struct ProcScore { QString name; double latestCpu; };
-    QList<ProcScore> scores;
-    for (auto it = ts.series.begin(); it != ts.series.end(); ++it) {
-        const auto& values = it.value();
-        double latest = (values.empty() ? 0.0 : values.back());
-        if (latest > 0.001) {  // Only include currently-active processes
-            scores.append({it.key(), latest});
-        }
-    }
-    std::sort(scores.begin(), scores.end(),
-              [](const ProcScore& a, const ProcScore& b) {
-                  return a.latestCpu > b.latestCpu;
-              });
-
-    // Take top N
-    QSet<QString> activeNames;
-    int showCount = std::min(static_cast<int>(scores.size()), kMaxVisibleProcesses);
-    for (int i = 0; i < showCount; ++i) {
-        activeNames.insert(scores[i].name);
-    }
-
-    // Create line items for processes that don't have one yet
-    for (const QString& name : activeNames) {
-        if (!lineItems_.contains(name)) {
-            auto* line = new QIM::QImPlotLineItemNode(plotNode_);
-            line->setLabel(name);
-            QColor color = getProcessColor(name);
-            line->setColor(color);
-            lineItems_.insert(name, line);
+    // On first call, establish stable order: all process names sorted alphabetically.
+    // On subsequent calls, append any newly-seen process names to the end.
+    // Never remove processes — once added, they stay in the stack forever.
+    if (orderedNames_.isEmpty()) {
+        orderedNames_ = ts.series.keys();
+        orderedNames_.sort();
+    } else {
+        QSet<QString> existing = QSet<QString>(orderedNames_.begin(), orderedNames_.end());
+        for (auto it = ts.series.begin(); it != ts.series.end(); ++it) {
+            if (!existing.contains(it.key())) {
+                orderedNames_.append(it.key());
+            }
         }
     }
 
-    // Update data for ALL tracked items (including exited processes)
-    // Exited processes get 0.0 values from HistoryBuffer, so their curves flatline at 0
-    for (auto it = lineItems_.begin(); it != lineItems_.end(); ++it) {
-        const QString& name = it.key();
-        auto* line = it.value();
+    // Build X values: seconds from first snapshot (shared across all processes)
+    std::vector<double> xValues(numPoints);
+    for (int t = 0; t < numPoints; ++t) {
+        xValues[t] = static_cast<double>(ts.timestamps[t] - firstTimestamp) / 1000.0;
+    }
 
-        auto seriesIt = ts.series.find(name);
-        if (seriesIt == ts.series.end())
+    // Create shaded items for any processes that don't have one yet
+    // (never remove existing items — once created, they persist)
+    for (int idx = 0; idx < orderedNames_.size(); ++idx) {
+        const QString& name = orderedNames_[idx];
+        if (!shadedItems_.contains(name)) {
+            auto* shaded = new QIM::QImPlotShadedItemNode(plotNode_);
+            shaded->setLabel(name);
+            shaded->setColor(getColorForIndex(idx));
+            shadedItems_.insert(name, shaded);
+        }
+    }
+
+    // Pre-compute stacked lower/upper values for each process in stable order
+    QHash<QString, std::vector<double>> lowerValues;
+    QHash<QString, std::vector<double>> upperValues;
+    for (const QString& name : orderedNames_) {
+        lowerValues[name].resize(numPoints, 0.0);
+        upperValues[name].resize(numPoints, 0.0);
+    }
+
+    for (int i = 0; i < numPoints; ++i) {
+        double cumulative = 0.0;
+        for (const QString& name : orderedNames_) {
+            const auto& rawValues = ts.series[name];
+            double rawValue = (i < static_cast<int>(rawValues.size())) ? rawValues[i] : 0.0;
+            double lower = cumulative;
+            double upper = cumulative + rawValue;
+            lowerValues[name][i] = lower;
+            upperValues[name][i] = upper;
+            cumulative = upper;
+        }
+    }
+
+    // Update data for all shaded items with pre-computed stacked values
+    for (const QString& name : orderedNames_) {
+        auto* shaded = shadedItems_.value(name, nullptr);
+        if (!shaded)
             continue;
-
-        const auto& yValues = seriesIt.value();
-        if (yValues.empty())
-            continue;
-
-        // Build X values: seconds from first snapshot
-        std::vector<double> xValues(numPoints);
-        for (int t = 0; t < numPoints; ++t) {
-            xValues[t] = static_cast<double>(ts.timestamps[t] - firstTimestamp) / 1000.0;
-        }
-
-        line->setData(xValues, yValues);
+        shaded->setData(xValues, lowerValues[name], upperValues[name]);
     }
 
     // Sliding-window X axis:
@@ -126,6 +130,4 @@ void StackedAreaView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
     double xMin = std::max(0.0, totalElapsed - kWindowDurationSec);
     double xMax = std::max(xMin + 1.0, totalElapsed);
     plotNode_->x1Axis()->setLimits(xMin, xMax, QIM::QImPlotCondition::Always);
-
-    lastActiveNames_ = activeNames;
 }

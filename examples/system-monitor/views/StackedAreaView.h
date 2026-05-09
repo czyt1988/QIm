@@ -9,7 +9,7 @@
 namespace QIM {
 class QImFigureWidget;
 class QImPlotNode;
-class QImPlotLineItemNode;
+class QImPlotShadedItemNode;
 }
 
 class HistoryBuffer;
@@ -24,8 +24,8 @@ private:
     QIM::QImPlotNode* plotNode_ = nullptr;
     HistoryBuffer* buffer_ = nullptr;
 
-    // processName → line item (persistent: items stay when process exits)
-    QHash<QString, QIM::QImPlotLineItemNode*> lineItems_;
-    // Track which processes were active in the last update (for cleanup)
-    QSet<QString> lastActiveNames_;
+    // Stable stacking order: first-seen processes listed first, never removed
+    QStringList orderedNames_;
+    // processName → shaded item (persistent: never removed once created)
+    QHash<QString, QIM::QImPlotShadedItemNode*> shadedItems_;
 };

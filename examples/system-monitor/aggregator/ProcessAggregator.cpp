@@ -51,33 +51,36 @@ QList<AggregatedProcessInfo> ProcessAggregator::aggregate(const ProcessSnapshot&
 
 QList<AggregatedProcessInfo> ProcessAggregator::getTopN(const QList<AggregatedProcessInfo>& all, int n, SortBy sortBy)
 {
+    // Comparator with name tie-breaker for deterministic ordering when values tie
+    auto cmp = [sortBy](const AggregatedProcessInfo& a, const AggregatedProcessInfo& b) {
+        switch (sortBy) {
+        case SortBy::ByCpu:
+            if (a.totalCpuPercent != b.totalCpuPercent) return a.totalCpuPercent > b.totalCpuPercent;
+            break;
+        case SortBy::ByMemory:
+            if (a.totalWorkingSetBytes != b.totalWorkingSetBytes) return a.totalWorkingSetBytes > b.totalWorkingSetBytes;
+            break;
+        case SortBy::ByGpu:
+            if (a.avgGpuPercent != b.avgGpuPercent) return a.avgGpuPercent > b.avgGpuPercent;
+            break;
+        case SortBy::ByDiskRead:
+            if (a.totalDiskReadRate != b.totalDiskReadRate) return a.totalDiskReadRate > b.totalDiskReadRate;
+            break;
+        case SortBy::ByDiskWrite:
+            if (a.totalDiskWriteRate != b.totalDiskWriteRate) return a.totalDiskWriteRate > b.totalDiskWriteRate;
+            break;
+        }
+        return a.processName < b.processName; // tie-breaker for stable ordering
+    };
+
     if (all.size() <= n) {
         QList<AggregatedProcessInfo> sorted = all;
-        std::sort(sorted.begin(), sorted.end(), [sortBy](const AggregatedProcessInfo& a, const AggregatedProcessInfo& b) {
-            switch (sortBy) {
-            case SortBy::ByCpu:       return a.totalCpuPercent > b.totalCpuPercent;
-            case SortBy::ByMemory:    return a.totalWorkingSetBytes > b.totalWorkingSetBytes;
-            case SortBy::ByGpu:       return a.avgGpuPercent > b.avgGpuPercent;
-            case SortBy::ByDiskRead:  return a.totalDiskReadRate > b.totalDiskReadRate;
-            case SortBy::ByDiskWrite: return a.totalDiskWriteRate > b.totalDiskWriteRate;
-            }
-            return false;
-        });
+        std::sort(sorted.begin(), sorted.end(), cmp);
         return sorted;
     }
 
     QList<AggregatedProcessInfo> sorted = all;
-    std::sort(sorted.begin(), sorted.end(), [sortBy](const AggregatedProcessInfo& a, const AggregatedProcessInfo& b) {
-        switch (sortBy) {
-        case SortBy::ByCpu:       return a.totalCpuPercent > b.totalCpuPercent;
-        case SortBy::ByMemory:    return a.totalWorkingSetBytes > b.totalWorkingSetBytes;
-        case SortBy::ByGpu:       return a.avgGpuPercent > b.avgGpuPercent;
-        case SortBy::ByDiskRead:  return a.totalDiskReadRate > b.totalDiskReadRate;
-        case SortBy::ByDiskWrite: return a.totalDiskWriteRate > b.totalDiskWriteRate;
-        }
-        return false;
-    });
-
+    std::sort(sorted.begin(), sorted.end(), cmp);
     return sorted.mid(0, n);
 }
 
