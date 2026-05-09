@@ -331,11 +331,16 @@ bool QImPlotErrorBarsItemNode::beginDraw()
     }
 
     // Update item status
-    ImPlotContext* ct = ImPlot::GetCurrentContext();
-    ImPlotItem* plotItem = ct->PreviousItem;
-    setImPlotItem(plotItem);
-    if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
-        QImAbstractNode::setVisible(plotItem->Show);
+    if(!imPlotItem()){
+        ImPlotContext* ct = ImPlot::GetCurrentContext();
+        if (!ct) {
+            return false;
+        }
+        ImPlotItem* plotItem = ct->PreviousItem;
+        setImPlotItem(plotItem);
+        if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
+            QImAbstractNode::setVisible(plotItem->Show);
+        }
     }
     if (!d->color) {
         // First render without explicit color, get default color from ImPlot

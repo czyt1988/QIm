@@ -309,11 +309,16 @@ bool QImPlotStairsItemNode::beginDraw()
     }
 
     // 更新item的状态
-    ImPlotContext* ct    = ImPlot::GetCurrentContext();
-    ImPlotItem* plotItem = ct->PreviousItem;
-    setImPlotItem(plotItem);
-    if (plotItem->Show != QImAbstractNode::isVisible()) {
-        QImAbstractNode::setVisible(plotItem->Show);
+    if(!imPlotItem()){
+        ImPlotContext* ct    = ImPlot::GetCurrentContext();
+        if (!ct) {
+            return false;
+        }
+        ImPlotItem* plotItem = ct->PreviousItem;
+        setImPlotItem(plotItem);
+        if (plotItem->Show != QImAbstractNode::isVisible()) {
+            QImAbstractNode::setVisible(plotItem->Show);
+        }
     }
     if (!d->color) {
         d->color = ImPlot::GetLastItemColor();

@@ -1149,8 +1149,9 @@ bool QImPlotNode::beginDraw()
     const char* title   = (d->titleUtf8->isEmpty() ? nullptr : d->titleUtf8->constData());
     d->beginPlotSuccess = ImPlot::BeginPlot(title, d->size, d->plotFlags);
     if (!d->beginPlotSuccess) {
-        // 不成功也返回true，因为有些样式的推入或colormap需要pop出来
-        return true;
+        // BeginPlot failed: return false to skip child rendering.
+        // Children calling ImPlot APIs without a valid context causes null deref/corruption.
+        return false;
     }
     d->plot = ImPlot::GetCurrentPlot();
     // 构建坐标轴

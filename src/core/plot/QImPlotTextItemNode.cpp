@@ -364,6 +364,9 @@ bool QImPlotTextItemNode::beginDraw()
     // Update item status
     if(!imPlotItem()){
         ImPlotContext* ct = ImPlot::GetCurrentContext();
+        if (!ct) {
+            return false;
+        }
         ImPlotItem* plotItem = ct->PreviousItem;
         setImPlotItem(plotItem);
         if (plotItem && plotItem->Show != QImAbstractNode::isVisible()) {
