@@ -105,56 +105,6 @@ void QImPlotShadedItemNode::setData(QImAbstractXYDataSeries* series1, QImAbstrac
 
 /**
  * \if ENGLISH
- * @brief Set two-line fill data from X, Y1, and Y2 containers
- * @param x X coordinates container
- * @param y1 Primary Y values container (lower bound)
- * @param y2 Secondary Y values container (upper bound)
- * @details Creates two data series sharing the same X coordinates.
- *          The area between y1 and y2 is filled.
- * \endif
- *
- * \if CHINESE
- * @brief 从X、Y1和Y2容器设置双线填充数据
- * @param x X坐标容器
- * @param y1 主Y值容器（下边界）
- * @param y2 辅助Y值容器（上边界）
- * @details 创建两个共享相同X坐标的数据系列。
- *          y1和y2之间的区域被填充。
- * \endif
- */
-template< typename ContainerX, typename ContainerY1, typename ContainerY2 >
-void QImPlotShadedItemNode::setData(const ContainerX& x, const ContainerY1& y1, const ContainerY2& y2)
-{
-    QImAbstractXYDataSeries* d1 = new QImVectorXYDataSeries(x, y1);
-    QImAbstractXYDataSeries* d2 = new QImVectorXYDataSeries(x, y2);
-    setData(d1, d2);
-}
-
-/**
- * \if ENGLISH
- * @brief Set two-line fill data from X, Y1, and Y2 containers (move semantics)
- * @param x X coordinates container
- * @param y1 Primary Y values container (lower bound)
- * @param y2 Secondary Y values container (upper bound)
- * \endif
- *
- * \if CHINESE
- * @brief 从X、Y1和Y2容器设置双线填充数据（移动语义）
- * @param x X坐标容器
- * @param y1 主Y值容器（下边界）
- * @param y2 辅助Y值容器（上边界）
- * \endif
- */
-template< typename ContainerX, typename ContainerY1, typename ContainerY2 >
-void QImPlotShadedItemNode::setData(ContainerX&& x, ContainerY1&& y1, ContainerY2&& y2)
-{
-    QImAbstractXYDataSeries* d1 = new QImVectorXYDataSeries(x, y1);
-    QImAbstractXYDataSeries* d2 = new QImVectorXYDataSeries(x, y2);
-    setData(d1, d2);
-}
-
-/**
- * \if ENGLISH
  * @brief Get primary data series
  * @return Pointer to QImAbstractXYDataSeries
  * \endif

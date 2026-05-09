@@ -276,8 +276,21 @@ inline QImAbstractXYDataSeries* QImPlotShadedItemNode::setData(ContainerX&& x, C
 }
 
 // Template function implementation - two line mode
-// Note: For two-line mode, we create two separate data series sharing the same X
-// The implementation is in the cpp file to avoid header complexity
+template< typename ContainerX, typename ContainerY1, typename ContainerY2 >
+inline void QImPlotShadedItemNode::setData(const ContainerX& x, const ContainerY1& y1, const ContainerY2& y2)
+{
+    QImAbstractXYDataSeries* d1 = new QImVectorXYDataSeries(x, y1);
+    QImAbstractXYDataSeries* d2 = new QImVectorXYDataSeries(x, y2);
+    setData(d1, d2);
+}
+
+template< typename ContainerX, typename ContainerY1, typename ContainerY2 >
+inline void QImPlotShadedItemNode::setData(ContainerX&& x, ContainerY1&& y1, ContainerY2&& y2)
+{
+    QImAbstractXYDataSeries* d1 = new QImVectorXYDataSeries(x, y1);
+    QImAbstractXYDataSeries* d2 = new QImVectorXYDataSeries(x, y2);
+    setData(d1, d2);
+}
 
 }  // end namespace QIM
 

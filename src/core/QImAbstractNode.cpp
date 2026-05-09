@@ -54,9 +54,11 @@ QImAbstractNode::~QImAbstractNode()
     // 1. Remove all child logical relationships first
     clearChildrenNodes();
 
-    // 2. Remove self from parent's child list
+    // 2. Remove self from parent's child list and refresh parent's z-order
     if (m_parent) {
-        m_parent->removeFromParentList();
+        QImAbstractNode* parentNode = m_parent.data();
+        removeFromParentList();         // Removes this from parent->m_children and clears m_parent
+        parentNode->updateZOrderedList();  // Refresh parent's z-ordered child list
     }
 }
 
