@@ -5,10 +5,9 @@
 
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
-#include "plot/QImPlotShadedItemNode.h"
+#include "plot/QImPlotLegendNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlot.h"
-#include "core/ColorPalette.h"
 #include "aggregator/HistoryBuffer.h"
 #include "aggregator/ProcessAggregator.h"
 
@@ -28,7 +27,6 @@ void StackedAreaView::buildView(QIM::QImFigureWidget* figure, const QList<Aggreg
     if (!figure)
         return;
 
-    shadedItems_.clear();
     orderedNames_.clear();
 
     figure->setSubplotGrid(1, 1);
@@ -40,14 +38,26 @@ void StackedAreaView::buildView(QIM::QImFigureWidget* figure, const QList<Aggreg
     plotNode_->setLegendEnabled(true);
     plotNode_->x1Axis()->setLabel("Time (s)");
     plotNode_->y1Axis()->setLabel("CPU %");
-    plotNode_->y1Axis()->setAutoFit(true);   // Y auto-scales to data
+    plotNode_->y1Axis()->setAutoFit(true);
+
+    // Create stacked bar groups node with deterministic colors
+    barGroups_ = new ColoredBarGroupsNode(plotNode_);
+    barGroups_->setStacked(true);
+    barGroups_->setGroupWidth(0.8);
+
+    // External legend at bottom
+    QIM::QImPlotLegendNode* legend = plotNode_->legendNode();
+    if (legend) {
+        legend->setOutside(true);
+        legend->setLocation(QIM::QImPlotLegendLocation::South);
+    }
 
     updateData(data);
 }
 
 void StackedAreaView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
 {
-    if (!plotNode_ || !buffer_ || buffer_->pointCount() < 1)
+    if (!plotNode_ || !barGroups_ || !buffer_ || buffer_->pointCount() < 1)
         return;
 
     // Get time-series data from history buffer
@@ -56,10 +66,7 @@ void StackedAreaView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
         return;
 
     int numPoints = ts.pointCount;
-    if (ts.timestamps.empty())
-        return;
-
-    qint64 firstTimestamp = ts.timestamps.front();
+    int groupCount = numPoints;
 
     // On first call, establish stable order: all process names sorted alphabetically.
     // On subsequent calls, append any newly-seen process names to the end.
@@ -76,58 +83,27 @@ void StackedAreaView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
         }
     }
 
-    // Build X values: seconds from first snapshot (shared across all processes)
-    std::vector<double> xValues(numPoints);
-    for (int t = 0; t < numPoints; ++t) {
-        xValues[t] = static_cast<double>(ts.timestamps[t] - firstTimestamp) / 1000.0;
-    }
+    int itemCount = orderedNames_.size();
 
-    // Create shaded items for any processes that don't have one yet
-    // (never remove existing items — once created, they persist)
-    for (int idx = 0; idx < orderedNames_.size(); ++idx) {
-        const QString& name = orderedNames_[idx];
-        if (!shadedItems_.contains(name)) {
-            auto* shaded = new QIM::QImPlotShadedItemNode(plotNode_);
-            shaded->setLabel(name);
-            shaded->setColor(colorManager_.colorForIndex(idx));
-            shadedItems_.insert(name, shaded);
+    // Build row-major values matrix: values[item * groupCount + group]
+    // Each row corresponds to one process (item), columns are time groups
+    QVector<double> values(itemCount * groupCount, 0.0);
+    for (int item = 0; item < itemCount; ++item) {
+        const auto& raw = ts.series[orderedNames_[item]];
+        for (int group = 0; group < groupCount; ++group) {
+            values[item * groupCount + group] = (group < static_cast<int>(raw.size())) ? raw[group] : 0.0;
         }
     }
 
-    // Pre-compute stacked lower/upper values for each process in stable order
-    QHash<QString, std::vector<double>> lowerValues;
-    QHash<QString, std::vector<double>> upperValues;
-    for (const QString& name : orderedNames_) {
-        lowerValues[name].resize(numPoints, 0.0);
-        upperValues[name].resize(numPoints, 0.0);
-    }
+    // Set deterministic colors using Tol palette
+    auto colors = colorManager_.toImVec4Colors(orderedNames_);
+    barGroups_->setCustomColormap(colors);
 
-    for (int i = 0; i < numPoints; ++i) {
-        double cumulative = 0.0;
-        for (const QString& name : orderedNames_) {
-            const auto& rawValues = ts.series[name];
-            double rawValue = (i < static_cast<int>(rawValues.size())) ? rawValues[i] : 0.0;
-            double lower = cumulative;
-            double upper = cumulative + rawValue;
-            lowerValues[name][i] = lower;
-            upperValues[name][i] = upper;
-            cumulative = upper;
-        }
-    }
+    // Set data: orderedNames_ provides item labels, values is row-major matrix
+    barGroups_->setData(orderedNames_, values, itemCount, groupCount);
 
-    // Update data for all shaded items with pre-computed stacked values
-    for (const QString& name : orderedNames_) {
-        auto* shaded = shadedItems_.value(name, nullptr);
-        if (!shaded)
-            continue;
-        shaded->setData(xValues, lowerValues[name], upperValues[name]);
-    }
-
-    // Sliding-window X axis:
-    //   - While elapsed < kWindowDurationSec: X shows 0 → elapsed (growing)
-    //   - After kWindowDurationSec:     X shows (elapsed - kWindowDurationSec) → elapsed (fixed-width slide)
-    double totalElapsed = static_cast<double>(ts.timestamps.back() - firstTimestamp) / 1000.0;
-    double xMin = std::max(0.0, totalElapsed - kWindowDurationSec);
-    double xMax = std::max(xMin + 1.0, totalElapsed);
+    // Sliding-window X axis using group indices (not timestamps)
+    double xMax = std::max(1.0, static_cast<double>(groupCount - 1));
+    double xMin = std::max(0.0, xMax - kWindowDurationSec);
     plotNode_->x1Axis()->setLimits(xMin, xMax, QIM::QImPlotCondition::Always);
 }

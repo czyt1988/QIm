@@ -2,6 +2,7 @@
 
 #include "collector/ProcessInfo.h"
 #include "core/ColorPalette.h"
+#include "views/ColoredBarGroupsNode.h"
 #include <QHash>
 #include <QList>
 #include <QSet>
@@ -10,7 +11,6 @@
 namespace QIM {
 class QImFigureWidget;
 class QImPlotNode;
-class QImPlotShadedItemNode;
 }
 
 class HistoryBuffer;
@@ -27,8 +27,8 @@ private:
 
     // Stable stacking order: first-seen processes listed first, never removed
     QStringList orderedNames_;
-    // processName → shaded item (persistent: never removed once created)
-    QHash<QString, QIM::QImPlotShadedItemNode*> shadedItems_;
+    // Bar groups node for stacked bar chart with deterministic colors
+    ColoredBarGroupsNode* barGroups_ = nullptr;
     // Color manager for deterministic process colors
     QImSystemMonitor::ColorManager colorManager_;
 };

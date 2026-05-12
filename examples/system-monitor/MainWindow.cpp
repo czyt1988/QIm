@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , centralWidget_(nullptr)
     , mainLayout_(nullptr)
-    , splitter_(nullptr)
+    , tabWidget_(nullptr)
     , processTree_(nullptr)
     , figureWidget_(nullptr)
     , viewSelector_(nullptr)
@@ -37,7 +37,7 @@ void MainWindow::setupUI()
     setWindowTitle("QIm System Monitor");
     resize(1400, 900);
 
-    // Central widget with vertical layout (splitter + view selector)
+    // Central widget with vertical layout (tab widget)
     centralWidget_ = new QWidget(this);
     mainLayout_ = new QVBoxLayout(centralWidget_);
     mainLayout_->setContentsMargins(4, 4, 4, 4);
@@ -51,19 +51,29 @@ void MainWindow::setupUI()
     // Create process tree widget
     processTree_ = new ProcessTreeWidget(this);
 
-    // Create horizontal splitter: 33% tree + 67% figure
-    splitter_ = new QSplitter(Qt::Horizontal, this);
-    splitter_->addWidget(processTree_);
-    splitter_->addWidget(figureWidget_);
-    splitter_->setStretchFactor(0, 1);
-    splitter_->setStretchFactor(1, 2);
-
-    // Create view mode selector (4 radio buttons at the bottom)
+    // Create view mode selector (4 radio buttons)
     viewSelector_ = new ViewModeSelector(this);
 
-    // Assemble layout: splitter fills most space, selector at bottom
-    mainLayout_->addWidget(splitter_, 1);
-    mainLayout_->addWidget(viewSelector_, 0);
+    // Create tab widget with two tabs
+    tabWidget_ = new QTabWidget(this);
+
+    // Tab 0: Table view (process tree)
+    tabWidget_->addTab(processTree_, tr("Table"));
+
+    // Tab 1: Plot view (view selector + figure widget)
+    QWidget* plotTab = new QWidget(this);
+    QVBoxLayout* plotLayout = new QVBoxLayout(plotTab);
+    plotLayout->setContentsMargins(0, 0, 0, 0);
+    plotLayout->setSpacing(2);
+    plotLayout->addWidget(viewSelector_, 0);
+    plotLayout->addWidget(figureWidget_, 1);
+    tabWidget_->addTab(plotTab, tr("Plot"));
+
+    // Add tab widget to main layout
+    mainLayout_->addWidget(tabWidget_, 1);
+
+    // Start on Plot tab
+    tabWidget_->setCurrentIndex(1);
 
     setCentralWidget(centralWidget_);
 

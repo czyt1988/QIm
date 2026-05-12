@@ -14,6 +14,7 @@ class StackedAreaView;
 class PieChartView;
 class Scatter3DView;
 class TimeSeries3DView;
+class SystemOverviewView;
 class HistoryBuffer;
 
 class ViewManager : public QObject {
@@ -36,6 +37,7 @@ private:
     PieChartView* pieChartView_ = nullptr;
     Scatter3DView* scatter3DView_ = nullptr;
     TimeSeries3DView* timeSeries3DView_ = nullptr;
+    SystemOverviewView* systemOverviewView_ = nullptr;
 
     ViewMode currentMode_ = static_cast<ViewMode>(-1);
     bool viewBuilt_ = false;

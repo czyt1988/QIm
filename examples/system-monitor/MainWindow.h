@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QSplitter>
+#include <QTabWidget>
 #include <QVBoxLayout>
 
 #include "collector/ProcessInfo.h"
@@ -29,7 +29,7 @@ private:
     // Top-level container
     QWidget* centralWidget_;
     QVBoxLayout* mainLayout_;
-    QSplitter* splitter_;
+    QTabWidget* tabWidget_;
 
     // Widgets
     ProcessTreeWidget* processTree_;

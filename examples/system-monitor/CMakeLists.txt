@@ -41,6 +41,7 @@ set(MAIN_PROJECT_SOURCES
     views/PieChartView.cpp
     views/Scatter3DView.cpp
     views/TimeSeries3DView.cpp
+    views/SystemOverviewView.cpp
     core/ViewManager.cpp
 )
 

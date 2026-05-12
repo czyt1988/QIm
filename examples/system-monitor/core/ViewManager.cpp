@@ -5,6 +5,7 @@
 #include "views/PieChartView.h"
 #include "views/Scatter3DView.h"
 #include "views/TimeSeries3DView.h"
+#include "views/SystemOverviewView.h"
 #include "aggregator/HistoryBuffer.h"
 #include "plot3d/QImPlot3DNode.h"
 #include "collector/ProcessInfo.h"
@@ -15,6 +16,7 @@ ViewManager::ViewManager(QIM::QImFigureWidget* figure, QObject* parent)
     pieChartView_ = new PieChartView;
     scatter3DView_ = new Scatter3DView;
     timeSeries3DView_ = new TimeSeries3DView;
+    systemOverviewView_ = new SystemOverviewView;
 }
 
 ViewManager::~ViewManager() {
@@ -22,12 +24,14 @@ ViewManager::~ViewManager() {
     delete pieChartView_;
     delete scatter3DView_;
     delete timeSeries3DView_;
+    delete systemOverviewView_;
 }
 
 void ViewManager::setHistoryBuffer(HistoryBuffer* buffer)
 {
     stackedAreaView_->setHistoryBuffer(buffer);
     timeSeries3DView_->setHistoryBuffer(buffer);
+    systemOverviewView_->setHistoryBuffer(buffer);
 }
 
 void ViewManager::switchTo(ViewMode mode, const QList<AggregatedProcessInfo>& data) {
@@ -66,6 +70,9 @@ void ViewManager::switchTo(ViewMode mode, const QList<AggregatedProcessInfo>& da
     case ViewMode::TimeSeries3D:
         timeSeries3DView_->buildView(figure_, data);
         break;
+    case ViewMode::SystemOverview:
+        systemOverviewView_->buildView(figure_, data);
+        break;
     }
 
     currentMode_ = mode;
@@ -88,6 +95,9 @@ void ViewManager::updateCurrentView(const QList<AggregatedProcessInfo>& data) {
         break;
     case ViewMode::TimeSeries3D:
         timeSeries3DView_->updateData(data);
+        break;
+    case ViewMode::SystemOverview:
+        systemOverviewView_->updateData(data);
         break;
     }
 }
