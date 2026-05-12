@@ -167,6 +167,18 @@ public:
     // Auto-fit axes to show all curves
     void rescaleAxes();
     void setAxesToFit();
+    //----------------------------------------------------
+    // Colormap push/pop
+    //----------------------------------------------------
+
+    // Pushes a colormap onto the colormap stack by enum (applied in beginDraw)
+    void pushColormap(QImPlotColormap colormap);
+
+    // Pushes a colormap onto the colormap stack by name (applied in beginDraw)
+    void pushColormap(const QByteArray& name);
+
+    // Pops colormaps from the stack (applied in endDraw)
+    void popColormap(int count = 1);
 Q_SIGNALS:
     /**
      * \if ENGLISH

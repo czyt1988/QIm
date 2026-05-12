@@ -37,6 +37,11 @@ public:
     // 交互标志
     ImPlotFlags plotFlags { ImPlotFlags_None };
     bool beginPlotSuccess { false };
+
+    // Colormap push tracking
+    QList<QByteArray> pushedColormapNames;  ///< Names of pushed colormaps (for named push)
+    QList<int> pushedColormapIndices;       ///< ImPlotColormap indices of pushed colormaps (for enum push)
+    int pushedColormapCount {0};            ///< Total number of colormap pushes to pop
     //===============================================================
     // 固定的节点
     //===============================================================
@@ -1124,6 +1129,77 @@ void QImPlotNode::setAxesToFit()
 
 /**
  * \if ENGLISH
+ * @brief Pushes a colormap by enum onto the colormap stack (applied in beginDraw)
+ * @param colormap Colormap enum value
+ * @details Stores the colormap enum for later application during beginDraw().
+ *          ImPlot::PushColormap is called in beginDraw() after setup calls,
+ *          before child items render.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 通过枚举将色彩映射压入色彩映射栈（在 beginDraw 中应用）
+ * @param colormap 色彩映射枚举值
+ * @details 存储色彩映射枚举，以便稍后在 beginDraw() 中应用。
+ *          ImPlot::PushColormap 在 beginDraw() 中于 setup 调用之后、
+ *          子元素渲染之前调用。
+ * \endif
+ */
+void QImPlotNode::pushColormap(QImPlotColormap colormap)
+{
+    QIM_D(d);
+    d->pushedColormapIndices.append(toImPlotColormap(colormap));
+    d->pushedColormapCount++;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Pushes a colormap by name onto the colormap stack (applied in beginDraw)
+ * @param name Colormap name (UTF-8 encoded)
+ * @details Stores the colormap name for later application during beginDraw().
+ *          ImPlot::PushColormap is called in beginDraw() after setup calls,
+ *          before child items render.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 通过名称将色彩映射压入色彩映射栈（在 beginDraw 中应用）
+ * @param name 色彩映射名称（UTF-8 编码）
+ * @details 存储色彩映射名称，以便稍后在 beginDraw() 中应用。
+ *          ImPlot::PushColormap 在 beginDraw() 中于 setup 调用之后、
+ *          子元素渲染之前调用。
+ * \endif
+ */
+void QImPlotNode::pushColormap(const QByteArray& name)
+{
+    QIM_D(d);
+    d->pushedColormapNames.append(name);
+    d->pushedColormapCount++;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Pops colormaps from the stack (applied in endDraw)
+ * @param count Number of colormaps to pop (default 1)
+ * @details Reduces the push count so the corresponding number of
+ *          ImPlot::PopColormap calls will be made in endDraw().
+ *          If count exceeds current push count, all pushes are popped.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从色彩映射栈弹出色彩映射（在 endDraw 中应用）
+ * @param count 要弹出的色彩映射数量（默认 1）
+ * @details 减少压入计数，以便在 endDraw() 中调用对应数量的
+ *          ImPlot::PopColormap。如果 count 超过当前压入计数，
+ *          则弹出所有压入的色彩映射。
+ * \endif
+ */
+void QImPlotNode::popColormap(int count)
+{
+    QIM_D(d);
+    d->pushedColormapCount = qMax(0, d->pushedColormapCount - count);
+}
+
+/**
+ * \if ENGLISH
  * @brief Begins plot rendering by calling ImPlot::BeginPlot()
  * @return true (always returns true to allow style cleanup even on failure)
  * @details Handles auto-fit request, sets title/size/flags, renders all axes, and configures legend.
@@ -1157,6 +1233,13 @@ bool QImPlotNode::beginDraw()
     // 构建坐标轴
     d->renderAllAxis();
     ImPlot::SetupLegend(ImPlotLocation_East);
+    // Colormap push — after setup, before child items render
+    for (int cmapIdx : d->pushedColormapIndices) {
+        ImPlot::PushColormap(cmapIdx);
+    }
+    for (const QByteArray& name : d->pushedColormapNames) {
+        ImPlot::PushColormap(name.constData());
+    }
     // 视口变化检测：比较当前ImPlot绘图范围与上次缓存的范围
     {
         ImPlotRect currentLimits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
@@ -1190,8 +1273,16 @@ void QImPlotNode::endDraw()
 {
     QIM_D(d);
     if (d->beginPlotSuccess) {
+        // Colormap pop — before EndPlot, after child items render
+        if (d->pushedColormapCount > 0) {
+            ImPlot::PopColormap(d->pushedColormapCount);
+        }
         ImPlot::EndPlot();
     }
+    // Reset push tracking for next frame
+    d->pushedColormapIndices.clear();
+    d->pushedColormapNames.clear();
+    d->pushedColormapCount = 0;
 }
 
 }  // namespace QIM
