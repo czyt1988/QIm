@@ -73,6 +73,7 @@ target_link_libraries(${MAIN_PROJECT_NAME} PRIVATE
     QIm::Core
     QIm::Widgets
     psapi
+    pdh
 )
 if(QT_VERSION_MAJOR EQUAL 6)
     target_link_libraries(${MAIN_PROJECT_NAME} PRIVATE

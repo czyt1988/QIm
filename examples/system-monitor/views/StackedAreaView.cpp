@@ -89,7 +89,7 @@ void StackedAreaView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
         if (!shadedItems_.contains(name)) {
             auto* shaded = new QIM::QImPlotShadedItemNode(plotNode_);
             shaded->setLabel(name);
-            shaded->setColor(getColorForIndex(idx));
+            shaded->setColor(colorManager_.colorForIndex(idx));
             shadedItems_.insert(name, shaded);
         }
     }

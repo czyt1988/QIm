@@ -7,7 +7,6 @@
 #include "plot3d/QImPlot3DNode.h"
 #include "plot3d/QImPlot3DScatterItemNode.h"
 #include "plot3d/QImPlot3D.h"
-#include "core/ColorPalette.h"
 #include "collector/ProcessInfo.h"
 #include "aggregator/ProcessAggregator.h"
 
@@ -85,9 +84,7 @@ void Scatter3DView::updateData(const QList<AggregatedProcessInfo>& data)
 
         scatter->setData(xVec, yVec, zVec);
 
-        QColor color = (proc.processName == QStringLiteral("Other"))
-                        ? getOtherColor()
-                        : getProcessColor(proc.processName);
+        QColor color = colorManager_.colorFor(proc.processName);
         scatter->setMarkerFillColor(color);
         scatter->setMarkerSize(6.0f);
     }

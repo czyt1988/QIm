@@ -1,6 +1,7 @@
 #pragma once
 
 #include "collector/ProcessInfo.h"
+#include "core/ColorPalette.h"
 #include <QHash>
 #include <QList>
 #include <QSet>
@@ -28,4 +29,6 @@ private:
     QStringList orderedNames_;
     // processName → shaded item (persistent: never removed once created)
     QHash<QString, QIM::QImPlotShadedItemNode*> shadedItems_;
+    // Color manager for deterministic process colors
+    QImSystemMonitor::ColorManager colorManager_;
 };

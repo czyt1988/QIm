@@ -3,7 +3,7 @@
 #include <QWidget>
 #include <QRadioButton>
 
-enum class ViewMode { StackedArea, PieChart, Scatter3D, TimeSeries3D };
+enum class ViewMode { StackedArea, PieChart, Scatter3D, TimeSeries3D, SystemOverview };
 
 class ViewModeSelector : public QWidget {
     Q_OBJECT
@@ -23,4 +23,5 @@ private:
     QRadioButton* btnPieChart_;
     QRadioButton* btnScatter3D_;
     QRadioButton* btnTimeSeries3D_;
+    QRadioButton* btnSystemOverview_;
 };

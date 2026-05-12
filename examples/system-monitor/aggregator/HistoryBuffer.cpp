@@ -197,3 +197,36 @@ int HistoryBuffer::pointCount() const
 {
     return static_cast<int>(buffer_.size());
 }
+
+SystemTimeSeries HistoryBuffer::getSystemTimeSeries() const
+{
+    SystemTimeSeries result;
+    result.pointCount = static_cast<int>(buffer_.size());
+
+    if (buffer_.empty()) {
+        return result;
+    }
+
+    // Reserve space for all vectors
+    result.timestamps.reserve(buffer_.size());
+    result.cpuPercent.reserve(buffer_.size());
+    result.memoryPercent.reserve(buffer_.size());
+    result.gpuPercent.reserve(buffer_.size());
+    result.diskReadMBps.reserve(buffer_.size());
+    result.diskWriteMBps.reserve(buffer_.size());
+    result.networkRecvMBps.reserve(buffer_.size());
+    result.networkSendMBps.reserve(buffer_.size());
+
+    for (const auto& snapshot : buffer_) {
+        result.timestamps.push_back(snapshot.timestamp);
+        result.cpuPercent.push_back(snapshot.systemCpuPercent);
+        result.memoryPercent.push_back(snapshot.systemUsedRamBytes * 100.0 / std::max(1LL, snapshot.systemTotalRamBytes));
+        result.gpuPercent.push_back(snapshot.systemGpuPercent);
+        result.diskReadMBps.push_back(snapshot.systemDiskReadRate / (1024.0 * 1024.0));
+        result.diskWriteMBps.push_back(snapshot.systemDiskWriteRate / (1024.0 * 1024.0));
+        result.networkRecvMBps.push_back(snapshot.systemNetworkRecvRate / (1024.0 * 1024.0));
+        result.networkSendMBps.push_back(snapshot.systemNetworkSendRate / (1024.0 * 1024.0));
+    }
+
+    return result;
+}

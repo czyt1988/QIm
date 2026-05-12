@@ -3,6 +3,8 @@
 #include "collector/ProcessCollector.h"
 #include <QDateTime>
 #include <QDebug>
+#include <cwctype>
+#include <algorithm>
 
 ProcessCollector* ProcessCollector::instance()
 {
@@ -16,6 +18,19 @@ ProcessCollector::ProcessCollector()
     , prevTimestamp_(0)
     , hQuery_(nullptr)
 {
+    PDH_STATUS status = PdhOpenQueryW(nullptr, 0, &hQuery_);
+    if (status == ERROR_SUCCESS) {
+        initGPUCounters();
+        initNetCounters();
+    }
+}
+
+ProcessCollector::~ProcessCollector()
+{
+    if (hQuery_) {
+        PdhCloseQuery(hQuery_);
+        hQuery_ = nullptr;
+    }
 }
 
 qint64 ProcessCollector::fileTimeToInt64(const FILETIME& ft)
@@ -48,11 +63,184 @@ double ProcessCollector::calcCpuPercent(qint64 curKernel, qint64 curUser,
     return qBound(0.0, percent, 100.0);
 }
 
+bool ProcessCollector::containsIgnoreCase(const std::wstring& str, const std::wstring& substr)
+{
+    auto it = std::search(str.begin(), str.end(), substr.begin(), substr.end(),
+        [](wchar_t a, wchar_t b) { return std::towlower(a) == std::towlower(b); });
+    return it != str.end();
+}
+
+// ─── PDH GPU counter initialization ──────────────────────────────────────────
+// Enumerates \\GPU Engine(*)\\Utilization Percentage instances,
+// keeps only those with "engtype_3D" in the instance name.
+
+void ProcessCollector::initGPUCounters()
+{
+    const wchar_t* gpuWildcard = L"\\GPU Engine(*)\\Utilization Percentage";
+
+    DWORD pathListLength = 0;
+    PDH_STATUS status = PdhExpandWildCardPathW(nullptr, gpuWildcard, nullptr,
+                                               &pathListLength, 0);
+    if (status != PDH_MORE_DATA || pathListLength == 0) {
+        return;
+    }
+
+    std::vector<wchar_t> pathBuffer(pathListLength);
+    status = PdhExpandWildCardPathW(nullptr, gpuWildcard, pathBuffer.data(),
+                                    &pathListLength, 0);
+    if (status != ERROR_SUCCESS) {
+        return;
+    }
+
+    // Parse MULTI_SZ: double-null-terminated array of null-terminated strings
+    const wchar_t* path = pathBuffer.data();
+    while (*path) {
+        std::wstring pathStr(path);
+        if (pathStr.find(L"engtype_3D") != std::wstring::npos) {
+            PDHCounter counter;
+            counter.instanceName = pathStr;
+            PDH_STATUS addStatus = PdhAddCounterW(hQuery_, pathStr.c_str(), 0,
+                                                  &counter.handle);
+            if (addStatus == ERROR_SUCCESS) {
+                gpuCounters_.push_back(counter);
+            }
+        }
+        path += wcslen(path) + 1;
+    }
+}
+
+// ─── PDH Network counter initialization ─────────────────────────────────────
+// Enumerates \\Network Adapter(*)\\Bytes Received/sec and Bytes Sent/sec,
+// filters out loopback / isatap / teredo pseudo-interfaces.
+
+void ProcessCollector::initNetCounters()
+{
+    const wchar_t* recvWildcard = L"\\Network Adapter(*)\\Bytes Received/sec";
+    const wchar_t* sendWildcard = L"\\Network Adapter(*)\\Bytes Sent/sec";
+
+    // ── Receive counters ────────────────────────────────────────────────────
+    DWORD pathListLength = 0;
+    PDH_STATUS status = PdhExpandWildCardPathW(nullptr, recvWildcard, nullptr,
+                                               &pathListLength, 0);
+    if (status == PDH_MORE_DATA && pathListLength > 0) {
+        std::vector<wchar_t> pathBuffer(pathListLength);
+        status = PdhExpandWildCardPathW(nullptr, recvWildcard, pathBuffer.data(),
+                                        &pathListLength, 0);
+        if (status == ERROR_SUCCESS) {
+            const wchar_t* path = pathBuffer.data();
+            while (*path) {
+                std::wstring pathStr(path);
+                if (!containsIgnoreCase(pathStr, L"loopback") &&
+                    !containsIgnoreCase(pathStr, L"isatap") &&
+                    !containsIgnoreCase(pathStr, L"teredo")) {
+                    PDHCounter counter;
+                    counter.instanceName = pathStr;
+                    PDH_STATUS addStatus = PdhAddCounterW(hQuery_, pathStr.c_str(), 0,
+                                                          &counter.handle);
+                    if (addStatus == ERROR_SUCCESS) {
+                        netRecvCounters_.push_back(counter);
+                    }
+                }
+                path += wcslen(path) + 1;
+            }
+        }
+    }
+
+    // ── Send counters ───────────────────────────────────────────────────────
+    pathListLength = 0;
+    status = PdhExpandWildCardPathW(nullptr, sendWildcard, nullptr,
+                                    &pathListLength, 0);
+    if (status == PDH_MORE_DATA && pathListLength > 0) {
+        std::vector<wchar_t> pathBuffer(pathListLength);
+        status = PdhExpandWildCardPathW(nullptr, sendWildcard, pathBuffer.data(),
+                                        &pathListLength, 0);
+        if (status == ERROR_SUCCESS) {
+            const wchar_t* path = pathBuffer.data();
+            while (*path) {
+                std::wstring pathStr(path);
+                if (!containsIgnoreCase(pathStr, L"loopback") &&
+                    !containsIgnoreCase(pathStr, L"isatap") &&
+                    !containsIgnoreCase(pathStr, L"teredo")) {
+                    PDHCounter counter;
+                    counter.instanceName = pathStr;
+                    PDH_STATUS addStatus = PdhAddCounterW(hQuery_, pathStr.c_str(), 0,
+                                                          &counter.handle);
+                    if (addStatus == ERROR_SUCCESS) {
+                        netSendCounters_.push_back(counter);
+                    }
+                }
+                path += wcslen(path) + 1;
+            }
+        }
+    }
+}
+
+// ─── PDH data collection ────────────────────────────────────────────────────
+// Collects current values for all registered GPU and network counters.
+// GPU: aggregates all engtype_3D utilization percentages (average).
+// Network: sums Bytes Received/sec and Bytes Sent/sec across all adapters.
+
+void ProcessCollector::collectPDHData(ProcessSnapshot& snapshot)
+{
+    if (!hQuery_ || (gpuCounters_.empty() && netRecvCounters_.empty() &&
+                     netSendCounters_.empty())) {
+        return;
+    }
+
+    PDH_STATUS status = PdhCollectQueryData(hQuery_);
+    if (status != ERROR_SUCCESS) {
+        return;
+    }
+
+    // ── GPU: aggregate all 3D engine utilization percentages ────────────────
+    if (!gpuCounters_.empty()) {
+        double totalGpu = 0.0;
+        int gpuCount = 0;
+        for (const auto& c : gpuCounters_) {
+            PDH_FMT_COUNTERVALUE value;
+            if (PdhGetFormattedCounterValue(c.handle, PDH_FMT_DOUBLE, nullptr,
+                                            &value) == ERROR_SUCCESS) {
+                totalGpu += value.doubleValue;
+                ++gpuCount;
+            }
+        }
+        snapshot.systemGpuPercent = (gpuCount > 0) ? totalGpu : 0.0;
+    }
+
+    // ── Network: sum Bytes/sec across all adapters ──────────────────────────
+    if (!netRecvCounters_.empty()) {
+        double totalRecv = 0.0;
+        for (const auto& c : netRecvCounters_) {
+            PDH_FMT_COUNTERVALUE value;
+            if (PdhGetFormattedCounterValue(c.handle, PDH_FMT_DOUBLE, nullptr,
+                                            &value) == ERROR_SUCCESS) {
+                totalRecv += value.doubleValue;
+            }
+        }
+        snapshot.systemNetworkRecvRate = totalRecv;
+    }
+
+    if (!netSendCounters_.empty()) {
+        double totalSent = 0.0;
+        for (const auto& c : netSendCounters_) {
+            PDH_FMT_COUNTERVALUE value;
+            if (PdhGetFormattedCounterValue(c.handle, PDH_FMT_DOUBLE, nullptr,
+                                            &value) == ERROR_SUCCESS) {
+                totalSent += value.doubleValue;
+            }
+        }
+        snapshot.systemNetworkSendRate = totalSent;
+    }
+}
+
+// ─── Main snapshot pipeline ─────────────────────────────────────────────────
+
 ProcessSnapshot ProcessCollector::takeSnapshot()
 {
     ProcessSnapshot snapshot;
     snapshot.timestamp = QDateTime::currentMSecsSinceEpoch();
 
+    collectPDHData(snapshot);
     collectProcessList(snapshot.processes);
     collectSystemCpuInfo(snapshot);
     collectSystemMemoryInfo(snapshot);
@@ -232,11 +420,13 @@ void ProcessCollector::collectSystemCpuInfo(ProcessSnapshot& snapshot)
     FILETIME idleTime, kernelTime, userTime;
     if (!GetSystemTimes(&idleTime, &kernelTime, &userTime)) {
         snapshot.systemCpuPercent = 0.0;
-        snapshot.systemGpuPercent = 0.0;
+        // GPU and network are already set by collectPDHData (called before this);
+        // preserve those values on failure — only zero out if they weren't set.
+        if (snapshot.systemGpuPercent == 0.0) {
+            // collected by PDH; 0.0 means either no GPU or not yet collected
+        }
         snapshot.systemDiskReadRate = 0.0;
         snapshot.systemDiskWriteRate = 0.0;
-        snapshot.systemNetworkRecvRate = 0.0;
-        snapshot.systemNetworkSendRate = 0.0;
         return;
     }
 
@@ -257,12 +447,9 @@ void ProcessCollector::collectSystemCpuInfo(ProcessSnapshot& snapshot)
         snapshot.systemCpuPercent = 0.0;
     }
 
-    // GPU: system-level placeholder (PDH counter in future)
-    snapshot.systemGpuPercent = 0.0;
+    // GPU and network are handled by collectPDHData — do NOT zero them out here.
     snapshot.systemDiskReadRate = 0.0;
     snapshot.systemDiskWriteRate = 0.0;
-    snapshot.systemNetworkRecvRate = 0.0;
-    snapshot.systemNetworkSendRate = 0.0;
 }
 
 void ProcessCollector::collectSystemMemoryInfo(ProcessSnapshot& snapshot)
