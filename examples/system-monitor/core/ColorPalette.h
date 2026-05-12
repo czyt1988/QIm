@@ -5,7 +5,7 @@
 #include <QString>
 #include <QStringList>
 #include <QVector>
-#include "implot.h"
+#include "imgui.h"
 
 namespace QImSystemMonitor {
 

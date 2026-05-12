@@ -29,6 +29,4 @@ private:
     QStringList orderedNames_;
     // Bar groups node for stacked bar chart with deterministic colors
     ColoredBarGroupsNode* barGroups_ = nullptr;
-    // Color manager for deterministic process colors
-    QImSystemMonitor::ColorManager colorManager_;
 };
