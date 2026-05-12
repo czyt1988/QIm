@@ -109,6 +109,29 @@ enum class QImPlotCondition
 };
 
 /**
+ * @brief Corresponds to ImPlotColormap
+ */
+enum class QImPlotColormap
+{
+    Deep = 0,      ///< ImPlotColormap_::ImPlotColormap_Deep
+    Dark = 1,      ///< ImPlotColormap_::ImPlotColormap_Dark
+    Pastel = 2,    ///< ImPlotColormap_::ImPlotColormap_Pastel
+    Paired = 3,    ///< ImPlotColormap_::ImPlotColormap_Paired
+    Viridis = 4,   ///< ImPlotColormap_::ImPlotColormap_Viridis
+    Plasma = 5,    ///< ImPlotColormap_::ImPlotColormap_Plasma
+    Hot = 6,       ///< ImPlotColormap_::ImPlotColormap_Hot
+    Cool = 7,      ///< ImPlotColormap_::ImPlotColormap_Cool
+    Pink = 8,      ///< ImPlotColormap_::ImPlotColormap_Pink
+    Jet = 9,       ///< ImPlotColormap_::ImPlotColormap_Jet
+    Twilight = 10, ///< ImPlotColormap_::ImPlotColormap_Twilight
+    RdBu = 11,     ///< ImPlotColormap_::ImPlotColormap_RdBu
+    BrBG = 12,     ///< ImPlotColormap_::ImPlotColormap_BrBG
+    PiYG = 13,     ///< ImPlotColormap_::ImPlotColormap_PiYG
+    Spectral = 14, ///< ImPlotColormap_::ImPlotColormap_Spectral
+    Greys = 15     ///< ImPlotColormap_::ImPlotColormap_Greys
+};
+
+/**
  * \if ENGLISH
  * @brief Qt-style wrapper enum for ImPlot legend location
  * @details Maps ImPlot's ImPlotLocation enumeration to Qt-compatible enum class values
@@ -164,12 +187,18 @@ QIM_CORE_API QImPlotCondition toQImPlotCondition(int v);
 QIM_CORE_API QImPlotLegendLocation toQImPlotLegendLocation(int v);
 QIM_CORE_API int toImPlotLocation(QImPlotLegendLocation v);
 
+// Converts QImPlotColormap wrapper enum to ImPlot's native colormap enumeration value
+QIM_CORE_API int toImPlotColormap(QImPlotColormap v);
+// Converts ImPlot's colormap enumeration value to QImPlotColormap wrapper enum
+QIM_CORE_API QImPlotColormap toQImPlotColormap(int v);
+
 }
 
 Q_DECLARE_METATYPE(QIM::QImPlotAxisId)
 Q_DECLARE_METATYPE(QIM::QImPlotScaleType)
 Q_DECLARE_METATYPE(QIM::QImPlotCondition)
 Q_DECLARE_METATYPE(QIM::QImPlotLegendLocation)
+Q_DECLARE_METATYPE(QIM::QImPlotColormap)
 Q_DECLARE_METATYPE(QIM::QImDownsampleAlgorithm)
 
 // ===== Helper macros =====

@@ -283,6 +283,190 @@ int toImPlotLocation(QImPlotLegendLocation v)
     return ImPlotLocation_East;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Converts ImPlot's colormap enumeration value to QImPlotColormap wrapper enum
+ * @param v Raw ImPlotColormap_ enumeration value (ImPlotColormap_Deep through ImPlotColormap_Greys)
+ * @return Corresponding QImPlotColormap enum value
+ * @details Performs direct 1:1 mapping between native ImPlot colormap types and Qt wrapper enum:
+ *          - ImPlotColormap_Deep     (0)  → QImPlotColormap::Deep
+ *          - ImPlotColormap_Dark     (1)  → QImPlotColormap::Dark
+ *          - ImPlotColormap_Pastel   (2)  → QImPlotColormap::Pastel
+ *          - ImPlotColormap_Paired   (3)  → QImPlotColormap::Paired
+ *          - ImPlotColormap_Viridis  (4)  → QImPlotColormap::Viridis
+ *          - ImPlotColormap_Plasma   (5)  → QImPlotColormap::Plasma
+ *          - ImPlotColormap_Hot      (6)  → QImPlotColormap::Hot
+ *          - ImPlotColormap_Cool     (7)  → QImPlotColormap::Cool
+ *          - ImPlotColormap_Pink     (8)  → QImPlotColormap::Pink
+ *          - ImPlotColormap_Jet      (9)  → QImPlotColormap::Jet
+ *          - ImPlotColormap_Twilight (10) → QImPlotColormap::Twilight
+ *          - ImPlotColormap_RdBu     (11) → QImPlotColormap::RdBu
+ *          - ImPlotColormap_BrBG     (12) → QImPlotColormap::BrBG
+ *          - ImPlotColormap_PiYG     (13) → QImPlotColormap::PiYG
+ *          - ImPlotColormap_Spectral (14) → QImPlotColormap::Spectral
+ *          - ImPlotColormap_Greys    (15) → QImPlotColormap::Greys
+ * @note Invalid input values default to QImPlotColormap::Deep for safety.
+ *       This function is typically used internally when reading colormap state from ImPlot context.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将 ImPlot 的色图枚举值转换为 QImPlotColormap 包装枚举
+ * @param v 原始 ImPlotColormap_ 枚举值（ImPlotColormap_Deep 到 ImPlotColormap_Greys）
+ * @return 对应的 QImPlotColormap 枚举值
+ * @details 执行原生 ImPlot 色图类型与 Qt 包装枚举之间的直接 1:1 映射：
+ *          - ImPlotColormap_Deep     (0)  → QImPlotColormap::Deep
+ *          - ImPlotColormap_Dark     (1)  → QImPlotColormap::Dark
+ *          - ImPlotColormap_Pastel   (2)  → QImPlotColormap::Pastel
+ *          - ImPlotColormap_Paired   (3)  → QImPlotColormap::Paired
+ *          - ImPlotColormap_Viridis  (4)  → QImPlotColormap::Viridis
+ *          - ImPlotColormap_Plasma   (5)  → QImPlotColormap::Plasma
+ *          - ImPlotColormap_Hot      (6)  → QImPlotColormap::Hot
+ *          - ImPlotColormap_Cool     (7)  → QImPlotColormap::Cool
+ *          - ImPlotColormap_Pink     (8)  → QImPlotColormap::Pink
+ *          - ImPlotColormap_Jet      (9)  → QImPlotColormap::Jet
+ *          - ImPlotColormap_Twilight (10) → QImPlotColormap::Twilight
+ *          - ImPlotColormap_RdBu     (11) → QImPlotColormap::RdBu
+ *          - ImPlotColormap_BrBG     (12) → QImPlotColormap::BrBG
+ *          - ImPlotColormap_PiYG     (13) → QImPlotColormap::PiYG
+ *          - ImPlotColormap_Spectral (14) → QImPlotColormap::Spectral
+ *          - ImPlotColormap_Greys    (15) → QImPlotColormap::Greys
+ * @note 无效输入值默认返回 QImPlotColormap::Deep 以保证安全。
+ *       此函数通常在从 ImPlot 上下文读取色图状态时内部使用。
+ * \endif
+ */
+QImPlotColormap toQImPlotColormap(int v)
+{
+    switch (v) {
+    case ImPlotColormap_Deep:
+        return QImPlotColormap::Deep;
+    case ImPlotColormap_Dark:
+        return QImPlotColormap::Dark;
+    case ImPlotColormap_Pastel:
+        return QImPlotColormap::Pastel;
+    case ImPlotColormap_Paired:
+        return QImPlotColormap::Paired;
+    case ImPlotColormap_Viridis:
+        return QImPlotColormap::Viridis;
+    case ImPlotColormap_Plasma:
+        return QImPlotColormap::Plasma;
+    case ImPlotColormap_Hot:
+        return QImPlotColormap::Hot;
+    case ImPlotColormap_Cool:
+        return QImPlotColormap::Cool;
+    case ImPlotColormap_Pink:
+        return QImPlotColormap::Pink;
+    case ImPlotColormap_Jet:
+        return QImPlotColormap::Jet;
+    case ImPlotColormap_Twilight:
+        return QImPlotColormap::Twilight;
+    case ImPlotColormap_RdBu:
+        return QImPlotColormap::RdBu;
+    case ImPlotColormap_BrBG:
+        return QImPlotColormap::BrBG;
+    case ImPlotColormap_PiYG:
+        return QImPlotColormap::PiYG;
+    case ImPlotColormap_Spectral:
+        return QImPlotColormap::Spectral;
+    case ImPlotColormap_Greys:
+        return QImPlotColormap::Greys;
+    default:
+        break;
+    }
+    return QImPlotColormap::Deep;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Converts QImPlotColormap wrapper enum to ImPlot's native colormap enumeration value
+ * @param v QImPlotColormap enum value (Deep through Greys)
+ * @return Corresponding ImPlotColormap_ enumeration value as integer
+ * @details Performs direct 1:1 mapping between Qt wrapper enum and native ImPlot colormap types:
+ *          - QImPlotColormap::Deep     → ImPlotColormap_Deep     (0)
+ *          - QImPlotColormap::Dark     → ImPlotColormap_Dark     (1)
+ *          - QImPlotColormap::Pastel   → ImPlotColormap_Pastel   (2)
+ *          - QImPlotColormap::Paired   → ImPlotColormap_Paired   (3)
+ *          - QImPlotColormap::Viridis  → ImPlotColormap_Viridis  (4)
+ *          - QImPlotColormap::Plasma   → ImPlotColormap_Plasma   (5)
+ *          - QImPlotColormap::Hot      → ImPlotColormap_Hot      (6)
+ *          - QImPlotColormap::Cool     → ImPlotColormap_Cool     (7)
+ *          - QImPlotColormap::Pink     → ImPlotColormap_Pink     (8)
+ *          - QImPlotColormap::Jet      → ImPlotColormap_Jet      (9)
+ *          - QImPlotColormap::Twilight → ImPlotColormap_Twilight (10)
+ *          - QImPlotColormap::RdBu     → ImPlotColormap_RdBu     (11)
+ *          - QImPlotColormap::BrBG     → ImPlotColormap_BrBG     (12)
+ *          - QImPlotColormap::PiYG     → ImPlotColormap_PiYG     (13)
+ *          - QImPlotColormap::Spectral → ImPlotColormap_Spectral (14)
+ *          - QImPlotColormap::Greys    → ImPlotColormap_Greys    (15)
+ * @note Invalid enum values default to ImPlotColormap_Deep for safety.
+ *       The returned integer can be passed directly to ImPlot colormap APIs.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将 QImPlotColormap 包装枚举转换为 ImPlot 的原生色图枚举值
+ * @param v QImPlotColormap 枚举值（Deep 到 Greys）
+ * @return 对应的 ImPlotColormap_ 枚举值（整数形式）
+ * @details 执行 Qt 包装枚举与原生 ImPlot 色图类型之间的直接 1:1 映射：
+ *          - QImPlotColormap::Deep     → ImPlotColormap_Deep     (0)
+ *          - QImPlotColormap::Dark     → ImPlotColormap_Dark     (1)
+ *          - QImPlotColormap::Pastel   → ImPlotColormap_Pastel   (2)
+ *          - QImPlotColormap::Paired   → ImPlotColormap_Paired   (3)
+ *          - QImPlotColormap::Viridis  → ImPlotColormap_Viridis  (4)
+ *          - QImPlotColormap::Plasma   → ImPlotColormap_Plasma   (5)
+ *          - QImPlotColormap::Hot      → ImPlotColormap_Hot      (6)
+ *          - QImPlotColormap::Cool     → ImPlotColormap_Cool     (7)
+ *          - QImPlotColormap::Pink     → ImPlotColormap_Pink     (8)
+ *          - QImPlotColormap::Jet      → ImPlotColormap_Jet      (9)
+ *          - QImPlotColormap::Twilight → ImPlotColormap_Twilight (10)
+ *          - QImPlotColormap::RdBu     → ImPlotColormap_RdBu     (11)
+ *          - QImPlotColormap::BrBG     → ImPlotColormap_BrBG     (12)
+ *          - QImPlotColormap::PiYG     → ImPlotColormap_PiYG     (13)
+ *          - QImPlotColormap::Spectral → ImPlotColormap_Spectral (14)
+ *          - QImPlotColormap::Greys    → ImPlotColormap_Greys    (15)
+ * @note 无效枚举值默认返回 ImPlotColormap_Deep 以保证安全。
+ *       返回的整数值可直接传递给 ImPlot 色图 API。
+ * \endif
+ */
+int toImPlotColormap(QImPlotColormap v)
+{
+    switch (v) {
+    case QImPlotColormap::Deep:
+        return ImPlotColormap_Deep;
+    case QImPlotColormap::Dark:
+        return ImPlotColormap_Dark;
+    case QImPlotColormap::Pastel:
+        return ImPlotColormap_Pastel;
+    case QImPlotColormap::Paired:
+        return ImPlotColormap_Paired;
+    case QImPlotColormap::Viridis:
+        return ImPlotColormap_Viridis;
+    case QImPlotColormap::Plasma:
+        return ImPlotColormap_Plasma;
+    case QImPlotColormap::Hot:
+        return ImPlotColormap_Hot;
+    case QImPlotColormap::Cool:
+        return ImPlotColormap_Cool;
+    case QImPlotColormap::Pink:
+        return ImPlotColormap_Pink;
+    case QImPlotColormap::Jet:
+        return ImPlotColormap_Jet;
+    case QImPlotColormap::Twilight:
+        return ImPlotColormap_Twilight;
+    case QImPlotColormap::RdBu:
+        return ImPlotColormap_RdBu;
+    case QImPlotColormap::BrBG:
+        return ImPlotColormap_BrBG;
+    case QImPlotColormap::PiYG:
+        return ImPlotColormap_PiYG;
+    case QImPlotColormap::Spectral:
+        return ImPlotColormap_Spectral;
+    case QImPlotColormap::Greys:
+        return ImPlotColormap_Greys;
+    default:
+        break;
+    }
+    return ImPlotColormap_Deep;
+}
+
 bool isXAxisId(QImPlotAxisId id)
 {
     return ((id >= QImPlotAxisId::X1) && (id <= QImPlotAxisId::X3));
