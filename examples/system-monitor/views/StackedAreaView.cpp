@@ -8,6 +8,7 @@
 #include "plot/QImPlotLegendNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlot.h"
+#include "plot/QImPlotColormapManager.h"
 #include "aggregator/HistoryBuffer.h"
 #include "aggregator/ProcessAggregator.h"
 
@@ -44,6 +45,18 @@ void StackedAreaView::buildView(QIM::QImFigureWidget* figure, const QList<Aggreg
     barGroups_ = new ColoredBarGroupsNode(plotNode_);
     barGroups_->setStacked(true);
     barGroups_->setGroupWidth(0.8);
+
+    // Register full Tol 22-color palette as an ImPlot colormap once.
+    // ImPlot colormap registration is global and persists across view switches.
+    // Use a fixed name for stable lookups.
+    // Use QList<QColor> constructor from kColorPalette.
+    QIM::QImPlotColormapManager::addColormap(
+        "__bar_groups_custom__",
+        QList<QColor>(QImSystemMonitor::kColorPalette.begin(), QImSystemMonitor::kColorPalette.end()),
+        true  // qualitative
+    );
+    // Push the custom colormap at plot level — QImPlotNode auto-pops in endDraw()
+    plotNode_->pushColormap("__bar_groups_custom__");
 
     // External legend at bottom
     QIM::QImPlotLegendNode* legend = plotNode_->legendNode();
@@ -95,9 +108,7 @@ void StackedAreaView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
         }
     }
 
-    // Set deterministic colors using Tol palette
-    auto colors = colorManager_.toImVec4Colors(orderedNames_);
-    barGroups_->setCustomColormap(colors);
+    // Colormap is registered once in buildView() and pushed at plot level — no per-update work needed
 
     // Set data: orderedNames_ provides item labels, values is row-major matrix
     barGroups_->setData(orderedNames_, values, itemCount, groupCount);
