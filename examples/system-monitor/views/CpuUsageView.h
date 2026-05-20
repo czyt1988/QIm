@@ -15,7 +15,7 @@ class QImPlotNode;
 
 class HistoryBuffer;
 
-class StackedAreaView {
+class CpuUsageView {
 public:
     void setHistoryBuffer(HistoryBuffer* buffer);
     void buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data);

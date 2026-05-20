@@ -1,4 +1,4 @@
-#include "StackedAreaView.h"
+#include "CpuUsageView.h"
 
 #include <algorithm>
 #include <vector>
@@ -15,7 +15,7 @@
 static constexpr int kHistoryDurationSec  = 600;       // 10 minutes
 static constexpr int kWindowDurationSec   = 600;       // X-axis window: 10 minutes
 
-void StackedAreaView::setHistoryBuffer(HistoryBuffer* buffer)
+void CpuUsageView::setHistoryBuffer(HistoryBuffer* buffer)
 {
     buffer_ = buffer;
     if (buffer_) {
@@ -23,7 +23,7 @@ void StackedAreaView::setHistoryBuffer(HistoryBuffer* buffer)
     }
 }
 
-void StackedAreaView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data)
+void CpuUsageView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data)
 {
     if (!figure)
         return;
@@ -68,7 +68,7 @@ void StackedAreaView::buildView(QIM::QImFigureWidget* figure, const QList<Aggreg
     updateData(data);
 }
 
-void StackedAreaView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
+void CpuUsageView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
 {
     if (!plotNode_ || !barGroups_ || !buffer_ || buffer_->pointCount() < 1)
         return;
