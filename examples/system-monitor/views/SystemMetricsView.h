@@ -11,7 +11,7 @@ class QImPlotLineItemNode;
 
 class HistoryBuffer;
 
-class SystemOverviewView {
+class SystemMetricsView {
 public:
     void setHistoryBuffer(HistoryBuffer* buffer);
     void buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data);

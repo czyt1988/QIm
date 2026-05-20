@@ -5,69 +5,69 @@
 
 ViewModeSelector::ViewModeSelector(QWidget* parent)
     : QWidget(parent)
-    , btnStackedArea_(new QRadioButton(tr("Stacked Area"), this))
-    , btnPieChart_(new QRadioButton(tr("Pie Chart"), this))
-    , btnScatter3D_(new QRadioButton(tr("3D Scatter"), this))
-    , btnTimeSeries3D_(new QRadioButton(tr("3D Time Series"), this))
-    , btnSystemOverview_(new QRadioButton(tr("System Overview"), this))
+    , btnCpuUsage_(new QRadioButton(tr("CPU Usage"), this))
+    , btnResourcePie_(new QRadioButton(tr("Resource Pies"), this))
+    , btnProcessResource3D_(new QRadioButton(tr("Process 3D"), this))
+    , btnCpuTimeline3D_(new QRadioButton(tr("CPU Timeline"), this))
+    , btnSystemMetrics_(new QRadioButton(tr("System Metrics"), this))
 {
     auto* layout = new QHBoxLayout(this);
-    layout->addWidget(btnStackedArea_);
-    layout->addWidget(btnPieChart_);
-    layout->addWidget(btnScatter3D_);
-    layout->addWidget(btnTimeSeries3D_);
-    layout->addWidget(btnSystemOverview_);
+    layout->addWidget(btnCpuUsage_);
+    layout->addWidget(btnResourcePie_);
+    layout->addWidget(btnProcessResource3D_);
+    layout->addWidget(btnCpuTimeline3D_);
+    layout->addWidget(btnSystemMetrics_);
     layout->addStretch();
 
     auto* buttonGroup = new QButtonGroup(this);
-    buttonGroup->addButton(btnStackedArea_);
-    buttonGroup->addButton(btnPieChart_);
-    buttonGroup->addButton(btnScatter3D_);
-    buttonGroup->addButton(btnTimeSeries3D_);
-    buttonGroup->addButton(btnSystemOverview_);
+    buttonGroup->addButton(btnCpuUsage_);
+    buttonGroup->addButton(btnResourcePie_);
+    buttonGroup->addButton(btnProcessResource3D_);
+    buttonGroup->addButton(btnCpuTimeline3D_);
+    buttonGroup->addButton(btnSystemMetrics_);
 
-    connect(btnStackedArea_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
-    connect(btnPieChart_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
-    connect(btnScatter3D_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
-    connect(btnTimeSeries3D_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
-    connect(btnSystemOverview_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
+    connect(btnCpuUsage_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
+    connect(btnResourcePie_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
+    connect(btnProcessResource3D_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
+    connect(btnCpuTimeline3D_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
+    connect(btnSystemMetrics_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
 
-    btnStackedArea_->setChecked(true);
+    btnCpuUsage_->setChecked(true);
 }
 
 ViewMode ViewModeSelector::currentMode() const
 {
-    if (btnStackedArea_->isChecked()) {
-        return ViewMode::StackedArea;
-    } else if (btnPieChart_->isChecked()) {
-        return ViewMode::PieChart;
-    } else if (btnScatter3D_->isChecked()) {
-        return ViewMode::Scatter3D;
-    } else if (btnTimeSeries3D_->isChecked()) {
-        return ViewMode::TimeSeries3D;
-    } else if (btnSystemOverview_->isChecked()) {
-        return ViewMode::SystemOverview;
+    if (btnCpuUsage_->isChecked()) {
+        return ViewMode::CpuUsage;
+    } else if (btnResourcePie_->isChecked()) {
+        return ViewMode::ResourcePie;
+    } else if (btnProcessResource3D_->isChecked()) {
+        return ViewMode::ProcessResource3D;
+    } else if (btnCpuTimeline3D_->isChecked()) {
+        return ViewMode::CpuTimeline3D;
+    } else if (btnSystemMetrics_->isChecked()) {
+        return ViewMode::SystemMetrics;
     }
-    return ViewMode::StackedArea;
+    return ViewMode::CpuUsage;
 }
 
 void ViewModeSelector::setCurrentMode(ViewMode mode)
 {
     switch (mode) {
-    case ViewMode::StackedArea:
-        btnStackedArea_->setChecked(true);
+    case ViewMode::CpuUsage:
+        btnCpuUsage_->setChecked(true);
         break;
-    case ViewMode::PieChart:
-        btnPieChart_->setChecked(true);
+    case ViewMode::ResourcePie:
+        btnResourcePie_->setChecked(true);
         break;
-    case ViewMode::Scatter3D:
-        btnScatter3D_->setChecked(true);
+    case ViewMode::ProcessResource3D:
+        btnProcessResource3D_->setChecked(true);
         break;
-    case ViewMode::TimeSeries3D:
-        btnTimeSeries3D_->setChecked(true);
+    case ViewMode::CpuTimeline3D:
+        btnCpuTimeline3D_->setChecked(true);
         break;
-    case ViewMode::SystemOverview:
-        btnSystemOverview_->setChecked(true);
+    case ViewMode::SystemMetrics:
+        btnSystemMetrics_->setChecked(true);
         break;
     }
 }

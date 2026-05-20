@@ -1,4 +1,4 @@
-#include "TimeSeries3DView.h"
+#include "CpuTimeline3DView.h"
 
 #include <algorithm>
 #include <cmath>
@@ -15,12 +15,12 @@
 
 static constexpr int kMaxProcesses = 8;
 
-void TimeSeries3DView::setHistoryBuffer(HistoryBuffer* buffer)
+void CpuTimeline3DView::setHistoryBuffer(HistoryBuffer* buffer)
 {
     buffer_ = buffer;
 }
 
-void TimeSeries3DView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data)
+void CpuTimeline3DView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data)
 {
     if (!figure)
         return;
@@ -40,7 +40,7 @@ void TimeSeries3DView::buildView(QIM::QImFigureWidget* figure, const QList<Aggre
     updateData(data);
 }
 
-void TimeSeries3DView::updateData(const QList<AggregatedProcessInfo>& data)
+void CpuTimeline3DView::updateData(const QList<AggregatedProcessInfo>& data)
 {
     if (!surfaceNode_)
         return;

@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget* parent)
     monitor_->start();
 
     // Trigger initial view with empty data (view will populate when first data arrives)
-    viewManager_->switchTo(ViewMode::StackedArea, {});
+    viewManager_->switchTo(ViewMode::CpuUsage, {});
 }
 
 MainWindow::~MainWindow() = default;

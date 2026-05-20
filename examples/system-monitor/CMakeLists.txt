@@ -37,11 +37,11 @@ set(MAIN_PROJECT_SOURCES
     core/ProcessMonitor.cpp
     widgets/ProcessTreeWidget.cpp
     widgets/ViewModeSelector.cpp
-    views/StackedAreaView.cpp
-    views/PieChartView.cpp
-    views/Scatter3DView.cpp
-    views/TimeSeries3DView.cpp
-    views/SystemOverviewView.cpp
+    views/CpuUsageView.cpp
+    views/ResourcePieView.cpp
+    views/ProcessResource3DView.cpp
+    views/CpuTimeline3DView.cpp
+    views/SystemMetricsView.cpp
     core/ViewManager.cpp
 )
 

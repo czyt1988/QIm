@@ -1,25 +1,26 @@
 #pragma once
 
 #include "collector/ProcessInfo.h"
+#include "core/ColorPalette.h"
+#include <QHash>
 #include <QList>
-#include <vector>
+#include <QSet>
 
 namespace QIM {
 class QImFigureWidget;
 class QImPlot3DNode;
-class QImPlot3DSurfaceItemNode;
+class QImPlot3DScatterItemNode;
 }
 
-class HistoryBuffer;
-
-class TimeSeries3DView {
+class ProcessResource3DView {
 public:
     void buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data);
     void updateData(const QList<AggregatedProcessInfo>& data);
-    void setHistoryBuffer(HistoryBuffer* buffer);
 
 private:
     QIM::QImPlot3DNode* plotNode_ = nullptr;
-    QIM::QImPlot3DSurfaceItemNode* surfaceNode_ = nullptr;
-    HistoryBuffer* buffer_ = nullptr;
+    QImSystemMonitor::ColorManager colorManager_;
+
+    // processName → scatter item (persistent: items stay when process exits)
+    QHash<QString, QIM::QImPlot3DScatterItemNode*> scatterItems_;
 };

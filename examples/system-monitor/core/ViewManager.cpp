@@ -1,37 +1,37 @@
 #include "ViewManager.h"
 
 #include "QImFigureWidget.h"
-#include "views/StackedAreaView.h"
-#include "views/PieChartView.h"
-#include "views/Scatter3DView.h"
-#include "views/TimeSeries3DView.h"
-#include "views/SystemOverviewView.h"
+#include "views/CpuUsageView.h"
+#include "views/ResourcePieView.h"
+#include "views/ProcessResource3DView.h"
+#include "views/CpuTimeline3DView.h"
+#include "views/SystemMetricsView.h"
 #include "aggregator/HistoryBuffer.h"
 #include "plot3d/QImPlot3DNode.h"
 #include "collector/ProcessInfo.h"
 
 ViewManager::ViewManager(QIM::QImFigureWidget* figure, QObject* parent)
     : QObject(parent), figure_(figure) {
-    stackedAreaView_ = new StackedAreaView;
-    pieChartView_ = new PieChartView;
-    scatter3DView_ = new Scatter3DView;
-    timeSeries3DView_ = new TimeSeries3DView;
-    systemOverviewView_ = new SystemOverviewView;
+    cpuUsageView_ = new CpuUsageView;
+    resourcePieView_ = new ResourcePieView;
+    processResource3DView_ = new ProcessResource3DView;
+    cpuTimeline3DView_ = new CpuTimeline3DView;
+    systemMetricsView_ = new SystemMetricsView;
 }
 
 ViewManager::~ViewManager() {
-    delete stackedAreaView_;
-    delete pieChartView_;
-    delete scatter3DView_;
-    delete timeSeries3DView_;
-    delete systemOverviewView_;
+    delete cpuUsageView_;
+    delete resourcePieView_;
+    delete processResource3DView_;
+    delete cpuTimeline3DView_;
+    delete systemMetricsView_;
 }
 
 void ViewManager::setHistoryBuffer(HistoryBuffer* buffer)
 {
-    stackedAreaView_->setHistoryBuffer(buffer);
-    timeSeries3DView_->setHistoryBuffer(buffer);
-    systemOverviewView_->setHistoryBuffer(buffer);
+    cpuUsageView_->setHistoryBuffer(buffer);
+    cpuTimeline3DView_->setHistoryBuffer(buffer);
+    systemMetricsView_->setHistoryBuffer(buffer);
 }
 
 void ViewManager::switchTo(ViewMode mode, const QList<AggregatedProcessInfo>& data) {
@@ -58,20 +58,20 @@ void ViewManager::switchTo(ViewMode mode, const QList<AggregatedProcessInfo>& da
     }
 
     switch (mode) {
-    case ViewMode::StackedArea:
-        stackedAreaView_->buildView(figure_, data);
+    case ViewMode::CpuUsage:
+        cpuUsageView_->buildView(figure_, data);
         break;
-    case ViewMode::PieChart:
-        pieChartView_->buildView(figure_, data);
+    case ViewMode::ResourcePie:
+        resourcePieView_->buildView(figure_, data);
         break;
-    case ViewMode::Scatter3D:
-        scatter3DView_->buildView(figure_, data);
+    case ViewMode::ProcessResource3D:
+        processResource3DView_->buildView(figure_, data);
         break;
-    case ViewMode::TimeSeries3D:
-        timeSeries3DView_->buildView(figure_, data);
+    case ViewMode::CpuTimeline3D:
+        cpuTimeline3DView_->buildView(figure_, data);
         break;
-    case ViewMode::SystemOverview:
-        systemOverviewView_->buildView(figure_, data);
+    case ViewMode::SystemMetrics:
+        systemMetricsView_->buildView(figure_, data);
         break;
     }
 
@@ -84,20 +84,20 @@ void ViewManager::updateCurrentView(const QList<AggregatedProcessInfo>& data) {
     if (!figure_ || !viewBuilt_) return;
 
     switch (currentMode_) {
-    case ViewMode::StackedArea:
-        stackedAreaView_->updateData(data);
+    case ViewMode::CpuUsage:
+        cpuUsageView_->updateData(data);
         break;
-    case ViewMode::PieChart:
-        pieChartView_->updateData(data);
+    case ViewMode::ResourcePie:
+        resourcePieView_->updateData(data);
         break;
-    case ViewMode::Scatter3D:
-        scatter3DView_->updateData(data);
+    case ViewMode::ProcessResource3D:
+        processResource3DView_->updateData(data);
         break;
-    case ViewMode::TimeSeries3D:
-        timeSeries3DView_->updateData(data);
+    case ViewMode::CpuTimeline3D:
+        cpuTimeline3DView_->updateData(data);
         break;
-    case ViewMode::SystemOverview:
-        systemOverviewView_->updateData(data);
+    case ViewMode::SystemMetrics:
+        systemMetricsView_->updateData(data);
         break;
     }
 }

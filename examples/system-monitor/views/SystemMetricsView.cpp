@@ -1,4 +1,4 @@
-#include "SystemOverviewView.h"
+#include "SystemMetricsView.h"
 
 #include <algorithm>
 #include <vector>
@@ -14,7 +14,7 @@
 // -----------------------------------------------------------
 // setHistoryBuffer
 // -----------------------------------------------------------
-void SystemOverviewView::setHistoryBuffer(HistoryBuffer* buffer)
+void SystemMetricsView::setHistoryBuffer(HistoryBuffer* buffer)
 {
     buffer_ = buffer;
 }
@@ -22,7 +22,7 @@ void SystemOverviewView::setHistoryBuffer(HistoryBuffer* buffer)
 // -----------------------------------------------------------
 // buildView
 // -----------------------------------------------------------
-void SystemOverviewView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& /*data*/)
+void SystemMetricsView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& /*data*/)
 {
     if (!figure)
         return;
@@ -103,7 +103,7 @@ void SystemOverviewView::buildView(QIM::QImFigureWidget* figure, const QList<Agg
 // -----------------------------------------------------------
 // updateData
 // -----------------------------------------------------------
-void SystemOverviewView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
+void SystemMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
 {
     if (!plotNode_ || !buffer_ || buffer_->pointCount() < 1)
         return;

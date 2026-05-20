@@ -10,11 +10,11 @@ namespace QIM {
 class QImFigureWidget;
 }
 
-class StackedAreaView;
-class PieChartView;
-class Scatter3DView;
-class TimeSeries3DView;
-class SystemOverviewView;
+class CpuUsageView;
+class ResourcePieView;
+class ProcessResource3DView;
+class CpuTimeline3DView;
+class SystemMetricsView;
 class HistoryBuffer;
 
 class ViewManager : public QObject {
@@ -33,11 +33,11 @@ Q_SIGNALS:
 private:
     QIM::QImFigureWidget* figure_;
 
-    StackedAreaView* stackedAreaView_ = nullptr;
-    PieChartView* pieChartView_ = nullptr;
-    Scatter3DView* scatter3DView_ = nullptr;
-    TimeSeries3DView* timeSeries3DView_ = nullptr;
-    SystemOverviewView* systemOverviewView_ = nullptr;
+    CpuUsageView* cpuUsageView_ = nullptr;
+    ResourcePieView* resourcePieView_ = nullptr;
+    ProcessResource3DView* processResource3DView_ = nullptr;
+    CpuTimeline3DView* cpuTimeline3DView_ = nullptr;
+    SystemMetricsView* systemMetricsView_ = nullptr;
 
     ViewMode currentMode_ = static_cast<ViewMode>(-1);
     bool viewBuilt_ = false;

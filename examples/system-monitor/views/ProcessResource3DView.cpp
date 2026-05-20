@@ -1,4 +1,4 @@
-#include "Scatter3DView.h"
+#include "ProcessResource3DView.h"
 
 #include <algorithm>
 #include <vector>
@@ -12,7 +12,7 @@
 
 static constexpr int kMaxVisibleProcesses = 16;  // Top 15 + "Other"
 
-void Scatter3DView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data)
+void ProcessResource3DView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data)
 {
     if (!figure)
         return;
@@ -34,7 +34,7 @@ void Scatter3DView::buildView(QIM::QImFigureWidget* figure, const QList<Aggregat
     updateData(data);
 }
 
-void Scatter3DView::updateData(const QList<AggregatedProcessInfo>& data)
+void ProcessResource3DView::updateData(const QList<AggregatedProcessInfo>& data)
 {
     if (!plotNode_)
         return;
