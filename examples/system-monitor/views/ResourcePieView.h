@@ -7,7 +7,7 @@
 #include "plot/QImPlotNode.h"
 #include "QImFigureWidget.h"
 
-class PieChartView {
+class ResourcePieView {
 public:
     void buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data);
     void updateData(const QList<AggregatedProcessInfo>& data);

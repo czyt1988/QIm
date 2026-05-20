@@ -1,4 +1,4 @@
-#include "PieChartView.h"
+#include "ResourcePieView.h"
 
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
@@ -13,7 +13,7 @@
 
 static constexpr int kTopN = 8;
 
-void PieChartView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data)
+void ResourcePieView::buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data)
 {
     figure->clearSubplotGrid();
     figure->setSubplotGrid(1, 3);
@@ -52,7 +52,7 @@ void PieChartView::buildView(QIM::QImFigureWidget* figure, const QList<Aggregate
     updateData(data);
 }
 
-void PieChartView::setupPiePlot(QIM::QImPlotNode* plot, const QString& title)
+void ResourcePieView::setupPiePlot(QIM::QImPlotNode* plot, const QString& title)
 {
     plot->setTitle(title);
     plot->setEqual(true);
@@ -63,7 +63,7 @@ void PieChartView::setupPiePlot(QIM::QImPlotNode* plot, const QString& title)
     plot->y1Axis()->setLimits(0, 1, QIM::QImPlotCondition::Always);
 }
 
-void PieChartView::updateData(const QList<AggregatedProcessInfo>& data)
+void ResourcePieView::updateData(const QList<AggregatedProcessInfo>& data)
 {
     if (!cpuPie_ || !memPie_ || !diskPie_)
         return;
