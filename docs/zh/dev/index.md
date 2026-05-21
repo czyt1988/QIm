@@ -22,6 +22,7 @@ QIm 将 ImGui 即时模式组件封装为 Qt 保留模式对象，这种跨范�
 | [PIMPL开发规范](pimpl-dev-guide.md) | QIM_DECLARE_PRIVATE/QIM_DECLARE_PUBLIC宏使用 | ⭐⭐⭐ 必读 |
 | [渲染性能规范](render-guidelines.md) | beginDraw最小化原则、UTF8-only存储规范 | ⭐⭐⭐ 必读 |
 | [枚举语义转换规范](flag-mapping.md) | ImPlot/ImGui否定→肯定语义转换规则和实现宏 | ⭐⭐⭐ 必读 |
+| [初始化时序陷阱](lifecycle-pitfalls.md) | ImGui/ImPlot context创建时机、构造函数中调用API的崩溃原因与解决方案 | ⭐⭐⭐ 必读 |
 | [新节点开发指南](new-node-guide.md) | 新节点开发的完整操作流程 | ⭐⭐ 推荐 |
 | [自定义节点](custom-node.md) | 继承QImAbstractNode创建自定义组件 | ⭐⭐ 推荐 |
 
@@ -35,5 +36,6 @@ flowchart TD
     E[PIMPL开发规范] --> D
     F[渲染性能规范] --> D
     G[代码风格与注释规范] --> D
+    I[初始化时序陷阱] --> D
     D --> H[自定义节点]
 </flowmermaid>
