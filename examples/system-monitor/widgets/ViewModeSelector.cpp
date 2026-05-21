@@ -10,6 +10,7 @@ ViewModeSelector::ViewModeSelector(QWidget* parent)
     , btnProcessResource3D_(new QRadioButton(tr("Process 3D"), this))
     , btnCpuTimeline3D_(new QRadioButton(tr("CPU Timeline"), this))
     , btnSystemMetrics_(new QRadioButton(tr("System Metrics"), this))
+    , btnSustainedMetrics_(new QRadioButton(tr("Sustained Metrics"), this))
 {
     auto* layout = new QHBoxLayout(this);
     layout->addWidget(btnCpuUsage_);
@@ -17,6 +18,7 @@ ViewModeSelector::ViewModeSelector(QWidget* parent)
     layout->addWidget(btnProcessResource3D_);
     layout->addWidget(btnCpuTimeline3D_);
     layout->addWidget(btnSystemMetrics_);
+    layout->addWidget(btnSustainedMetrics_);
     layout->addStretch();
 
     auto* buttonGroup = new QButtonGroup(this);
@@ -25,12 +27,14 @@ ViewModeSelector::ViewModeSelector(QWidget* parent)
     buttonGroup->addButton(btnProcessResource3D_);
     buttonGroup->addButton(btnCpuTimeline3D_);
     buttonGroup->addButton(btnSystemMetrics_);
+    buttonGroup->addButton(btnSustainedMetrics_);
 
     connect(btnCpuUsage_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
     connect(btnResourcePie_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
     connect(btnProcessResource3D_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
     connect(btnCpuTimeline3D_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
     connect(btnSystemMetrics_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
+    connect(btnSustainedMetrics_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
 
     btnCpuUsage_->setChecked(true);
 }
@@ -47,6 +51,8 @@ ViewMode ViewModeSelector::currentMode() const
         return ViewMode::CpuTimeline3D;
     } else if (btnSystemMetrics_->isChecked()) {
         return ViewMode::SystemMetrics;
+    } else if (btnSustainedMetrics_->isChecked()) {
+        return ViewMode::SustainedMetrics;
     }
     return ViewMode::CpuUsage;
 }
@@ -68,6 +74,9 @@ void ViewModeSelector::setCurrentMode(ViewMode mode)
         break;
     case ViewMode::SystemMetrics:
         btnSystemMetrics_->setChecked(true);
+        break;
+    case ViewMode::SustainedMetrics:
+        btnSustainedMetrics_->setChecked(true);
         break;
     }
 }

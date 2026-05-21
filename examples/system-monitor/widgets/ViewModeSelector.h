@@ -3,7 +3,7 @@
 #include <QWidget>
 #include <QRadioButton>
 
-enum class ViewMode { CpuUsage, ResourcePie, ProcessResource3D, CpuTimeline3D, SystemMetrics };
+enum class ViewMode { CpuUsage, ResourcePie, ProcessResource3D, CpuTimeline3D, SystemMetrics, SustainedMetrics };
 
 class ViewModeSelector : public QWidget {
     Q_OBJECT
@@ -24,4 +24,5 @@ private:
     QRadioButton* btnProcessResource3D_;
     QRadioButton* btnCpuTimeline3D_;
     QRadioButton* btnSystemMetrics_;
+    QRadioButton* btnSustainedMetrics_;
 };

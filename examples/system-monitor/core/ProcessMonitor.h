@@ -8,6 +8,7 @@
 class ProcessCollector;
 class ProcessAggregator;
 class HistoryBuffer;
+class SustainedMetricsTracker;
 
 class ProcessMonitor : public QObject {
     Q_OBJECT
@@ -20,6 +21,7 @@ public:
     ProcessCollector* collector() const;
     ProcessAggregator* aggregator() const;
     HistoryBuffer* historyBuffer() const;
+    SustainedMetricsTracker* sustainedMetricsTracker() const;
 
 #ifndef _WIN32
     QList<AggregatedProcessInfo> currentAggregated() const;
@@ -37,6 +39,7 @@ private:
     ProcessCollector* m_collector;
     ProcessAggregator* m_aggregator;
     HistoryBuffer* m_historyBuffer;
+    SustainedMetricsTracker* m_sustainedMetricsTracker;
     QTimer* m_timer;
     QList<AggregatedProcessInfo> m_currentAggregated;
 };

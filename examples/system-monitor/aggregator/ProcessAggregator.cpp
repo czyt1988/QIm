@@ -106,9 +106,6 @@ AggregatedProcessInfo ProcessAggregator::getOthers(const QList<AggregatedProcess
     others.totalNetworkRecvRate = 0;
     others.totalNetworkSendRate = 0;
     others.totalThreadCount = 0;
-    others.accumulatedCpuTime = 0;
-    others.avgHeldMemory = 0;
-    others.accumulatedGpuTime = 0;
 
     int gpuCount = 0;
 

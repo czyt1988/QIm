@@ -6,6 +6,8 @@
 #include "widgets/ViewModeSelector.h"
 #include "core/ProcessMonitor.h"
 #include "core/ViewManager.h"
+#include "widgets/SustainedMetricSelector.h"
+#include "aggregator/SustainedMetricsTracker.h"
 #include "collector/ProcessInfo.h"
 #include <QTimer>
 
@@ -19,6 +21,9 @@ MainWindow::MainWindow(QWidget* parent)
     , viewSelector_(nullptr)
     , monitor_(nullptr)
     , viewManager_(nullptr)
+    , metricSelector_(nullptr)
+    , sustainedMenu_(nullptr)
+    , resetAction_(nullptr)
     , lastAggregatedData_()
 {
     setupUI();
@@ -57,8 +62,12 @@ void MainWindow::setupUI()
     // Create process tree widget
     processTree_ = new ProcessTreeWidget(this);
 
-    // Create view mode selector (4 radio buttons)
+    // Create view mode selector (5 radio buttons)
     viewSelector_ = new ViewModeSelector(this);
+
+    // Create sustained metric selector (hidden by default, shown in SustainedMetrics mode)
+    metricSelector_ = new SustainedMetricSelector(this);
+    metricSelector_->hide();
 
     // Create tab widget with two tabs
     tabWidget_ = new QTabWidget(this);
@@ -72,6 +81,7 @@ void MainWindow::setupUI()
     plotLayout->setContentsMargins(0, 0, 0, 0);
     plotLayout->setSpacing(2);
     plotLayout->addWidget(viewSelector_, 0);
+    plotLayout->addWidget(metricSelector_, 0);
     plotLayout->addWidget(figureWidget_, 1);
     tabWidget_->addTab(plotTab, tr("Plot"));
 
@@ -83,12 +93,20 @@ void MainWindow::setupUI()
 
     setCentralWidget(centralWidget_);
 
+    // Menu: Reset Sustained Metrics
+    sustainedMenu_ = menuBar()->addMenu(tr("Sustained Metrics"));
+    resetAction_ = sustainedMenu_->addAction(tr("Reset"));
+
     // Create controllers
     monitor_ = ProcessMonitor::instance();
     viewManager_ = new ViewManager(figureWidget_, this);
 
     // Wire history buffer to time-series views
     viewManager_->setHistoryBuffer(monitor_->historyBuffer());
+
+    // Wire sustained metrics tracker to view manager
+    viewManager_->setSustainedMetricsTracker(monitor_->sustainedMetricsTracker());
+    viewManager_->setSustainedMetricSelector(metricSelector_);
 }
 
 void MainWindow::connectSignals()
@@ -106,4 +124,24 @@ void MainWindow::connectSignals()
             [this](ViewMode mode) {
                 viewManager_->switchTo(mode, lastAggregatedData_);
             });
+
+    // Reset sustained metrics
+    connect(resetAction_, &QAction::triggered, this, [this]() {
+        monitor_->sustainedMetricsTracker()->reset();
+        if (viewManager_) {
+            viewManager_->switchTo(ViewMode::SustainedMetrics, lastAggregatedData_);
+        }
+    });
+
+    // Metric selector changes trigger data refresh
+    connect(metricSelector_, &SustainedMetricSelector::metricChanged, this,
+        [this](SustainedMetric) {
+            viewManager_->updateCurrentView(lastAggregatedData_);
+        });
+
+    // View mode changed → show/hide metric selector
+    connect(viewSelector_, &ViewModeSelector::modeChanged, this,
+        [this](ViewMode mode) {
+            metricSelector_->setVisible(mode == ViewMode::SustainedMetrics);
+        });
 }

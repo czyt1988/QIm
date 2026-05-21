@@ -42,6 +42,9 @@ set(MAIN_PROJECT_SOURCES
     views/ProcessResource3DView.cpp
     views/CpuTimeline3DView.cpp
     views/SystemMetricsView.cpp
+    aggregator/SustainedMetricsTracker.cpp
+    widgets/SustainedMetricSelector.cpp
+    views/SustainedMetricsView.cpp
     core/ViewManager.cpp
 )
 

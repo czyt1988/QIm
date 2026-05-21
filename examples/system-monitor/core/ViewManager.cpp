@@ -6,6 +6,9 @@
 #include "views/ProcessResource3DView.h"
 #include "views/CpuTimeline3DView.h"
 #include "views/SystemMetricsView.h"
+#include "views/SustainedMetricsView.h"
+#include "widgets/SustainedMetricSelector.h"
+#include "aggregator/SustainedMetricsTracker.h"
 #include "aggregator/HistoryBuffer.h"
 #include "plot3d/QImPlot3DNode.h"
 #include "collector/ProcessInfo.h"
@@ -19,6 +22,7 @@ ViewManager::ViewManager(QIM::QImFigureWidget* figure, QObject* parent)
     processResource3DView_ = new ProcessResource3DView;
     cpuTimeline3DView_ = new CpuTimeline3DView;
     systemMetricsView_ = new SystemMetricsView;
+    sustainedMetricsView_ = new SustainedMetricsView;
 }
 
 ViewManager::~ViewManager() {
@@ -27,6 +31,7 @@ ViewManager::~ViewManager() {
     delete processResource3DView_;
     delete cpuTimeline3DView_;
     delete systemMetricsView_;
+    delete sustainedMetricsView_;
 }
 
 void ViewManager::setHistoryBuffer(HistoryBuffer* buffer)
@@ -34,6 +39,17 @@ void ViewManager::setHistoryBuffer(HistoryBuffer* buffer)
     cpuUsageView_->setHistoryBuffer(buffer);
     cpuTimeline3DView_->setHistoryBuffer(buffer);
     systemMetricsView_->setHistoryBuffer(buffer);
+}
+
+void ViewManager::setSustainedMetricsTracker(SustainedMetricsTracker* tracker)
+{
+    sustainedTracker_ = tracker;
+    sustainedMetricsView_->setTracker(tracker);
+}
+
+void ViewManager::setSustainedMetricSelector(SustainedMetricSelector* selector)
+{
+    sustainedMetricsView_->setMetricSelector(selector);
 }
 
 void ViewManager::switchTo(ViewMode mode, const QList<AggregatedProcessInfo>& data) {
@@ -89,6 +105,10 @@ void ViewManager::switchTo(ViewMode mode, const QList<AggregatedProcessInfo>& da
     case ViewMode::SystemMetrics:
         systemMetricsView_->buildView(figure_, data);
         break;
+    case ViewMode::SustainedMetrics:
+        sustainedMetricsView_->setTracker(sustainedTracker_);
+        sustainedMetricsView_->buildView(figure_, data);
+        break;
     }
 
     currentMode_ = mode;
@@ -114,6 +134,9 @@ void ViewManager::updateCurrentView(const QList<AggregatedProcessInfo>& data) {
         break;
     case ViewMode::SystemMetrics:
         systemMetricsView_->updateData(data);
+        break;
+    case ViewMode::SustainedMetrics:
+        sustainedMetricsView_->updateData(data);
         break;
     }
 }

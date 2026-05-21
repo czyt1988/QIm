@@ -58,9 +58,6 @@ struct AggregatedProcessInfo {
     double totalNetworkRecvRate;
     double totalNetworkSendRate;
     int totalThreadCount;
-    double accumulatedCpuTime;
-    qint64 avgHeldMemory;
-    double accumulatedGpuTime;
 };
 
 struct StackedTimeSeries {

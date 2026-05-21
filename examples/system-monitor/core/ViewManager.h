@@ -15,7 +15,10 @@ class ResourcePieView;
 class ProcessResource3DView;
 class CpuTimeline3DView;
 class SystemMetricsView;
+class SustainedMetricsView;
 class HistoryBuffer;
+class SustainedMetricsTracker;
+class SustainedMetricSelector;
 
 class ViewManager : public QObject {
     Q_OBJECT
@@ -26,6 +29,8 @@ public:
     void switchTo(ViewMode mode, const QList<AggregatedProcessInfo>& data);
     void updateCurrentView(const QList<AggregatedProcessInfo>& data);
     void setHistoryBuffer(HistoryBuffer* buffer);
+    void setSustainedMetricsTracker(SustainedMetricsTracker* tracker);
+    void setSustainedMetricSelector(SustainedMetricSelector* selector);
 
 Q_SIGNALS:
     void viewSwitched(ViewMode mode);
@@ -38,6 +43,8 @@ private:
     ProcessResource3DView* processResource3DView_ = nullptr;
     CpuTimeline3DView* cpuTimeline3DView_ = nullptr;
     SystemMetricsView* systemMetricsView_ = nullptr;
+    SustainedMetricsView* sustainedMetricsView_ = nullptr;
+    SustainedMetricsTracker* sustainedTracker_ = nullptr;
 
     ViewMode currentMode_ = static_cast<ViewMode>(-1);
     bool viewBuilt_ = false;

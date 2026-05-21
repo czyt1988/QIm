@@ -3,6 +3,9 @@
 #include <QMainWindow>
 #include <QTabWidget>
 #include <QVBoxLayout>
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
 
 #include "collector/ProcessInfo.h"
 
@@ -14,6 +17,7 @@ class ProcessTreeWidget;
 class ViewModeSelector;
 class ProcessMonitor;
 class ViewManager;
+class SustainedMetricSelector;
 
 // Main application window for the QIm System Monitor
 class MainWindow : public QMainWindow {
@@ -39,6 +43,10 @@ private:
     // Controllers
     ProcessMonitor* monitor_;
     ViewManager* viewManager_;
+
+    SustainedMetricSelector* metricSelector_;
+    QMenu* sustainedMenu_;
+    QAction* resetAction_;
 
     // Cached data for mode switches
     QList<AggregatedProcessInfo> lastAggregatedData_;
