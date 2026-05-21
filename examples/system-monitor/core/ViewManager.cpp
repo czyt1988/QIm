@@ -9,6 +9,8 @@
 #include "aggregator/HistoryBuffer.h"
 #include "plot3d/QImPlot3DNode.h"
 #include "collector/ProcessInfo.h"
+#include "ColorPalette.h"
+#include "plot/QImPlotColormapManager.h"
 
 ViewManager::ViewManager(QIM::QImFigureWidget* figure, QObject* parent)
     : QObject(parent), figure_(figure) {
@@ -36,6 +38,20 @@ void ViewManager::setHistoryBuffer(HistoryBuffer* buffer)
 
 void ViewManager::switchTo(ViewMode mode, const QList<AggregatedProcessInfo>& data) {
     if (!figure_) return;
+
+    // Register the custom colormap once on first switchTo call.
+    // This must be done after ImPlot context is ready (after initializeGL),
+    // so we do it here instead of in the constructor.
+    // Using static bool ensures it only happens once across all calls.
+    static bool colormapRegistered = false;
+    if (!colormapRegistered) {
+        QIM::QImPlotColormapManager::addColormap(
+            "__bar_groups_custom__",
+            QList<QColor>(QImSystemMonitor::kColorPalette.begin(), QImSystemMonitor::kColorPalette.end()),
+            true  // qualitative
+        );
+        colormapRegistered = true;
+    }
 
     // If same mode is already active and built, just update data (no rebuild needed)
     if (mode == currentMode_ && viewBuilt_) {

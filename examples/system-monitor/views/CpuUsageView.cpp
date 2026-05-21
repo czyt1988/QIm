@@ -8,7 +8,6 @@
 #include "plot/QImPlotLegendNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlot.h"
-#include "plot/QImPlotColormapManager.h"
 #include "aggregator/HistoryBuffer.h"
 #include "aggregator/ProcessAggregator.h"
 
@@ -46,16 +45,8 @@ void CpuUsageView::buildView(QIM::QImFigureWidget* figure, const QList<Aggregate
     barGroups_->setStacked(true);
     barGroups_->setGroupWidth(0.8);
 
-    // Register full Tol 22-color palette as an ImPlot colormap once.
-    // ImPlot colormap registration is global and persists across view switches.
-    // Use a fixed name for stable lookups.
-    // Use QList<QColor> constructor from kColorPalette.
-    QIM::QImPlotColormapManager::addColormap(
-        "__bar_groups_custom__",
-        QList<QColor>(QImSystemMonitor::kColorPalette.begin(), QImSystemMonitor::kColorPalette.end()),
-        true  // qualitative
-    );
-    // Push the custom colormap at plot level — QImPlotNode auto-pops in endDraw()
+    // Colormap is registered once in ViewManager constructor.
+    // Just push it at plot level — QImPlotNode auto-pops in endDraw()
     plotNode_->pushColormap("__bar_groups_custom__");
 
     // External legend at bottom

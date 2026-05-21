@@ -7,6 +7,7 @@
 #include "core/ProcessMonitor.h"
 #include "core/ViewManager.h"
 #include "collector/ProcessInfo.h"
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -26,8 +27,13 @@ MainWindow::MainWindow(QWidget* parent)
     // Start data collection
     monitor_->start();
 
-    // Trigger initial view with empty data (view will populate when first data arrives)
-    viewManager_->switchTo(ViewMode::CpuUsage, {});
+    // Delay initial view switch until the event loop is running and the OpenGL/ImGui
+    // context has been initialized (initializeGL fires on first widget show).
+    // Calling switchTo → buildView → addColormap before ImGui context exists
+    // causes ACCESS_VIOLATION in ImGuiStorage::GetInt().
+    QTimer::singleShot(0, this, [this]() {
+        viewManager_->switchTo(ViewMode::CpuUsage, {});
+    });
 }
 
 MainWindow::~MainWindow() = default;
