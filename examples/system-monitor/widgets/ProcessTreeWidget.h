@@ -15,10 +15,17 @@ public:
     void setHistoryBuffer(HistoryBuffer* buffer);
 
 private:
+    struct SortState {
+        int column = 1;  // Default sort by CPU% (column 1)
+        Qt::SortOrder order = Qt::DescendingOrder;  // Default descending
+    };
+
     QStandardItemModel* model_;
     HistoryBuffer* historyBuffer_;
+    SortState sortState_;
 
     void setupColumns();
     QStandardItem* createNumberItem(double value, const QString& suffix = "");
     QStandardItem* createTextItem(const QString& text);
+    bool compareProcesses(const AggregatedProcessInfo& a, const AggregatedProcessInfo& b) const;
 };

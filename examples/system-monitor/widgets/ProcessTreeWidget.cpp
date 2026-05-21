@@ -2,6 +2,7 @@
 #include "collector/ProcessInfo.h"
 #include "aggregator/HistoryBuffer.h"
 
+#include <QHeaderView>
 #include <algorithm>
 
 ProcessTreeWidget::ProcessTreeWidget(QWidget* parent)
@@ -12,6 +13,13 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget* parent)
     setupColumns();
     setModel(model_);
     setSortingEnabled(true);
+
+    // Track sort indicator changes to remember user's sort preference
+    connect(header(), &QHeaderView::sortIndicatorChanged,
+            this, [this](int column, Qt::SortOrder order) {
+                sortState_.column = column;
+                sortState_.order = order;
+            });
 }
 
 void ProcessTreeWidget::setupColumns()
@@ -45,14 +53,45 @@ QStandardItem* ProcessTreeWidget::createTextItem(const QString& text)
     return item;
 }
 
+bool ProcessTreeWidget::compareProcesses(const AggregatedProcessInfo& a, const AggregatedProcessInfo& b) const
+{
+    // For descending order, swap a and b to reverse comparison direction
+    // This preserves strict weak ordering (comp(a,a) must return false)
+    const AggregatedProcessInfo& left = (sortState_.order == Qt::AscendingOrder) ? a : b;
+    const AggregatedProcessInfo& right = (sortState_.order == Qt::AscendingOrder) ? b : a;
+
+    switch (sortState_.column) {
+        case 0: return left.processName < right.processName;
+        case 1: return left.totalCpuPercent < right.totalCpuPercent;
+        case 2: return left.totalWorkingSetBytes < right.totalWorkingSetBytes;
+        case 3: return left.avgGpuPercent < right.avgGpuPercent;
+        case 4: return left.totalDiskReadRate < right.totalDiskReadRate;
+        case 5: return left.totalDiskWriteRate < right.totalDiskWriteRate;
+        case 6: return left.totalNetworkRecvRate < right.totalNetworkRecvRate;
+        case 7: return left.totalNetworkSendRate < right.totalNetworkSendRate;
+        case 8: return left.instanceCount < right.instanceCount;
+        default: return left.totalCpuPercent < right.totalCpuPercent;
+    }
+}
+
 void ProcessTreeWidget::updateData(const QList<AggregatedProcessInfo>& data)
 {
+    // Save expanded state before clearing
+    QSet<QString> expandedNames;
+    for (int i = 0; i < model_->rowCount(); ++i) {
+        QModelIndex index = model_->index(i, 0);
+        if (isExpanded(index)) {
+            expandedNames.insert(model_->item(i, 0)->text());
+        }
+    }
+
     model_->removeRows(0, model_->rowCount());
 
+    // Sort data according to user's selected sort state
     QList<AggregatedProcessInfo> sorted = data;
     std::sort(sorted.begin(), sorted.end(),
-              [](const AggregatedProcessInfo& a, const AggregatedProcessInfo& b) {
-                  return a.totalCpuPercent > b.totalCpuPercent;
+              [this](const AggregatedProcessInfo& a, const AggregatedProcessInfo& b) {
+                  return compareProcesses(a, b);
               });
 
     for (const AggregatedProcessInfo& info : sorted) {
@@ -86,7 +125,14 @@ void ProcessTreeWidget::updateData(const QList<AggregatedProcessInfo>& data)
         }
     }
 
-    expandAll();
+    // Restore expanded state for matching process names
+    for (int i = 0; i < model_->rowCount(); ++i) {
+        QModelIndex index = model_->index(i, 0);
+        QString processName = model_->item(i, 0)->text();
+        if (expandedNames.contains(processName)) {
+            expand(index);
+        }
+    }
 }
 
 void ProcessTreeWidget::setHistoryBuffer(HistoryBuffer* buffer)
