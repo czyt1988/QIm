@@ -1,6 +1,7 @@
 ﻿#ifndef QIMPLOTAXISINFO_H
 #define QIMPLOTAXISINFO_H
 #include <QObject>
+#include <QList>
 #include "QImAPI.h"
 #include "QImPlot.h"
 namespace QIM
@@ -66,6 +67,10 @@ class QIM_CORE_API QImPlotAxisInfo : public QObject
     Q_PROPERTY(bool noDecorations READ isNoDecorations WRITE setNoDecorations NOTIFY axisFlagChanged)
     //  scaleType
     Q_PROPERTY(QImPlotScaleType scaleType READ scaleType WRITE setScaleType NOTIFY scaleTypeChanged)
+    // Tick configuration
+    Q_PROPERTY(QList<double> tickValues READ tickValues WRITE setTickValues NOTIFY tickConfigChanged)
+    Q_PROPERTY(QList<QByteArray> tickLabels READ tickLabels WRITE setTickLabels NOTIFY tickConfigChanged)
+    Q_PROPERTY(bool keepDefaultTicks READ isKeepDefaultTicks WRITE setKeepDefaultTicks NOTIFY tickConfigChanged)
 
     QIM_DECLARE_PRIVATE(QImPlotAxisInfo)
     Q_DISABLE_COPY(QImPlotAxisInfo)
@@ -152,6 +157,17 @@ public:
     QImPlotScaleType scaleType() const;
     void setScaleType(QImPlotScaleType t);
     int imPlotScale() const;
+    // Tick configuration properties
+    QList<double> tickValues() const;
+    void setTickValues(const QList<double>& values);
+    QList<QByteArray> tickLabels() const;
+    void setTickLabels(const QList<QByteArray>& labels);
+    bool isKeepDefaultTicks() const;
+    void setKeepDefaultTicks(bool keep);
+
+    // Convenience methods for tick configuration
+    void setAxisTicks(const QList<double>& values, const QList<QByteArray>& labels = {}, bool keepDefault = false);
+    void setAxisTicksRange(double v_min, double v_max, int n_ticks, const QList<QByteArray>& labels = {}, bool keepDefault = false);
     // 标记坐标轴是否有效（隐藏或显示，对于X1和Y1隐藏或显示是通过setNoDecorations来实现）
     bool isEnabled() const;
     void setEnabled(bool on);
@@ -266,6 +282,21 @@ Q_SIGNALS:
      * \endif
      */
     void scaleTypeChanged();
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when tick configuration changes (tick values, labels, or keepDefaultTicks)
+     * @details Triggered by setTickValues(), setTickLabels(), setKeepDefaultTicks(), setAxisTicks(),
+     *          or setAxisTicksRange() when tick configuration changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 当刻度配置变更时发射（刻度值、标签或是否保留默认刻度）
+     * @details 当 setTickValues()、setTickLabels()、setKeepDefaultTicks()、setAxisTicks()
+     *          或 setAxisTicksRange() 修改刻度配置时触发。
+     * \endif
+     */
+    void tickConfigChanged();
 
 public:
     /**

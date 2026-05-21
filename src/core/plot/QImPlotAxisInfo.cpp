@@ -3,6 +3,8 @@
 #include "QImTrackedValue.hpp"
 #include "implot.h"
 #include "QImPlotNode.h"
+#include <QList>
+#include <vector>
 namespace QIM
 {
 class QImPlotAxisInfo::PrivateData
@@ -22,6 +24,16 @@ public:
     ImPlotCond limitCond { ImPlotCond_Once };
     bool enable { false };  ///< 对于X1和Y1设置为无效是把flag设置为
     QImPlotNode* plot { nullptr };
+
+    // Tick configuration (mirrors QImPlot3DAxisInfo::PrivateData)
+    QList<double> tickValues;                ///< Tick position values
+    QList<QByteArray> tickLabels;            ///< Tick label strings (UTF-8)
+    bool keepDefaultTicks { false };         ///< Whether to keep default ticks
+    bool hasTickConfig { false };            ///< Whether tick configuration is set
+    bool useRangeTicks { false };            ///< Whether to use range-based tick generation
+    double rangeTickMin { 0.0 };             ///< Range tick minimum value
+    double rangeTickMax { 1.0 };             ///< Range tick maximum value
+    int rangeTickCount { 5 };                ///< Number of ticks in range mode
 };
 
 QImPlotAxisInfo::PrivateData::PrivateData(QImPlotAxisInfo* p) : q_ptr(p)
@@ -1398,6 +1410,81 @@ void QImPlotAxisInfo::setEnabled(bool on)
     }
 }
 
+// ===== Tick Configuration Methods =====
+
+QList<double> QImPlotAxisInfo::tickValues() const
+{
+    QIM_DC(d);
+    return d->tickValues;
+}
+
+void QImPlotAxisInfo::setTickValues(const QList<double>& values)
+{
+    QIM_D(d);
+    if (d->tickValues != values) {
+        d->tickValues = values;
+        d->useRangeTicks = false;
+        d->hasTickConfig = true;
+        Q_EMIT tickConfigChanged();
+    }
+}
+
+QList<QByteArray> QImPlotAxisInfo::tickLabels() const
+{
+    QIM_DC(d);
+    return d->tickLabels;
+}
+
+void QImPlotAxisInfo::setTickLabels(const QList<QByteArray>& labels)
+{
+    QIM_D(d);
+    if (d->tickLabels != labels) {
+        d->tickLabels = labels;
+        d->hasTickConfig = true;
+        Q_EMIT tickConfigChanged();
+    }
+}
+
+bool QImPlotAxisInfo::isKeepDefaultTicks() const
+{
+    QIM_DC(d);
+    return d->keepDefaultTicks;
+}
+
+void QImPlotAxisInfo::setKeepDefaultTicks(bool keep)
+{
+    QIM_D(d);
+    if (d->keepDefaultTicks != keep) {
+        d->keepDefaultTicks = keep;
+        d->hasTickConfig = true;
+        Q_EMIT tickConfigChanged();
+    }
+}
+
+void QImPlotAxisInfo::setAxisTicks(const QList<double>& values, const QList<QByteArray>& labels, bool keepDefault)
+{
+    QIM_D(d);
+    d->tickValues = values;
+    d->tickLabels = labels;
+    d->keepDefaultTicks = keepDefault;
+    d->useRangeTicks = false;
+    d->hasTickConfig = true;
+    Q_EMIT tickConfigChanged();
+}
+
+void QImPlotAxisInfo::setAxisTicksRange(double v_min, double v_max, int n_ticks, const QList<QByteArray>& labels, bool keepDefault)
+{
+    QIM_D(d);
+    d->rangeTickMin = v_min;
+    d->rangeTickMax = v_max;
+    d->rangeTickCount = n_ticks;
+    d->tickLabels = labels;
+    d->keepDefaultTicks = keepDefault;
+    d->useRangeTicks = true;
+    d->hasTickConfig = true;
+    Q_EMIT tickConfigChanged();
+}
+
 /**
  * \if ENGLISH
  * @brief Renders the axis by calling ImPlot setup functions
@@ -1429,6 +1516,37 @@ void QImPlotAxisInfo::render()
     }
     if (d->scale.is_dirty()) {
         ImPlot::SetupAxisScale(d->axisId, d->scale.value());
+    }
+
+    // Setup axis ticks if configured
+    if (d->hasTickConfig) {
+        if (d->useRangeTicks) {
+            const char* const* labelsPtr = nullptr;
+            std::vector<const char*> labelPtrs;
+            if (!d->tickLabels.isEmpty()) {
+                labelPtrs.reserve(d->tickLabels.size());
+                for (const QByteArray& lbl : d->tickLabels) {
+                    labelPtrs.push_back(lbl.constData());
+                }
+                labelsPtr = labelPtrs.data();
+            }
+            ImPlot::SetupAxisTicks(d->axisId, d->rangeTickMin, d->rangeTickMax,
+                                   d->rangeTickCount, labelsPtr, d->keepDefaultTicks);
+        } else {
+            // Explicit tick values
+            std::vector<double> valuesVec(d->tickValues.begin(), d->tickValues.end());
+            const char* const* labelsPtr = nullptr;
+            std::vector<const char*> labelPtrs;
+            if (!d->tickLabels.isEmpty()) {
+                labelPtrs.reserve(d->tickLabels.size());
+                for (const QByteArray& lbl : d->tickLabels) {
+                    labelPtrs.push_back(lbl.constData());
+                }
+                labelsPtr = labelPtrs.data();
+            }
+            ImPlot::SetupAxisTicks(d->axisId, valuesVec.data(),
+                                   static_cast<int>(valuesVec.size()), labelsPtr, d->keepDefaultTicks);
+        }
     }
 }
 
