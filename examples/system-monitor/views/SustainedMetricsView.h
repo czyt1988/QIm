@@ -3,7 +3,9 @@
 #include "collector/ProcessInfo.h"
 #include "core/ColorPalette.h"
 #include "aggregator/SustainedMetricsTracker.h"
+#include <QByteArray>
 #include <QHash>
+#include <QList>
 #include <QStringList>
 
 namespace QIM {
@@ -32,6 +34,8 @@ private:
     QIM::QImPlotBarGroupsItemNode* rankingBars_ = nullptr;
     QHash<QString, QIM::QImPlotLineItemNode*> timelineLines_;
     QStringList orderedNames_;
+    QList<double> m_tickPositions;          ///< Y-axis tick positions for ranking chart
+    QList<QByteArray> m_tickLabels;         ///< Y-axis tick labels (process names, UTF-8)
     QImSystemMonitor::ColorManager colorManager_;
     SustainedMetricsTracker* tracker_ = nullptr;
     SustainedMetricSelector* metricSelector_ = nullptr;

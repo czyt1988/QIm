@@ -65,12 +65,12 @@ void SustainedMetricsView::buildView(QIM::QImFigureWidget* figure, const QList<A
     rankingPlot_->setTitle(QStringLiteral("Sustained Metrics Ranking"));
     rankingPlot_->setLegendEnabled(true);
     rankingPlot_->x1Axis()->setLabel(metricUnit(currentMetric_));
-    rankingPlot_->y1Axis()->setLabel(QStringLiteral("Process"));
+    rankingPlot_->y1Axis()->setLabel(QString());  // Process names are shown as tick labels
 
     rankingBars_ = new QIM::QImPlotBarGroupsItemNode(rankingPlot_);
     rankingBars_->setHorizontal(true);
     rankingBars_->setStacked(false);
-    rankingBars_->setGroupWidth(0.8);
+    rankingBars_->setGroupWidth(0.4);  // Reduce bar density
 
     rankingPlot_->pushColormap("__bar_groups_custom__");
 
@@ -126,6 +126,17 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
         rankingBars_->setData(labels, values, ranking.size(), 1);
         rankingPlot_->setTitle(title + QStringLiteral(" Ranking"));
         rankingPlot_->x1Axis()->setLabel(unit);
+
+        // Build Y-axis tick labels: process name at bar index position
+        m_tickPositions.clear();
+        m_tickLabels.clear();
+        m_tickPositions.reserve(ranking.size());
+        m_tickLabels.reserve(ranking.size());
+        for (int i = 0; i < ranking.size(); ++i) {
+            m_tickPositions.append(static_cast<double>(i));
+            m_tickLabels.append(labels[i].toUtf8());
+        }
+        rankingPlot_->y1Axis()->setAxisTicks(m_tickPositions, m_tickLabels);
     }
 
     // ---- TIMELINE ----
