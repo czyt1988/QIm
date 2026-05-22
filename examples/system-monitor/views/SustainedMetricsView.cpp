@@ -65,7 +65,10 @@ void SustainedMetricsView::buildView(QIM::QImFigureWidget* figure, const QList<A
     rankingPlot_->setTitle(QStringLiteral("Sustained Metrics Ranking"));
     rankingPlot_->setLegendEnabled(true);
     rankingPlot_->x1Axis()->setLabel(metricUnit(currentMetric_));
+    rankingPlot_->x1Axis()->setAutoFit(true);   // Auto-fit X axis to bar values
     rankingPlot_->y1Axis()->setLabel(QString());  // Process names are shown as tick labels
+    rankingPlot_->y1Axis()->setAutoFit(true);   // Auto-fit Y axis to bar positions
+    rankingPlot_->y1Axis()->setInverted(true);  // Top-ranked process at top
 
     rankingBars_ = new QIM::QImPlotBarGroupsItemNode(rankingPlot_);
     rankingBars_->setHorizontal(true);
@@ -109,14 +112,18 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
     QString title = metricTitle(currentMetric_);
     QString unit = metricUnit(currentMetric_);
 
-    // ---- RANKING ----
-    QList<QPair<QString, double>> ranking = tracker_->getRanking(currentMetric_);  // ALL processes for ranking chart;
+// ---- RANKING ----
+    QList<QPair<QString, double>> ranking = tracker_->getRanking(currentMetric_);
 
     if (!ranking.isEmpty()) {
+        // Show only top N processes for readability
+        int topN = qMin(ranking.size(), kTopN);
+        ranking = ranking.mid(0, topN);
+
         QStringList labels;
         QVector<double> values;
-        labels.reserve(ranking.size());
-        values.reserve(ranking.size());
+        labels.reserve(topN);
+        values.reserve(topN);
 
         for (const auto& pair : ranking) {
             labels.append(pair.first);
@@ -126,24 +133,20 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
         // Build data: values only, single item label (process names go on axis, not bar labels)
         QStringList itemLabels;
         itemLabels.append(title);  // Single item label for the bar group
-        rankingBars_->setData(itemLabels, values, 1, ranking.size());
+        rankingBars_->setData(itemLabels, values, 1, topN);
         rankingPlot_->setTitle(title + QStringLiteral(" Ranking"));
         rankingPlot_->x1Axis()->setLabel(unit);
 
         // Build Y-axis tick labels: process name at bar index position
         m_tickPositions.clear();
         m_tickLabels.clear();
-        m_tickPositions.reserve(ranking.size());
-        m_tickLabels.reserve(ranking.size());
-        for (int i = 0; i < ranking.size(); ++i) {
-            m_tickPositions.append(static_cast<double>(i+1));
+        m_tickPositions.reserve(topN);
+        m_tickLabels.reserve(topN);
+        for (int i = 0; i < topN; ++i) {
+            m_tickPositions.append(static_cast<double>(i));
             m_tickLabels.append(labels[i].toUtf8());
         }
         rankingPlot_->y1Axis()->setAxisTicks(m_tickPositions, m_tickLabels);
-        rankingPlot_->y1Axis()->setLimits(0, ranking.size() + 1);
-        qDebug() << "Tick positions:" << m_tickPositions;
-        qDebug() << "Y axis limits:" << rankingPlot_->y1Axis()->minLimits()
-                 << rankingPlot_->y1Axis()->maxLimits();
     }
 
     // ---- TIMELINE ----
