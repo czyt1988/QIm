@@ -21,6 +21,8 @@ build*
 imgui.ini
 # 不忽略 .trae 目录（Agent 规则配置）
 .trae/
+.omc
+.omo
 
 # 顶层的临时文件夹不追踪
 tmp
