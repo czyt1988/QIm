@@ -83,6 +83,149 @@ QIM::QImPlotLineItemNode* line = new QIM::QImPlotLineItemNode(plot);  // line �
     - **QObject 父子关系**：标准的 Qt 对象树，控制内存生命周期
     - **逻辑父子关系**：渲染时的层次关系，控制绘制顺序
 
+## 完整类层次
+
+本章节列出 QIm 项目中所有节点类的完整继承关系，包括 2D/3D 绘图项、交互工具、容器节点和辅助类。
+
+### 节点继承树
+
+```text
+QImAbstractNode (抽象基类 ─ QObject 派生)
+├── QImWidgetNode (ImGui 窗口封装)
+│
+├── QImGridNode (通用网格布局 ─ 可混合放置 2D/3D 子图)
+│   ├── QImGridNode::CellNode (内嵌单元格节点)
+│   └── QImSubplots3DNode (3D 绘图网格)
+│
+├── QImSubplotsNode (2D 子图网格布局)
+│
+├── QImPlotNode (2D 绘图区域 ─ BeginPlot/EndPlot 作用域)
+│
+├── QImPlotItemNode (2D 绘图项基类 ─ type() 基值: 10)
+│   │
+│   │  ═══ 2D 绘图项 ═══
+│   ├── QImPlotLineItemNode       (type=11  折线图)
+│   ├── QImPlotScatterItemNode    (type=12  散点图)
+│   ├── QImPlotStairsItemNode     (type=13  阶梯图)
+│   ├── QImPlotBarsItemNode       (type=14  柱状图)
+│   ├── QImPlotShadedItemNode     (type=15  阴影填充区域)
+│   ├── QImPlotErrorBarsItemNode  (type=16  误差棒)
+│   ├── QImPlotStemsItemNode      (type=17  茎叶图)
+│   ├── QImPlotInfLinesItemNode   (type=18  无限水平/垂直线)
+│   ├── QImPlotDigitalItemNode    (type=18  数字信号)
+│   ├── QImPlotTextItemNode       (type=19  文本标注)
+│   ├── QImPlotDummyItemNode      (type=19  占位/彩色矩块)
+│   ├── QImPlotBarGroupsItemNode  (type=19  分组柱状图)
+│   ├── QImPlotPieChartItemNode   (type=20  饼图)
+│   ├── QImPlotHeatmapItemNode    (type=20  热力图)
+│   ├── QImPlotHistogramItemNode  (type=21  直方图)
+│   ├── QImPlotHistogram2DItemNode(type=22  2D 直方图)
+│   ├── QImPlotImageItemNode      (type=23  图像)
+│   │
+│   │  ═══ 2D 交互工具 ═══
+│   ├── QImPlotDragPointNode      (type=30  拖拽点)
+│   ├── QImPlotDragLineXNode      (type=31  拖拽竖直线)
+│   ├── QImPlotDragLineYNode      (type=32  拖拽水平线)
+│   ├── QImPlotDragRectNode       (type=33  拖拽矩形区域)
+│   ├── QImPlotAnnotationNode     (type=34  浮动标注)
+│   ├── QImPlotTagXNode           (type=35  X 轴标签)
+│   └── QImPlotTagYNode           (type=36  Y 轴标签)
+│
+├── QImPlotValueTrackerNode (值追踪器 ─ 直接继承 QImAbstractNode，非 QImPlotItemNode)
+│
+├── QImPlotLegendNode (图例节点)
+│
+├── QImPlot3DNode (3D 绘图区域 ─ BeginPlot/EndPlot 作用域)
+│
+└── QImPlot3DItemNode (3D 绘图项基类 ─ type() 基值: 1000)
+    ├── QImPlot3DScatterItemNode   (type=1001  3D 散点图)
+    ├── QImPlot3DLineItemNode      (type=1002  3D 折线图)
+    ├── QImPlot3DSurfaceItemNode   (type=1003  3D 曲面图)
+    ├── QImPlot3DMeshItemNode      (type=1004  3D 网格图)
+    ├── QImPlot3DTriangleItemNode  (type=1005  3D 三角形)
+    ├── QImPlot3DQuadItemNode      (type=1006  3D 四边形)
+    ├── QImPlot3DImageItemNode     (type=1007  3D 图像)
+    ├── QImPlot3DTextItemNode      (type=1008  3D 文本)
+    └── QImPlot3DDummyItemNode     (type=1009  3D 占位图元)
+```
+
+### Mermaid 类继承图
+
+```mermaid
+classDiagram
+    QObject <|-- QImAbstractNode
+
+    QImAbstractNode <|-- QImWidgetNode
+    QImAbstractNode <|-- QImGridNode
+    QImAbstractNode <|-- QImSubplotsNode
+    QImAbstractNode <|-- QImPlotNode
+    QImAbstractNode <|-- QImPlotItemNode
+    QImAbstractNode <|-- QImPlotValueTrackerNode
+    QImAbstractNode <|-- QImPlotLegendNode
+    QImAbstractNode <|-- QImPlot3DNode
+    QImAbstractNode <|-- QImPlot3DItemNode
+
+    QImGridNode <|-- QImSubplots3DNode
+
+    QImPlotItemNode <|-- QImPlotLineItemNode
+    QImPlotItemNode <|-- QImPlotScatterItemNode
+    QImPlotItemNode <|-- QImPlotStairsItemNode
+    QImPlotItemNode <|-- QImPlotBarsItemNode
+    QImPlotItemNode <|-- QImPlotShadedItemNode
+    QImPlotItemNode <|-- QImPlotErrorBarsItemNode
+    QImPlotItemNode <|-- QImPlotStemsItemNode
+    QImPlotItemNode <|-- QImPlotInfLinesItemNode
+    QImPlotItemNode <|-- QImPlotDigitalItemNode
+    QImPlotItemNode <|-- QImPlotTextItemNode
+    QImPlotItemNode <|-- QImPlotDummyItemNode
+    QImPlotItemNode <|-- QImPlotBarGroupsItemNode
+    QImPlotItemNode <|-- QImPlotPieChartItemNode
+    QImPlotItemNode <|-- QImPlotHeatmapItemNode
+    QImPlotItemNode <|-- QImPlotHistogramItemNode
+    QImPlotItemNode <|-- QImPlotHistogram2DItemNode
+    QImPlotItemNode <|-- QImPlotImageItemNode
+    QImPlotItemNode <|-- QImPlotDragPointNode
+    QImPlotItemNode <|-- QImPlotDragLineXNode
+    QImPlotItemNode <|-- QImPlotDragLineYNode
+    QImPlotItemNode <|-- QImPlotDragRectNode
+    QImPlotItemNode <|-- QImPlotAnnotationNode
+    QImPlotItemNode <|-- QImPlotTagXNode
+    QImPlotItemNode <|-- QImPlotTagYNode
+
+    QImPlot3DItemNode <|-- QImPlot3DLineItemNode
+    QImPlot3DItemNode <|-- QImPlot3DScatterItemNode
+    QImPlot3DItemNode <|-- QImPlot3DSurfaceItemNode
+    QImPlot3DItemNode <|-- QImPlot3DMeshItemNode
+    QImPlot3DItemNode <|-- QImPlot3DTriangleItemNode
+    QImPlot3DItemNode <|-- QImPlot3DQuadItemNode
+    QImPlot3DItemNode <|-- QImPlot3DImageItemNode
+    QImPlot3DItemNode <|-- QImPlot3DTextItemNode
+    QImPlot3DItemNode <|-- QImPlot3DDummyItemNode
+```
+
+### 非节点辅助类
+
+以下类不继承自 `QImAbstractNode`，也不参与渲染树遍历。它们以不同方式支持节点系统：
+
+```text
+QObject 派生辅助类:
+├── QImPlotAxisInfo             (2D 坐标轴属性 ─ axis label, range, flags, scale type 等)
+├── QImPlot3DAxisInfo           (3D 坐标轴属性 ─ X/Y/Z 三轴)
+├── QImPlot3DStyleNode          (3D 样式属性 ─ 色彩、线宽、标记大小等 ImPlot3DStyle 字段)
+└── QImPlotValueTrackerNodeGroup (值追踪器群组 ─ 多子图联动追踪)
+
+非 QObject 工具类:
+├── QImPlotColormapManager      (2D 颜色映射查询与注册 ─ 静态方法，无继承)
+├── QImPlot3DColormapManager    (3D 颜色映射查询与注册 ─ 静态方法，无继承)
+└── QImPlotTheme                (2D 主题管理器 ─ 普通 C++ 类，使用 PIMPL 模式)
+```
+
+!!! info "type() 值的含义"
+    - **2D 绘图项** 的 `type()` 从 `QImPlotItemNode::InnerType = 10` 起始，各子类在此基础上偏移。
+    - **2D 交互工具** 从 `type = 30` 起始，以区分普通绘图项。
+    - **3D 绘图项** 的 `type()` 从 `QImPlot3DItemNode::InnerType3D = 1000` 起始，避免与 2D 类型冲突。
+    - `type()` 方法用于快速运行时类型识别，避免 `qobject_cast`/`dynamic_cast` 开销。
+
 ## 如何应用
 
 ### 节点生命周期管理

@@ -471,8 +471,8 @@ if (QIM::QImPlot3DNode* plot = figure3D->createPlot3DNode()) {
 
 `QImPlot3DQuadItemNode` 通过 X、Y、Z 数据点序列渲染三维四边形面片。每 4 个连续顶点定义一个四边形面，适合规则截面结构的渲染。
 
-!!! warning "开发状态"
-    Quad 组件目前处于开发阶段，暂无完整示例代码。以下用法说明基于头文件接口描述。
+!!! tip "完整示例"
+    Quad 组件的示例位于 `examples/qimfigure-test/functions/3d/` 目录。以下用法说明基于完整实现。
 
 ### 1. 基本使用
 

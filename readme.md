@@ -27,15 +27,11 @@
 
 目前 `QIm` 已完成的图形能力如下：
 
-- 2D 图形：`Line`、`Scatter`、`Stairs`、`Bars`、`Shaded`、`ErrorBars`、`Stems`、`InfLines`、`PieChart`、`Text`、`Dummy`、`Histogram`
-- 3D 图形：`Line`、`Scatter`、`Surface`、`Triangle`、`Mesh`
-- 大数据能力：已支持 `LTTB` 和 `MinMaxLTTB` 降采样
-
-后续计划继续补齐以下图形能力：
-
-- 2D 图形：`Heatmap`、`Histogram2D`、`Digital`、`Image`
-- 2D 扩展图形：分组柱状图、堆叠柱状图、蜡烛图
-- 3D 图形：`Quad`
+- 2D 图形：`Line`、`Scatter`、`Stairs`、`Bars`、`Shaded`、`ErrorBars`、`Stems`、`InfLines`、`PieChart`、`Text`、`Dummy`、`Histogram`、`Heatmap`、`Histogram2D`、`Digital`、`Image`、`BarGroups`
+- 2D 交互工具：`DragPoint`、`DragLineX`、`DragLineY`、`DragRect`、`Annotation`、`TagX`、`TagY`、`ValueTracker`
+- 3D 图形：`Line`、`Scatter`、`Surface`、`Triangle`、`Mesh`、`Quad`、`Image`、`Text`、`Dummy`
+- 3D 配置：`StyleNode`、`AxisFormatter`、`AxisTransform`、`ColormapManager`
+- 大数据能力：已支持 `LTTB` 和 `MinMaxLTTB` 降采样（含 SIMD 加速）
 
 ## 使用方式
 

@@ -83,6 +83,149 @@ QIM::QImPlotLineItemNode* line = new QIM::QImPlotLineItemNode(plot);  // line au
     - **QObject Parent-Child Relationship**: Standard Qt object tree, controls memory lifecycle
     - **Logical Parent-Child Relationship**: Hierarchy during rendering, controls drawing order
 
+## Complete Class Hierarchy
+
+This section lists the complete inheritance relationships of all node classes in the QIm project, including 2D/3D plot items, interaction tools, container nodes, and helper classes.
+
+### Node Inheritance Tree
+
+```text
+QImAbstractNode (Abstract Base Class ─ QObject-derived)
+├── QImWidgetNode (ImGui Window Wrapper)
+│
+├── QImGridNode (General Grid Layout ─ can mix 2D/3D subplots)
+│   ├── QImGridNode::CellNode (Inline Cell Node)
+│   └── QImSubplots3DNode (3D Plot Grid)
+│
+├── QImSubplotsNode (2D Subplot Grid Layout)
+│
+├── QImPlotNode (2D Plot Area ─ BeginPlot/EndPlot scope)
+│
+├── QImPlotItemNode (2D Plot Item Base ─ type() base: 10)
+│   │
+│   │  ═══ 2D Plot Items ═══
+│   ├── QImPlotLineItemNode       (type=11  Line Chart)
+│   ├── QImPlotScatterItemNode    (type=12  Scatter Plot)
+│   ├── QImPlotStairsItemNode     (type=13  Stairs Chart)
+│   ├── QImPlotBarsItemNode       (type=14  Bar Chart)
+│   ├── QImPlotShadedItemNode     (type=15  Shaded Fill Area)
+│   ├── QImPlotErrorBarsItemNode  (type=16  Error Bars)
+│   ├── QImPlotStemsItemNode      (type=17  Stem Plot)
+│   ├── QImPlotInfLinesItemNode   (type=18  Infinite Horizontal/Vertical Lines)
+│   ├── QImPlotDigitalItemNode    (type=18  Digital Signal)
+│   ├── QImPlotTextItemNode       (type=19  Text Annotation)
+│   ├── QImPlotDummyItemNode      (type=19  Placeholder/Colored Rectangle)
+│   ├── QImPlotBarGroupsItemNode  (type=19  Grouped Bar Chart)
+│   ├── QImPlotPieChartItemNode   (type=20  Pie Chart)
+│   ├── QImPlotHeatmapItemNode    (type=20  Heatmap)
+│   ├── QImPlotHistogramItemNode  (type=21  Histogram)
+│   ├── QImPlotHistogram2DItemNode(type=22  2D Histogram)
+│   ├── QImPlotImageItemNode      (type=23  Image)
+│   │
+│   │  ═══ 2D Interaction Tools ═══
+│   ├── QImPlotDragPointNode      (type=30  Draggable Point)
+│   ├── QImPlotDragLineXNode      (type=31  Draggable Vertical Line)
+│   ├── QImPlotDragLineYNode      (type=32  Draggable Horizontal Line)
+│   ├── QImPlotDragRectNode       (type=33  Draggable Rectangle Region)
+│   ├── QImPlotAnnotationNode     (type=34  Floating Annotation)
+│   ├── QImPlotTagXNode           (type=35  X-Axis Tag)
+│   └── QImPlotTagYNode           (type=36  Y-Axis Tag)
+│
+├── QImPlotValueTrackerNode (Value Tracker ─ directly inherits QImAbstractNode, not QImPlotItemNode)
+│
+├── QImPlotLegendNode (Legend Node)
+│
+├── QImPlot3DNode (3D Plot Area ─ BeginPlot/EndPlot scope)
+│
+└── QImPlot3DItemNode (3D Plot Item Base ─ type() base: 1000)
+    ├── QImPlot3DScatterItemNode   (type=1001  3D Scatter Plot)
+    ├── QImPlot3DLineItemNode      (type=1002  3D Line Chart)
+    ├── QImPlot3DSurfaceItemNode   (type=1003  3D Surface Plot)
+    ├── QImPlot3DMeshItemNode      (type=1004  3D Mesh)
+    ├── QImPlot3DTriangleItemNode  (type=1005  3D Triangle)
+    ├── QImPlot3DQuadItemNode      (type=1006  3D Quadrilateral)
+    ├── QImPlot3DImageItemNode     (type=1007  3D Image)
+    ├── QImPlot3DTextItemNode      (type=1008  3D Text)
+    └── QImPlot3DDummyItemNode     (type=1009  3D Placeholder Primitive)
+```
+
+### Mermaid Class Inheritance Diagram
+
+```mermaid
+classDiagram
+    QObject <|-- QImAbstractNode
+
+    QImAbstractNode <|-- QImWidgetNode
+    QImAbstractNode <|-- QImGridNode
+    QImAbstractNode <|-- QImSubplotsNode
+    QImAbstractNode <|-- QImPlotNode
+    QImAbstractNode <|-- QImPlotItemNode
+    QImAbstractNode <|-- QImPlotValueTrackerNode
+    QImAbstractNode <|-- QImPlotLegendNode
+    QImAbstractNode <|-- QImPlot3DNode
+    QImAbstractNode <|-- QImPlot3DItemNode
+
+    QImGridNode <|-- QImSubplots3DNode
+
+    QImPlotItemNode <|-- QImPlotLineItemNode
+    QImPlotItemNode <|-- QImPlotScatterItemNode
+    QImPlotItemNode <|-- QImPlotStairsItemNode
+    QImPlotItemNode <|-- QImPlotBarsItemNode
+    QImPlotItemNode <|-- QImPlotShadedItemNode
+    QImPlotItemNode <|-- QImPlotErrorBarsItemNode
+    QImPlotItemNode <|-- QImPlotStemsItemNode
+    QImPlotItemNode <|-- QImPlotInfLinesItemNode
+    QImPlotItemNode <|-- QImPlotDigitalItemNode
+    QImPlotItemNode <|-- QImPlotTextItemNode
+    QImPlotItemNode <|-- QImPlotDummyItemNode
+    QImPlotItemNode <|-- QImPlotBarGroupsItemNode
+    QImPlotItemNode <|-- QImPlotPieChartItemNode
+    QImPlotItemNode <|-- QImPlotHeatmapItemNode
+    QImPlotItemNode <|-- QImPlotHistogramItemNode
+    QImPlotItemNode <|-- QImPlotHistogram2DItemNode
+    QImPlotItemNode <|-- QImPlotImageItemNode
+    QImPlotItemNode <|-- QImPlotDragPointNode
+    QImPlotItemNode <|-- QImPlotDragLineXNode
+    QImPlotItemNode <|-- QImPlotDragLineYNode
+    QImPlotItemNode <|-- QImPlotDragRectNode
+    QImPlotItemNode <|-- QImPlotAnnotationNode
+    QImPlotItemNode <|-- QImPlotTagXNode
+    QImPlotItemNode <|-- QImPlotTagYNode
+
+    QImPlot3DItemNode <|-- QImPlot3DLineItemNode
+    QImPlot3DItemNode <|-- QImPlot3DScatterItemNode
+    QImPlot3DItemNode <|-- QImPlot3DSurfaceItemNode
+    QImPlot3DItemNode <|-- QImPlot3DMeshItemNode
+    QImPlot3DItemNode <|-- QImPlot3DTriangleItemNode
+    QImPlot3DItemNode <|-- QImPlot3DQuadItemNode
+    QImPlot3DItemNode <|-- QImPlot3DImageItemNode
+    QImPlot3DItemNode <|-- QImPlot3DTextItemNode
+    QImPlot3DItemNode <|-- QImPlot3DDummyItemNode
+```
+
+### Non-Node Helper Classes
+
+The following classes do not inherit from `QImAbstractNode` and do not participate in the render tree traversal. They support the node system in different ways:
+
+```text
+QObject-Derived Helper Classes:
+├── QImPlotAxisInfo             (2D Axis Properties ─ axis label, range, flags, scale type, etc.)
+├── QImPlot3DAxisInfo           (3D Axis Properties ─ X/Y/Z three axes)
+├── QImPlot3DStyleNode          (3D Style Properties ─ colors, line width, marker size, etc. ImPlot3DStyle fields)
+└── QImPlotValueTrackerNodeGroup (Value Tracker Group ─ multi-subplot linked tracking)
+
+Non-QObject Utility Classes:
+├── QImPlotColormapManager      (2D Colormap Query and Registration ─ static methods, no inheritance)
+├── QImPlot3DColormapManager    (3D Colormap Query and Registration ─ static methods, no inheritance)
+└── QImPlotTheme                (2D Theme Manager ─ regular C++ class, uses PIMPL pattern)
+```
+
+!!! info "Meaning of type() Values"
+    - **2D Plot Items** have `type()` starting from `QImPlotItemNode::InnerType = 10`, with each subclass offsetting from this base.
+    - **2D Interaction Tools** start from `type = 30` to distinguish from regular plot items.
+    - **3D Plot Items** have `type()` starting from `QImPlot3DItemNode::InnerType3D = 1000` to avoid conflicts with 2D types.
+    - The `type()` method is used for fast runtime type identification, avoiding the overhead of `qobject_cast`/`dynamic_cast`.
+
 ## How to Apply
 
 ### Node Lifecycle Management

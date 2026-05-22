@@ -169,6 +169,9 @@ plot->y1Axis()->setForeground(true);
 | `lock` | `bool` | `false` | 是否同时锁定最小值和最大值（`lockMin && lockMax`） |
 | `noDecorations` | `bool` | `false` | 是否隐藏所有装饰（对应 `ImPlotAxisFlags_NoDecorations`） |
 | `scaleType` | `QImPlotScaleType` | `Linear` | 刻度类型（线性/对数/时间/对称对数） |
+| `tickValues` | `QList<double>` | 空列表 | 自定义刻度位置（值列表） |
+| `tickLabels` | `QList<QByteArray>` | 空列表 | 自定义刻度标签（UTF8 编码列表） |
+| `keepDefaultTicks` | `bool` | `false` | 是否保留默认刻度（与自定义刻度共存） |
 
 ### 肯定语义转换说明
 
@@ -265,6 +268,36 @@ void setScaleType(QImPlotScaleType t);
 int imPlotScale() const;
 ```
 
+### 自定义刻度配置
+
+```cpp
+// 获取/设置自定义刻度位置
+QList<double> tickValues() const;
+void setTickValues(const QList<double>& values);
+
+// 获取/设置自定义刻度标签（UTF8 编码）
+QList<QByteArray> tickLabels() const;
+void setTickLabels(const QList<QByteArray>& labels);
+
+// 获取/设置是否保留默认刻度
+bool isKeepDefaultTicks() const;
+void setKeepDefaultTicks(bool keep);
+
+// 便捷方法：同时设置刻度和标签
+void setAxisTicks(const QList<double>& values,
+                  const QList<QByteArray>& labels = {},
+                  bool keepDefault = false);
+
+// 便捷方法：在范围内均匀生成 N 个刻度
+void setAxisTicksRange(double v_min, double v_max, int n_ticks,
+                       const QList<QByteArray>& labels = {},
+                       bool keepDefault = false);
+```
+
+!!! info "tickLabels 类型"
+    `tickLabels` 使用 `QList<QByteArray>` 而非 `QString`，
+    遵循 QIm 的 UTF8 优先存储规范。设置标签时需自行编码为 UTF8 `QByteArray`。
+
 ### 高级标志操作
 
 ```cpp
@@ -285,6 +318,7 @@ void setEnabled(bool on);
 | `limitsChanged(double min, double max)` | `double, double` | 坐标轴范围限制改变时（最小值、最大值或两者同时） |
 | `axisFlagChanged()` | 无 | 任意坐标轴标志属性变更时（autoFit、inverted、gridLinesEnabled 等） |
 | `scaleTypeChanged()` | 无 | 坐标轴刻度类型变更时（线性 → 对数、时间 → 对称对数等） |
+| `tickConfigChanged()` | 无 | 自定义刻度配置变更时（tickValues、tickLabels、keepDefaultTicks 任一变更） |
 
 ### 典型信号槽连接示例
 

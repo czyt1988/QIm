@@ -597,3 +597,79 @@ ImGui::Text((const char*)u8"こんにちは");
 - 或使用 Windows 自带的 Arial Unicode 等 Unicode 字体以获得完整字符覆盖（许可信息不确定）
 
 [返回目录](#目录)
+
+---
+
+## QIm 字体工具类
+
+QIm 提供 `QImFontFileHelper` 静态工具类，用于通过 `QFont` 对象查找系统字体文件路径。
+该类为非 QObject 静态工具类，所有方法均为静态方法，适用于在 QIm 应用中加载系统字体。
+
+### QImFontFileHelper
+
+`QImFontFileHelper` 从操作系统字体目录扫描并缓存字体族名与文件路径的映射关系，
+后续可通过 `QFont` 对象查找对应的 TTF 文件路径。
+
+!!! note "非 QObject 类"
+    `QImFontFileHelper` 是普通的 C++ 类（使用 PIMPL 模式），非 QObject 派生类。
+    所有方法均为静态方法，无需实例化即可调用。
+
+#### 初始化
+
+在程序启动时调用 `preloadCommonFonts()` 预加载系统字体缓存：
+
+```cpp
+#include "QImFontFileHelper.h"
+
+// 程序启动时预加载（建议在 main() 或早期初始化中调用）
+QIM::QImFontFileHelper::preloadCommonFonts();
+```
+
+该方法会扫描操作系统字体目录（如 Windows 的 `C:\Windows\Fonts`），
+缓存所有可用字体族名和对应的文件路径。
+
+#### API 参考
+
+| 方法 | 返回类型 | 说明 |
+|------|----------|------|
+| `getFontFiles(font)` | `QList<QString>` | 根据 QFont 对象获取对应的字体文件路径列表（含粗体、斜体等变体，已去重） |
+| `getAvailableFamilies()` | `QList<QString>` | 获取所有已缓存的字体族名列表 |
+| `clearCache()` | void | 清除字体缓存 |
+| `preloadCommonFonts()` | void | 预加载系统常用字体（扫描 OS 字体目录并缓存） |
+| `getFontPixelSize(qtFont)` | float | 根据 QFont 计算像素大小（自动从磅值转换） |
+| `getRecommendedChineseFontPath()` | `std::string` | 获取推荐的中文字体文件路径 |
+
+#### 使用示例
+
+```cpp
+#include "QImFontFileHelper.h"
+
+// 1. 程序启动时预加载字体缓存
+QIM::QImFontFileHelper::preloadCommonFonts();
+
+// 2. 创建 QFont 并查找对应字体文件
+QFont font("Microsoft YaHei", 12);
+QList<QString> fontFiles = QIM::QImFontFileHelper::getFontFiles(font);
+if (!fontFiles.isEmpty()) {
+    qDebug() << "找到字体文件:" << fontFiles.first();
+}
+
+// 3. 获取像素大小（自动从磅值转换）
+float pixelSize = QIM::QImFontFileHelper::getFontPixelSize(font);
+
+// 4. 获取推荐的中文字体路径
+std::string chineseFontPath =
+    QIM::QImFontFileHelper::getRecommendedChineseFontPath();
+
+// 5. 查询已缓存的字体族列表
+QList<QString> families = QIM::QImFontFileHelper::getAvailableFamilies();
+qDebug() << "可用字体族数:" << families.size();
+```
+
+!!! tip "缓存机制"
+    `getFontFiles()` 内部使用缓存提高查询性能。首次查询某字体族后结果会被缓存，
+    后续相同查询直接返回缓存结果。调用 `clearCache()` 可重置缓存状态。
+
+!!! info "getRecommendedChineseFontPath"
+    该方法返回 QIm 推荐的中文字体文件路径，用于在应用程序中加载合适的中文字体。
+    返回值类型为 `std::string`，是底层 ImGui 所需的字节格式。

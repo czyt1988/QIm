@@ -61,6 +61,7 @@ plugins:
                 - PIMPL模式: zh/pimpl-pattern.md
                 - 信号槽: zh/signal-slot.md
                 - 属性系统: zh/property-system.md
+                - 颜色映射: zh/colormap.md
             - 2D绘图:
                 - 概述: zh/plot2d/index.md
                 - Figure Widget: zh/plot2d/figure-widget.md
@@ -73,6 +74,7 @@ plugins:
                 - 特殊图表: zh/plot2d/plot-special-charts.md
                 - 标注类: zh/plot2d/plot-annotations.md
                 - 交互工具: zh/plot2d/plot-tools.md
+                - 数值跟踪器: zh/plot2d/value-tracker.md
                 - 数据系列: zh/plot2d/data-series.md
                 - 降采样: zh/plot2d/downsampling.md
             - 3D绘图:
@@ -91,6 +93,7 @@ plugins:
                 - 枚举语义转换规范: zh/dev/flag-mapping.md
                 - 新节点开发指南: zh/dev/new-node-guide.md
                 - 自定义节点: zh/dev/custom-node.md
+                - 初始化时序陷阱: zh/dev/lifecycle-pitfalls.md
             - 使用指南:
                 - 渲染模式: zh/render-mode.md
             - API参考:
@@ -110,14 +113,29 @@ plugins:
                 - PIMPL Pattern: en/pimpl-pattern.md
                 - Signal/Slot: en/signal-slot.md
                 - Property System: en/property-system.md
+                - Color Mapping: en/colormap.md
             - 2D Plot:
                 - Overview: en/plot2d/index.md
                 - Figure Widget: en/plot2d/figure-widget.md
+                - Plot Container: en/plot2d/plot-node.md
+                - Axis Configuration: en/plot2d/plot-axis.md
+                - Basic Charts: en/plot2d/plot-basic-charts.md
                 - Line Plot: en/plot2d/plot-line.md
+                - Bar Charts: en/plot2d/plot-bar-charts.md
+                - Area Charts: en/plot2d/plot-area-charts.md
+                - Special Charts: en/plot2d/plot-special-charts.md
+                - Annotations: en/plot2d/plot-annotations.md
+                - Interactive Tools: en/plot2d/plot-tools.md
+                - Value Tracker: en/plot2d/value-tracker.md
                 - Data Series: en/plot2d/data-series.md
                 - Downsampling: en/plot2d/downsampling.md
             - 3D Plot:
                 - Overview: en/plot3d/index.md
+                - Basic Charts: en/plot3d/basic-charts.md
+                - Surface Charts: en/plot3d/surface-charts.md
+                - Mesh Charts: en/plot3d/mesh.md
+                - Annotations: en/plot3d/annotations.md
+                - Configuration: en/plot3d/configuration.md
             - Development Standards:
                 - Overview: en/dev/index.md
                 - Qt Integration Standards: en/dev/qt-integration.md
@@ -127,12 +145,14 @@ plugins:
                 - Flag Mapping Standards: en/dev/flag-mapping.md
                 - New Node Development Guide: en/dev/new-node-guide.md
                 - Custom Node: en/dev/custom-node.md
+                - Lifecycle Pitfalls: en/dev/lifecycle-pitfalls.md
             - Usage Guide:
                 - Render Mode: en/render-mode.md
             - API Reference:
                 - C++ API Docs: en/api-reference.md
             - Others:
                 - Performance: en/performance.md
+                - Font: en/font.md
   # 需要版本切换再打开下面
   # - git-revision-date
   # - mike:                       

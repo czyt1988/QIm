@@ -254,6 +254,47 @@ plot->setCanvasEnabled(true);     // 显示画布背景
     （如 `titleEnabled`）。设置 `setTitleEnabled(false)` 等同于 ImPlot 的
     `ImPlotFlags_NoTitle`。详见[枚举语义转换规范](../dev/flag-mapping.md)。
 
+### 6. 颜色映射
+
+QIm 提供栈式 colormap 管理，通过 `pushColormap()` / `popColormap()` 方法控制当前绘图区域的颜色映射：
+
+```cpp
+QIM::QImPlotNode* plot = figure->createPlotNode();
+
+// 方式1：通过枚举值设置 colormap
+plot->pushColormap(QIM::QImPlotColormap::Viridis);
+
+// 方式2：通过名称字符串设置 colormap（需在 QImPlotColormapManager 注册）
+plot->pushColormap(QByteArray("MyCustomColormap"));
+
+// 添加使用当前 colormap 的绘图节点
+QIM::QImPlotHeatmapItemNode* heatmap = new QIM::QImPlotHeatmapItemNode(plot);
+heatmap->setData(values, rows, cols);
+
+// 恢复上一个 colormap
+plot->popColormap();
+
+// 也可一次弹出多个
+plot->popColormap(2);
+```
+
+`QImPlotColormap` 枚举提供 16 种内置 colormap：
+
+| 枚举值 | 序号 | 枚举值 | 序号 |
+|--------|------|--------|------|
+| `Deep` | 0 | `Dark` | 1 |
+| `Pastel` | 2 | `Paired` | 3 |
+| `Viridis` | 4 | `Plasma` | 5 |
+| `Hot` | 6 | `Cool` | 7 |
+| `Pink` | 8 | `Jet` | 9 |
+| `Twilight` | 10 | `RdBu` | 11 |
+| `BrBG` | 12 | `PiYG` | 13 |
+| `Spectral` | 14 | `Greys` | 15 |
+
+`pushColormap()` 在 `beginDraw()` 中生效，`popColormap()` 在 `endDraw()` 中执行。
+自定义 colormap 可通过 `QImPlotColormapManager` 注册，
+详见[颜色映射文档](colormap.md)。
+
 ## API参考
 
 ### 属性列表
@@ -294,6 +335,9 @@ plot->setCanvasEnabled(true);     // 显示画布背景
 | `plotToPixels(dx, dy)` | double, double | 绘图坐标 → 屏幕坐标 |
 | `rescaleAxes()` | - | 自动适配坐标轴范围 |
 | `setAxesToFit()` | - | 设置坐标轴范围适配数据 |
+| `pushColormap(colormap)` | QImPlotColormap | 压入 colormap（枚举值） |
+| `pushColormap(name)` | QByteArray | 压入 colormap（名称字符串） |
+| `popColormap(count)` | int | 弹出 N 个 colormap（默认1） |
 | `imPlotFlags()` | - | 获取原始 ImPlot 标志位 |
 | `setImPlotFlags(flags)` | int | 设置原始 ImPlot 标志位 |
 
