@@ -123,7 +123,10 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
             values.append(pair.second);
         }
 
-        rankingBars_->setData(labels, values, 1, ranking.size());
+        // Build data: values only, single item label (process names go on axis, not bar labels)
+        QStringList itemLabels;
+        itemLabels.append(title);  // Single item label for the bar group
+        rankingBars_->setData(itemLabels, values, 1, ranking.size());
         rankingPlot_->setTitle(title + QStringLiteral(" Ranking"));
         rankingPlot_->x1Axis()->setLabel(unit);
 
