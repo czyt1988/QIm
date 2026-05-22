@@ -123,7 +123,7 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
             values.append(pair.second);
         }
 
-        rankingBars_->setData(labels, values, ranking.size(), 1);
+        rankingBars_->setData(labels, values, 1, ranking.size());
         rankingPlot_->setTitle(title + QStringLiteral(" Ranking"));
         rankingPlot_->x1Axis()->setLabel(unit);
 
@@ -133,10 +133,14 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
         m_tickPositions.reserve(ranking.size());
         m_tickLabels.reserve(ranking.size());
         for (int i = 0; i < ranking.size(); ++i) {
-            m_tickPositions.append(static_cast<double>(i));
+            m_tickPositions.append(static_cast<double>(i+1));
             m_tickLabels.append(labels[i].toUtf8());
         }
         rankingPlot_->y1Axis()->setAxisTicks(m_tickPositions, m_tickLabels);
+        rankingPlot_->y1Axis()->setLimits(0, ranking.size() + 1);
+        qDebug() << "Tick positions:" << m_tickPositions;
+        qDebug() << "Y axis limits:" << rankingPlot_->y1Axis()->minLimits()
+                 << rankingPlot_->y1Axis()->maxLimits();
     }
 
     // ---- TIMELINE ----
