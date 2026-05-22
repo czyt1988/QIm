@@ -102,11 +102,22 @@ void SustainedMetricsView::buildView(QIM::QImFigureWidget* figure, const QList<A
 
 void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data*/)
 {
-    if (!tracker_ || !rankingPlot_ || !timelinePlot_)
+    if (!tracker_ || !rankingPlot_ || !timelinePlot_ || !rankingBars_)
         return;
 
+    SustainedMetric previousMetric = currentMetric_;
     if (metricSelector_)
         currentMetric_ = metricSelector_->currentMetric();
+
+    // When metric type changes, destroy stale timeline line items and reset
+    // ordering to avoid accumulating invisible orphaned nodes across metrics
+    if (currentMetric_ != previousMetric && !timelineLines_.isEmpty()) {
+        for (auto* line : timelineLines_) {
+            line->deleteLater();
+        }
+        timelineLines_.clear();
+        orderedNames_.clear();
+    }
 
     QString title = metricTitle(currentMetric_);
     QString unit = metricUnit(currentMetric_);
@@ -159,7 +170,7 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
 
     int numPoints = timeline.pointCount;
 
-    // Maintain orderedNames_: append-only, sort on first call
+    // Maintain orderedNames_: reset on metric change, otherwise append
     if (orderedNames_.isEmpty()) {
         orderedNames_ = timeline.topNames;
     } else {
@@ -196,12 +207,13 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
         }
     }
 
-    // Hide stale lines
-    for (auto it = timelineLines_.begin(); it != timelineLines_.end(); ++it) {
+    // Remove stale lines (deleteLater for safe deferred destruction)
+    for (auto it = timelineLines_.begin(); it != timelineLines_.end(); ) {
         if (!activeNames.contains(it.key())) {
-            it.value()->setVisible(false);
+            it.value()->deleteLater();
+            it = timelineLines_.erase(it);
         } else {
-            it.value()->setVisible(true);
+            ++it;
         }
     }
 
@@ -219,7 +231,10 @@ void SustainedMetricsView::resetAccumulation()
 {
     orderedNames_.clear();
     colorManager_.clear();
-    timelineLines_.clear();  // Items destroyed as QObject children of plot nodes during view rebuild
+    for (auto* line : timelineLines_) {
+        line->deleteLater();
+    }
+    timelineLines_.clear();
 }
 
 void SustainedMetricsView::setRankingTopN(int n)

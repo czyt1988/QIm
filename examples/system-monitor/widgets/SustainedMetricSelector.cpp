@@ -1,6 +1,7 @@
 #include "SustainedMetricSelector.h"
 
 #include <QHBoxLayout>
+#include <QAbstractButton>
 #include <QButtonGroup>
 
 SustainedMetricSelector::SustainedMetricSelector(QWidget* parent)
@@ -26,11 +27,10 @@ SustainedMetricSelector::SustainedMetricSelector(QWidget* parent)
     buttonGroup->addButton(btnDiskRead_);
     buttonGroup->addButton(btnDiskWrite_);
 
-    connect(btnCpuTime_, &QRadioButton::toggled, this, &SustainedMetricSelector::onMetricChanged);
-    connect(btnGpuTime_, &QRadioButton::toggled, this, &SustainedMetricSelector::onMetricChanged);
-    connect(btnAvgMemory_, &QRadioButton::toggled, this, &SustainedMetricSelector::onMetricChanged);
-    connect(btnDiskRead_, &QRadioButton::toggled, this, &SustainedMetricSelector::onMetricChanged);
-    connect(btnDiskWrite_, &QRadioButton::toggled, this, &SustainedMetricSelector::onMetricChanged);
+    // Use buttonClicked (fires once per switch) instead of toggled
+    // (fires twice: toggled(true) on new button + toggled(false) on old button)
+    connect(buttonGroup, QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked),
+            this, &SustainedMetricSelector::onMetricChanged);
 
     btnCpuTime_->setChecked(true);
 }
