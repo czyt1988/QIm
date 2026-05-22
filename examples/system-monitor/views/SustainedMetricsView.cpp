@@ -66,9 +66,8 @@ void SustainedMetricsView::buildView(QIM::QImFigureWidget* figure, const QList<A
     rankingPlot_->setLegendEnabled(true);
     rankingPlot_->x1Axis()->setLabel(metricUnit(currentMetric_));
     rankingPlot_->y1Axis()->setLabel(QString());  // Process names shown as tick labels
-    rankingPlot_->y1Axis()->setInverted(true);    // Top-ranked process at top
-    // Initial Y range: show top N bars with padding, then allow user interaction
-    rankingPlot_->y1Axis()->setLimits(-0.5, kTopN - 0.5, QIM::QImPlotCondition::Once);
+    // Highest usage at bottom (default non-inverted), user can zoom/drag after initial fit
+    rankingPlot_->y1Axis()->setLimits(-0.5, rankingTopN_ - 0.5, QIM::QImPlotCondition::Once);
 
     rankingBars_ = new QIM::QImPlotBarGroupsItemNode(rankingPlot_);
     rankingBars_->setHorizontal(true);
@@ -117,7 +116,7 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
 
     if (!ranking.isEmpty()) {
         // Show only top N processes for readability
-        int topN = qMin(ranking.size(), kTopN);
+        int topN = qMin(ranking.size(), rankingTopN_);
         ranking = ranking.mid(0, topN);
 
         QStringList labels;
@@ -153,7 +152,7 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
     }
 
     // ---- TIMELINE ----
-    SustainedTimelineData timeline = tracker_->getTimeline(currentMetric_, kTopN);
+    SustainedTimelineData timeline = tracker_->getTimeline(currentMetric_, kTimelineTopN);
 
     if (timeline.pointCount < 1 || timeline.timestamps.isEmpty())
         return;
@@ -221,4 +220,14 @@ void SustainedMetricsView::resetAccumulation()
     orderedNames_.clear();
     colorManager_.clear();
     timelineLines_.clear();  // Items destroyed as QObject children of plot nodes during view rebuild
+}
+
+void SustainedMetricsView::setRankingTopN(int n)
+{
+    rankingTopN_ = qBound(1, n, 50);  // Clamp to sensible range
+}
+
+int SustainedMetricsView::rankingTopN() const
+{
+    return rankingTopN_;
 }

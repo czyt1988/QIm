@@ -21,6 +21,8 @@ class SustainedMetricsView {
 public:
     void setTracker(SustainedMetricsTracker* tracker);
     void setMetricSelector(SustainedMetricSelector* selector);
+    void setRankingTopN(int n);           ///< Set number of processes shown in ranking chart
+    int rankingTopN() const;              ///< Get current ranking display count
     void buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data);
     void updateData(const QList<AggregatedProcessInfo>& data);
     void resetAccumulation();
@@ -42,5 +44,6 @@ private:
     SustainedMetric currentMetric_ = SustainedMetric::CpuTime;
 
     static constexpr int kWindowDurationSec = 600;
-    static constexpr int kTopN = 8;
+    static constexpr int kTimelineTopN = 8;
+    int rankingTopN_ = 10;          ///< Number of processes shown in ranking, user-adjustable
 };
