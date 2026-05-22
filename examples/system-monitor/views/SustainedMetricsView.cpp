@@ -65,10 +65,10 @@ void SustainedMetricsView::buildView(QIM::QImFigureWidget* figure, const QList<A
     rankingPlot_->setTitle(QStringLiteral("Sustained Metrics Ranking"));
     rankingPlot_->setLegendEnabled(true);
     rankingPlot_->x1Axis()->setLabel(metricUnit(currentMetric_));
-    rankingPlot_->x1Axis()->setAutoFit(true);   // Auto-fit X axis to bar values
-    rankingPlot_->y1Axis()->setLabel(QString());  // Process names are shown as tick labels
-    rankingPlot_->y1Axis()->setAutoFit(true);   // Auto-fit Y axis to bar positions
-    rankingPlot_->y1Axis()->setInverted(true);  // Top-ranked process at top
+    rankingPlot_->y1Axis()->setLabel(QString());  // Process names shown as tick labels
+    rankingPlot_->y1Axis()->setInverted(true);    // Top-ranked process at top
+    // Initial Y range: show top N bars with padding, then allow user interaction
+    rankingPlot_->y1Axis()->setLimits(-0.5, kTopN - 0.5, QIM::QImPlotCondition::Once);
 
     rankingBars_ = new QIM::QImPlotBarGroupsItemNode(rankingPlot_);
     rankingBars_->setHorizontal(true);
@@ -147,6 +147,9 @@ void SustainedMetricsView::updateData(const QList<AggregatedProcessInfo>& /*data
             m_tickLabels.append(labels[i].toUtf8());
         }
         rankingPlot_->y1Axis()->setAxisTicks(m_tickPositions, m_tickLabels);
+        // Initial X range: fit to max value with 10% padding, then allow user interaction
+        double maxVal = *std::max_element(values.begin(), values.end());
+        rankingPlot_->x1Axis()->setLimits(0, maxVal * 1.1, QIM::QImPlotCondition::Once);
     }
 
     // ---- TIMELINE ----
