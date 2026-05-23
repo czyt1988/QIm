@@ -3,10 +3,14 @@
 #include <cmath>
 #include <cstddef>
 
+#if defined(__x86_64__) || defined(_M_X64)
+#define QIM_X86_INTRINSICS_AVAILABLE 1
+#endif
+
 // Platform-specific intrinsics headers
-#if defined(_MSC_VER)
+#if defined(QIM_X86_INTRINSICS_AVAILABLE) && defined(_MSC_VER)
     #include <intrin.h>
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(QIM_X86_INTRINSICS_AVAILABLE) && (defined(__GNUC__) || defined(__clang__))
     #include <x86intrin.h>
 #endif
 
@@ -20,7 +24,7 @@ enum SimdLevel { Scalar, SSE42, AVX2 };
 
 SimdLevel detectSimdLevel()
 {
-#if defined(Q_OS_WIN)
+#if defined(Q_OS_WIN) && defined(QIM_X86_INTRINSICS_AVAILABLE)
     // MSVC: __cpuid / __cpuidex intrinsics
     int cpuinfo[4];
     __cpuid(cpuinfo, 0);
@@ -33,8 +37,8 @@ SimdLevel detectSimdLevel()
     // SSE4.2: leaf 1, ECX bit 20
     if (cpuinfo[2] & (1 << 20)) return SSE42;
     return Scalar;
-#elif defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-#if defined(__GNUC__)
+#elif (defined(Q_OS_LINUX) || defined(Q_OS_MAC)) && defined(QIM_X86_INTRINSICS_AVAILABLE)
+#if defined(__GNUC__) || defined(__clang__)
     // GCC/Clang: __builtin_cpu_supports
     __builtin_cpu_init();
     if (__builtin_cpu_supports("avx2")) return AVX2;
