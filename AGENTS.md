@@ -1,6 +1,25 @@
 # QIm 项目指南
 
+**Commit:** 6ae8ab2 · **Branch:** feature/sustained-metrics · **Updated:** 2026-05-25
+
 QIm 是一个将 Dear ImGui、ImPlot、ImPlot3D 以保留模式（Retained Mode）封装到 Qt 的 C++17 库。所有图表元素都是 QObject 节点，通过父-子对象树组织。
+
+## 导航
+
+| 任务 | 位置 | 备注 |
+|------|----------|-------|
+| 新增2D绘图节点 | `src/core/plot/` → 见子目录 AGENTS.md | 本目录有详细2D编码模式 |
+| 新增3D绘图节点 | `src/core/plot3d/` → 见子目录 AGENTS.md | 3D与2D有重要差异 |
+| 基础节点类 | `src/core/QImAbstractNode.h` | PIMPL例外：基类有私有成员 |
+| PIMPL宏定义 | `src/QImAPI.h` | 自定义宏，非Qt标准 |
+| 标志宏定义(2D) | `src/core/plot/QImPlot.h:206-244` | 全局宏+本地宏两种风格 |
+| 标志宏定义(3D) | `src/core/plot3d/QImPlot3D.h` | QIMPLOT3D_FLAG_* 系列 |
+| 开发规范详细版 | `docs/zh/dev/` (9个文件) | 编码前必读 |
+| 降采样算法 | `src/core/plot/QImLTTBDownsampler.h` | 仅2D，3D无降采样 |
+| 颜色延迟初始化 | `src/core/plot/QImPlotItemNode.h` | QImOptionalColor定义 |
+| 构建脚本 | `build.ps1` | 自动探测Qt/VS/CMake |
+| Widget层 | `src/widgets/` (7文件) | QImFigureWidget入口 |
+| 测试 | `tests/plot/` + `tests/plot3d/` | 纯算法测试，无GUI |
 
 ## 构建
 
@@ -41,8 +60,8 @@ CI 测试（Ubuntu）需要 `-DQIM_BUILD_TESTS=ON`，运行 `ctest --output-on-f
 ## 源码结构
 
 - `src/core/` — 核心库 `QImCore`，直接打包 ImGui+ImPlot+ImPlot3D+qtimgui 源码（无独立第三方库 target）
-- `src/core/plot/` — 2D ImPlot 封装，79个文件，扁平目录
-- `src/core/plot3d/` — 3D ImPlot3D 封装，39个文件，扁平目录
+- `src/core/plot/` — 2D ImPlot 封装，83个文件，扁平目录（有独立 AGENTS.md）
+- `src/core/plot3d/` — 3D ImPlot3D 封装，39个文件，扁平目录（有独立 AGENTS.md）
 - `src/widgets/` — Widgets 兼容层 `QImWidgets`（QImFigureWidget + QImWidget + QImPlotTheme）
 - CMake 目标名：`QIm::Core`、`QIm::Widgets`（输出文件为 `QImCore.dll`/`QImWidgets.dll`）
 - `3rdparty/` — imgui、implot、implot3d、qtimgui（通过 `IMGUI_USER_CONFIG="QImAPI.h"` 注入 QIm 的导出宏）
@@ -91,7 +110,7 @@ CI 测试（Ubuntu）需要 `-DQIM_BUILD_TESTS=ON`，运行 `ctest --output-on-f
 - **2D 肯定语义**：直接映射（`isXxx = (flags & Xxx) != 0`）
   - 宏 `QIMPLOT_FLAG_ACCESSOR(ClassName, PropName, ImPlotFlag_Xxx, signal)` — 直接映射
 - **组合标志**（如 `CanvasOnly` = 多个 No 标志组合）：手动实现 getter/setter
-- **3D ImPlot3D**：标志多为肯定语义，使用直接映射而非反转
+- **3D ImPlot3D**：宏逻辑相同（`QIMPLOT3D_FLAG_ENABLED_ACCESSOR`反转 / `QIMPLOT3D_FLAG_ACCESSOR`直接），可见性标志仍用NoXxx反转，样式标志多为肯定映射
 - 多个标志属性共享同一信号（如 `plotFlagChanged()`），因为底层是同一个 `ImPlotFlags` 变量
 - `beginDraw()` 直接传递 `d->flags`，不做组装——所有组装在 setter 通过位操作完成
 
@@ -158,3 +177,11 @@ MkDocs + i18n 插件（中英双语站点）。Doxygen API 文档由 CI 生成�
 - 不支持自定义线型（虚线/点划线）
 - 字体需先加载字体文件
 - QIm 内存开销约为 Qwt/QCustomPlot 的 5-15 倍（架构特性）
+
+## 已知偏差（编码注意）
+
+- **QImAbstractNode.h 有私有成员**：基类不遵循PIMPL规则（m_visible/m_enabled/m_zOrder等直接在头文件），所有子类则严格遵循
+- **QImPlotNode.h include子类**：`#include "QImPlotLineItemNode.h"`（父include子，非标准Qt模式，为便捷方法addLine服务）
+- **标志宏两种风格**：全局宏(`QIMPLOT_FLAG_*`)定义在QImPlot.h；本地宏(`ClassName_FLAG_ACCESSOR`)定义在各.cpp顶部——本地宏更常用
+- **PrivateData中flags必须命名`flags`**：标志宏通过`d_ptr->flags`访问，变量名不可改
+- **file(GLOB)收集源文件**：CMakeLists用GLOB而非手动列举，新增文件需重配CMake
