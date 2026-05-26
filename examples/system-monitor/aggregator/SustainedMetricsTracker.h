@@ -46,6 +46,7 @@ public:
     void reset();
 
     QList<QPair<QString, double>> getRanking(SustainedMetric metric, int topN = -1) const;
+    QList<QPair<QString, double>> getRankingWithOthers(SustainedMetric metric, int topN) const;
     SustainedTimelineData getTimeline(SustainedMetric metric, int topN = 10) const;
     qint64 startTimestamp() const;
 

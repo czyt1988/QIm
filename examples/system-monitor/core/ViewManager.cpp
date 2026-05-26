@@ -45,6 +45,7 @@ void ViewManager::setSustainedMetricsTracker(SustainedMetricsTracker* tracker)
 {
     sustainedTracker_ = tracker;
     sustainedMetricsView_->setTracker(tracker);
+    resourcePieView_->setTracker(tracker);
 }
 
 void ViewManager::setSustainedMetricSelector(SustainedMetricSelector* selector)

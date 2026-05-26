@@ -84,6 +84,22 @@ QList<QPair<QString, double>> SustainedMetricsTracker::getRanking(SustainedMetri
     return ranking;
 }
 
+QList<QPair<QString, double>> SustainedMetricsTracker::getRankingWithOthers(SustainedMetric metric, int topN) const
+{
+    QList<QPair<QString, double>> all = getRanking(metric);
+    if (all.size() <= topN) {
+        return all;
+    }
+
+    QList<QPair<QString, double>> result = all.mid(0, topN);
+    double othersSum = 0.0;
+    for (int i = topN; i < all.size(); ++i) {
+        othersSum += all[i].second;
+    }
+    result.append({QStringLiteral("Other"), othersSum});
+    return result;
+}
+
 SustainedTimelineData SustainedMetricsTracker::getTimeline(SustainedMetric metric, int topN) const
 {
     SustainedTimelineData result;
