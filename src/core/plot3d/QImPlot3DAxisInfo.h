@@ -26,23 +26,23 @@ class QImPlot3DAxisTransform;
  * @note This class does NOT render plots itself. It stores configuration state that should be
  *       applied to ImPlot3D via SetupAxis(), SetupAxisLimits(), and SetupAxisScale() during
  *       plot setup (inside BeginPlot/EndPlot block).
- * @note All property changes are stored locally; actual plot appearance updates only after
+ * @warning All property changes are stored locally; actual plot appearance updates only after
  *          re-rendering with updated configuration applied to ImPlot3D context.
  * @see ImPlot3D::SetupAxis(), ImPlot3D::SetupAxisLimits(), ImPlot3D::SetupAxisScale()
  * \endif
  *
  * \if CHINESE
- * @brief 用于管理 ImPlot3D 坐标轴配置的 Qt 封装类，提供类型安全的属性接�?
- * @details 提供基于 QObject 的接口来配置 ImPlot3D 坐标轴，无需直接操作底层 ImPlot3DAxisFlags 位掩码�?
- *          封装功能包括�?
- *          - 坐标轴标签文本及可见�?
- *          - 范围限制（最�?最大值）及自动适配行为
- *          - 所�?ImPlot3DAxisFlags_ 选项以直观的布尔属性形式暴�?
- *          - 刻度类型配置（线�?对数/对称对数�?
+ * @brief 用于管理 ImPlot3D 坐标轴配置的 Qt 封装类，提供类型安全的属性接口
+ * @details 提供基于 QObject 的接口来配置 ImPlot3D 坐标轴，无需直接操作底层 ImPlot3DAxisFlags 位掩码。
+ *          封装功能包括：
+ *          - 坐标轴标签文本及可见性
+ *          - 范围限制（最小/最大值）及自动适配行为
+ *          - 所有 ImPlot3DAxisFlags_ 选项以直观的布尔属性形式暴露
+ *          - 刻度类型配置（线性/对数/对称对数）
  *          - Qt 枚举（QImPlot3DAxisId）与 ImPlot3D 枚举（ImAxis3D）的双向转换
- * @note 此类本身不渲染绘图。它仅存储配置状态，需在绘图设置阶段（BeginPlot/EndPlot 块内�?
- *       通过 SetupAxis()、SetupAxisLimits() �?SetupAxisScale() 应用�?ImPlot3D�?
- * @note 所有属性变更仅在本地存储；实际绘图外观更新需在重新渲染时将配置应用到 ImPlot3D 上下文后生效�?
+ * @note 此类本身不渲染绘图。它仅存储配置状态，需在绘图设置阶段（BeginPlot/EndPlot 块内）
+ *       通过 SetupAxis()、SetupAxisLimits() 和 SetupAxisScale() 应用于 ImPlot3D。
+ * @warning 所有属性变更仅在本地存储；实际绘图外观更新需在重新渲染时将配置应用到 ImPlot3D 上下文后生效。
  * @see ImPlot3D::SetupAxis(), ImPlot3D::SetupAxisLimits(), ImPlot3D::SetupAxisScale()
  * \endif
  */
@@ -200,8 +200,8 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 当坐标轴标签文本改变时发�?
-     * @param label 新的标签文本字符�?
+     * @brief 当坐标轴标签文本改变时发射
+     * @param label 新的标签文本字符串
      * \endif
      */
     void labelChanged(const QString& label);
@@ -215,8 +215,8 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 当坐标轴范围限制改变时发射（最小值、最大值或两者同时）
-     * @param min 坐标轴可见范围的新最小�?
-     * @param max 坐标轴可见范围的新最大�?
+     * @param min 坐标轴可见范围的新最小值
+     * @param max 坐标轴可见范围的新最大值
      * \endif
      */
     void limitsChanged(double min, double max);
@@ -238,7 +238,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 当坐标轴刻度类型变更时发�?
+     * @brief 当坐标轴刻度类型变更时发射
      * \endif
      */
     void scaleChanged();
@@ -249,7 +249,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 当坐标轴范围限制约束变更时发�?
+     * @brief 当坐标轴范围限制约束变更时发射
      * \endif
      */
     void limitsConstraintsChanged();
@@ -260,7 +260,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 当坐标轴缩放约束变更时发�?
+     * @brief 当坐标轴缩放约束变更时发射
      * \endif
      */
     void zoomConstraintsChanged();
@@ -273,7 +273,7 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 当自定义坐标轴变换变更时发射
-     * @param transform 新的变换指针（重置时可能�?nullptr�?
+     * @param transform 新的变换指针（重置时可能为 nullptr）
      * \endif
      */
     void axisTransformChanged(QImPlot3DAxisTransform* transform);
@@ -284,7 +284,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 当坐标轴格式化器变更时发�?
+     * @brief 当坐标轴格式化器变更时发射
      * \endif
      */
     void axisFormatterChanged();
@@ -295,7 +295,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 当刻度配置变更时发射（值、标签或保留默认刻度�?
+     * @brief 当刻度配置变更时发射（值、标签或保留默认刻度）
      * \endif
      */
     void tickConfigChanged();

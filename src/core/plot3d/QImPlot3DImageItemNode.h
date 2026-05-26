@@ -20,7 +20,9 @@ namespace QIM
  *
  * @note Images are rendered as rectangles in 3D space with texture coordinates.
  *       Useful for overlaying textures, logos, or pre-rendered graphics in 3D plots.
- * @note Texture ID must be a valid ImTextureID obtained from the rendering backend.
+ * @warning Texture ID must be a valid ImTextureID obtained from the rendering backend.
+ *
+ * @param[in] parent Parent QObject (optional)
  *
  * @see QImPlot3DItemNode
  * \endif
@@ -28,13 +30,15 @@ namespace QIM
  * \if CHINESE
  * @brief ImPlot3D 3D图像可视化的Qt风格封装
  *
- * @details 为ImPlot3D 3D图像渲染提供Qt风格的保留模式封装�?
- *          支持在由中心点和两个方向向量（轴）定义的3D空间中渲染图像纹理�?
- *          继承自QImPlot3DItemNode，并遵循与其�?D元素节点相同的PIMPL设计模式以保持一致性�?
+ * @details 为ImPlot3D 3D图像渲染提供Qt风格的保留模式封装。
+ *          支持在由中心点和两个方向向量（轴）定义的3D空间中渲染图像纹理。
+ *          继承自QImPlot3DItemNode，并遵循与其他3D元素节点相同的PIMPL设计模式以保持一致性。
  *
- * @note 图像�?D空间中渲染为带纹理坐标的矩形�?
- *       适用于在3D图表上叠加纹理、徽标或预渲染图形�?
- * @note 纹理ID必须是来自渲染后端的有效ImTextureID�?
+ * @note 图像在3D空间中渲染为带纹理坐标的矩形。
+ *       适用于在3D图表上叠加纹理、徽标或预渲染图形。
+ * @warning 纹理ID必须是来自渲染后端的有效ImTextureID。
+ *
+ * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlot3DItemNode
  * \endif
@@ -243,8 +247,8 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 纹理ID更改时触�?
-     * @param[in] id 新的纹理ID�?
+     * @brief 纹理ID更改时触发
+     * @param[in] id 新的纹理ID值
      * \endif
      */
     void textureIdChanged(quintptr id);
@@ -258,7 +262,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意中心坐标更改时触�?
+     * @brief 任意中心坐标更改时触发
      * @param[in] x 新的中心X坐标
      * @param[in] y 新的中心Y坐标
      * @param[in] z 新的中心Z坐标
@@ -308,7 +312,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意UV0坐标更改时触�?
+     * @brief 任意UV0坐标更改时触发
      * @param[in] x 新的UV0 X坐标
      * @param[in] y 新的UV0 Y坐标
      * \endif
@@ -323,7 +327,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意UV1坐标更改时触�?
+     * @brief 任意UV1坐标更改时触发
      * @param[in] x 新的UV1 X坐标
      * @param[in] y 新的UV1 Y坐标
      * \endif
@@ -337,7 +341,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 色调颜色更改时触�?
+     * @brief 色调颜色更改时触发
      * @param[in] color 新的色调颜色
      * \endif
      */
@@ -349,7 +353,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意图像标志更改时触�?
+     * @brief 任意图像标志更改时触发
      * \endif
      */
     void imageFlagChanged();
@@ -362,7 +366,7 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 四边形模式启用状态更改时触发
-     * @param[in] enabled 新的四边形模式启用状�?
+     * @param[in] enabled 新的四边形模式启用状态
      * \endif
      */
     void quadModeEnabledChanged(bool enabled);
@@ -376,7 +380,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意角点0坐标更改时触�?
+     * @brief 任意角点0坐标更改时触发
      * @param[in] x 新的P0 X坐标
      * @param[in] y 新的P0 Y坐标
      * @param[in] z 新的P0 Z坐标
@@ -393,7 +397,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意角点1坐标更改时触�?
+     * @brief 任意角点1坐标更改时触发
      * @param[in] x 新的P1 X坐标
      * @param[in] y 新的P1 Y坐标
      * @param[in] z 新的P1 Z坐标
@@ -410,7 +414,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意角点2坐标更改时触�?
+     * @brief 任意角点2坐标更改时触发
      * @param[in] x 新的P2 X坐标
      * @param[in] y 新的P2 Y坐标
      * @param[in] z 新的P2 Z坐标
@@ -427,7 +431,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意角点3坐标更改时触�?
+     * @brief 任意角点3坐标更改时触发
      * @param[in] x 新的P3 X坐标
      * @param[in] y 新的P3 Y坐标
      * @param[in] z 新的P3 Z坐标
@@ -443,7 +447,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意UV�?坐标更改时触�?
+     * @brief 任意UV点0坐标更改时触发
      * @param[in] x 新的UV P0 X坐标
      * @param[in] y 新的UV P0 Y坐标
      * \endif
@@ -458,7 +462,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意UV�?坐标更改时触�?
+     * @brief 任意UV点1坐标更改时触发
      * @param[in] x 新的UV P1 X坐标
      * @param[in] y 新的UV P1 Y坐标
      * \endif
@@ -473,7 +477,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意UV�?坐标更改时触�?
+     * @brief 任意UV点2坐标更改时触发
      * @param[in] x 新的UV P2 X坐标
      * @param[in] y 新的UV P2 Y坐标
      * \endif
@@ -488,7 +492,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 任意UV�?坐标更改时触�?
+     * @brief 任意UV点3坐标更改时触发
      * @param[in] x 新的UV P3 X坐标
      * @param[in] y 新的UV P3 Y坐标
      * \endif
