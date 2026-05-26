@@ -390,11 +390,14 @@ bool QImPlotDragRectNode::beginDraw()
 {
     QIM_D(d);
     
-    // Store previous coordinates to detect changes
+    // Store previous state to detect changes
     const double prevX1 = d->x1;
     const double prevY1 = d->y1;
     const double prevX2 = d->x2;
     const double prevY2 = d->y2;
+    const bool prevClicked = d->clicked;
+    const bool prevHovered = d->hovered;
+    const bool prevHeld = d->held;
     
     // Convert color to ImVec4
     ImVec4 colorVec = d->color.has_value() ? d->color->value() : ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -427,8 +430,15 @@ bool QImPlotDragRectNode::beginDraw()
     }
     
     // Emit interaction state signals if changed
-    // Note: We could emit signals here, but to avoid excessive signals,
-    // we rely on property bindings or manual polling
+    if (d->clicked != prevClicked) {
+        Q_EMIT clickedChanged(d->clicked);
+    }
+    if (d->hovered != prevHovered) {
+        Q_EMIT hoveredChanged(d->hovered);
+    }
+    if (d->held != prevHeld) {
+        Q_EMIT heldChanged(d->held);
+    }
     
     // Update item status (for consistency with other plot items)
     ImPlotContext* ct = ImPlot::GetCurrentContext();

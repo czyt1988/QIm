@@ -68,6 +68,8 @@ class QIM_CORE_API QImPlotNode : public QImAbstractNode
     Q_PROPERTY(bool equal READ isEqual WRITE setEqual NOTIFY plotFlagChanged)
     Q_PROPERTY(bool crosshairs READ isCrosshairs WRITE setCrosshairs NOTIFY plotFlagChanged)
     Q_PROPERTY(bool canvasEnabled READ isCanvasEnabled WRITE setCanvasEnabled NOTIFY plotFlagChanged)
+    // Runtime mouse state
+    Q_PROPERTY(bool isHovered READ isHovered NOTIFY isHoveredChanged)
     // impl
     Q_DISABLE_COPY(QImPlotNode)
 
@@ -158,6 +160,9 @@ public:
     //----------------------------------------------------
     // Interaction (must be called after beginDraw)
     //----------------------------------------------------
+    // Runtime mouse state (updated per-frame in beginDraw)
+    bool isHovered() const;
+    /// @deprecated Use isHovered() instead
     bool isPlotHovered() const;
     // Screen to plot coordinate conversion
     QPointF pixelsToPlot(const float& screenX, const float& screenY);
@@ -256,6 +261,22 @@ Q_SIGNALS:
      */
     void plotLimitsChanged();
 
+    /**
+     * \if ENGLISH
+     * @brief Emitted when the mouse hover state over the plot area changes
+     * @param[in] isHovered true if mouse cursor is currently over the plot area
+     * @details Updated per-frame during beginDraw() via ImPlot::IsPlotHovered().
+     *          Only emitted when the state actually toggles between hovered and unhovered.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 鼠标悬停绘图区域状态更改时触发
+     * @param[in] isHovered true 表示鼠标光标当前位于绘图区域上方
+     * @details 每帧在 beginDraw() 中通过 ImPlot::IsPlotHovered() 更新。
+     *          仅在悬停/非悬停状态实际切换时触发。
+     * \endif
+     */
+    void isHoveredChanged(bool isHovered);
 protected:
     bool beginDraw() override;
     void endDraw() override;

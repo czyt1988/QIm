@@ -394,8 +394,11 @@ bool QImPlotDragLineYNode::beginDraw()
 {
     QIM_D(d);
     
-    // Store previous position to detect changes
+    // Store previous state to detect changes
     const double prevY = d->y;
+    const bool prevClicked = d->clicked;
+    const bool prevHovered = d->hovered;
+    const bool prevHeld = d->held;
     
     // Convert color to ImVec4
     ImVec4 colorVec = d->color.has_value() ? d->color->value() : ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
@@ -420,6 +423,17 @@ bool QImPlotDragLineYNode::beginDraw()
         if (d->y != prevY) {
             Q_EMIT valueChanged(d->y);
         }
+    }
+    
+    // Emit interaction state signals if changed
+    if (d->clicked != prevClicked) {
+        Q_EMIT clickedChanged(d->clicked);
+    }
+    if (d->hovered != prevHovered) {
+        Q_EMIT hoveredChanged(d->hovered);
+    }
+    if (d->held != prevHeld) {
+        Q_EMIT heldChanged(d->held);
     }
     
     // Update item status (for consistency with other plot items)

@@ -56,6 +56,8 @@ public:
     // 视口变化检测
     ImPlotRect lastLimits;
     bool firstFrame { true };
+    // 运行时鼠标状态（每帧在 beginDraw 中更新）
+    bool hovered { false };
 };
 
 QImPlotNode::PrivateData::PrivateData(QImPlotNode* q) : q_ptr(q)
@@ -982,18 +984,41 @@ QImPlotLegendNode* QImPlotNode::legendNode() const
  * @brief Checks if the mouse cursor is hovering over the plot area
  * @return true if the plot area is currently hovered
  * @details Requires valid ImPlot context (after beginDraw). Returns false if plot pointer is null.
+ * @deprecated Use isHovered() instead.
  * \endif
  *
  * \if CHINESE
  * @brief 检查鼠标光标是否悬停在绘图区域上方
  * @return true 表示绘图区域当前被悬停
  * @details 需要有效的 ImPlot 上下文（beginDraw 之后）。如果 plot 指针为空则返回 false。
+ * @deprecated 请使用 isHovered() 替代。
  * \endif
  */
 bool QImPlotNode::isPlotHovered() const
 {
+    return isHovered();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Returns cached mouse hover state for the plot area
+ * @return true if mouse cursor is currently over the plot area
+ * @details Uses cached value updated per-frame in beginDraw() via ImPlot::IsPlotHovered().
+ *          Does not require active ImPlot context (reads cached state). The property is
+ *          updated only when beginDraw() succeeds.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回绘图区域鼠标悬停状态的缓存值
+ * @return true 表示鼠标光标当前位于绘图区域上方
+ * @details 使用每帧在 beginDraw() 中通过 ImPlot::IsPlotHovered() 更新的缓存值。
+ *          不需要活动的 ImPlot 上下文（读取缓存状态）。该属性仅在 beginDraw() 成功时更新。
+ * \endif
+ */
+bool QImPlotNode::isHovered() const
+{
     QIM_DC(d);
-    return d->plot && d->plot->Hovered;
+    return d->hovered;
 }
 
 /**
@@ -1253,6 +1278,14 @@ bool QImPlotNode::beginDraw()
             d->lastLimits = currentLimits;
             d->firstFrame = false;
             Q_EMIT plotLimitsChanged();
+        }
+    }
+    // 运行时鼠标状态更新
+    {
+        bool currentHovered = ImPlot::IsPlotHovered();
+        if (d->hovered != currentHovered) {
+            d->hovered = currentHovered;
+            Q_EMIT isHoveredChanged(currentHovered);
         }
     }
     return true;
