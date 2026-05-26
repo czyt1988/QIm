@@ -46,7 +46,7 @@ public:
     int type() const override
     {
         return XYData;
-    }  // 代理后总是XY模式
+    }
 
     int size() const override;
 

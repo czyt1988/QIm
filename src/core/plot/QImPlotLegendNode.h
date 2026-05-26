@@ -50,7 +50,7 @@ public:
     // Position methods
     QImPlotLegendLocation location() const;
     void setLocation(QImPlotLegendLocation v);
-    // 映射为Qt::Alignment
+    // Maps to Qt::Alignment
     Qt::Alignment alignment() const;
     void setAlignment(Qt::Alignment a);
 
@@ -78,7 +78,7 @@ public:
     // ImPlotLegendFlags_Reverse
     bool isReverse() const;
     void setReverse(bool on);
-    // 原始标志访问（高级用法）
+    // Raw flags access (advanced)
     int legendFlags() const;
     void setLegendFlags(int flags);
 
