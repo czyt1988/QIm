@@ -3,6 +3,7 @@
 #include "QImFigureWidget.h"
 #include "plot3d/QImPlot3DNode.h"
 #include "plot3d/QImPlot3DSurfaceItemNode.h"
+#include "plot3d/QImPlot3DAxisInfo.h"
 #include "plot3d/QImPlot3D.h"
 #include "aggregator/HistoryBuffer.h"
 
