@@ -188,6 +188,17 @@ void QImPlot3DScatterItemNode::setMarkerWeight(float weight)
     Q_EMIT markerWeightChanged(weight);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the marker shape
+ * @return Marker shape as QImPlot3DMarkerShape enum value (int)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取标记形状
+ * @return 标记形状（QImPlot3DMarkerShape 枚举值，int 类型）
+ * \endif
+ */
 int QImPlot3DScatterItemNode::markerShape() const
 {
     QIM_DC(d);
@@ -195,6 +206,17 @@ int QImPlot3DScatterItemNode::markerShape() const
     return static_cast<int>(toQImPlot3DMarkerShape(static_cast<ImPlot3DMarker>(d->markerShape)));
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the marker shape
+ * @param[in] shape New marker shape (QImPlot3DMarkerShape enum value)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置标记形状
+ * @param[in] shape 新标记形状（QImPlot3DMarkerShape 枚举值）
+ * \endif
+ */
 void QImPlot3DScatterItemNode::setMarkerShape(int shape)
 {
     QIM_D(d);

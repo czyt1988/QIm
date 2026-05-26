@@ -44,6 +44,21 @@ int QImDownsamplingController::threshold() const
     return m_threshold;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the source data series for downsampling
+ * @details The controller does not own the source — the caller must ensure
+ *          the source outlives the controller. Changing the source invalidates cache.
+ * @param source Source data series (non-owning pointer, must outlive controller)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置降采样的源数据系列
+ * @details 控制器不拥有源数据——调用者必须确保源数据的生命周期超过控制器。
+ *          更改源数据会使缓存失效。
+ * @param source 源数据系列（非拥有指针，必须超过控制器生命周期）
+ * \endif
+ */
 void QImDownsamplingController::setSource(QImAbstractXYDataSeries* source)
 {
     if (m_source != source) {
@@ -52,6 +67,28 @@ void QImDownsamplingController::setSource(QImAbstractXYDataSeries* source)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Resolves the data series to use for rendering with zoom-aware adaptive downsampling
+ * @details On first call, builds the initial downsampled proxy. On subsequent calls,
+ *          checks whether zoom level or pixel width has changed enough to warrant
+ *          re-sampling. Returns the downsampled proxy when active, or the raw source.
+ * @param pixelWidth Available pixel width for rendering (used for pixel-aware target count)
+ * @param xMin Minimum X value of the visible range
+ * @param xMax Maximum X value of the visible range
+ * @return Pointer to the data series to use (either downsampled proxy or raw source)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 解析用于渲染的数据系列，支持缩放感知的自适应降采样
+ * @details 首次调用时构建初始降采样代理。后续调用时检查缩放级别或像素宽度
+ *          的变化是否足够大以触发重新采样。激活时返回降采样代理，否则返回原始源数据。
+ * @param pixelWidth 渲染可用的像素宽度（用于像素感知的目标点数）
+ * @param xMin 可见范围的最小X值
+ * @param xMax 可见范围的最大X值
+ * @return 指向要使用的数据系列的指针（降采样代理或原始源数据）
+ * \endif
+ */
 QImAbstractXYDataSeries* QImDownsamplingController::resolve(int pixelWidth, double xMin, double xMax)
 {
     if (m_algorithm == QImDownsampleAlgorithm::None)
@@ -74,6 +111,21 @@ QImAbstractXYDataSeries* QImDownsamplingController::resolve(int pixelWidth, doub
     return m_downsampled ? m_downsampled.get() : m_source;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Invalidates the downsampled cache, forcing re-downsample on next resolve()
+ * @details Resets the downsampled proxy and clears all tracking state
+ *          (initial done flag, last X range, last pixel width).
+ *          Call after source data changes.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使降采样缓存失效，强制在下一次 resolve() 时重新降采样
+ * @details 重置降采样代理并清除所有追踪状态
+ *          （初始完成标志、上次X范围、上次像素宽度）。
+ *          在源数据变化后调用。
+ * \endif
+ */
 void QImDownsamplingController::invalidate()
 {
     m_downsampled.reset();
@@ -82,6 +134,25 @@ void QImDownsamplingController::invalidate()
     m_lastPixelWidth  = 0;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Converts pixel width to a target point count for downsampling
+ * @details Uses kPixelToPointRatio (default 5) to derive target points from
+ *          available pixel width. Result clamped to [kMinTargetPoints, kMaxTargetPoints].
+ *          This ensures the downsampled data density matches the rendering resolution.
+ * @param pixelWidth Available pixel width for rendering
+ * @return Target point count, clamped to [100, 50000]
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将像素宽度转换为降采样的目标点数
+ * @details 使用 kPixelToPointRatio（默认5）从可用像素宽度推导目标点数。
+ *          结果限制在[kMinTargetPoints, kMaxTargetPoints]范围内。
+ *          这确保降采样后的数据密度与渲染分辨率匹配。
+ * @param pixelWidth 渲染可用的像素宽度
+ * @return 目标点数，限制在[100, 50000]范围内
+ * \endif
+ */
 int QImDownsamplingController::pixelAwareTargetPoints(int pixelWidth)
 {
     if (pixelWidth <= 0) return kMinTargetPoints;
