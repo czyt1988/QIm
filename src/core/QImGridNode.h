@@ -15,13 +15,16 @@ namespace QIM
  * @brief 通用网格布局节点，支持在统一网格中混合放置任意类型的子图节点
  * @brief Generic grid layout node that enables mixing any plot node types in a uniform grid
  *
- * 设计理念：\if ENGLISH
+ * 设计理念：
+ * \if ENGLISH
  * QImGridNode provides a generalized grid layout that can host both 2D (QImPlotNode)
  * and 3D (QImPlot3DNode) plots in the same grid. Unlike QImSubplots3DNode which is
  * specific to 3D plots, QImGridNode uses Qt's property system for cell size notification,
  * making it type-agnostic. Both QImPlotNode and QImPlot3DNode expose Q_PROPERTY(QSizeF size)
  * and Q_PROPERTY(bool autoSize), so property-based notification works seamlessly.
- * \endif \if CHINESE
+ * \endif 
+ * 
+ * \if CHINESE
  * QImGridNode 提供一个通用网格布局，可在同一网格中混合放置 2D（QImPlotNode）和
  * 3D（QImPlot3DNode）子图。与专用于 3D 子图的 QImSubplots3DNode 不同，QImGridNode
  * 使用 Qt 属性系统进行单元格尺寸通知，因此与具体类型无关。QImPlotNode 和 QImPlot3DNode

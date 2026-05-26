@@ -11,8 +11,8 @@
 #include "aggregator/HistoryBuffer.h"
 #include "aggregator/ProcessAggregator.h"
 
-static constexpr int kHistoryDurationSec  = 600;       // 10 minutes
-static constexpr int kWindowDurationSec   = 600;       // X-axis window: 10 minutes
+static constexpr int kHistoryDurationSec  = 300;       // 5 minutes
+static constexpr int kWindowDurationSec   = 300;       // X-axis window: 5 minutes
 
 void CpuUsageView::setHistoryBuffer(HistoryBuffer* buffer)
 {
