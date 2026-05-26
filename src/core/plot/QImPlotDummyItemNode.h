@@ -21,7 +21,6 @@ namespace QIM
  *       graphics in the plot area. They are typically used to add custom
  *       legend entries for manual annotations or grouped data representations.
  *
- * @param[in] parent Parent QObject (optional)
  *
  * @see QImPlotItemNode
  * @see QImPlotNode
@@ -38,7 +37,6 @@ namespace QIM
  * @note 虚拟项仅出现在图例中，不在绘图区域渲染任何可见图形。
  *       它们通常用于添加自定义图例条目，用于手动注释或分组数据表示。
  *
- * @param[in] parent 父 QObject 对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotNode

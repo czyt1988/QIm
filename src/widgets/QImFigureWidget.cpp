@@ -137,12 +137,22 @@ QImSubplotsNode* QImFigureWidget::subplotNode() const
 }
 
 /**
+ * \if ENGLISH
  * @brief Create a 2D plot node, placed intelligently based on current mode
  *
  * If no subplot exists, creates QImPlotNode as a root-level render node (fills window).
  * If subplot exists, delegates to QImSubplotsNode::createPlotNode() (plot occupies a grid cell).
  *
  * @return New QImPlotNode, or nullptr if subplot grid is full
+ * \endif
+ * \if CHINESE
+ * @brief 创建二维绘图节点，根据当前模式智能放置
+ *
+ * 若不存在子图，则创建根层级的 QImPlotNode（填充整个窗口）。
+ * 若子图已存在，则委托给 QImSubplotsNode::createPlotNode()（绘图占据一个网格单元）。
+ *
+ * @return 新的 QImPlotNode，若子图网格已满则返回 nullptr
+ * \endif
  */
 QImPlotNode* QImFigureWidget::createPlotNode()
 {

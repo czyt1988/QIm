@@ -30,20 +30,81 @@ class QImFontFileHelper::PrivateData
 {
     QIM_DECLARE_PUBLIC(QImFontFileHelper)
 public:
+    /**
+     * \if ENGLISH
+     * @brief PrivateData constructor
+     * @param[in] p Pointer to the owning QImFontFileHelper
+     * \endif
+     * \if CHINESE
+     * @brief PrivateData 构造函数
+     * @param[in] p 指向所属 QImFontFileHelper 的指针
+     * \endif
+     */
     explicit PrivateData(QImFontFileHelper* p) : q_ptr(p)
     {
     }
 
-    // 获取系统字体目录路径
+    /**
+     * \if ENGLISH
+     * @brief Gets system font directory paths for the current platform
+     * @return List of platform-specific font directory paths
+     * @details Returns paths like Windows Fonts folder, macOS /System/Library/Fonts,
+     *          or Linux /usr/share/fonts.
+     * \endif
+     * \if CHINESE
+     * @brief 获取当前平台的系统字体目录路径
+     * @return 平台特定的字体目录路径列表
+     * @details 返回诸如 Windows Fonts 目录、macOS /System/Library/Fonts
+     *          或 Linux /usr/share/fonts 等路径。
+     * \endif
+     */
     static QStringList getSystemFontDirectories();
 
-    // 扫描单个字体文件
+    /**
+     * \if ENGLISH
+     * @brief Scans a single font file and adds it to the global cache
+     * @param[in] fontFilePath Absolute path to the font file
+     * @details Loads the font temporarily via QFontDatabase to extract family names.
+     * \endif
+     * \if CHINESE
+     * @brief 扫描单个字体文件并将其加入全局缓存
+     * @param[in] fontFilePath 字体文件的绝对路径
+     * @details 通过 QFontDatabase 临时加载字体以提取家族名称。
+     * \endif
+     */
     static void scanFontFile(const QString& fontFilePath);
 
-    // 递归扫描目录
+    /**
+     * \if ENGLISH
+     * @brief Recursively scans a directory for font files
+     * @param[in] directory Directory path to scan
+     * @details Searches for .ttf and .otf files and calls scanFontFile() for each.
+     * \endif
+     * \if CHINESE
+     * @brief 递归扫描目录中的字体文件
+     * @param[in] directory 要扫描的目录路径
+     * @details 搜索 .ttf 和 .otf 文件，并对每个文件调用 scanFontFile()。
+     * \endif
+     */
     static void scanFontDirectory(const QString& directory);
 
-    // 根据QFont属性筛选最合适的字体文件
+    /**
+     * \if ENGLISH
+     * @brief Filters font files by font family with fuzzy matching fallback
+     * @param[in] family Font family name to search for
+     * @param[in] font Qt font object for additional matching criteria
+     * @return List of matching font file paths
+     * @details Performs exact match first; if not found, falls back to
+     *          case-insensitive substring matching.
+     * \endif
+     * \if CHINESE
+     * @brief 根据字体家族筛选字体文件，支持模糊匹配回退
+     * @param[in] family 要搜索的字体家族名称
+     * @param[in] font 用于附加匹配条件的 Qt 字体对象
+     * @return 匹配的字体文件路径列表
+     * @details 先进行精确匹配；若未找到，则回退到不区分大小写的子串匹配。
+     * \endif
+     */
     static QList< QString > filterFontFilesByFont(const QString& family, const QFont& font);
 };
 

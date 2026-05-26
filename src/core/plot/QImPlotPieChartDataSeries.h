@@ -16,9 +16,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Abstract base class for pie chart data series
  *
- * @class QImAbstractPieChartDataSeries
- * @ingroup plot_data
- *
  * @details Provides a unified interface for data series that represent pie charts.
  *          Stores slice labels and values.
  *          Supports zero-copy rendering when data is contiguous in memory.
@@ -29,9 +26,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief 饼图数据系列的抽象基类
- *
- * @class QImAbstractPieChartDataSeries
- * @ingroup plot_data
  *
  * @details 为表示饼图的数据系列提供统一接口。
  *          存储切片标签和值。
@@ -87,9 +81,6 @@ public:
  * \if ENGLISH
  * @brief Template class for pie chart data series with arbitrary containers
  *
- * @class QImVectorPieChartDataSeries
- * @ingroup plot_data
- *
  * @details Provides a concrete implementation of QImAbstractPieChartDataSeries
  *          using arbitrary container types for values and QStringList for labels.
  *          Supports std::vector, QVector, or any container with:
@@ -105,9 +96,6 @@ public:
  *
  * \if CHINESE
  * @brief 支持任意容器的饼图数据系列模板类
- *
- * @class QImVectorPieChartDataSeries
- * @ingroup plot_data
  *
  * @details 使用任意容器类型为值和QStringList为标签提供QImAbstractPieChartDataSeries的具体实现。
  *          支持std::vector、QVector或任何具有以下特性的容器：

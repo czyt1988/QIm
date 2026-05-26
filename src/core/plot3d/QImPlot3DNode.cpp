@@ -100,6 +100,17 @@ QImPlot3DNode::PrivateData::PrivateData(QImPlot3DNode* q) : q_ptr(q)
 // QImPlot3DNode Implementation
 //===============================================================
 
+/**
+ * \if ENGLISH
+ * @brief Constructs a QImPlot3DNode with optional parent
+ * @param[in] parent Optional parent QObject
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造一个带有可选父对象的 QImPlot3DNode
+ * @param[in] parent 可选的父 QObject
+ * \endif
+ */
 QImPlot3DNode::QImPlot3DNode(QObject* parent)
     : QImAbstractNode(parent)
     , QIM_PIMPL_CONSTRUCT
@@ -107,12 +118,34 @@ QImPlot3DNode::QImPlot3DNode(QObject* parent)
     setObjectName(QStringLiteral("Plot3DNode"));
 }
 
+/**
+ * \if ENGLISH
+ * @brief Constructs a QImPlot3DNode with title and optional parent
+ * @param[in] title Plot title text
+ * @param[in] parent Optional parent QObject
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造一个带有标题和可选父对象的 QImPlot3DNode
+ * @param[in] title 绘图标题文本
+ * @param[in] parent 可选的父 QObject
+ * \endif
+ */
 QImPlot3DNode::QImPlot3DNode(const QString& title, QObject* parent)
     : QImPlot3DNode(parent)
 {
     setTitle(title);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destroys the QImPlot3DNode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 销毁 QImPlot3DNode
+ * \endif
+ */
 QImPlot3DNode::~QImPlot3DNode()
 {
 }
@@ -121,12 +154,34 @@ QImPlot3DNode::~QImPlot3DNode()
 // Title
 //----------------------------------------------------
 
+/**
+ * \if ENGLISH
+ * @brief Gets the plot title text
+ * @return Plot title as QString
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取绘图标题文本
+ * @return 绘图标题（QString 类型）
+ * \endif
+ */
 QString QImPlot3DNode::title() const
 {
     QIM_DC(d);
     return QString::fromUtf8(d->titleUtf8);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the plot title text
+ * @param[in] title New title text
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置绘图标题文本
+ * @param[in] title 新标题文本
+ * \endif
+ */
 void QImPlot3DNode::setTitle(const QString& title)
 {
     QIM_D(d);
@@ -141,12 +196,34 @@ void QImPlot3DNode::setTitle(const QString& title)
 // Size
 //----------------------------------------------------
 
+/**
+ * \if ENGLISH
+ * @brief Gets the plot frame size
+ * @return Plot size as QSizeF
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取绘图框尺寸
+ * @return 绘图尺寸（QSizeF 类型）
+ * \endif
+ */
 QSizeF QImPlot3DNode::size() const
 {
     QIM_DC(d);
     return QSizeF(d->sizeVec4.x, d->sizeVec4.y);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the plot frame size
+ * @param[in] size New plot size (negative values for auto-size)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置绘图框尺寸
+ * @param[in] size 新的绘图尺寸（负值表示自动尺寸）
+ * \endif
+ */
 void QImPlot3DNode::setSize(const QSizeF& size)
 {
     QIM_D(d);
@@ -170,12 +247,34 @@ void QImPlot3DNode::setSize(const QSizeF& size)
 // Auto-size
 //----------------------------------------------------
 
+/**
+ * \if ENGLISH
+ * @brief Checks if auto-size mode is enabled
+ * @return true if auto-size is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查自动尺寸模式是否启用
+ * @return true 表示自动尺寸已启用
+ * \endif
+ */
 bool QImPlot3DNode::isAutoSize() const
 {
     QIM_DC(d);
     return d->autoSize;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Enables or disables auto-size mode
+ * @param[in] enabled true to use auto-fill size, false to use manual size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用或禁用自动尺寸模式
+ * @param[in] enabled true 使用自动填充尺寸，false 使用手动尺寸
+ * \endif
+ */
 void QImPlot3DNode::setAutoSize(bool enabled)
 {
     QIM_D(d);
@@ -189,6 +288,19 @@ void QImPlot3DNode::setAutoSize(bool enabled)
 // Axis management
 //----------------------------------------------------
 
+/**
+ * \if ENGLISH
+ * @brief Gets axis info by axis ID
+ * @param[in] aid Axis ID (X1, Y1, or Z1)
+ * @return Pointer to QImPlot3DAxisInfo, or nullptr if invalid axis ID
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 根据坐标轴 ID 获取坐标轴信息
+ * @param[in] aid 坐标轴 ID（X1、Y1 或 Z1）
+ * @return QImPlot3DAxisInfo 指针，无效坐标轴 ID 则返回 nullptr
+ * \endif
+ */
 QImPlot3DAxisInfo* QImPlot3DNode::axisInfo(QImPlot3DAxisId aid) const
 {
     QIM_DC(d);
@@ -204,18 +316,51 @@ QImPlot3DAxisInfo* QImPlot3DNode::axisInfo(QImPlot3DAxisId aid) const
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the X axis info
+ * @return Pointer to the X-axis QImPlot3DAxisInfo
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取 X 轴信息
+ * @return X 轴 QImPlot3DAxisInfo 指针
+ * \endif
+ */
 QImPlot3DAxisInfo* QImPlot3DNode::xAxis() const
 {
     QIM_DC(d);
     return d->xAxisInfo;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the Y axis info
+ * @return Pointer to the Y-axis QImPlot3DAxisInfo
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取 Y 轴信息
+ * @return Y 轴 QImPlot3DAxisInfo 指针
+ * \endif
+ */
 QImPlot3DAxisInfo* QImPlot3DNode::yAxis() const
 {
     QIM_DC(d);
     return d->yAxisInfo;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the Z axis info
+ * @return Pointer to the Z-axis QImPlot3DAxisInfo
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取 Z 轴信息
+ * @return Z 轴 QImPlot3DAxisInfo 指针
+ * \endif
+ */
 QImPlot3DAxisInfo* QImPlot3DNode::zAxis() const
 {
     QIM_DC(d);
@@ -226,6 +371,17 @@ QImPlot3DAxisInfo* QImPlot3DNode::zAxis() const
 // Style node accessor
 //----------------------------------------------------
 
+/**
+ * \if ENGLISH
+ * @brief Gets the style node for this plot
+ * @return Pointer to QImPlot3DStyleNode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取此绘图的样式节点
+ * @return QImPlot3DStyleNode 指针
+ * \endif
+ */
 QImPlot3DStyleNode* QImPlot3DNode::styleNode() const
 {
     QIM_DC(d);

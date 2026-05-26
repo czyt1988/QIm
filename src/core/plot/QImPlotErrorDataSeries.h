@@ -9,9 +9,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Abstract base class for error data series
  *
- * @class QImAbstractErrorDataSeries
- * @ingroup plot_data
- *
  * @details Provides a unified interface for data series that include error values.
  *          Supports both symmetric errors (same for positive and negative)
  *          and asymmetric errors (different positive and negative values).
@@ -24,9 +21,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief 误差数据系列的抽象基类
- *
- * @class QImAbstractErrorDataSeries
- * @ingroup plot_data
  *
  * @details 为包含误差值的数据系列提供统一接口。
  *          支持对称误差（正负相同）和非对称误差（正负不同）。
@@ -84,9 +78,6 @@ public:
  * \if ENGLISH
  * @brief Template class for error data series with arbitrary containers
  *
- * @class QImVectorErrorDataSeries
- * @ingroup plot_data
- *
  * @details Provides a concrete implementation of QImAbstractErrorDataSeries
  *          using arbitrary container types for X, Y, and error values.
  *          Supports std::vector, QVector, or any container with:
@@ -104,9 +95,6 @@ public:
  *
  * \if CHINESE
  * @brief 支持任意容器的误差数据系列模板类
- *
- * @class QImVectorErrorDataSeries
- * @ingroup plot_data
  *
  * @details 使用任意容器类型为 X、Y 和误差值提供 QImAbstractErrorDataSeries 的具体实现。
  *          支持 std::vector、QVector 或任何具有以下特性的容器：

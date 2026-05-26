@@ -23,8 +23,6 @@ namespace QIM
  *       rotated by an angle (in degrees) and offset in pixel space for fine positioning.
  *       Unlike the 2D version, this uses angle (degrees) instead of vertical boolean.
  *
- * @param[in] parent Parent QObject (optional)
- *
  * @see QImPlot3DItemNode
  * @see QImPlotTextItemNode
  * @see ImPlot3D::PlotText
@@ -40,8 +38,6 @@ namespace QIM
  *
  * @note 文本标签在指定的 3D 绘图位置 (x, y, z) 处渲染，并可以按角度（度）旋转并在像素空间中进行偏移
  *       以进行精细定位调整。与 2D 版本不同，此版本使用角度（度）而非垂直布尔值。
- *
- * @param[in] parent 父 QObject 对象（可选）
  *
  * @see QImPlot3DItemNode
  * @see QImPlotTextItemNode

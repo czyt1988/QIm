@@ -21,9 +21,7 @@ class QImAbstractXYDataSeries;
  *
  * @note Shaded plots visualize filled regions between lines or between a line and a reference.
  *       Use QImPlotLineItemNode for simple line plots.
- * @warning For two-line fill mode, both data series must have the same X coordinates.
- *
- * @param[in] parent Parent QObject (optional)
+ * @note For two-line fill mode, both data series must have the same X coordinates.
  *
  * @see QImPlotItemNode
  * @see QImPlotLineItemNode
@@ -33,16 +31,14 @@ class QImAbstractXYDataSeries;
  * \if CHINESE
  * @brief ImPlot填充区域（阴影）可视化的Qt风格封装
  *
- * @details 为ImPlot填充/阴影区域提供Qt风格的保留模式封装。
- *          支持线条与水平参考值之间的填充，或两条线之间（上下边界）的填充。
- *          适用于面积图、置信区间和不确定性可视化。
- *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性。
+ * @details 为ImPlot填充/阴影区域提供Qt风格的保留模式封装�?
+ *          支持线条与水平参考值之间的填充，或两条线之间（上下边界）的填充�?
+ *          适用于面积图、置信区间和不确定性可视化�?
+ *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性�?
  *
- * @note 填充图可视化线条之间或线条与参考值之间的填充区域。
- *       简单线图请使用QImPlotLineItemNode。
- * @warning 对于双线填充模式，两个数据系列必须具有相同的X坐标。
- *
- * @param[in] parent 父QObject对象（可选）
+ * @note 填充图可视化线条之间或线条与参考值之间的填充区域�?
+ *       简单线图请使用QImPlotLineItemNode�?
+ * @note 对于双线填充模式，两个数据系列必须具有相同的X坐标�?
  *
  * @see QImPlotItemNode
  * @see QImPlotLineItemNode
@@ -71,11 +67,11 @@ class QIM_CORE_API QImPlotShadedItemNode : public QImPlotItemNode
      * @property QImPlotShadedItemNode::referenceValue
      * @brief 单线填充模式的参考值（Y轴）
      *
-     * @details 控制填充的水平参考线。
-     *          数据线与该参考值之间的区域被填充。
-     *          使用-INFINITY表示填充延伸到负无穷，
-     *          +INFINITY表示填充延伸到正无穷。
-     *          默认值为0.0。
+     * @details 控制填充的水平参考线�?
+     *          数据线与该参考值之间的区域被填充�?
+     *          使用-INFINITY表示填充延伸到负无穷�?
+     *          +INFINITY表示填充延伸到正无穷�?
+     *          默认值为0.0�?
      * @accessors READ referenceValue WRITE setReferenceValue NOTIFY referenceValueChanged
      * \endif
      */
@@ -93,10 +89,10 @@ class QIM_CORE_API QImPlotShadedItemNode : public QImPlotItemNode
      *
      * \if CHINESE
      * @property QImPlotShadedItemNode::color
-     * @brief 填充区域的颜色
+     * @brief 填充区域的颜�?
      *
-     * @details 定义填充区域的主要颜色。
-     *          未设置时，使用ImPlot的默认颜色序列。
+     * @details 定义填充区域的主要颜色�?
+     *          未设置时，使用ImPlot的默认颜色序列�?
      * @accessors READ color WRITE setColor NOTIFY colorChanged
      * \endif
      */
@@ -193,9 +189,9 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 参考值更改时触发
-     * @param[in] value 新参考值
-     * @details 当值实际更改时由setReferenceValue()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @param[in] value 新参考�?
+     * @details 当值实际更改时由setReferenceValue()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void referenceValueChanged(double value);
@@ -209,10 +205,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 填充颜色更改时触发
-     * @param[in] color 新填充颜色
-     * @details 当值实际更改时由setColor()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 填充颜色更改时触�?
+     * @param[in] color 新填充颜�?
+     * @details 当值实际更改时由setColor()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void colorChanged(const QColor& color);
@@ -225,9 +221,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触发
-     * @details 当分配新数据时由setData()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 数据系列更改时触�?
+     * @details 当分配新数据时由setData()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void dataChanged();
@@ -240,9 +236,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 填充标志更改时触发
-     * @details 任何标志属性更改时触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 填充标志更改时触�?
+     * @details 任何标志属性更改时触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void shadedFlagChanged();

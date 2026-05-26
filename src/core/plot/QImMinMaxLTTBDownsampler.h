@@ -12,7 +12,6 @@ namespace QIM
 
 /**
  * \if ENGLISH
- * @class QImMinMaxLTTBDownsampler
  * @brief MinMaxLTTB downsampling proxy class - transparent decorator for QImAbstractXYDataSeries
  *
  * @section algo_principle Algorithm Principle
@@ -71,7 +70,6 @@ namespace QIM
  * \endif
  *
  * \if CHINESE
- * @class QImMinMaxLTTBDownsampler
  * @brief MinMaxLTTB 下采样代理类 - 作为 QImAbstractXYDataSeries 的透明装饰器
  *
  * @section algo_principle 算法原理
@@ -131,27 +129,25 @@ namespace QIM
 class QIM_CORE_API QImMinMaxLTTBDownsampler : public QImAbstractXYDataSeries
 {
 public:
-    /**
-     * @brief 构造代理（不拥有原始数据所有权）
-     * @param source 原始数据系列（必须保证生命周期长于代理）
-     * @param target_points 目标点数（默认 2000，≈1.5 倍典型屏幕宽度）
-     * @param preselection_ratio MinMax 预筛选比例（默认 4.0，即每个桶保留 4 个极值候选点）
-     */
+    // Construct proxy (does not own source data)
+    // source: original data series (must outlive the proxy)
+    // target_points: target point count (default 2000, ~1.5x typical screen width)
+    // preselection_ratio: MinMax preselection ratio (default 4.0, 4 extrema candidates per bucket)
     explicit QImMinMaxLTTBDownsampler(QImAbstractXYDataSeries* source,
                                       int target_points         = 2000,
                                       double preselection_ratio = 4.0,
                                       bool autoDownsample       = true);
     ~QImMinMaxLTTBDownsampler() override = default;
 
-    // ===== QImAbstractXYDataSeries 接口重写 =====
+    // QImAbstractXYDataSeries interface overrides
     int type() const override
     {
         return XYData;
-    }  // 代理后总是 XY 模式
+    }
 
     int size() const override;
 
-    bool isContiguous() const override;  // 缓存数据总是连续
+    bool isContiguous() const override;
 
     int stride() const override;
 
@@ -159,12 +155,12 @@ public:
 
     const double* yRawData() const override;
 
-    // 代理后不再支持 Y-only 模式（下采样破坏等间隔假设），返回默认值
+    // Y-only mode no longer supported after downsampling (breaks equidistant assumption)
     double xScale() const override;
     double xStart() const override;
     int offset() const override;
 
-    // ===== 配置接口 =====
+    // Configuration
     void setTargetPoints(int points);
 
     int targetPoints() const;
@@ -176,25 +172,25 @@ public:
     virtual double xValue(int index) const override;
     virtual double yValue(int index) const override;
 
-    // 根据目标点数更新数据，这个函数在目标点数变化，或原数据发生变化时调用，用于更新
+    // Update data based on target point count; call when target changes or source data changes
     void downSampler();
     void downSampler(double x_min, double x_max);
 
 private:
-    // ===== 内部状态 =====
-    QImAbstractXYDataSeries* m_source;  // 原始数据指针
+    // Internal state
+    QImAbstractXYDataSeries* m_source;  // source data pointer
     int m_target_points;
-    double m_preselection_ratio;  // MinMax 预筛选比例
+    double m_preselection_ratio;  // MinMax preselection ratio
 
-    // 缓存状态
+    // cached state
     mutable std::vector< double > m_cached_x;
     mutable std::vector< double > m_cached_y;
     mutable bool m_cached_valid = false;
 
-    // 查找视图范围内的数据索引 [start_idx, end_idx)
+    // Find visible data range [start_idx, end_idx)
     std::pair< int, int > findVisibleRange(double x_min, double x_max) const;
 
-    // MinMaxLTTB 核心算法（O(n)，带 MinMax 预筛选）
+    // Core MinMaxLTTB algorithm (O(n) with MinMax preselection)
     void minMaxLTTB(const double* x_data, const double* y_data, int start_idx, int end_idx, int target_points);
 };
 

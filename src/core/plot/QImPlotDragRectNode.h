@@ -24,8 +24,6 @@ namespace QIM
  * @note The rectangle coordinates are stored as double values in plot coordinate space.
  *       ImPlot modifies the coordinates directly through pointers during dragging.
  *
- * @param[in] parent Parent QObject (optional)
- *
  * @see QImPlotItemNode
  * @see QImPlotNode
  * @see ImPlot::DragRect()
@@ -41,8 +39,6 @@ namespace QIM
  *
  * @note 矩形坐标在绘图坐标空间中存储为double值。
  *       拖拽期间，ImPlot通过指针直接修改坐标。
- *
- * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotNode

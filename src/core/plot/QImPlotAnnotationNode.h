@@ -24,8 +24,6 @@ namespace QIM
  * @note The annotation position is in plot coordinate space.
  *       The annotation is static (non-interactive) and does not support dragging.
  *
- * @param[in] parent Parent QObject (optional)
- *
  * @see QImPlotItemNode
  * @see QImPlotNode
  * @see ImPlot::Annotation()
@@ -40,8 +38,6 @@ namespace QIM
  *
  * @note 注释位置在绘图坐标空间中。
  *       注释是静态的（非交互式），不支持拖拽。
- *
- * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotNode

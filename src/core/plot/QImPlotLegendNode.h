@@ -32,10 +32,10 @@ class QIM_CORE_API QImPlotLegendNode : public QImAbstractNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotLegendNode)
 
-    // === 位置属性 ===
+    // Position properties
     Q_PROPERTY(QImPlotLegendLocation location READ location WRITE setLocation NOTIFY locationChanged)
 
-    // === 方向属性 ===
+    // Orientation properties
     Q_PROPERTY(Qt::Orientation orientation READ orientation WRITE setOrientation NOTIFY legendFlagChanged)
     Q_PROPERTY(bool outside READ isOutside WRITE setOutside NOTIFY legendFlagChanged)
     Q_PROPERTY(bool buttonEnabled READ isButtonEnabled WRITE setButtonEnabled NOTIFY legendFlagChanged)
@@ -47,25 +47,19 @@ public:
     explicit QImPlotLegendNode(QObject* parent = nullptr);
     ~QImPlotLegendNode() override;
 
-    // ----------------------------------------------------
-    // 位置相关方法
-    // ----------------------------------------------------
+    // Position methods
     QImPlotLegendLocation location() const;
     void setLocation(QImPlotLegendLocation v);
     // 映射为Qt::Alignment
     Qt::Alignment alignment() const;
     void setAlignment(Qt::Alignment a);
 
-    // ----------------------------------------------------
-    // 方向相关方法
-    // ----------------------------------------------------
+    // Orientation methods
     // ImPlotLegendFlags_Horizontal
     void setOrientation(Qt::Orientation vh);
     Qt::Orientation orientation() const;
 
-    // ----------------------------------------------------
     // ImPlotLegendFlags
-    // ----------------------------------------------------
     // ImPlotLegendFlags_Outside
     bool isOutside() const;
     void setOutside(bool on);
@@ -88,9 +82,7 @@ public:
     int legendFlags() const;
     void setLegendFlags(int flags);
 
-    // ----------------------------------------------------
-    // 应用图例设置到当前绘图
-    // ----------------------------------------------------
+    // Apply legend settings to current plot
     void apply() const;
 
 Q_SIGNALS:

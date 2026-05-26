@@ -74,19 +74,18 @@ public:
     void downSampler();
 
 private:
-    // ===== 内部状态 =====
-    QImAbstractXYDataSeries* m_source;  // 原始数据指针
+    // Internal state
+    QImAbstractXYDataSeries* m_source;  // source data pointer
     int m_target_points;
-    // 缓存状态
+    // cached state
     mutable std::vector< double > m_cached_x;
     mutable std::vector< double > m_cached_y;
     mutable bool m_cached_valid = false;
 
-
-    // 查找视图范围内的数据索引 [start_idx, end_idx)
+    // Find visible data range [start_idx, end_idx)
     std::pair< int, int > findVisibleRange(double x_min, double x_max) const;
 
-    // LTTB核心算法（裁剪后数据段）
+    // Core LTTB algorithm (clipped data segment)
     void lttb(const double* x_data, const double* y_data, int start_idx, int end_idx, int target_points);
 };
 

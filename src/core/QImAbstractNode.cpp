@@ -62,11 +62,33 @@ QImAbstractNode::~QImAbstractNode()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Check if the node is visible
+ * @return true if the node is visible, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查节点是否可见
+ * @return true表示节点可见，false表示不可见
+ * \endif
+ */
 bool QImAbstractNode::isVisible() const
 {
     return m_visible;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Set the visibility state of the node
+ * @param[in] visible New visibility state
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置节点的可见性状态
+ * @param[in] visible 新的可见性状态
+ * \endif
+ */
 void QImAbstractNode::setVisible(bool visible)
 {
     if (m_visible != visible) {
@@ -75,11 +97,33 @@ void QImAbstractNode::setVisible(bool visible)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Check if the node is enabled
+ * @return true if the node is enabled, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查节点是否启用
+ * @return true表示节点已启用，false表示未启用
+ * \endif
+ */
 bool QImAbstractNode::isEnabled() const
 {
     return m_enabled;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Set the enabled state of the node
+ * @param[in] enabled New enabled state
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置节点的启用状态
+ * @param[in] enabled 新的启用状态
+ * \endif
+ */
 void QImAbstractNode::setEnabled(bool enabled)
 {
     if (m_enabled != enabled) {
@@ -275,21 +319,67 @@ void QImAbstractNode::clearChildrenNodes()
     m_childrenZordered.clear();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the index of a child node in the child list
+ * @param[in] child Child node to find
+ * @return Index of the child node, or -1 if not found
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取子节点在子列表中的索引
+ * @param[in] child 要查找的子节点
+ * @return 子节点的索引，未找到则返回-1
+ * \endif
+ */
 int QImAbstractNode::indexOfChildNode(QImAbstractNode* child) const
 {
     return m_children.indexOf(child);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the list of child nodes in insertion order
+ * @return Const reference to the child node list
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取按插入顺序排列的子节点列表
+ * @return 子节点列表的常量引用
+ * \endif
+ */
 const QList< QImAbstractNode* >& QImAbstractNode::childrenNodes() const
 {
     return m_children;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the list of child nodes pre-sorted by z-order
+ * @return Const reference to the z-order sorted child node list
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取按z-order预排序的子节点列表
+ * @return z-order排序子节点列表的常量引用
+ * \endif
+ */
 const QList< QImAbstractNode* >& QImAbstractNode::childrenNodesZOrdered() const
 {
     return m_childrenZordered;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the number of child nodes
+ * @return Number of child nodes
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取子节点数量
+ * @return 子节点数量
+ * \endif
+ */
 int QImAbstractNode::childNodeCount() const
 {
     return m_children.size();

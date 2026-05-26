@@ -23,8 +23,6 @@ namespace QIM
  * @note The tag position is in plot coordinate space.
  *       The tag is static (non-interactive) and does not support dragging.
  *
- * @param[in] parent Parent QObject (optional)
- *
  * @see QImPlotItemNode
  * @see QImPlotNode
  * @see ImPlot::TagX()
@@ -39,8 +37,6 @@ namespace QIM
  *
  * @note 标签位置在绘图坐标空间中。
  *       标签是静态的（非交互式），不支持拖拽。
- *
- * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotNode

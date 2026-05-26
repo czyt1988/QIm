@@ -16,9 +16,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Abstract base class for bar groups data series
  *
- * @class QImAbstractBarGroupsDataSeries
- * @ingroup plot_data
- *
  * @details Provides a unified interface for data series that represent grouped bar charts.
  *          Stores item labels and a row-major matrix of values (item_count rows, group_count columns).
  *          Supports zero-copy rendering when data is contiguous in memory.
@@ -29,9 +26,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief 分组柱状图数据系列的抽象基类
- *
- * @class QImAbstractBarGroupsDataSeries
- * @ingroup plot_data
  *
  * @details 为表示分组柱状图的数据系列提供统一接口。
  *          存储项目标签和行主序的值矩阵（item_count 行，group_count 列）。
@@ -90,9 +84,6 @@ public:
  * \if ENGLISH
  * @brief Template class for bar groups data series with arbitrary containers
  *
- * @class QImVectorBarGroupsDataSeries
- * @ingroup plot_data
- *
  * @details Provides a concrete implementation of QImAbstractBarGroupsDataSeries
  *          using arbitrary container types for values and QStringList for labels.
  *          Supports std::vector, QVector, or any container with:
@@ -108,9 +99,6 @@ public:
  *
  * \if CHINESE
  * @brief 支持任意容器的分组柱状图数据系列模板类
- *
- * @class QImVectorBarGroupsDataSeries
- * @ingroup plot_data
  *
  * @details 使用任意容器类型为值和QStringList为标签提供QImAbstractBarGroupsDataSeries的具体实现。
  *          支持std::vector、QVector或任何具有以下特性的容器：

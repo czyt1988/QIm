@@ -22,7 +22,7 @@ namespace QIM
  *
  * @note Images are rendered as axis-aligned rectangles with texture coordinates.
  *       Useful for overlaying icons, logos, or pre-rendered graphics on plots.
- * @warning Texture ID must be a valid ImTextureID obtained from the rendering backend.
+ * @note Texture ID must be a valid ImTextureID obtained from the rendering backend.
  *
  * @see QImPlotItemNode
  * @see QImPlotHeatmapItemNode
@@ -32,13 +32,13 @@ namespace QIM
  * \if CHINESE
  * @brief ImPlot图像可视化的Qt风格封装
  *
- * @details 为ImPlot图像渲染提供Qt风格的保留模式封装。
- *          支持在指定的绘图坐标边界内渲染图像纹理。
- *          继承自QImPlotItemNode，并遵循与QImPlotHeatmapItemNode相同的PIMPL设计模式以保持一致性。
+ * @details 为ImPlot图像渲染提供Qt风格的保留模式封装�?
+ *          支持在指定的绘图坐标边界内渲染图像纹理�?
+ *          继承自QImPlotItemNode，并遵循与QImPlotHeatmapItemNode相同的PIMPL设计模式以保持一致性�?
  *
- * @note 图像作为轴对齐矩形渲染，具有纹理坐标。
- *       适用于在图表上叠加图标、徽标或预渲染图形。
- * @warning 纹理ID必须是来自渲染后端的有效ImTextureID。
+ * @note 图像作为轴对齐矩形渲染，具有纹理坐标�?
+ *       适用于在图表上叠加图标、徽标或预渲染图形�?
+ * @note 纹理ID必须是来自渲染后端的有效ImTextureID�?
  *
  * @see QImPlotItemNode
  * @see QImPlotHeatmapItemNode
@@ -123,10 +123,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 纹理ID更改时触发
-     * @param[in] id 新的纹理ID值
-     * @details 当值实际更改时由setTextureId()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 纹理ID更改时触�?
+     * @param[in] id 新的纹理ID�?
+     * @details 当值实际更改时由setTextureId()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void textureIdChanged(quintptr id);
@@ -141,9 +141,9 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 左下角边界更改时触发
-     * @param[in] min 新的左下角边界位置
-     * @details 当值实际更改时由setBoundsMin()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @param[in] min 新的左下角边界位�?
+     * @details 当值实际更改时由setBoundsMin()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void boundsMinChanged(const QPointF& min);
@@ -158,9 +158,9 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 右上角边界更改时触发
-     * @param[in] max 新的右上角边界位置
-     * @details 当值实际更改时由setBoundsMax()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @param[in] max 新的右上角边界位�?
+     * @details 当值实际更改时由setBoundsMax()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void boundsMaxChanged(const QPointF& max);
@@ -176,8 +176,8 @@ Q_SIGNALS:
      * \if CHINESE
      * @brief 左下角纹理坐标更改时触发
      * @param[in] uv 新的UV0坐标
-     * @details 当值实际更改时由setUv0()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @details 当值实际更改时由setUv0()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void uv0Changed(const QPointF& uv);
@@ -193,8 +193,8 @@ Q_SIGNALS:
      * \if CHINESE
      * @brief 右上角纹理坐标更改时触发
      * @param[in] uv 新的UV1坐标
-     * @details 当值实际更改时由setUv1()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @details 当值实际更改时由setUv1()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void uv1Changed(const QPointF& uv);
@@ -208,10 +208,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 色调颜色更改时触发
+     * @brief 色调颜色更改时触�?
      * @param[in] color 新的色调颜色
-     * @details 当值实际更改时由setTintColor()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @details 当值实际更改时由setTintColor()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void tintColorChanged(const QColor& color);
@@ -224,9 +224,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 图像标志更改时触发
-     * @details 任何标志属性更改时触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 图像标志更改时触�?
+     * @details 任何标志属性更改时触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void imageFlagChanged();

@@ -20,8 +20,6 @@ namespace QIM
  * @note The line position is stored as a double value in plot coordinate space.
  *       ImPlot modifies the position directly through pointers during dragging.
  *
- * @param[in] parent Parent QObject (optional)
- *
  * @see QImPlotItemNode
  * @see QImPlotNode
  * @see ImPlot::DragLineX()
@@ -37,8 +35,6 @@ namespace QIM
  *
  * @note 线位置在绘图坐标空间中存储为double值。
  *       拖拽期间，ImPlot通过指针直接修改位置。
- *
- * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotNode

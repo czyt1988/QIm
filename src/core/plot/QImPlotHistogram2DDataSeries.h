@@ -14,9 +14,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Abstract base class for 2D histogram data series
  *
- * @class QImAbstractHistogram2DDataSeries
- * @ingroup plot_data
- *
  * @details Provides a unified interface for data series that represent 2D histogram values.
  *          Stores X and Y arrays for bivariate data.
  *          Inherits from QImAbstractXYDataSeries to reuse existing infrastructure.
@@ -27,9 +24,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief 二维直方图数据系列的抽象基类
- *
- * @class QImAbstractHistogram2DDataSeries
- * @ingroup plot_data
  *
  * @details 为表示二维直方图值的数据系列提供统一接口。
  *          存储双变量数据的X和Y数组。
@@ -82,9 +76,6 @@ public:
  * \if ENGLISH
  * @brief Template class for 2D histogram data series with arbitrary containers
  *
- * @class QImVectorHistogram2DDataSeries
- * @ingroup plot_data
- *
  * @details Provides a concrete implementation of QImAbstractHistogram2DDataSeries
  *          using arbitrary container types for X and Y values.
  *          Supports std::vector, QVector, or any container with:
@@ -101,9 +92,6 @@ public:
  *
  * \if CHINESE
  * @brief 支持任意容器的二维直方图数据系列模板类
- *
- * @class QImVectorHistogram2DDataSeries
- * @ingroup plot_data
  *
  * @details 使用任意容器类型为X和Y值提供 QImAbstractHistogram2DDataSeries 的具体实现。
  *          支持 std::vector、QVector 或任何具有以下特性的容器：

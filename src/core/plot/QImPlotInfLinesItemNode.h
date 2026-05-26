@@ -27,8 +27,6 @@ namespace QIM
  *       thresholds, reference values, or asymptotes. Multiple lines can be
  *       drawn with a single node by providing an array of values.
  *
- * @param[in] parent Parent QObject (optional)
- *
  * @see QImPlotItemNode
  * @see QImPlotNode
  * \endif
@@ -47,8 +45,6 @@ namespace QIM
  *
  * @note 无限线通常用于标记重要值，如阈值、参考值或渐近线。
  *       通过提供值数组，单个节点可以绘制多条无限线。
- *
- * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotNode

@@ -14,9 +14,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Abstract base class for histogram data series
  *
- * @class QImAbstractHistogramDataSeries
- * @ingroup plot_data
- *
  * @details Provides a unified interface for data series that represent histogram values.
  *          Stores single values (Y) only, with X generated automatically as indices.
  *          Inherits from QImAbstractXYDataSeries to reuse existing infrastructure.
@@ -27,9 +24,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief 直方图数据系列的抽象基类
- *
- * @class QImAbstractHistogramDataSeries
- * @ingroup plot_data
  *
  * @details 为表示直方图值的数据系列提供统一接口。
  *          仅存储单值（Y），X自动生成为索引。
@@ -76,9 +70,6 @@ public:
  * \if ENGLISH
  * @brief Template class for histogram data series with arbitrary containers
  *
- * @class QImVectorHistogramDataSeries
- * @ingroup plot_data
- *
  * @details Provides a concrete implementation of QImAbstractHistogramDataSeries
  *          using arbitrary container types for values.
  *          Supports std::vector, QVector, or any container with:
@@ -94,9 +85,6 @@ public:
  *
  * \if CHINESE
  * @brief 支持任意容器的直方图数据系列模板类
- *
- * @class QImVectorHistogramDataSeries
- * @ingroup plot_data
  *
  * @details 使用任意容器类型为值提供 QImAbstractHistogramDataSeries 的具体实现。
  *          支持 std::vector、QVector 或任何具有以下特性的容器：

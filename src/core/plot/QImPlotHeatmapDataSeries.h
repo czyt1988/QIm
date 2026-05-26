@@ -15,9 +15,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Abstract base class for heatmap data series
  *
- * @class QImAbstractHeatmapDataSeries
- * @ingroup plot_data
- *
  * @details Provides a unified interface for data series that represent heatmap charts.
  *          Stores a 2D matrix of values with rows and columns dimensions.
  *          Supports zero-copy rendering when data is contiguous in memory.
@@ -29,9 +26,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief 热力图数据系列的抽象基类
- *
- * @class QImAbstractHeatmapDataSeries
- * @ingroup plot_data
  *
  * @details 为表示热力图的数据系列提供统一接口。
  *          存储具有行和列维度的二维值矩阵。
@@ -88,9 +82,6 @@ public:
  * \if ENGLISH
  * @brief Template class for heatmap data series with arbitrary containers
  *
- * @class QImVectorHeatmapDataSeries
- * @ingroup plot_data
- *
  * @details Provides a concrete implementation of QImAbstractHeatmapDataSeries
  *          using arbitrary container types for values.
  *          Supports std::vector, QVector, or any container with:
@@ -106,9 +97,6 @@ public:
  *
  * \if CHINESE
  * @brief 支持任意容器的热力图数据系列模板类
- *
- * @class QImVectorHeatmapDataSeries
- * @ingroup plot_data
  *
  * @details 使用任意容器类型为值提供QImAbstractHeatmapDataSeries的具体实现。
  *          支持std::vector、QVector或任何具有以下特性的容器：

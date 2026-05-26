@@ -10,10 +10,6 @@ namespace QIM
 /**
  * \if ENGLISH
  * @brief 3D triangle plot item node
- *
- * @class QImPlot3DTriangleItemNode
- * @ingroup plot3d
- *
  * @details Renders 3D triangles defined by sequences of X, Y, Z data points.
  * Supports configurable visibility for lines, fill, and markers,
  * as well as separate color and style properties for each element.
@@ -24,10 +20,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief 三维三角形绘图项节点
- *
- * @class QImPlot3DTriangleItemNode
- * @ingroup plot3d
- *
  * @details 通过X、Y、Z数据点序列渲染三维三角形。
  * 支持线条、填充和标记点的可见性配置，
  * 以及每种元素的独立颜色和样式属性。

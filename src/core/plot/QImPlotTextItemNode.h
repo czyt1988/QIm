@@ -23,8 +23,6 @@ namespace QIM
  * @note Text labels are rendered at the specified plot position (x, y) and can be
  *       offset in pixel space for fine positioning adjustments.
  *
- * @param[in] parent Parent QObject (optional)
- *
  * @see QImPlotItemNode
  * @see QImPlotNode
  * \endif
@@ -38,8 +36,6 @@ namespace QIM
  *          继承自QImPlotItemNode，并遵循与其他绘图项节点相同的PIMPL设计模式以保持一致性。
  *
  * @note 文本标签在指定的绘图位置 (x, y) 处渲染，并可以在像素空间中进行偏移以进行精细定位调整。
- *
- * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotNode

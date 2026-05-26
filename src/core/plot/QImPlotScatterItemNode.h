@@ -20,9 +20,7 @@ class QImAbstractXYDataSeries;
  *
  * @note Scatter plots visualize discrete data points without connecting lines.
  *       Use QImPlotLineItemNode for continuous line plots.
- * @warning Marker size and shape changes require redraw to take effect.
- *
- * @param[in] parent Parent QObject (optional)
+ * @note Marker size and shape changes require redraw to take effect.
  *
  * @see QImPlotItemNode
  * @see QImPlotLineItemNode
@@ -32,16 +30,15 @@ class QImAbstractXYDataSeries;
  * \if CHINESE
  * @brief ImPlot散点图可视化的Qt风格封装
  *
- * @details 为ImPlot散点图提供Qt风格的保留模式封装。
- *          支持标记自定义（形状、大小、填充）、自适应采样，
- *          以及完整的Qt属性系统集成和信号槽事件处理。
- *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性。
+ * @details 为ImPlot散点图提供Qt风格的保留模式封装�?
+ *          支持标记自定义（形状、大小、填充）、自适应采样�?
+ *          以及完整的Qt属性系统集成和信号槽事件处理�?
+ *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性�?
  *
- * @note 散点图可视化离散数据点而不连接线。
- *       连续线图请使用QImPlotLineItemNode。
- * @warning 标记大小和形状更改需要重绘才能生效。
+ * @note 散点图可视化离散数据点而不连接线�?
+ *       连续线图请使用QImPlotLineItemNode�?
+ * @note 标记大小和形状更改需要重绘才能生效�?
  *
- * @param[in] parent 父QObject对象（可选）
  *
  * @see QImPlotItemNode
  * @see QImPlotLineItemNode
@@ -177,10 +174,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标记大小更改时触发
-     * @param[in] size 新标记大小（像素）
-     * @details 当值实际更改时由setMarkerSize()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 标记大小更改时触�?
+     * @param[in] size 新标记大小（像素�?
+     * @details 当值实际更改时由setMarkerSize()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void markerSizeChanged(float size);
@@ -194,10 +191,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标记形状更改时触发
+     * @brief 标记形状更改时触�?
      * @param[in] shape 新标记形状（ImPlotMarker枚举值）
-     * @details 当值实际更改时由setMarkerShape()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @details 当值实际更改时由setMarkerShape()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void markerShapeChanged(int shape);
@@ -212,9 +209,9 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 标记填充状态更改时触发
-     * @param[in] fill 新标记填充状态（true = 填充，false = 轮廓）
-     * @details 当值实际更改时由setMarkerFill()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @param[in] fill 新标记填充状态（true = 填充，false = 轮廓�?
+     * @details 当值实际更改时由setMarkerFill()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void markerFillChanged(bool fill);
@@ -227,7 +224,7 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 降采样算法变更时发射
-     * @param[in] algo 新的算法值
+     * @param[in] algo 新的算法�?
      * \endif
      */
     void downsampleAlgorithmChanged(QImDownsampleAlgorithm algo);
@@ -243,8 +240,8 @@ Q_SIGNALS:
      * \if CHINESE
      * @brief 降采样阈值更改时触发
      * @param[in] threshold 新降采样阈值（数据点）
-     * @details 当值实际更改时由setDownsampleThreshold()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @details 当值实际更改时由setDownsampleThreshold()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void downsampleThresholdChanged(int threshold);
@@ -258,10 +255,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标记颜色更改时触发
-     * @param[in] color 新标记颜色
-     * @details 当值实际更改时由setColor()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 标记颜色更改时触�?
+     * @param[in] color 新标记颜�?
+     * @details 当值实际更改时由setColor()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void colorChanged(const QColor& color);
@@ -274,9 +271,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触发
-     * @details 当分配新数据时由setData()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 数据系列更改时触�?
+     * @details 当分配新数据时由setData()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void dataChanged();
@@ -290,8 +287,8 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 散点图标志更改时触发
-     * @details 任何标志属性更改（标记填充等）时触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @details 任何标志属性更改（标记填充等）时触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void scatterFlagChanged();

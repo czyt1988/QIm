@@ -21,9 +21,7 @@ class QImAbstractXYDataSeries;
  *
  * @note Digital signals are typically used for visualizing binary data, logic levels,
  *       or any signal that switches between discrete values (e.g., 0 and 1).
- * @warning Digital plots are always referenced to the plot bottom and ignore y-axis scaling.
- *
- * @param[in] parent Parent QObject (optional)
+ * @note Digital plots are always referenced to the plot bottom and ignore y-axis scaling.
  *
  * @see QImPlotItemNode
  * @see QImPlotLineItemNode
@@ -33,15 +31,13 @@ class QImAbstractXYDataSeries;
  * \if CHINESE
  * @brief ImPlot数字信号可视化的Qt风格封装
  *
- * @details 为ImPlot数字信号提供Qt风格的保留模式封装。
- *          数字图可视化二进制/数字信号（开/关状态）。
- *          它们不响应y轴拖动/缩放，并且始终参考绘图底部。
- *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性。
+ * @details 为ImPlot数字信号提供Qt风格的保留模式封装�?
+ *          数字图可视化二进�?数字信号（开/关状态）�?
+ *          它们不响应y轴拖�?缩放，并且始终参考绘图底部�?
+ *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性�?
  *
- * @note 数字信号通常用于可视化二进制数据、逻辑电平或任何在离散值之间切换的信号（例如0和1）。
- * @warning 数字图始终参考绘图底部并忽略y轴缩放。
- *
- * @param[in] parent 父QObject对象（可选）
+ * @note 数字信号通常用于可视化二进制数据、逻辑电平或任何在离散值之间切换的信号（例�?�?）�?
+ * @note 数字图始终参考绘图底部并忽略y轴缩放�?
  *
  * @see QImPlotItemNode
  * @see QImPlotLineItemNode
@@ -118,10 +114,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数字信号颜色更改时触发
-     * @param[in] color 新数字信号颜色
-     * @details 当值实际更改时由setColor()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 数字信号颜色更改时触�?
+     * @param[in] color 新数字信号颜�?
+     * @details 当值实际更改时由setColor()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void colorChanged(const QColor& color);
@@ -134,9 +130,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触发
-     * @details 当分配新数据时由setData()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 数据系列更改时触�?
+     * @details 当分配新数据时由setData()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void dataChanged();
@@ -149,9 +145,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数字标志更改时触发
-     * @details 任何标志属性更改时触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 数字标志更改时触�?
+     * @details 任何标志属性更改时触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void digitalFlagChanged();

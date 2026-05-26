@@ -93,7 +93,7 @@ QRectF QImPlotDragRectNode::rect() const
  * @param rect New rectangle in plot coordinates
  * \endif
  *
- * \if CHINESe
+ * \if CHINESE
  * @brief 设置矩形坐标
  * @param rect 绘图坐标中的新矩形
  * \endif

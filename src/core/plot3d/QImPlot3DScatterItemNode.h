@@ -22,9 +22,7 @@ class QImAbstractXYZDataSeries;
  *
  * @note Scatter plots visualize discrete data points in 3D space as markers.
  *       Use QImPlot3DLineItemNode for continuous line plots.
- * @warning Marker size and shape changes require redraw to take effect.
- *
- * @param[in] parent Parent QObject (optional, typically a QImPlot3DNode)
+ * @note Marker size and shape changes require redraw to take effect.
  *
  * @see QImPlot3DItemNode
  * @see QImAbstractXYZDataSeries
@@ -34,17 +32,15 @@ class QImAbstractXYZDataSeries;
  * \if CHINESE
  * @brief ImPlot3D散点图可视化的Qt风格封装
  *
- * @details 为ImPlot3D散点图提供Qt风格的保留模式封装。
- *          支持标记自定义（形状、大小、填充颜色、描边颜色、描边粗细）以及完整的Qt属性系统集成和信号槽事件处理。
- *          继承自QImPlot3DItemNode，并遵循相同的PIMPL设计模式。
+ * @details 为ImPlot3D散点图提供Qt风格的保留模式封装�?
+ *          支持标记自定义（形状、大小、填充颜色、描边颜色、描边粗细）以及完整的Qt属性系统集成和信号槽事件处理�?
+ *          继承自QImPlot3DItemNode，并遵循相同的PIMPL设计模式�?
  *          标记填充/描边颜色使用QImOptional3DColor进行延迟初始化，
- *          未设置时在首次渲染时捕获ImPlot3D默认颜色。
+ *          未设置时在首次渲染时捕获ImPlot3D默认颜色�?
  *
- * @note 散点图以标记形式可视化3D空间中的离散数据点。
- *       连续线图请使用QImPlot3DLineItemNode。
- * @warning 标记大小和形状更改需要重绘才能生效。
- *
- * @param[in] parent 父QObject对象（可选，通常是QImPlot3DNode）
+ * @note 散点图以标记形式可视�?D空间中的离散数据点�?
+ *       连续线图请使用QImPlot3DLineItemNode�?
+ * @note 标记大小和形状更改需要重绘才能生效�?
  *
  * @see QImPlot3DItemNode
  * @see QImAbstractXYZDataSeries
@@ -155,8 +151,8 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标记填充颜色更改时触发
-     * @param color 新标记填充颜色
+     * @brief 标记填充颜色更改时触�?
+     * @param color 新标记填充颜�?
      * \endif
      */
     void markerFillColorChanged(const QColor& color);
@@ -168,8 +164,8 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标记描边颜色更改时触发
-     * @param color 新标记描边颜色
+     * @brief 标记描边颜色更改时触�?
+     * @param color 新标记描边颜�?
      * \endif
      */
     void markerOutlineColorChanged(const QColor& color);
@@ -181,8 +177,8 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标记大小更改时触发
-     * @param size 新标记大小（像素）
+     * @brief 标记大小更改时触�?
+     * @param size 新标记大小（像素�?
      * \endif
      */
     void markerSizeChanged(float size);
@@ -194,8 +190,8 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标记描边粗细更改时触发
-     * @param weight 新标记描边粗细（像素）
+     * @brief 标记描边粗细更改时触�?
+     * @param weight 新标记描边粗细（像素�?
      * \endif
      */
     void markerWeightChanged(float weight);
@@ -207,7 +203,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标记形状更改时触发
+     * @brief 标记形状更改时触�?
      * @param shape 新标记形状（QImPlot3DMarkerShape枚举值）
      * \endif
      */
@@ -230,7 +226,7 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触发
+     * @brief 数据系列更改时触�?
      * \endif
      */
     void dataChanged();

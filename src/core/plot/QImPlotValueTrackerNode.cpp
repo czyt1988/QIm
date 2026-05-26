@@ -61,6 +61,20 @@ QImPlotValueTrackerNode::PrivateData::PrivateData(QImPlotValueTrackerNode* p) : 
 {
 }
 
+/**
+ * \if ENGLISH
+ * @brief Clears and rebuilds the support series list from plot item nodes
+ * @param[in] plot The plot node whose item nodes to scan
+ * @details Iterates all child plot item nodes in the plot, extracting their
+ *          data series via tryAddSeries().
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 清除并重建支持序列列表
+ * @param[in] plot 要扫描的绘图节点
+ * @details 遍历绘图中的所有子绘图项目节点，通过tryAddSeries()提取其数据序列。
+ * \endif
+ */
 void QImPlotValueTrackerNode::PrivateData::updateSupportSeries(QImPlotNode* plot)
 {
     supportSeries.clear();
@@ -70,6 +84,22 @@ void QImPlotValueTrackerNode::PrivateData::updateSupportSeries(QImPlotNode* plot
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Attempts to add a data series from a child node
+ * @param[in] n The node to extract a data series from
+ * @return true if a series was successfully added, false otherwise
+ * @details Checks if the node is a QImPlotLineItemNode and, if so, adds its
+ *          data series to the support series list.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 尝试添加子节点的数据序列
+ * @param[in] n 要提取数据序列的节点
+ * @return 成功添加序列返回true，否则返回false
+ * @details 检查节点是否为QImPlotLineItemNode，若是则将其数据序列添加到支持序列列表。
+ * \endif
+ */
 bool QImPlotValueTrackerNode::PrivateData::tryAddSeries(QImAbstractNode* n)
 {
     if (QImPlotLineItemNode* line = qobject_cast< QImPlotLineItemNode* >(n)) {
@@ -79,6 +109,22 @@ bool QImPlotValueTrackerNode::PrivateData::tryAddSeries(QImAbstractNode* n)
     return false;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Attempts to remove a data series associated with a child node
+ * @param[in] n The node whose data series to remove
+ * @return true if a series was successfully removed, false otherwise
+ * @details Checks if the node is a QImPlotLineItemNode and, if so, removes
+ *          its data series from the support series list.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 尝试移除子节点关联的数据序列
+ * @param[in] n 要移除数据序列的节点
+ * @return 成功移除序列返回true，否则返回false
+ * @details 检查节点是否为QImPlotLineItemNode，若是则从支持序列列表中移除其数据序列。
+ * \endif
+ */
 bool QImPlotValueTrackerNode::PrivateData::tryRemoveSeries(QImAbstractNode* n)
 {
     if (QImPlotLineItemNode* line = qobject_cast< QImPlotLineItemNode* >(n)) {
@@ -87,6 +133,21 @@ bool QImPlotValueTrackerNode::PrivateData::tryRemoveSeries(QImAbstractNode* n)
     return false;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Updates the tracking state and computes tracked values at the mouse position
+ * @details Core state machine that determines whether the tracker is active based on
+ *          mouse hover state, handles group synchronization for multi-plot tracking,
+ *          and computes Y values for all visible line items at the current mouse X position.
+ *          Updates tracked values only when the mouse has moved significantly.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 更新追踪状态并计算鼠标位置处的追踪值
+ * @details 核心状态机，根据鼠标悬停状态确定追踪器是否激活，处理多子图联动的组同步，
+ *          并计算当前鼠标X位置处所有可见折线项目的Y值。仅在鼠标发生显著移动时更新追踪值。
+ * \endif
+ */
 void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
 {
     // bool mouseInPlot = (plotScreenSize.x > 0 && plotScreenSize.y > 0)
@@ -194,6 +255,23 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
 //----------------------------------------------------
 // QImPlotValueTrackerNode
 //----------------------------------------------------
+/**
+ * \if ENGLISH
+ * @brief Constructs a value tracker node attached to a plot node
+ * @param[in] plotNode The plot node to track values in
+ * @param[in] parent Optional parent QObject
+ * @details Automatically connects to the plot's childNodeAdded/childNodeRemoved signals
+ *          and initializes the support series list. Sets high Z-order to render on top.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造附着于绘图节点的值追踪器节点
+ * @param[in] plotNode 要追踪值的绘图节点
+ * @param[in] parent 可选的父QObject
+ * @details 自动连接绘图的childNodeAdded/childNodeRemoved信号并初始化支持序列列表。
+ *          设置高Z序以在最上层渲染。
+ * \endif
+ */
 QImPlotValueTrackerNode::QImPlotValueTrackerNode(QImPlotNode* plotNode, QObject* parent)
     : QImAbstractNode(parent), QIM_PIMPL_CONSTRUCT
 {
@@ -210,6 +288,15 @@ QImPlotValueTrackerNode::QImPlotValueTrackerNode(QImPlotNode* plotNode, QObject*
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destroys the tracker and removes it from its group
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 析构追踪器并从其所属组中移除
+ * \endif
+ */
 QImPlotValueTrackerNode::~QImPlotValueTrackerNode()
 {
     QIM_D(d);
@@ -218,6 +305,17 @@ QImPlotValueTrackerNode::~QImPlotValueTrackerNode()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Assigns this tracker to a group for synchronized multi-plot tracking
+ * @param[in] group The tracker group to join, or nullptr to leave the current group
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将此追踪器分配到组中，实现多子图联动追踪
+ * @param[in] group 要加入的追踪器组，或nullptr退出当前组
+ * \endif
+ */
 void QImPlotValueTrackerNode::setGroup(QImPlotValueTrackerNodeGroup* group)
 {
     QIM_D(d);
@@ -236,36 +334,106 @@ void QImPlotValueTrackerNode::setGroup(QImPlotValueTrackerNodeGroup* group)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Returns whether this tracker belongs to a group
+ * @return true if the tracker is part of a tracker group
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回此追踪器是否属于某个组
+ * @return 追踪器属于追踪器组返回true
+ * \endif
+ */
 bool QImPlotValueTrackerNode::hasGroup() const
 {
     QIM_DC(d);
     return (d->group != nullptr);
 }
 
-QImPlotValueTrackerNodeGroup* QIM::QImPlotValueTrackerNode::group() const
+/**
+ * \if ENGLISH
+ * @brief Returns the tracker group this tracker belongs to
+ * @return The tracker group, or nullptr if not in a group
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回此追踪器所属的追踪器组
+ * @return 追踪器组，未加入任何组则返回nullptr
+ * \endif
+ */
+QImPlotValueTrackerNodeGroup* QImPlotValueTrackerNode::group() const
 {
     QIM_DC(d);
     return d->group;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Slot invoked when a child node is added to the plot
+ * @param[in] n The newly added child node
+ * @details Attempts to register the node's data series via tryAddSeries().
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 子节点添加到绘图时触发的槽函数
+ * @param[in] n 新添加的子节点
+ * @details 通过tryAddSeries()尝试注册该节点的数据序列。
+ * \endif
+ */
 void QImPlotValueTrackerNode::onChildNodeAdded(QImAbstractNode* n)
 {
     QIM_D(d);
     d->tryAddSeries(n);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Slot invoked when a child node is removed from the plot
+ * @param[in] n The removed child node
+ * @details Attempts to unregister the node's data series via tryRemoveSeries().
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 子节点从绘图移除时触发的槽函数
+ * @param[in] n 被移除的子节点
+ * @details 通过tryRemoveSeries()尝试注销该节点的数据序列。
+ * \endif
+ */
 void QImPlotValueTrackerNode::onChildNodeRemoved(QImAbstractNode* n)
 {
     QIM_D(d);
     d->tryRemoveSeries(n);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Enables or disables skipping NaN and non-finite values during tracking
+ * @param[in] on true to skip invalid values, false to include them
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用或禁用追踪时跳过NaN和非有限值
+ * @param[in] on true跳过无效值，false包含无效值
+ * \endif
+ */
 void QImPlotValueTrackerNode::setSkipNanFiniteValues(bool on)
 {
     QIM_D(d);
     d->skipNanFiniteValues = on;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Returns whether NaN and non-finite values are skipped during tracking
+ * @return true if invalid values are skipped
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回追踪时是否跳过NaN和非有限值
+ * @return 跳过无效值返回true
+ * \endif
+ */
 bool QImPlotValueTrackerNode::isSkipNanFiniteValues() const
 {
     QIM_DC(d);

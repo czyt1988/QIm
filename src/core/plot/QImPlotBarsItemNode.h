@@ -20,9 +20,7 @@ class QImAbstractXYDataSeries;
  *
  * @note Bar charts visualize categorical or discrete data using rectangular bars.
  *       Use QImPlotLineItemNode for continuous line plots.
- * @warning Bar width changes require redraw to take effect.
- *
- * @param[in] parent Parent QObject (optional)
+ * @note Bar width changes require redraw to take effect.
  *
  * @see QImPlotItemNode
  * @see QImPlotLineItemNode
@@ -32,16 +30,14 @@ class QImAbstractXYDataSeries;
  * \if CHINESE
  * @brief ImPlot柱状图可视化的Qt风格封装
  *
- * @details 为ImPlot柱状图提供Qt风格的保留模式封装。
+ * @details 为ImPlot柱状图提供Qt风格的保留模式封装�?
  *          支持水平/垂直方向、可自定义柱宽，
- *          以及完整的Qt属性系统集成和信号槽事件处理。
- *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性。
+ *          以及完整的Qt属性系统集成和信号槽事件处理�?
+ *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性�?
  *
- * @note 柱状图使用矩形柱可视化分类或离散数据。
- *       连续线图请使用QImPlotLineItemNode。
- * @warning 柱宽更改需要重绘才能生效。
- *
- * @param[in] parent 父QObject对象（可选）
+ * @note 柱状图使用矩形柱可视化分类或离散数据�?
+ *       连续线图请使用QImPlotLineItemNode�?
+ * @note 柱宽更改需要重绘才能生效�?
  *
  * @see QImPlotItemNode
  * @see QImPlotLineItemNode
@@ -137,10 +133,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 柱宽更改时触发
-     * @param[in] width 新柱宽（绘图单位）
-     * @details 当值实际更改时由setBarWidth()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 柱宽更改时触�?
+     * @param[in] width 新柱宽（绘图单位�?
+     * @details 当值实际更改时由setBarWidth()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void barWidthChanged(double width);
@@ -154,10 +150,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 方向更改时触发
-     * @param[in] horizontal 新水平方向状态
-     * @details 当值实际更改时由setHorizontal()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 方向更改时触�?
+     * @param[in] horizontal 新水平方向状�?
+     * @details 当值实际更改时由setHorizontal()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void orientationChanged(bool horizontal);
@@ -171,10 +167,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 柱子颜色更改时触发
-     * @param[in] color 新柱子颜色
-     * @details 当值实际更改时由setColor()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 柱子颜色更改时触�?
+     * @param[in] color 新柱子颜�?
+     * @details 当值实际更改时由setColor()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void colorChanged(const QColor& color);
@@ -187,9 +183,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触发
-     * @details 当分配新数据时由setData()触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @brief 数据系列更改时触�?
+     * @details 当分配新数据时由setData()触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void dataChanged();
@@ -203,8 +199,8 @@ Q_SIGNALS:
      *
      * \if CHINESE
      * @brief 柱状图标志更改时触发
-     * @details 任何标志属性更改（水平方向等）时触发。
-     *          连接到更新UI元素或执行相关操作。
+     * @details 任何标志属性更改（水平方向等）时触发�?
+     *          连接到更新UI元素或执行相关操作�?
      * \endif
      */
     void barsFlagChanged();
