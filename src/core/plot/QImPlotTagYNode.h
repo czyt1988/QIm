@@ -16,9 +16,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot Y-axis tag tool
  *
- * @class QImPlotTagYNode
- * @ingroup plot_tools
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot's TagY tool.
  *          A tag appears as a horizontal line with optional text label at specified y coordinate.
  *          Tags are useful for marking specific y values on the plot.
@@ -35,9 +32,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot Y 轴标签工具的 Qt 风格封装
- *
- * @class QImPlotTagYNode
- * @ingroup plot_tools
  *
  * @details 为 ImPlot 的 TagY 工具提供 Qt 风格的保留模式封装。
  *          标签在指定的 y 坐标处显示为带可选文本标签的水平线。

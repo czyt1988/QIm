@@ -12,9 +12,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot draggable vertical line tool
  *
- * @class QImPlotDragLineXNode
- * @ingroup plot_tools
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot's DragLineX tool.
  *          A draggable vertical line appears at specified x coordinate.
  *          Users can click and drag the line to modify its x position.
@@ -32,9 +29,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot可拖拽垂直线工具的Qt风格封装
- *
- * @class QImPlotDragLineXNode
- * @ingroup plot_tools
  *
  * @details 为ImPlot的DragLineX工具提供Qt风格的保留模式封装。
  *          可拖拽垂直线出现在指定的x坐标处。

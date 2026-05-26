@@ -58,103 +58,25 @@ public:
     QImAbstractErrorDataSeries() : QImAbstractXYDataSeries() {}
     virtual ~QImAbstractErrorDataSeries() = default;
 
-    /**
-     * \if ENGLISH
-     * @brief Get the error data type
-     * @return ErrorDataType indicating symmetric or asymmetric errors
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取误差数据类型
-     * @return ErrorDataType 指示对称或非对称误差
-     * \endif
-     */
+    // Get the error data type
     virtual ErrorDataType errorType() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Check if using symmetric errors
-     * @return true if symmetric error mode
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查是否使用对称误差
-     * @return 如果是对称误差模式则返回true
-     * \endif
-     */
+    // Check if using symmetric errors
     bool isSymmetric() const { return errorType() == SymmetricError; }
 
-    /**
-     * \if ENGLISH
-     * @brief Check if using asymmetric errors
-     * @return true if asymmetric error mode
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查是否使用非对称误差
-     * @return 如果是非对称误差模式则返回true
-     * \endif
-     */
+    // Check if using asymmetric errors
     bool isAsymmetric() const { return errorType() == AsymmetricError; }
 
-    /**
-     * \if ENGLISH
-     * @brief Get positive error value at index
-     * @param index Data point index
-     * @return Positive error value
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取指定索引的正误差值
-     * @param index 数据点索引
-     * @return 正误差值
-     * \endif
-     */
+    // Get positive error value at index
     virtual double posError(int index) const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get negative error value at index
-     * @param index Data point index
-     * @return Negative error value
-     * @note For symmetric errors, returns the same value as posError()
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取指定索引的负误差值
-     * @param index 数据点索引
-     * @return 负误差值
-     * @note 对于对称误差，返回与 posError() 相同的值
-     * \endif
-     */
+    // Get negative error value at index
     virtual double negError(int index) const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get raw pointer to positive error data
-     * @return Pointer to positive error array, or nullptr if not contiguous
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取正误差数据的原始指针
-     * @return 正误差数组指针，如果不连续则返回nullptr
-     * \endif
-     */
+    // Get raw pointer to positive error data
     virtual const double* posErrorRawData() const { return nullptr; }
 
-    /**
-     * \if ENGLISH
-     * @brief Get raw pointer to negative error data
-     * @return Pointer to negative error array, or nullptr if not contiguous
-     * @note For symmetric errors, may return the same pointer as posErrorRawData()
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取负误差数据的原始指针
-     * @return 负误差数组指针，如果不连续则返回nullptr
-     * @note 对于对称误差，可能返回与 posErrorRawData() 相同的指针
-     * \endif
-     */
+    // Get raw pointer to negative error data
     virtual const double* negErrorRawData() const { return nullptr; }
 };
 

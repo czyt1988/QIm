@@ -16,9 +16,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot X-axis tag tool
  *
- * @class QImPlotTagXNode
- * @ingroup plot_tools
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot's TagX tool.
  *          A tag appears as a vertical line with optional text label at specified x coordinate.
  *          Tags are useful for marking specific x values on the plot.
@@ -35,9 +32,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot X轴标签工具的Qt风格封装
- *
- * @class QImPlotTagXNode
- * @ingroup plot_tools
  *
  * @details 为ImPlot的TagX工具提供Qt风格的保留模式封装。
  *          标签在指定的x坐标处显示为带可选文本标签的垂直线。

@@ -12,9 +12,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot infinite lines visualization
  *
- * @class QImPlotInfLinesItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot infinite lines.
  *          Infinite lines are vertical or horizontal lines that extend infinitely
  *          across the plot area, useful for drawing reference lines, asymptotes,
@@ -38,9 +35,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot无限线的Qt风格封装
- *
- * @class QImPlotInfLinesItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot无限线提供Qt风格的保留模式封装。
  *          无限线是垂直或水平的线条，在绘图区域内无限延伸，

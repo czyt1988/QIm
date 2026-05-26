@@ -15,9 +15,6 @@ class QImAbstractXYDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot 2D histogram visualization
  *
- * @class QImPlotHistogram2DItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot 2D histograms (bivariate).
  *          Supports customizable binning in X and Y dimensions, range filtering,
  *          density normalization, outlier exclusion, and column-major data layout.
@@ -37,9 +34,6 @@ class QImAbstractXYDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot二维直方图可视化的Qt风格封装
- *
- * @class QImPlotHistogram2DItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot二维直方图（双变量）提供Qt风格的保留模式封装。
  *          支持可自定义的X和Y维度装箱、范围过滤、

@@ -61,112 +61,28 @@ public:
     QImAbstractBarGroupsDataSeries() : QImAbstractPlotDataSeries() {}
     virtual ~QImAbstractBarGroupsDataSeries() = default;
 
-    /**
-     * \if ENGLISH
-     * @brief Get the data type
-     * @return BarGroupsDataType indicating bar groups data
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取数据类型
-     * @return BarGroupsDataType 指示分组柱状图数据
-     * \endif
-     */
+    // Get the data type
     virtual int type() const override { return BarGroupsData; }
 
-    /**
-     * \if ENGLISH
-     * @brief Get number of items (rows)
-     * @return Item count
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取项目数量（行数）
-     * @return 项目数量
-     * \endif
-     */
+    // Get number of items (rows)
     virtual int itemCount() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get number of groups (columns)
-     * @return Group count
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取组数量（列数）
-     * @return 组数量
-     * \endif
-     */
+    // Get number of groups (columns)
     virtual int groupCount() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get item labels
-     * @return QStringList of item labels
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取项目标签
-     * @return 项目标签的QStringList
-     * \endif
-     */
+    // Get item labels
     virtual QStringList labels() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get raw pointer to values matrix (row-major)
-     * @return Pointer to contiguous double array, or nullptr if not contiguous
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取值矩阵的原始指针（行主序）
-     * @return 连续double数组指针，如果不连续则返回nullptr
-     * \endif
-     */
+    // Get raw pointer to values matrix (row-major)
     virtual const double* valuesRawData() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Check if data is contiguous in memory
-     * @return true if values are stored contiguously
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查数据在内存中是否连续
-     * @return 如果值连续存储则返回true
-     * \endif
-     */
+    // Check if data is contiguous in memory
     virtual bool isContiguous() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get value at specified item and group indices
-     * @param itemIndex Item index (row)
-     * @param groupIndex Group index (column)
-     * @return Value at position
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取指定项目和组索引处的值
-     * @param itemIndex 项目索引（行）
-     * @param groupIndex 组索引（列）
-     * @return 位置处的值
-     * \endif
-     */
+    // Get value at specified item and group indices
     virtual double value(int itemIndex, int groupIndex) const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get array of C-string labels for ImPlot
-     * @return Vector of const char* pointers, valid as long as the data series exists
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取用于ImPlot的C字符串标签数组
-     * @return const char* 指针的向量，只要数据系列存在即有效
-     * \endif
-     */
+    // Get array of C-string labels for ImPlot
     virtual std::vector<const char*> labelPtrs() const = 0;
 };
 

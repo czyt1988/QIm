@@ -14,9 +14,6 @@ class QImAbstractPieChartDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot pie chart visualization
  *
- * @class QImPlotPieChartItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot pie charts.
  *          Supports customizable center position, radius, label formatting,
  *          start angle, and flags for normalization, hidden slice handling,
@@ -37,9 +34,6 @@ class QImAbstractPieChartDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot饼图可视化的Qt风格封装
- *
- * @class QImPlotPieChartItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot饼图提供Qt风格的保留模式封装。
  *          支持可自定义的中心位置、半径、标签格式化、

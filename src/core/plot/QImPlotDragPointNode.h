@@ -17,9 +17,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot draggable point tool
  *
- * @class QImPlotDragPointNode
- * @ingroup plot_tools
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot's DragPoint tool.
  *          A draggable point appears as a colored marker at specified plot coordinates.
  *          Users can click and drag the point to modify its position.
@@ -37,9 +34,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot可拖拽点工具的Qt风格封装
- *
- * @class QImPlotDragPointNode
- * @ingroup plot_tools
  *
  * @details 为ImPlot的DragPoint工具提供Qt风格的保留模式封装。
  *          可拖拽点在指定的绘图坐标处显示为彩色标记。

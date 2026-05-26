@@ -12,9 +12,6 @@ class QImAbstractXYDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot scatter plot visualization
  *
- * @class QImPlotScatterItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot scatter plots.
  *          Supports marker customization (shape, size, fill), adaptive sampling,
  *          and full Qt property system integration with signal-slot event handling.
@@ -34,9 +31,6 @@ class QImAbstractXYDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot散点图可视化的Qt风格封装
- *
- * @class QImPlotScatterItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot散点图提供Qt风格的保留模式封装。
  *          支持标记自定义（形状、大小、填充）、自适应采样，

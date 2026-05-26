@@ -36,15 +36,13 @@ namespace QIM
 class QIM_CORE_API QImLTTBDownsampler : public QImAbstractXYDataSeries
 {
 public:
-    /**
-     * @brief 构造代理（不拥有原始数据所有权）
-     * @param source 原始数据系列（必须保证生命周期长于代理）
-     * @param target_points 目标点数（默认2000，≈1.5倍典型屏幕宽度）
-     */
+    // Construct proxy (does not own source data)
+    // source: original data series (must outlive the proxy)
+    // target_points: target point count (default 2000, ~1.5x typical screen width)
     explicit QImLTTBDownsampler(QImAbstractXYDataSeries* source, int target_points = 2000);
     ~QImLTTBDownsampler() override = default;
 
-    // ===== QImAbstractXYDataSeries 接口重写 =====
+    // QImAbstractXYDataSeries interface overrides
     int type() const override
     {
         return XYData;
@@ -52,7 +50,7 @@ public:
 
     int size() const override;
 
-    bool isContiguous() const override;  // 缓存数据总是连续
+    bool isContiguous() const override;
 
     int stride() const override;
 
@@ -60,19 +58,19 @@ public:
 
     const double* yRawData() const override;
 
-    // 代理后不再支持Y-only模式（下采样破坏等间隔假设），返回默认值
+    // Y-only mode no longer supported after downsampling (breaks equidistant assumption)
     double xScale() const override;
     double xStart() const override;
     int offset() const override;
 
-    // ===== 配置接口 =====
+    // Configuration
     void setTargetPoints(int points);
 
     int targetPoints() const;
 
     virtual double xValue(int index) const override;
     virtual double yValue(int index) const override;
-    // 根据目标点数更新数据，这个函数在目标点数变化,或原数据发生变化是调用，用于更新
+    // Update data based on target point count; call when target changes or source data changes
     void downSampler();
 
 private:

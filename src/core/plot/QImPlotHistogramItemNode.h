@@ -16,9 +16,6 @@ class QImAbstractHistogramDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot histogram visualization
  *
- * @class QImPlotHistogramItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot histograms.
  *          Supports customizable binning, bar scaling, range filtering,
  *          and full Qt property system integration with signal-slot event handling.
@@ -38,9 +35,6 @@ class QImAbstractHistogramDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot直方图可视化的Qt风格封装
- *
- * @class QImPlotHistogramItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot直方图提供Qt风格的保留模式封装。
  *          支持可自定义的装箱、柱条缩放、范围过滤，

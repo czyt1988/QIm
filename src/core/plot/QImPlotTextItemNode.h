@@ -13,9 +13,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot text label visualization
  *
- * @class QImPlotTextItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot text labels.
  *          Text labels render centered text at specified plot coordinates with optional
  *          pixel offset. Useful for annotating specific points, marking data features,
@@ -34,9 +31,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot文本标签的Qt风格封装
- *
- * @class QImPlotTextItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot文本标签提供Qt风格的保留模式封装。
  *          文本标签在指定的绘图坐标处渲染居中文本，可选像素偏移。

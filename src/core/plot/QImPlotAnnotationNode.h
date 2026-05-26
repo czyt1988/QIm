@@ -17,9 +17,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot annotation tool
  *
- * @class QImPlotAnnotationNode
- * @ingroup plot_tools
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot's Annotation tool.
  *          An annotation appears as a callout text label at specified plot coordinates.
  *          The annotation can be positioned with pixel offset and clamping options.
@@ -36,9 +33,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot注释工具的Qt风格封装
- *
- * @class QImPlotAnnotationNode
- * @ingroup plot_tools
  *
  * @details 为ImPlot的Annotation工具提供Qt风格的保留模式封装。
  *          注释在指定的绘图坐标处显示为标注文本标签。

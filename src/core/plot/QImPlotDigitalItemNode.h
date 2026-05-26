@@ -13,9 +13,6 @@ class QImAbstractXYDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot digital signal visualization
  *
- * @class QImPlotDigitalItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot digital signals.
  *          Digital plots visualize binary/digital signals (on/off states).
  *          They don't respond to y-axis drag/zoom and are always referenced to plot bottom.
@@ -35,9 +32,6 @@ class QImAbstractXYDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot数字信号可视化的Qt风格封装
- *
- * @class QImPlotDigitalItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot数字信号提供Qt风格的保留模式封装。
  *          数字图可视化二进制/数字信号（开/关状态）。

@@ -14,9 +14,6 @@ class QImAbstractBarGroupsDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot grouped bar chart visualization
  *
- * @class QImPlotBarGroupsItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot grouped bar charts.
  *          Supports horizontal/vertical orientation, customizable group width,
  *          stacked bars, shift offset, and full Qt property system integration
@@ -37,9 +34,6 @@ class QImAbstractBarGroupsDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot分组柱状图可视化的Qt风格封装
- *
- * @class QImPlotBarGroupsItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot分组柱状图提供Qt风格的保留模式封装。
  *          支持水平/垂直方向、可自定义组宽、

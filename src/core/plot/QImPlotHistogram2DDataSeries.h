@@ -59,86 +59,22 @@ public:
     QImAbstractHistogram2DDataSeries() : QImAbstractXYDataSeries() {}
     virtual ~QImAbstractHistogram2DDataSeries() = default;
 
-    /**
-     * \if ENGLISH
-     * @brief Get the data type
-     * @return Histogram2DDataType indicating 2D histogram data
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取数据类型
-     * @return Histogram2DDataType 指示二维直方图数据
-     * \endif
-     */
+    // Gets the data type
     virtual int type() const override { return Histogram2DData; }
 
-    /**
-     * \if ENGLISH
-     * @brief Check if data is contiguous in memory
-     * @return true if values are stored contiguously
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查数据在内存中是否连续
-     * @return 如果值连续存储则返回true
-     * \endif
-     */
+    // Checks if data is contiguous in memory
     virtual bool isContiguous() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get raw pointer to X values array
-     * @return Pointer to contiguous double array, or nullptr if not contiguous
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取X值数组的原始指针
-     * @return 连续double数组指针，如果不连续则返回nullptr
-     * \endif
-     */
+    // Gets raw pointer to X values array
     virtual const double* xValuesRawData() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get raw pointer to Y values array
-     * @return Pointer to contiguous double array, or nullptr if not contiguous
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取Y值数组的原始指针
-     * @return 连续double数组指针，如果不连续则返回nullptr
-     * \endif
-     */
+    // Gets raw pointer to Y values array
     virtual const double* yValuesRawData() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get X value at specified index
-     * @param index Data point index
-     * @return X value at position
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取指定索引处的X值
-     * @param index 数据点索引
-     * @return 位置处的X值
-     * \endif
-     */
+    // Gets X value at specified index
     virtual double xValueAt(int index) const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get Y value at specified index
-     * @param index Data point index
-     * @return Y value at position
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取指定索引处的Y值
-     * @param index 数据点索引
-     * @return 位置处的Y值
-     * \endif
-     */
+    // Gets Y value at specified index
     virtual double yValueAt(int index) const = 0;
 };
 

@@ -12,9 +12,6 @@ class QImAbstractErrorDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot error bars visualization
  *
- * @class QImPlotErrorBarsItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot error bars.
  *          Supports both symmetric and asymmetric error bars, vertical and horizontal orientations.
  *          Error bars are typically used in combination with line plots or scatter plots
@@ -37,9 +34,6 @@ class QImAbstractErrorDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot误差棒图的Qt风格封装
- *
- * @class QImPlotErrorBarsItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot误差棒图提供Qt风格的保留模式封装。
  *          支持对称和非对称误差棒，垂直和水平方向。

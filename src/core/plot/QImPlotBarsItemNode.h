@@ -12,9 +12,6 @@ class QImAbstractXYDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot bar chart visualization
  *
- * @class QImPlotBarsItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot bar charts.
  *          Supports horizontal/vertical orientation, customizable bar width,
  *          and full Qt property system integration with signal-slot event handling.
@@ -34,9 +31,6 @@ class QImAbstractXYDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot柱状图可视化的Qt风格封装
- *
- * @class QImPlotBarsItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot柱状图提供Qt风格的保留模式封装。
  *          支持水平/垂直方向、可自定义柱宽，

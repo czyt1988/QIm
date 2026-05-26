@@ -10,9 +10,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot dummy item visualization
  *
- * @class QImPlotDummyItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot dummy items.
  *          Dummy items create placeholder entries in the legend with a color icon,
  *          useful for custom legend entries or annotations that don't correspond
@@ -32,9 +29,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot 虚拟项的 Qt 风格封装
- *
- * @class QImPlotDummyItemNode
- * @ingroup plot_items
  *
  * @details 为 ImPlot 虚拟项提供 Qt 风格的保留模式封装。
  *          虚拟项在图例中创建带有颜色图标的占位符条目，

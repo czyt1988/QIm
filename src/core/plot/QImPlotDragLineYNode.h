@@ -12,9 +12,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot draggable horizontal line tool
  *
- * @class QImPlotDragLineYNode
- * @ingroup plot_tools
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot's DragLineY tool.
  *          A draggable horizontal line appears at specified y coordinate.
  *          Users can click and drag the line to modify its y position.
@@ -32,9 +29,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot可拖拽水平线工具的Qt风格封装
- *
- * @class QImPlotDragLineYNode
- * @ingroup plot_tools
  *
  * @details 为ImPlot的DragLineY工具提供Qt风格的保留模式封装。
  *          可拖拽水平线出现在指定的y坐标处。

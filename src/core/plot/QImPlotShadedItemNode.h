@@ -12,9 +12,6 @@ class QImAbstractXYDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot shaded (filled) region visualization
  *
- * @class QImPlotShadedItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot shaded/filled regions.
  *          Supports filling between a line and a horizontal reference value,
  *          or filling between two lines (upper and lower bounds).
@@ -35,9 +32,6 @@ class QImAbstractXYDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot填充区域（阴影）可视化的Qt风格封装
- *
- * @class QImPlotShadedItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot填充/阴影区域提供Qt风格的保留模式封装。
  *          支持线条与水平参考值之间的填充，或两条线之间（上下边界）的填充。

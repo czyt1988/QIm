@@ -16,9 +16,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot draggable rectangle tool
  *
- * @class QImPlotDragRectNode
- * @ingroup plot_tools
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot's DragRect tool.
  *          A draggable rectangle appears between specified coordinates (x1,y1) and (x2,y2).
  *          Users can click and drag the rectangle to modify its position and size.
@@ -36,9 +33,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImPlot可拖拽矩形工具的Qt风格封装
- *
- * @class QImPlotDragRectNode
- * @ingroup plot_tools
  *
  * @details 为ImPlot的DragRect工具提供Qt风格的保留模式封装。
  *          可拖拽矩形出现在指定的坐标 (x1,y1) 和 (x2,y2) 之间。

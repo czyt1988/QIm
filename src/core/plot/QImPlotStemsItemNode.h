@@ -12,9 +12,6 @@ class QImAbstractXYDataSeries;
  * \if ENGLISH
  * @brief Qt-style wrapper for ImPlot stems visualization
  *
- * @class QImPlotStemsItemNode
- * @ingroup plot_items
- *
  * @details Provides Qt-style retained mode encapsulation for ImPlot stems.
  *          Stems plot draws a line from a reference value (baseline) to each data point,
  *          useful for visualizing discrete data points and their deviation from a baseline.
@@ -35,9 +32,6 @@ class QImAbstractXYDataSeries;
  *
  * \if CHINESE
  * @brief ImPlot茎叶图的Qt风格封装
- *
- * @class QImPlotStemsItemNode
- * @ingroup plot_items
  *
  * @details 为ImPlot茎叶图提供Qt风格的保留模式封装。
  *          茎叶图从参考值（基线）绘制线条到每个数据点，
