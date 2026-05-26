@@ -13,7 +13,6 @@ class QImFigureWidget;
 class CpuUsageView;
 class ResourcePieView;
 class ProcessResource3DView;
-class SystemOverview3DView;
 class SystemMetricsView;
 class SustainedMetricsView;
 class HistoryBuffer;
@@ -41,7 +40,6 @@ private:
     CpuUsageView* cpuUsageView_ = nullptr;
     ResourcePieView* resourcePieView_ = nullptr;
     ProcessResource3DView* processResource3DView_ = nullptr;
-    SystemOverview3DView* systemOverview3DView_ = nullptr;
     SystemMetricsView* systemMetricsView_ = nullptr;
     SustainedMetricsView* sustainedMetricsView_ = nullptr;
     SustainedMetricsTracker* sustainedTracker_ = nullptr;

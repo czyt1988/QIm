@@ -12,14 +12,20 @@ class QImPlot3DNode;
 class QImPlot3DScatterItemNode;
 }
 
+class SustainedMetricsTracker;
+
 class ProcessResource3DView {
 public:
     void buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data);
     void updateData(const QList<AggregatedProcessInfo>& data);
+    void setTracker(SustainedMetricsTracker* tracker);
 
 private:
+    void updateDataInstantaneous(const QList<AggregatedProcessInfo>& data);
+
     QIM::QImPlot3DNode* plotNode_ = nullptr;
     QImSystemMonitor::ColorManager colorManager_;
+    SustainedMetricsTracker* tracker_ = nullptr;
 
     // processName → scatter item (persistent: items stay when process exits)
     QHash<QString, QIM::QImPlot3DScatterItemNode*> scatterItems_;

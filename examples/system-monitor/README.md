@@ -2,11 +2,11 @@
 
 基于 QIm 的实时系统进程监控应用，展示 2D 与 3D 可视化的完整开发范式。
 
-该示例通过 Windows 底层 API（`psapi`、`pdh`）采集系统进程的 CPU、内存、磁盘 I/O、网络、GPU 等实时指标，以 1Hz 频率更新，提供 **6 种可切换的可视化视图**——涵盖折线图、叠加柱状图、饼图、3D 散点图、3D 曲面图等 QIm 典型用法。
+该示例通过 Windows 底层 API（`psapi`、`pdh`）采集系统进程的 CPU、内存、磁盘 I/O、网络、GPU 等实时指标，以 1Hz 频率更新，提供 **5 种可切换的可视化视图**——涵盖折线图、叠加柱状图、饼图、3D 散点图等 QIm 典型用法。
 
 ## 功能特性
 
-- ✅ **6 种可视化视图**：CPU 使用率（叠加柱状图）、资源饼图、进程 3D 散点图、CPU 时间线 3D 曲面、系统多轴指标、持续累积指标排名
+- ✅ **5 种可视化视图**：CPU 使用率（叠加柱状图）、资源饼图、进程 3D 散点图、系统多轴指标、持续累积指标排名
 - ✅ **实时进程表格**：按进程名分组的树形表格，支持按任意列排序，刷新时保持展开状态
 - ✅ **QIm 二维 + 三维混合渲染**：2D 与 3D 子图在同一 `QImFigureWidget` 中自由切换
 - ✅ **色盲友好的配色方案**：基于 Paul Tol 22 色定性色盘，通过 `QImPlotColormapManager` 管理
@@ -50,10 +50,9 @@ flowchart TD
     subgraph 视图层
         VM --> V1[CpuUsageView<br/>2D 叠加柱状图]
         VM --> V2[ResourcePieView<br/>2D 饼图 ×3]
-        VM --> V3[ProcessResource3DView<br/>3D 散点图]
-        VM --> V4[SystemOverview3DView<br/>300×5 system metrics 3D surface with 5 metric lanes]
-        VM --> V5[SystemMetricsView<br/>2D 多轴折线图]
-        VM --> V6[SustainedMetricsView<br/>2D 水平柱状 + 时间线]
+        VM --> V3[ProcessResource3DView<br/>3D 散点图，累积指标]
+        VM --> V4[SystemMetricsView<br/>2D 多轴折线图]
+        VM --> V5[SustainedMetricsView<br/>2D 水平柱状 + 时间线]
     end
 ```
 
@@ -63,8 +62,7 @@ flowchart TD
 |------|-----------|------------|----------|
 | CpuUsageView | `QImPlotBarGroupsItemNode` | `PlotBarGroups` | 叠加柱状图，有序名称确保稳定层级 |
 | ResourcePieView | `QImPlotPieChartItemNode` | `PlotPieChart` | 3 饼图横排，累积聚合数据（来自 SustainedMetricsTracker），Top8 + Others |
-| ProcessResource3DView | `QImPlot3DScatterItemNode` | `PlotScatter3D` | 3D 散点，X=CPU / Y=内存 / Z=磁盘 |
-| SystemOverview3DView | `QImPlot3DSurfaceItemNode` | `PlotSurface` | 300×5 system metrics 3D surface with 5 metric lanes |
+| ProcessResource3DView | `QImPlot3DScatterItemNode` | `PlotScatter3D` | 3D 散点，X=累积CPU / Y=平均内存 / Z=累积磁盘（来自 SustainedMetricsTracker） |
 | SystemMetricsView | `QImPlotLineItemNode` | `PlotLine` | 7 条线共享 3 个 Y 轴 |
 | SustainedMetricsView | `QImPlotBarGroupsItemNode` + `QImPlotLineItemNode` | `PlotBarGroups` (horizontal) + `PlotLine` | 水平排名柱状图 + 时间线折线图 |
 
@@ -120,11 +118,11 @@ target_link_libraries(system-monitor PRIVATE
 运行 `system-monitor.exe`，主窗口包含两个选项卡：
 
 - **进程表格**：按进程名分组的树形列表，可排序、展开/折叠
-- **图表视图**：6 种可视化模式，通过顶部的单选按钮切换
+- **图表视图**：5 种可视化模式，通过顶部的单选按钮切换
 
 ### 视图切换
 
-点击顶部的 6 个单选按钮（CPU 使用率 / 资源饼图 / 进程 3D / CPU 时间线 / 系统指标 / 持续指标）即可切换视图。
+点击顶部的 5 个单选按钮（CPU 使用率 / 资源饼图 / 进程 3D / 系统指标 / 持续指标）即可切换视图。
 
 ### 资源饼图（Resource Pie）
 

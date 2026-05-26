@@ -40,7 +40,6 @@ set(MAIN_PROJECT_SOURCES
     views/CpuUsageView.cpp
     views/ResourcePieView.cpp
     views/ProcessResource3DView.cpp
-    views/SystemOverview3DView.cpp
     views/SystemMetricsView.cpp
     aggregator/SustainedMetricsTracker.cpp
     widgets/SustainedMetricSelector.cpp
