@@ -7,6 +7,7 @@ namespace QIM {
 class QImFigureWidget;
 class QImPlotNode;
 class QImPlotLineItemNode;
+class QImPlotValueTrackerNode;
 }
 
 class HistoryBuffer;
@@ -33,6 +34,9 @@ private:
 
     // y3 items (GPU%, right axis, 0-100%)
     QIM::QImPlotLineItemNode* gpuLine_ = nullptr;
+
+    // Value tracker for hover-data feedback on all line items
+    QIM::QImPlotValueTrackerNode* valueTracker_ = nullptr;
 
     static constexpr int kWindowDurationSec = 600;
 };

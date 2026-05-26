@@ -13,6 +13,7 @@ class QImFigureWidget;
 class QImPlotNode;
 class QImPlotLineItemNode;
 class QImPlotBarGroupsItemNode;
+class QImPlotValueTrackerNode;
 }
 
 class SustainedMetricSelector;
@@ -34,6 +35,7 @@ private:
     QIM::QImPlotNode* rankingPlot_ = nullptr;
     QIM::QImPlotNode* timelinePlot_ = nullptr;
     QIM::QImPlotBarGroupsItemNode* rankingBars_ = nullptr;
+    QIM::QImPlotValueTrackerNode* timelineTracker_ = nullptr;
     QHash<QString, QIM::QImPlotLineItemNode*> timelineLines_;
     QStringList orderedNames_;
     QList<double> m_tickPositions;          ///< Y-axis tick positions for ranking chart

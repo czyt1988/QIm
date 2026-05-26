@@ -9,6 +9,7 @@
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlot.h"
 #include "plot/QImPlotLegendNode.h"
+#include "plot/QImPlotValueTrackerNode.h"
 #include "aggregator/HistoryBuffer.h"
 
 // -----------------------------------------------------------
@@ -98,6 +99,12 @@ void SystemMetricsView::buildView(QIM::QImFigureWidget* figure, const QList<Aggr
         legend->setOutside(true);
         legend->setLocation(QIM::QImPlotLegendLocation::South);
     }
+
+    // Value tracker: hover-data tooltip showing all 7 series at cursor position
+    valueTracker_ = new QIM::QImPlotValueTrackerNode(plotNode_);
+    valueTracker_->setFixedWidth(220.0f);
+    valueTracker_->setSkipNanFiniteValues(true);
+    plotNode_->addChildNode(valueTracker_);
 }
 
 // -----------------------------------------------------------

@@ -8,6 +8,7 @@
 #include "plot/QImPlotLineItemNode.h"
 #include "plot/QImPlotBarGroupsItemNode.h"
 #include "plot/QImPlotLegendNode.h"
+#include "plot/QImPlotValueTrackerNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlot.h"
 #include "aggregator/SustainedMetricsTracker.h"
@@ -96,6 +97,12 @@ void SustainedMetricsView::buildView(QIM::QImFigureWidget* figure, const QList<A
         timelineLegend->setOutside(true);
         timelineLegend->setLocation(QIM::QImPlotLegendLocation::South);
     }
+
+    // Value tracker: hover-data tooltip for timeline line items (auto-tracks dynamic lifecycle)
+    timelineTracker_ = new QIM::QImPlotValueTrackerNode(timelinePlot_);
+    timelineTracker_->setFixedWidth(220.0f);
+    timelineTracker_->setSkipNanFiniteValues(true);
+    timelinePlot_->addChildNode(timelineTracker_);
 
     updateData({});
 }
