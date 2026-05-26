@@ -8,7 +8,7 @@ ViewModeSelector::ViewModeSelector(QWidget* parent)
     , btnCpuUsage_(new QRadioButton(tr("CPU Usage"), this))
     , btnResourcePie_(new QRadioButton(tr("Resource Pies"), this))
     , btnProcessResource3D_(new QRadioButton(tr("Process 3D"), this))
-    , btnCpuTimeline3D_(new QRadioButton(tr("CPU Timeline"), this))
+    , btnSystemOverview3D_(new QRadioButton(tr("System 3D"), this))
     , btnSystemMetrics_(new QRadioButton(tr("System Metrics"), this))
     , btnSustainedMetrics_(new QRadioButton(tr("Sustained Metrics"), this))
 {
@@ -16,7 +16,7 @@ ViewModeSelector::ViewModeSelector(QWidget* parent)
     layout->addWidget(btnCpuUsage_);
     layout->addWidget(btnResourcePie_);
     layout->addWidget(btnProcessResource3D_);
-    layout->addWidget(btnCpuTimeline3D_);
+    layout->addWidget(btnSystemOverview3D_);
     layout->addWidget(btnSystemMetrics_);
     layout->addWidget(btnSustainedMetrics_);
     layout->addStretch();
@@ -25,14 +25,14 @@ ViewModeSelector::ViewModeSelector(QWidget* parent)
     buttonGroup->addButton(btnCpuUsage_);
     buttonGroup->addButton(btnResourcePie_);
     buttonGroup->addButton(btnProcessResource3D_);
-    buttonGroup->addButton(btnCpuTimeline3D_);
+    buttonGroup->addButton(btnSystemOverview3D_);
     buttonGroup->addButton(btnSystemMetrics_);
     buttonGroup->addButton(btnSustainedMetrics_);
 
     connect(btnCpuUsage_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
     connect(btnResourcePie_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
     connect(btnProcessResource3D_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
-    connect(btnCpuTimeline3D_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
+    connect(btnSystemOverview3D_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
     connect(btnSystemMetrics_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
     connect(btnSustainedMetrics_, &QRadioButton::toggled, this, &ViewModeSelector::onModeChanged);
 
@@ -47,8 +47,8 @@ ViewMode ViewModeSelector::currentMode() const
         return ViewMode::ResourcePie;
     } else if (btnProcessResource3D_->isChecked()) {
         return ViewMode::ProcessResource3D;
-    } else if (btnCpuTimeline3D_->isChecked()) {
-        return ViewMode::CpuTimeline3D;
+    } else if (btnSystemOverview3D_->isChecked()) {
+        return ViewMode::SystemOverview3D;
     } else if (btnSystemMetrics_->isChecked()) {
         return ViewMode::SystemMetrics;
     } else if (btnSustainedMetrics_->isChecked()) {
@@ -69,8 +69,8 @@ void ViewModeSelector::setCurrentMode(ViewMode mode)
     case ViewMode::ProcessResource3D:
         btnProcessResource3D_->setChecked(true);
         break;
-    case ViewMode::CpuTimeline3D:
-        btnCpuTimeline3D_->setChecked(true);
+    case ViewMode::SystemOverview3D:
+        btnSystemOverview3D_->setChecked(true);
         break;
     case ViewMode::SystemMetrics:
         btnSystemMetrics_->setChecked(true);

@@ -51,7 +51,7 @@ flowchart TD
         VM --> V1[CpuUsageView<br/>2D 叠加柱状图]
         VM --> V2[ResourcePieView<br/>2D 饼图 ×3]
         VM --> V3[ProcessResource3DView<br/>3D 散点图]
-        VM --> V4[CpuTimeline3DView<br/>3D 曲面图]
+        VM --> V4[SystemOverview3DView<br/>300×5 system metrics 3D surface with 5 metric lanes]
         VM --> V5[SystemMetricsView<br/>2D 多轴折线图]
         VM --> V6[SustainedMetricsView<br/>2D 水平柱状 + 时间线]
     end
@@ -64,7 +64,7 @@ flowchart TD
 | CpuUsageView | `QImPlotBarGroupsItemNode` | `PlotBarGroups` | 叠加柱状图，有序名称确保稳定层级 |
 | ResourcePieView | `QImPlotPieChartItemNode` | `PlotPieChart` | 3 饼图横排，累积聚合数据（来自 SustainedMetricsTracker），Top8 + Others |
 | ProcessResource3DView | `QImPlot3DScatterItemNode` | `PlotScatter3D` | 3D 散点，X=CPU / Y=内存 / Z=磁盘 |
-| CpuTimeline3DView | `QImPlot3DSurfaceItemNode` | `PlotSurface` | Viridis 色图，时间序列曲面 |
+| SystemOverview3DView | `QImPlot3DSurfaceItemNode` | `PlotSurface` | 300×5 system metrics 3D surface with 5 metric lanes |
 | SystemMetricsView | `QImPlotLineItemNode` | `PlotLine` | 7 条线共享 3 个 Y 轴 |
 | SustainedMetricsView | `QImPlotBarGroupsItemNode` + `QImPlotLineItemNode` | `PlotBarGroups` (horizontal) + `PlotLine` | 水平排名柱状图 + 时间线折线图 |
 
@@ -186,7 +186,7 @@ examples/system-monitor/
     ├── CpuUsageView.h / .cpp        # 叠加柱状图（CPU 时间序列）
     ├── ResourcePieView.h / .cpp     # 3 饼图（CPU/内存/磁盘）
     ├── ProcessResource3DView.h / .cpp    # 3D 散点图
-    ├── CpuTimeline3DView.h / .cpp   # 3D 曲面图（CPU 时间线）
+    ├── SystemOverview3DView.h / .cpp   # 3D 曲面图（300×5 system metrics 3D surface with 5 metric lanes）
     ├── SystemMetricsView.h / .cpp   # 多轴系统指标折线图
     └── SustainedMetricsView.h / .cpp     # 排名柱状图 + 时间线折线图
 ```

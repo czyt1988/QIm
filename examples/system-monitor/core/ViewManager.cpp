@@ -4,7 +4,7 @@
 #include "views/CpuUsageView.h"
 #include "views/ResourcePieView.h"
 #include "views/ProcessResource3DView.h"
-#include "views/CpuTimeline3DView.h"
+#include "views/SystemOverview3DView.h"
 #include "views/SystemMetricsView.h"
 #include "views/SustainedMetricsView.h"
 #include "widgets/SustainedMetricSelector.h"
@@ -20,7 +20,7 @@ ViewManager::ViewManager(QIM::QImFigureWidget* figure, QObject* parent)
     cpuUsageView_ = new CpuUsageView;
     resourcePieView_ = new ResourcePieView;
     processResource3DView_ = new ProcessResource3DView;
-    cpuTimeline3DView_ = new CpuTimeline3DView;
+    systemOverview3DView_ = new SystemOverview3DView;
     systemMetricsView_ = new SystemMetricsView;
     sustainedMetricsView_ = new SustainedMetricsView;
 }
@@ -29,7 +29,7 @@ ViewManager::~ViewManager() {
     delete cpuUsageView_;
     delete resourcePieView_;
     delete processResource3DView_;
-    delete cpuTimeline3DView_;
+    delete systemOverview3DView_;
     delete systemMetricsView_;
     delete sustainedMetricsView_;
 }
@@ -37,7 +37,7 @@ ViewManager::~ViewManager() {
 void ViewManager::setHistoryBuffer(HistoryBuffer* buffer)
 {
     cpuUsageView_->setHistoryBuffer(buffer);
-    cpuTimeline3DView_->setHistoryBuffer(buffer);
+    systemOverview3DView_->setHistoryBuffer(buffer);
     systemMetricsView_->setHistoryBuffer(buffer);
 }
 
@@ -100,8 +100,8 @@ void ViewManager::switchTo(ViewMode mode, const QList<AggregatedProcessInfo>& da
     case ViewMode::ProcessResource3D:
         processResource3DView_->buildView(figure_, data);
         break;
-    case ViewMode::CpuTimeline3D:
-        cpuTimeline3DView_->buildView(figure_, data);
+    case ViewMode::SystemOverview3D:
+        systemOverview3DView_->buildView(figure_, data);
         break;
     case ViewMode::SystemMetrics:
         systemMetricsView_->buildView(figure_, data);
@@ -130,8 +130,8 @@ void ViewManager::updateCurrentView(const QList<AggregatedProcessInfo>& data) {
     case ViewMode::ProcessResource3D:
         processResource3DView_->updateData(data);
         break;
-    case ViewMode::CpuTimeline3D:
-        cpuTimeline3DView_->updateData(data);
+    case ViewMode::SystemOverview3D:
+        systemOverview3DView_->updateData(data);
         break;
     case ViewMode::SystemMetrics:
         systemMetricsView_->updateData(data);
