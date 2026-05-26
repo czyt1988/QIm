@@ -4,68 +4,53 @@
 #include "QImAPI.h"
 namespace QIM
 {
-/**
- * @brief Font file helper class
- *
- * Used to find font file paths based on QFont objects.
- *
- * At program startup, preloadCommonFonts scans OS font directories and caches
- * font family names and file paths in a static object.
- *
- * Subsequently, QFont objects can be used to look up corresponding TTF files.
- */
+/// \if ENGLISH
+/// @brief Font file helper class
+///
+/// Used to find font file paths based on QFont objects.
+///
+/// At program startup, preloadCommonFonts scans OS font directories and caches
+/// font family names and file paths in a static object.
+///
+/// Subsequently, QFont objects can be used to look up corresponding TTF files.
+/// \endif
+///
+/// \if CHINESE
+/// @brief 字体文件辅助类
+///
+/// 用于根据 QFont 对象查找字体文件路径。
+///
+/// 程序启动时，preloadCommonFonts 会扫描系统字体目录，
+/// 将字体族名和文件路径缓存到静态对象中。
+///
+/// 之后可以通过 QFont 对象查询对应的 TTF 文件。
+/// \endif
 class QIM_CORE_API QImFontFileHelper
 {
     QIM_DECLARE_PRIVATE(QImFontFileHelper)
 public:
-    /**
-     * @brief Constructor
-     */
+    // Constructs a QImFontFileHelper
     QImFontFileHelper();
 
-    /**
-     * @brief Destructor
-     */
+    // Destroys the QImFontFileHelper
     ~QImFontFileHelper();
 
-    /**
-     * @brief Get all font file paths for the specified font
-     * @param font Qt font object
-     * @return List of font file paths (deduplicated)
-     *
-     * Retrieves all available font files for the specified font family,
-     * including bold, italic, and other variants.
-     * Supports caching for improved performance.
-     */
+    // Gets all font file paths for the specified font
     static QList< QString > getFontFiles(const QFont& font);
 
-    /**
-     * @brief Get all cached font families
-     * @return List of font family names
-     */
+    // Gets all cached font family names
     static QList< QString > getAvailableFamilies();
 
-    /**
-     * @brief Clear font cache
-     */
+    // Clears the font cache
     static void clearCache();
 
-    /**
-     * @brief Preload common fonts
-     */
+    // Preloads common system fonts into the cache
     static void preloadCommonFonts();
 
-    /**
-     * @brief Get pixel size from QFont, auto-converting from point size if needed
-     * @param qtFont
-     * @return Pixel size as float
-     */
+    // Gets the pixel size from a QFont, auto-converting from point size if needed
     static float getFontPixelSize(const QFont& qtFont);
 
-    /**
-     * @brief Recommended Chinese font file path
-     * @return Path to recommended Chinese font
-     */
+    // Gets the recommended Chinese font file path
     static std::string getRecommendedChineseFontPath();
 };
 

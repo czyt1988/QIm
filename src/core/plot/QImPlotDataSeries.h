@@ -30,9 +30,7 @@ namespace QIM
 class QIM_CORE_API QImAbstractPlotDataSeries
 {
 public:
-    /**
-     * @brief 把内置的数据类型枚举出来，避免dynamic_cast
-     */
+    // Enumerates built-in data types to avoid dynamic_cast
     enum DataType
     {
         XYData
@@ -43,16 +41,10 @@ public:
     {
     }
     virtual ~QImAbstractPlotDataSeries() = default;
-    /**
-     * @brief 用于快速区分类型，避免dynamic_cast
-     * @return
-     */
+    // Used for fast type identification to avoid dynamic_cast
     virtual int type() const = 0;
 
-    /**
-     * @brief 数据尺寸
-     * @return
-     */
+    // Data size
     virtual int size() const = 0;
 };
 
@@ -126,21 +118,7 @@ public:
 
     virtual double xValue(int index) const = 0;
     virtual double yValue(int index) const = 0;
-    /**
-     * @brief 二分查找：给定X值，返回最接近的Y值
-     *
-     * 智能处理两种模式：
-     * - 完整XY模式 (xRawData() != nullptr)：在X数组中二分查找
-     * - Y-only模式 (xRawData() == nullptr)：通过公式计算索引
-     *
-     * @param x 目标X值
-     * @param[out] index 可选：返回匹配的索引位置
-     * @param[out] exact 可选：是否精确匹配（X值完全相等）
-     * @return 对应的Y值；若数据无效返回NaN
-     *
-     * @note 要求X数据单调递增（时间序列/数值序列均满足）
-     * @note 内部自动处理边界情况（x超出范围时返回首/尾点）
-     */
+    // Binary search: given an X value, returns the closest Y value
     virtual double yValueAtX(double x, int* index = nullptr, bool* exact = nullptr) const
     {
         const int n = size();

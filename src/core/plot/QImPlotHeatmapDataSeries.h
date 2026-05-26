@@ -62,99 +62,25 @@ public:
     QImAbstractHeatmapDataSeries() : QImAbstractPlotDataSeries() {}
     virtual ~QImAbstractHeatmapDataSeries() = default;
 
-    /**
-     * \if ENGLISH
-     * @brief Get the data type
-     * @return HeatmapDataType indicating heatmap data
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取数据类型
-     * @return HeatmapDataType 指示热力图数据
-     * \endif
-     */
+    // Get the data type
     virtual int type() const override { return HeatmapData; }
 
-    /**
-     * \if ENGLISH
-     * @brief Get number of rows
-     * @return Row count
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取行数
-     * @return 行数
-     * \endif
-     */
+    // Get number of rows
     virtual int rows() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get number of columns
-     * @return Column count
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取列数
-     * @return 列数
-     * \endif
-     */
+    // Get number of columns
     virtual int cols() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get raw pointer to values matrix (row-major by default)
-     * @return Pointer to contiguous double array, or nullptr if not contiguous
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取值矩阵的原始指针（默认行主序）
-     * @return 连续double数组指针，如果不连续则返回nullptr
-     * \endif
-     */
+    // Get raw pointer to values matrix (row-major by default)
     virtual const double* valuesRawData() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Check if data is contiguous in memory
-     * @return true if values are stored contiguously
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查数据在内存中是否连续
-     * @return 如果值连续存储则返回true
-     * \endif
-     */
+    // Check if data is contiguous in memory
     virtual bool isContiguous() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Check if data is stored in column-major order
-     * @return true if column-major, false if row-major (default)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查数据是否按列主序存储
-     * @return true 表示列主序，false 表示行主序（默认）
-     * \endif
-     */
+    // Check if data is stored in column-major order
     virtual bool isColMajor() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get value at specified row and column indices
-     * @param row Row index (0-based)
-     * @param col Column index (0-based)
-     * @return Value at position
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取指定行和列索引处的值
-     * @param row 行索引（从0开始）
-     * @param col 列索引（从0开始）
-     * @return 位置处的值
-     * \endif
-     */
+    // Get value at specified row and column indices
     virtual double value(int row, int col) const = 0;
 };
 

@@ -59,58 +59,16 @@ public:
     QImAbstractHistogramDataSeries() : QImAbstractXYDataSeries() {}
     virtual ~QImAbstractHistogramDataSeries() = default;
 
-    /**
-     * \if ENGLISH
-     * @brief Get the data type
-     * @return HistogramDataType indicating histogram data
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取数据类型
-     * @return HistogramDataType 指示直方图数据
-     * \endif
-     */
+    // Gets the data type
     virtual int type() const override { return HistogramData; }
 
-    /**
-     * \if ENGLISH
-     * @brief Check if data is contiguous in memory
-     * @return true if values are stored contiguously
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查数据在内存中是否连续
-     * @return 如果值连续存储则返回true
-     * \endif
-     */
+    // Checks if data is contiguous in memory
     virtual bool isContiguous() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get raw pointer to values array
-     * @return Pointer to contiguous double array, or nullptr if not contiguous
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取值数组的原始指针
-     * @return 连续double数组指针，如果不连续则返回nullptr
-     * \endif
-     */
+    // Gets raw pointer to values array
     virtual const double* valuesRawData() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get value at specified index
-     * @param index Data point index
-     * @return Value at position
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取指定索引处的值
-     * @param index 数据点索引
-     * @return 位置处的值
-     * \endif
-     */
+    // Gets value at specified index
     virtual double value(int index) const = 0;
 };
 

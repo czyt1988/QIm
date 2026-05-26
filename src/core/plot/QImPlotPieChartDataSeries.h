@@ -61,97 +61,25 @@ public:
     QImAbstractPieChartDataSeries() : QImAbstractPlotDataSeries() {}
     virtual ~QImAbstractPieChartDataSeries() = default;
 
-    /**
-     * \if ENGLISH
-     * @brief Get the data type
-     * @return PieChartDataType indicating pie chart data
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取数据类型
-     * @return PieChartDataType 指示饼图数据
-     * \endif
-     */
+    // Gets the data type
     virtual int type() const override { return PieChartData; }
 
-    /**
-     * \if ENGLISH
-     * @brief Get number of slices
-     * @return Slice count
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取切片数量
-     * @return 切片数量
-     * \endif
-     */
+    // Gets the number of slices
     virtual int sliceCount() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get slice labels
-     * @return QStringList of slice labels
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取切片标签
-     * @return 切片标签的QStringList
-     * \endif
-     */
+    // Gets slice labels
     virtual QStringList labels() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get raw pointer to values array
-     * @return Pointer to contiguous double array, or nullptr if not contiguous
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取值数组的原始指针
-     * @return 连续double数组指针，如果不连续则返回nullptr
-     * \endif
-     */
+    // Gets raw pointer to values array
     virtual const double* valuesRawData() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Check if data is contiguous in memory
-     * @return true if values are stored contiguously
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 检查数据在内存中是否连续
-     * @return 如果值连续存储则返回true
-     * \endif
-     */
+    // Checks if data is contiguous in memory
     virtual bool isContiguous() const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get value at specified slice index
-     * @param sliceIndex Slice index
-     * @return Value at position
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取指定切片索引处的值
-     * @param sliceIndex 切片索引
-     * @return 位置处的值
-     * \endif
-     */
+    // Gets value at specified slice index
     virtual double value(int sliceIndex) const = 0;
 
-    /**
-     * \if ENGLISH
-     * @brief Get array of C-string labels for ImPlot
-     * @return Vector of const char* pointers, valid as long as the data series exists
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 获取用于ImPlot的C字符串标签数组
-     * @return const char* 指针的向量，只要数据系列存在即有效
-     * \endif
-     */
+    // Gets array of C-string labels for ImPlot
     virtual std::vector<const char*> labelPtrs() const = 0;
 };
 

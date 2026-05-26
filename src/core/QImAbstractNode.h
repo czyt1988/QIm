@@ -9,9 +9,6 @@ namespace QIM
  * \if ENGLISH
  * @brief Abstract base class for ImGui drawing nodes
  *
- * @class QImAbstractNode
- * @ingroup core
- *
  * @details Design philosophy:
  * - Each node should correspond to an ImGui scope (Begin/End pair, some may have no End)
  * - Supports nested hierarchical structure with automatic ID stack handling
@@ -59,9 +56,6 @@ namespace QIM
  *
  * \if CHINESE
  * @brief ImGui 绘图节点的抽象基类
- *
- * @class QImAbstractNode
- * @ingroup core
  *
  * @details 设计理念：
  * - 每个节点理论应该对应一个ImGui作用域（Begin/End对,某些可以没有end）
