@@ -62,201 +62,22 @@ class QIM_CORE_API QImPlotHistogram2DItemNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotHistogram2DItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHistogram2DItemNode::xBins
-     * @brief Number of bins in X dimension or automatic binning method
-     *
-     * @details Controls the binning strategy for X dimension.
-     *          Positive integer: exact bin count.
-     *          ImPlotBin enumeration: automatic method.
-     *          Default value is ImPlotBin_Sturges (-2).
-     * @accessors READ xBins WRITE setXBins NOTIFY xBinsChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHistogram2DItemNode::xBins
-     * @brief X维度的箱数或自动装箱方法
-     *
-     * @details 控制X维度的装箱策略。
-     *          正整数：精确箱数。
-     *          ImPlotBin枚举：自动方法。
-     *          默认值为ImPlotBin_Sturges (-2)。
-     * @accessors READ xBins WRITE setXBins NOTIFY xBinsChanged
-     * \endif
-     */
     Q_PROPERTY(int xBins READ xBins WRITE setXBins NOTIFY xBinsChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHistogram2DItemNode::yBins
-     * @brief Number of bins in Y dimension or automatic binning method
-     *
-     * @details Controls the binning strategy for Y dimension.
-     *          Positive integer: exact bin count.
-     *          ImPlotBin enumeration: automatic method.
-     *          Default value is ImPlotBin_Sturges (-2).
-     * @accessors READ yBins WRITE setYBins NOTIFY yBinsChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHistogram2DItemNode::yBins
-     * @brief Y维度的箱数或自动装箱方法
-     *
-     * @details 控制Y维度的装箱策略。
-     *          正整数：精确箱数。
-     *          ImPlotBin枚举：自动方法。
-     *          默认值为ImPlotBin_Sturges (-2)。
-     * @accessors READ yBins WRITE setYBins NOTIFY yBinsChanged
-     * \endif
-     */
     Q_PROPERTY(int yBins READ yBins WRITE setYBins NOTIFY yBinsChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHistogram2DItemNode::xRangeMin
-     * @brief Minimum value for X binning range
-     *
-     * @details Defines the lower bound of the X histogram range.
-     *          If equal to xRangeMax (default 0), automatic range from data is used.
-     * @accessors READ xRangeMin WRITE setXRangeMin NOTIFY xRangeChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHistogram2DItemNode::xRangeMin
-     * @brief X装箱范围的最小值
-     *
-     * @details 定义X直方图范围的下界。
-     *          如果等于xRangeMax（默认0），则使用数据的自动范围。
-     * @accessors READ xRangeMin WRITE setXRangeMin NOTIFY xRangeChanged
-     * \endif
-     */
     Q_PROPERTY(double xRangeMin READ xRangeMin WRITE setXRangeMin NOTIFY xRangeChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHistogram2DItemNode::xRangeMax
-     * @brief Maximum value for X binning range
-     *
-     * @details Defines the upper bound of the X histogram range.
-     *          If equal to xRangeMin (default 0), automatic range from data is used.
-     * @accessors READ xRangeMax WRITE setXRangeMax NOTIFY xRangeChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHistogram2DItemNode::xRangeMax
-     * @brief X装箱范围的最大值
-     *
-     * @details 定义X直方图范围的上界。
-     *          如果等于xRangeMin（默认0），则使用数据的自动范围。
-     * @accessors READ xRangeMax WRITE setXRangeMax NOTIFY xRangeChanged
-     * \endif
-     */
     Q_PROPERTY(double xRangeMax READ xRangeMax WRITE setXRangeMax NOTIFY xRangeChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHistogram2DItemNode::yRangeMin
-     * @brief Minimum value for Y binning range
-     *
-     * @details Defines the lower bound of the Y histogram range.
-     *          If equal to yRangeMax (default 0), automatic range from data is used.
-     * @accessors READ yRangeMin WRITE setYRangeMin NOTIFY yRangeChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHistogram2DItemNode::yRangeMin
-     * @brief Y装箱范围的最小值
-     *
-     * @details 定义Y直方图范围的下界。
-     *          如果等于yRangeMax（默认0），则使用数据的自动范围。
-     * @accessors READ yRangeMin WRITE setYRangeMin NOTIFY yRangeChanged
-     * \endif
-     */
     Q_PROPERTY(double yRangeMin READ yRangeMin WRITE setYRangeMin NOTIFY yRangeChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHistogram2DItemNode::yRangeMax
-     * @brief Maximum value for Y binning range
-     *
-     * @details Defines the upper bound of the Y histogram range.
-     *          If equal to yRangeMin (default 0), automatic range from data is used.
-     * @accessors READ yRangeMax WRITE setYRangeMax NOTIFY yRangeChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHistogram2DItemNode::yRangeMax
-     * @brief Y装箱范围的最大值
-     *
-     * @details 定义Y直方图范围的上界。
-     *          如果等于yRangeMin（默认0），则使用数据的自动范围。
-     * @accessors READ yRangeMax WRITE setYRangeMax NOTIFY yRangeChanged
-     * \endif
-     */
     Q_PROPERTY(double yRangeMax READ yRangeMax WRITE setYRangeMax NOTIFY yRangeChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHistogram2DItemNode::density
-     * @brief Density normalization flag
-     *
-     * @details When true, counts are normalized to represent probability density (PDF).
-     *          Corresponds to ImPlotHistogramFlags_Density.
-     * @accessors READ isDensity WRITE setDensity NOTIFY densityChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHistogram2DItemNode::density
-     * @brief 密度归一化标志
-     *
-     * @details 为true时，计数被归一化以表示概率密度（PDF）。
-     *          对应于ImPlotHistogramFlags_Density。
-     * @accessors READ isDensity WRITE setDensity NOTIFY densityChanged
-     * \endif
-     */
     Q_PROPERTY(bool density READ isDensity WRITE setDensity NOTIFY densityChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHistogram2DItemNode::noOutliers
-     * @brief Exclude outliers flag
-     *
-     * @details When true, values outside the specified histogram range are excluded from normalization and cumulative counts.
-     *          Corresponds to ImPlotHistogramFlags_NoOutliers.
-     * @accessors READ isNoOutliers WRITE setNoOutliers NOTIFY noOutliersChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHistogram2DItemNode::noOutliers
-     * @brief 排除异常值标志
-     *
-     * @details 为true时，指定直方图范围之外的值将从归一化和累积计数中排除。
-     *          对应于ImPlotHistogramFlags_NoOutliers。
-     * @accessors READ isNoOutliers WRITE setNoOutliers NOTIFY noOutliersChanged
-     * \endif
-     */
     Q_PROPERTY(bool noOutliers READ isNoOutliers WRITE setNoOutliers NOTIFY noOutliersChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotHistogram2DItemNode::colMajor
-     * @brief Column-major data layout flag
-     *
-     * @details When true, data is assumed to be stored in column-major order.
-     *          Corresponds to ImPlotHistogramFlags_ColMajor.
-     * @accessors READ isColMajor WRITE setColMajor NOTIFY colMajorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotHistogram2DItemNode::colMajor
-     * @brief 列主序数据布局标志
-     *
-     * @details 为true时，假定数据按列主序存储。
-     *          对应于ImPlotHistogramFlags_ColMajor。
-     * @accessors READ isColMajor WRITE setColMajor NOTIFY colMajorChanged
-     * \endif
-     */
     Q_PROPERTY(bool colMajor READ isColMajor WRITE setColMajor NOTIFY colMajorChanged)
 
 public:

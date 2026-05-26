@@ -55,25 +55,6 @@ class QIM_CORE_API QImPlotDummyItemNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotDummyItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotDummyItemNode::color
-     * @brief Color of the dummy item legend icon
-     *
-     * @details Defines the color for the dummy item's legend icon.
-     *          When not set, uses ImPlot's default color sequence.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotDummyItemNode::color
-     * @brief 虚拟项图例图标的颜色
-     *
-     * @details 定义虚拟项图例图标的颜色。
-     *          未设置时，使用 ImPlot 的默认颜色序列。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:

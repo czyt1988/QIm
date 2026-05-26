@@ -136,9 +136,15 @@ public:
 
 Q_SIGNALS:
     /**
+     * \if ENGLISH
      * @brief Emitted when the grid title changes
+     * @param[in] title The new title
+     * \endif
+     *
+     * \if CHINESE
      * @brief 当网格标题改变时发出
-     * @param title The new title
+     * @param[in] title 新的标题
+     * \endif
      */
     void titleChanged(const QString& title);
 
@@ -156,9 +162,15 @@ Q_SIGNALS:
     void gridInfoChanged();
 
     /**
+     * \if ENGLISH
      * @brief Emitted when the grid size changes
+     * @param[in] size The new size
+     * \endif
+     *
+     * \if CHINESE
      * @brief 当网格尺寸改变时发出
-     * @param size The new size
+     * @param[in] size 新的尺寸
+     * \endif
      */
     void sizeChanged(const QSizeF& size);
 

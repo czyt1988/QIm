@@ -62,111 +62,14 @@ class QIM_CORE_API QImPlotBarGroupsItemNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotBarGroupsItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotBarGroupsItemNode::groupWidth
-     * @brief Width of groups in plot units
-     *
-     * @details Controls the visual width of groups in the grouped bar chart.
-     *          Value is in plot units (not pixels).
-     *          Default value is 0.67.
-     * @accessors READ groupWidth WRITE setGroupWidth NOTIFY groupWidthChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotBarGroupsItemNode::groupWidth
-     * @brief 组的宽度（绘图单位）
-     *
-     * @details 控制分组柱状图中组的视觉宽度。
-     *          值为绘图单位（非像素）。
-     *          默认值为0.67。
-     * @accessors READ groupWidth WRITE setGroupWidth NOTIFY groupWidthChanged
-     * \endif
-     */
     Q_PROPERTY(double groupWidth READ groupWidth WRITE setGroupWidth NOTIFY groupWidthChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotBarGroupsItemNode::horizontal
-     * @brief Horizontal orientation flag
-     *
-     * @details When true, bars are rendered horizontally on the current y-axis.
-     *          When false, bars are rendered vertically (default).
-     * @accessors READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotBarGroupsItemNode::horizontal
-     * @brief 水平方向标志
-     *
-     * @details 为true时，柱子沿当前y轴水平渲染。
-     *          为false时，柱子垂直渲染（默认）。
-     * @accessors READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged
-     * \endif
-     */
     Q_PROPERTY(bool horizontal READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotBarGroupsItemNode::stacked
-     * @brief Stacked bars flag
-     *
-     * @details When true, bars within each group are stacked on top of each other.
-     *          When false, bars are placed side-by-side (default).
-     * @accessors READ isStacked WRITE setStacked NOTIFY stackedChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotBarGroupsItemNode::stacked
-     * @brief 堆叠柱状图标志
-     *
-     * @details 为true时，每个组内的柱子堆叠在一起。
-     *          为false时，柱子并排放置（默认）。
-     * @accessors READ isStacked WRITE setStacked NOTIFY stackedChanged
-     * \endif
-     */
     Q_PROPERTY(bool stacked READ isStacked WRITE setStacked NOTIFY stackedChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotBarGroupsItemNode::shift
-     * @brief Shift offset for groups
-     *
-     * @details Controls the horizontal shift of groups in plot units.
-     *          Default value is 0.
-     * @accessors READ shift WRITE setShift NOTIFY shiftChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotBarGroupsItemNode::shift
-     * @brief 组的偏移量
-     *
-     * @details 控制组的水平偏移量（绘图单位）。
-     *          默认值为0。
-     * @accessors READ shift WRITE setShift NOTIFY shiftChanged
-     * \endif
-     */
     Q_PROPERTY(double shift READ shift WRITE setShift NOTIFY shiftChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotBarGroupsItemNode::color
-     * @brief Color of bars
-     *
-     * @details Defines the primary color for bar chart bars.
-     *          When not set, uses ImPlot's default color sequence.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotBarGroupsItemNode::color
-     * @brief 柱子的颜色
-     *
-     * @details 定义柱状图柱子的主要颜色。
-     *          未设置时，使用ImPlot的默认颜色序列。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:

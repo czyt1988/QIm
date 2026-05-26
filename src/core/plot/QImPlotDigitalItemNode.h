@@ -59,25 +59,6 @@ class QIM_CORE_API QImPlotDigitalItemNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotDigitalItemNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotDigitalItemNode::color
-     * @brief Color of digital signal lines
-     *
-     * @details Defines the color for digital signal lines.
-     *          When not set, uses ImPlot's default color sequence.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotDigitalItemNode::color
-     * @brief 数字信号线的颜色
-     *
-     * @details 定义数字信号线的颜色。
-     *          未设置时，使用ImPlot的默认颜色序列。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:

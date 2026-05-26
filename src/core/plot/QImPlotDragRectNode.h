@@ -60,91 +60,12 @@ class QIM_CORE_API QImPlotDragRectNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotDragRectNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotDragRectNode::rect
-     * @brief Rectangle coordinates in plot space
-     *
-     * @details Defines the (x1, y1, x2, y2) coordinates where the draggable rectangle will be rendered.
-     *          Coordinates are in plot space.
-     *          Emits rectChanged() when the user drags the rectangle.
-     * @accessors READ rect WRITE setRect NOTIFY rectChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotDragRectNode::rect
-     * @brief 绘图空间中的矩形坐标
-     *
-     * @details 定义可拖拽矩形将渲染的 (x1, y1, x2, y2) 坐标。
-     *          坐标在绘图空间中。
-     *          用户拖拽该矩形时，发出rectChanged()信号。
-     * @accessors READ rect WRITE setRect NOTIFY rectChanged
-     * \endif
-     */
     Q_PROPERTY(QRectF rect READ rect WRITE setRect NOTIFY rectChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotDragRectNode::color
-     * @brief Color of the draggable rectangle border
-     *
-     * @details Defines the color for the draggable rectangle border.
-     *          When not set, uses a default color from ImPlot.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotDragRectNode::color
-     * @brief 可拖拽矩形边框的颜色
-     *
-     * @details 定义可拖拽矩形边框的颜色。
-     *          未设置时，使用ImPlot的默认颜色。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotDragRectNode::id
-     * @brief Unique identifier for the drag tool
-     *
-     * @details Defines the integer identifier used by ImPlot to distinguish
-     *          between multiple draggable rectangles in the same plot.
-     *          Must be unique within the same plot context.
-     * @accessors READ id WRITE setId NOTIFY idChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotDragRectNode::id
-     * @brief 拖拽工具的唯一标识符
-     *
-     * @details 定义ImPlot用于区分同一绘图中多个可拖拽矩形的整数标识符。
-     *          在同一绘图上下文中必须唯一。
-     * @accessors READ id WRITE setId NOTIFY idChanged
-     * \endif
-     */
     Q_PROPERTY(int id READ id WRITE setId NOTIFY idChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotDragRectNode::flags
-     * @brief ImPlot drag tool flags
-     *
-     * @details Defines the ImPlotDragToolFlags bitmask for controlling tool behavior.
-     *          Options include NoCursors, NoFit, NoInputs, Delayed.
-     * @accessors READ flags WRITE setFlags NOTIFY flagsChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotDragRectNode::flags
-     * @brief ImPlot拖拽工具标志
-     *
-     * @details 定义用于控制工具行为的ImPlotDragToolFlags位掩码。
-     *          选项包括NoCursors、NoFit、NoInputs、Delayed。
-     * @accessors READ flags WRITE setFlags NOTIFY flagsChanged
-     * \endif
-     */
     Q_PROPERTY(int flags READ flags WRITE setFlags NOTIFY flagsChanged)
 
     Q_PROPERTY(bool cursorsEnabled READ isCursorsEnabled WRITE setCursorsEnabled NOTIFY dragToolFlagChanged)
@@ -152,70 +73,10 @@ class QIM_CORE_API QImPlotDragRectNode : public QImPlotItemNode
     Q_PROPERTY(bool inputsEnabled READ isInputsEnabled WRITE setInputsEnabled NOTIFY dragToolFlagChanged)
     Q_PROPERTY(bool delayed READ isDelayed WRITE setDelayed NOTIFY dragToolFlagChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotDragRectNode::clicked
-     * @brief Whether the rectangle was clicked in the current frame
-     *
-     * @details Read-only property indicating if the draggable rectangle was clicked
-     *          (mouse button pressed) in the current frame.
-     *          Updated after each render cycle.
-     * @accessors READ clicked NOTIFY clickedChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotDragRectNode::clicked
-     * @brief 矩形在当前帧中是否被点击
-     *
-     * @details 只读属性，指示可拖拽矩形是否在当前帧中被点击（鼠标按钮按下）。
-     *          每次渲染循环后更新。
-     * @accessors READ clicked NOTIFY clickedChanged
-     * \endif
-     */
     Q_PROPERTY(bool clicked READ clicked NOTIFY clickedChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotDragRectNode::hovered
-     * @brief Whether the rectangle is hovered in the current frame
-     *
-     * @details Read-only property indicating if the mouse cursor is hovering
-     *          over the draggable rectangle in the current frame.
-     *          Updated after each render cycle.
-     * @accessors READ hovered NOTIFY hoveredChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotDragRectNode::hovered
-     * @brief 矩形在当前帧中是否被悬停
-     *
-     * @details 只读属性，指示鼠标光标是否在当前帧中悬停在可拖拽矩形上。
-     *          每次渲染循环后更新。
-     * @accessors READ hovered NOTIFY hoveredChanged
-     * \endif
-     */
     Q_PROPERTY(bool hovered READ hovered NOTIFY hoveredChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotDragRectNode::held
-     * @brief Whether the rectangle is being held (dragged) in the current frame
-     *
-     * @details Read-only property indicating if the draggable rectangle is currently
-     *          being dragged (mouse button held down) in the current frame.
-     *          Updated after each render cycle.
-     * @accessors READ held NOTIFY heldChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotDragRectNode::held
-     * @brief 矩形在当前帧中是否被按住（拖拽）
-     *
-     * @details 只读属性，指示可拖拽矩形是否在当前帧中被拖拽（鼠标按钮按下）。
-     *          每次渲染循环后更新。
-     * @accessors READ held NOTIFY heldChanged
-     * \endif
-     */
     Q_PROPERTY(bool held READ held NOTIFY heldChanged)
 
 public:

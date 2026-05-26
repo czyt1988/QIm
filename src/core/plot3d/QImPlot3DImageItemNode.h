@@ -68,99 +68,14 @@ class QIM_CORE_API QImPlot3DImageItemNode : public QImPlot3DItemNode
 
     Q_PROPERTY(double axisVZ READ axisVZ WRITE setAxisVZ NOTIFY axisVChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::uv0X
-     * @brief X component of the lower-left texture coordinate (UV0)
-     * @details Defines the X texture coordinate for the lower-left corner of the image.
-     *          Default is 0.0.
-     * @accessors READ uv0X WRITE setUv0X NOTIFY uv0Changed
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::uv0X
-     * @brief 左下角纹理坐标(UV0)的X分量
-     * @details 定义图像左下角的X纹理坐标。默认值为0.0。
-     * @accessors READ uv0X WRITE setUv0X NOTIFY uv0Changed
-     * \endif
-     */
     Q_PROPERTY(double uv0X READ uv0X WRITE setUv0X NOTIFY uv0Changed)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::uv0Y
-     * @brief Y component of the lower-left texture coordinate (UV0)
-     * @details Defines the Y texture coordinate for the lower-left corner of the image.
-     *          Default is 0.0.
-     * @accessors READ uv0Y WRITE setUv0Y NOTIFY uv0Changed
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::uv0Y
-     * @brief 左下角纹理坐标(UV0)的Y分量
-     * @details 定义图像左下角的Y纹理坐标。默认值为0.0。
-     * @accessors READ uv0Y WRITE setUv0Y NOTIFY uv0Changed
-     * \endif
-     */
     Q_PROPERTY(double uv0Y READ uv0Y WRITE setUv0Y NOTIFY uv0Changed)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::uv1X
-     * @brief X component of the upper-right texture coordinate (UV1)
-     * @details Defines the X texture coordinate for the upper-right corner of the image.
-     *          Default is 1.0.
-     * @accessors READ uv1X WRITE setUv1X NOTIFY uv1Changed
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::uv1X
-     * @brief 右上角纹理坐标(UV1)的X分量
-     * @details 定义图像右上角的X纹理坐标。默认值为1.0。
-     * @accessors READ uv1X WRITE setUv1X NOTIFY uv1Changed
-     * \endif
-     */
     Q_PROPERTY(double uv1X READ uv1X WRITE setUv1X NOTIFY uv1Changed)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::uv1Y
-     * @brief Y component of the upper-right texture coordinate (UV1)
-     * @details Defines the Y texture coordinate for the upper-right corner of the image.
-     *          Default is 1.0.
-     * @accessors READ uv1Y WRITE setUv1Y NOTIFY uv1Changed
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::uv1Y
-     * @brief 右上角纹理坐标(UV1)的Y分量
-     * @details 定义图像右上角的Y纹理坐标。默认值为1.0。
-     * @accessors READ uv1Y WRITE setUv1Y NOTIFY uv1Changed
-     * \endif
-     */
     Q_PROPERTY(double uv1Y READ uv1Y WRITE setUv1Y NOTIFY uv1Changed)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlot3DImageItemNode::tintColor
-     * @brief Tint color applied to the image
-     *
-     * @details Defines the color multiplier applied to the image texture.
-     *          Default is white (1,1,1,1) which renders the image unchanged.
-     *          Use alpha component to control transparency.
-     * @accessors READ tintColor WRITE setTintColor NOTIFY tintColorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlot3DImageItemNode::tintColor
-     * @brief 应用于图像的色调颜色
-     *
-     * @details 定义应用于图像纹理的颜色乘数。
-     *          默认为白色 (1,1,1,1)，图像保持不变。
-     *          使用 alpha 分量控制透明度。
-     * @accessors READ tintColor WRITE setTintColor NOTIFY tintColorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor tintColor READ tintColor WRITE setTintColor NOTIFY tintColorChanged)
 
     Q_PROPERTY(bool quadModeEnabled READ quadModeEnabled WRITE setQuadModeEnabled NOTIFY quadModeEnabledChanged)

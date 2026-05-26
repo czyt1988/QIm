@@ -58,92 +58,12 @@ class QIM_CORE_API QImPlotTagYNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotTagYNode)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotTagYNode::value
-     * @brief Y position of the tag in plot coordinates
-     *
-     * @details Defines the y coordinate where the tag will be rendered.
-     *          Coordinate is in plot space.
-     * @accessors READ value WRITE setValue NOTIFY valueChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotTagYNode::value
-     * @brief 标签在绘图坐标中的 Y 位置
-     *
-     * @details 定义标签将渲染的 y 坐标。
-     *          坐标在绘图空间中。
-     * @accessors READ value WRITE setValue NOTIFY valueChanged
-     * \endif
-     */
     Q_PROPERTY(double value READ value WRITE setValue NOTIFY valueChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotTagYNode::color
-     * @brief Color of the tag line
-     *
-     * @details Defines the color for the tag horizontal line.
-     *          When not set, uses a default color from ImPlot.
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotTagYNode::color
-     * @brief 标签线的颜色
-     *
-     * @details 定义标签水平线的颜色。
-     *          未设置时，使用 ImPlot 的默认颜色。
-     * @accessors READ color WRITE setColor NOTIFY colorChanged
-     * \endif
-     */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotTagYNode::text
-     * @brief Text content of the tag
-     *
-     * @details Defines the text label displayed by the tag.
-     *          Supports printf-style formatting when using setText() with arguments.
-     *          Default is empty string (no text displayed).
-     * @accessors READ text WRITE setText NOTIFY textChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotTagYNode::text
-     * @brief 标签的文本内容
-     *
-     * @details 定义标签显示的文本标签。
-     *          使用带参数的 setText() 时支持 printf 风格格式化。
-     *          默认为空字符串（不显示文本）。
-     * @accessors READ text WRITE setText NOTIFY textChanged
-     * \endif
-     */
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 
-    /**
-     * \if ENGLISH
-     * @property QImPlotTagYNode::round
-     * @brief Whether to round the tag position to integer pixels
-     *
-     * @details When true, the tag position will be rounded to integer pixel coordinates.
-     *          This can improve line rendering sharpness.
-     *          Default is false.
-     * @accessors READ round WRITE setRound NOTIFY roundChanged
-     * \endif
-     *
-     * \if CHINESE
-     * @property QImPlotTagYNode::round
-     * @brief 是否将标签位置舍入为整数像素
-     *
-     * @details 为 true 时，标签位置将舍入为整数像素坐标。
-     *          这可以提高线渲染的清晰度。
-     *          默认值为 false。
-     * @accessors READ round WRITE setRound NOTIFY roundChanged
-     * \endif
-     */
     Q_PROPERTY(bool round READ round WRITE setRound NOTIFY roundChanged)
 
 public:

@@ -59,22 +59,16 @@ class QIM_CORE_API QImPlotAnnotationNode : public QImPlotItemNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotAnnotationNode)
 
-    // Position of the annotation in plot coordinates (READ position WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(QPointF position READ position WRITE setPosition NOTIFY positionChanged)
 
-    // Text color of the annotation (READ color WRITE setColor NOTIFY colorChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
-    // Text content of the annotation, supports printf-style formatting (READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 
-    // Pixel offset from the plot position (READ pixelOffset WRITE setPixelOffset NOTIFY pixelOffsetChanged)
     Q_PROPERTY(QPointF pixelOffset READ pixelOffset WRITE setPixelOffset NOTIFY pixelOffsetChanged)
 
-    // Whether to clamp the annotation within plot area (READ clamp WRITE setClamp NOTIFY clampChanged)
     Q_PROPERTY(bool clamp READ clamp WRITE setClamp NOTIFY clampChanged)
 
-    // Whether to round the annotation position to integer pixels (READ round WRITE setRound NOTIFY roundChanged)
     Q_PROPERTY(bool round READ round WRITE setRound NOTIFY roundChanged)
 
 public:
