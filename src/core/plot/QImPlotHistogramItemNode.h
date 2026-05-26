@@ -32,16 +32,16 @@ class QImAbstractHistogramDataSeries;
  * \endif
  *
  * \if CHINESE
- * @brief ImPlot直方图可视化的Qt风格封装
+ * @brief ImPlot直方图可视化的Qt风格封装。
  *
- * @details 为ImPlot直方图提供Qt风格的保留模式封装�?
+ * @details 为ImPlot直方图提供Qt风格的保留模式封装。
  *          支持可自定义的装箱、柱条缩放、范围过滤，
- *          以及完整的Qt属性系统集成和信号槽事件处理�?
- *          继承自QImPlotItemNode，并遵循与QImPlotBarsItemNode相同的PIMPL设计模式以保持一致性�?
+ *          以及完整的Qt属性系统集成和信号槽事件处理。
+ *          继承自QImPlotItemNode，并遵循与QImPlotBarsItemNode相同的PIMPL设计模式以保持一致性。
  *
- * @note 直方图通过将单值数据装箱到柱条中来可视化数据分布�?
- *       分类或离散XY柱状图请使用QImPlotBarsItemNode�?
- * @note 箱数更改需要重绘才能生效�?
+ * @note 直方图通过将单值数据装箱到柱条中来可视化数据分布。
+ *       分类或离散XY柱状图请使用QImPlotBarsItemNode。
+ * @note 箱数更改需要重绘才能生效。
  *
  *
  * @see QImPlotItemNode
@@ -185,10 +185,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 箱数更改时触�?
+     * @brief 箱数更改时触发
      * @param[in] bins 新箱数或方法
-     * @details 当值实际更改时由setBins()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @details 当值实际更改时由setBins()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void binsChanged(int bins);
@@ -202,10 +202,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 柱条缩放因子更改时触�?
-     * @param[in] scale 新柱条缩放因�?
-     * @details 当值实际更改时由setBarScale()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 柱条缩放因子更改时触发
+     * @param[in] scale 新柱条缩放因子
+     * @details 当值实际更改时由setBarScale()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void barScaleChanged(double scale);
@@ -218,9 +218,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 直方图范围更改时触发
-     * @details 当值实际更改时由setRangeMin()或setRangeMax()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 直方图范围更改时触发。
+     * @details 当值实际更改时由setRangeMin()或setRangeMax()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void rangeChanged();
@@ -234,10 +234,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 累积标志更改时触�?
-     * @param[in] cumulative 新累积标志状�?
-     * @details 当值实际更改时由setCumulative()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 累积标志更改时触发
+     * @param[in] cumulative 新累积标志状态
+     * @details 当值实际更改时由setCumulative()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void cumulativeChanged(bool cumulative);
@@ -251,10 +251,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 密度标志更改时触�?
-     * @param[in] density 新密度标志状�?
-     * @details 当值实际更改时由setDensity()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 密度标志更改时触发
+     * @param[in] density 新密度标志状态
+     * @details 当值实际更改时由setDensity()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void densityChanged(bool density);
@@ -268,10 +268,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 方向更改时触�?
-     * @param[in] horizontal 新水平方向状�?
-     * @details 当值实际更改时由setHorizontal()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 方向更改时触发
+     * @param[in] horizontal 新水平方向状态
+     * @details 当值实际更改时由setHorizontal()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void orientationChanged(bool horizontal);
@@ -285,10 +285,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 异常值包含标志更改时触发
-     * @param[in] included 新异常值包含状�?
-     * @details 当值实际更改时由setOutliersIncluded()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 异常值包含标志更改时触发。
+     * @param[in] included 新异常值包含状态
+     * @details 当值实际更改时由setOutliersIncluded()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void outliersIncludedChanged(bool included);
@@ -302,10 +302,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 直方图柱条颜色更改时触发
+     * @brief 直方图柱条颜色更改时触发。
      * @param[in] color 新直方图柱条颜色
-     * @details 当值实际更改时由setColor()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @details 当值实际更改时由setColor()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void colorChanged(const QColor& color);
@@ -318,9 +318,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触�?
-     * @details 当分配新数据时由setData()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 数据系列更改时触发
+     * @details 当分配新数据时由setData()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void dataChanged();
@@ -333,9 +333,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 直方图标志更改时触发
-     * @details 任何标志属性更改（累积、密度、水平方向、排除异常值）时触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 直方图标志更改时触发。
+     * @details 任何标志属性更改（累积、密度、水平方向、排除异常值）时触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void histogramFlagChanged();

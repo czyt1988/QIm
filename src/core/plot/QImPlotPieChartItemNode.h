@@ -31,16 +31,16 @@ class QImAbstractPieChartDataSeries;
  * \endif
  *
  * \if CHINESE
- * @brief ImPlot饼图可视化的Qt风格封装
+ * @brief ImPlot饼图可视化的Qt风格封装。
  *
- * @details 为ImPlot饼图提供Qt风格的保留模式封装�?
- *          支持可自定义的中心位置、半径、标签格式化�?
- *          起始角度，以及用于归一化、隐藏切片处理和爆炸切片的标志�?
- *          继承自QImPlotItemNode，并遵循与QImPlotBarsItemNode相同的PIMPL设计模式以保持一致性�?
+ * @details 为ImPlot饼图提供Qt风格的保留模式封装。
+ *          支持可自定义的中心位置、半径、标签格式化。
+ *          起始角度，以及用于归一化、隐藏切片处理和爆炸切片的标志。
+ *          继承自QImPlotItemNode，并遵循与QImPlotBarsItemNode相同的PIMPL设计模式以保持一致性。
  *
- * @note 饼图使用圆形切片可视化比例数据�?
- *       分组柱状图请使用QImPlotBarGroupsItemNode�?
- * @note 半径更改需要重绘才能生效�?
+ * @note 饼图使用圆形切片可视化比例数据。
+ *       分组柱状图请使用QImPlotBarGroupsItemNode。
+ * @note 半径更改需要重绘才能生效。
  *
  *
  * @see QImPlotItemNode
@@ -158,10 +158,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 中心位置更改时触�?
-     * @param[in] center 新中心位�?
-     * @details 当值实际更改时由setCenter()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 中心位置更改时触发
+     * @param[in] center 新中心位置
+     * @details 当值实际更改时由setCenter()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void centerChanged(const QPointF& center);
@@ -175,10 +175,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 半径更改时触�?
-     * @param[in] radius 新半径（绘图单位�?
-     * @details 当值实际更改时由setRadius()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 半径更改时触发
+     * @param[in] radius 新半径（绘图单位）
+     * @details 当值实际更改时由setRadius()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void radiusChanged(double radius);
@@ -192,10 +192,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标签格式更改时触�?
+     * @brief 标签格式更改时触发
      * @param[in] format 新标签格式字符串
-     * @details 当值实际更改时由setLabelFormat()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @details 当值实际更改时由setLabelFormat()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void labelFormatChanged(const QString& format);
@@ -209,10 +209,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 起始角度更改时触�?
+     * @brief 起始角度更改时触发
      * @param[in] angle 新起始角度（度）
-     * @details 当值实际更改时由setStartAngle()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @details 当值实际更改时由setStartAngle()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void startAngleChanged(double angle);
@@ -226,10 +226,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 归一化标志更改时触发
-     * @param[in] normalize 新归一化状�?
-     * @details 当值实际更改时由setNormalize()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 归一化标志更改时触发。
+     * @param[in] normalize 新归一化状态
+     * @details 当值实际更改时由setNormalize()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void normalizeChanged(bool normalize);
@@ -243,10 +243,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 忽略隐藏标志更改时触�?
-     * @param[in] ignore 新忽略隐藏状�?
-     * @details 当值实际更改时由setIgnoreHidden()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 忽略隐藏标志更改时触发
+     * @param[in] ignore 新忽略隐藏状态
+     * @details 当值实际更改时由setIgnoreHidden()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void ignoreHiddenChanged(bool ignore);
@@ -260,10 +260,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 爆炸标志更改时触�?
-     * @param[in] exploding 新爆炸状�?
-     * @details 当值实际更改时由setExploding()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 爆炸标志更改时触发
+     * @param[in] exploding 新爆炸状态
+     * @details 当值实际更改时由setExploding()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void explodingChanged(bool exploding);
@@ -276,9 +276,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触�?
-     * @details 当分配新数据时由setData()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 数据系列更改时触发
+     * @details 当分配新数据时由setData()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void dataChanged();
@@ -291,9 +291,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 饼图标志更改时触�?
-     * @details 任何标志属性更改（归一化、忽略隐藏、爆炸等）时触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 饼图标志更改时触发
+     * @details 任何标志属性更改（归一化、忽略隐藏、爆炸等）时触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void pieChartFlagChanged();

@@ -32,16 +32,16 @@ class QImAbstractXYDataSeries;
  * \endif
  *
  * \if CHINESE
- * @brief ImPlot二维直方图可视化的Qt风格封装
+ * @brief ImPlot二维直方图可视化的Qt风格封装。
  *
- * @details 为ImPlot二维直方图（双变量）提供Qt风格的保留模式封装�?
- *          支持可自定义的X和Y维度装箱、范围过滤�?
- *          密度归一化、异常值排除和列主序数据布局�?
- *          继承自QImPlotItemNode，并遵循与QImPlotHeatmapItemNode相同的PIMPL设计模式以保持一致性�?
+ * @details 为ImPlot二维直方图（双变量）提供Qt风格的保留模式封装。
+ *          支持可自定义的X和Y维度装箱、范围过滤。
+ *          密度归一化、异常值排除和列主序数据布局。
+ *          继承自QImPlotItemNode，并遵循与QImPlotHeatmapItemNode相同的PIMPL设计模式以保持一致性。
  *
- * @note 二维直方图将两个变量的联合分布可视化为装箱计数的热力图�?
- *       适用于相关性分析、密度估计和二维数据探索�?
- * @note 大量箱数�?100x100）可能影响性能�?
+ * @note 二维直方图将两个变量的联合分布可视化为装箱计数的热力图。
+ *       适用于相关性分析、密度估计和二维数据探索。
+ * @note 大量箱数。100x100）可能影响性能。
  *
  *
  * @see QImPlotItemNode
@@ -183,10 +183,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief X箱数更改时触�?
-     * @param[in] bins 新X箱数或方�?
-     * @details 当值实际更改时由setXBins()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief X箱数更改时触发
+     * @param[in] bins 新X箱数或方法
+     * @details 当值实际更改时由setXBins()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void xBinsChanged(int bins);
@@ -200,10 +200,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief Y箱数更改时触�?
-     * @param[in] bins 新Y箱数或方�?
-     * @details 当值实际更改时由setYBins()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief Y箱数更改时触发
+     * @param[in] bins 新Y箱数或方法
+     * @details 当值实际更改时由setYBins()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void yBinsChanged(int bins);
@@ -216,9 +216,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief X或Y范围更改时触�?
-     * @details 当值实际更改时由setXRangeMin()、setXRangeMax()、setYRangeMin()、setYRangeMax()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief X或Y范围更改时触发
+     * @details 当值实际更改时由setXRangeMin()、setXRangeMax()、setYRangeMin()、setYRangeMax()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void xRangeChanged();
@@ -231,9 +231,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief Y范围更改时触�?
-     * @details 当值实际更改时由setYRangeMin()或setYRangeMax()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief Y范围更改时触发
+     * @details 当值实际更改时由setYRangeMin()或setYRangeMax()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void yRangeChanged();
@@ -247,10 +247,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 密度标志更改时触�?
-     * @param[in] density 新密度标志状�?
-     * @details 当值实际更改时由setDensity()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 密度标志更改时触发
+     * @param[in] density 新密度标志状态
+     * @details 当值实际更改时由setDensity()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void densityChanged(bool density);
@@ -264,10 +264,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 排除异常值标志更改时触发
-     * @param[in] noOutliers 新排除异常值标志状�?
-     * @details 当值实际更改时由setNoOutliers()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 排除异常值标志更改时触发。
+     * @param[in] noOutliers 新排除异常值标志状态
+     * @details 当值实际更改时由setNoOutliers()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void noOutliersChanged(bool noOutliers);
@@ -281,10 +281,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 列主序布局标志更改时触�?
-     * @param[in] colMajor 新列主序状�?
-     * @details 当值实际更改时由setColMajor()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 列主序布局标志更改时触发
+     * @param[in] colMajor 新列主序状态
+     * @details 当值实际更改时由setColMajor()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void colMajorChanged(bool colMajor);
@@ -297,9 +297,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触�?
-     * @details 当分配新数据时由setData()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 数据系列更改时触发
+     * @details 当分配新数据时由setData()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void dataChanged();
@@ -312,9 +312,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 直方图标志更改时触发
-     * @details 任何标志属性更改（密度、排除异常值、列主序）时触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 直方图标志更改时触发。
+     * @details 任何标志属性更改（密度、排除异常值、列主序）时触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void histogramFlagChanged();

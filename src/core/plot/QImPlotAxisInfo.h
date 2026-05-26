@@ -26,17 +26,17 @@ class QImPlotNode;
  * \endif
  *
  * \if CHINESE
- * @brief ���ڹ��� ImPlot ���������õ� Qt ��װ�࣬�ṩ���Ͱ�ȫ�����Խӿ�
- * @details �ṩ���� QObject �Ľӿ������� ImPlot �����ᣬ����ֱ�Ӳ����ײ� ImPlotAxisFlags λ���롣
- *          ��װ���ܰ�����
- *          - �������ǩ�ı����ɼ���
- *          - ��Χ���ƣ���С/���ֵ�����Զ�������Ϊ
- *          - ���� ImPlotAxisFlags_ ѡ����ֱ�۵Ĳ���������ʽ��¶
- *          - �̶��������ã�����/����/ʱ��/�Գƶ�����
- *          - Qt ö�٣�QImPlotAxisId���� ImPlot ö�٣�ImAxis����˫��ת��
- * @note ���౾������Ⱦ��ͼ�������洢����״̬�����ڻ�ͼ���ý׶Σ�BeginPlot/EndPlot ���ڣ�
- *       ͨ�� SetupAxis()��SetupAxisLimits() �� SetupAxisScale() Ӧ���� ImPlot��
- * @note �������Ա�����ڱ��ش洢��ʵ�ʻ�ͼ��۸�������������Ⱦʱ������Ӧ�õ� ImPlot �����ĺ���Ч��
+ * @brief 用于管理 ImPlot 坐标轴配置的 Qt 封装类，提供类型安全的属性接口
+ * @details 提供基于 QObject 的接口来配置 ImPlot 坐标轴，无需直接操作底层 ImPlotAxisFlags 位掩码。
+ *          封装内容包括：
+ *          - 坐标轴标签文本及可见性
+ *          - 范围限制（最小/最大值）及自动适配行为
+ *          - 所有 ImPlotAxisFlags_ 选项以直观的布尔属性方式暴露
+ *          - 刻度类型设置（线性/对数/时间/对称对数）
+ *          - Qt 枚举（QImPlotAxisId）与 ImPlot 枚举（ImAxis）的双向转换
+ * @note 本类本身不渲染图形，仅作图绘配置存储，在绘图设置阶段（BeginPlot/EndPlot 块内）
+ *       通过 SetupAxis()、SetupAxisLimits() 和 SetupAxisScale() 应用到 ImPlot。
+ * @note 所有属性变更被本地存储，实际画面更新仅在重新渲染时，将更新后的配置应用到 ImPlot 上下文后生效。
  * @see ImPlot::SetupAxis(), ImPlot::SetupAxisLimits(), ImPlot::SetupAxisScale()
  * \endif
  */
@@ -79,13 +79,13 @@ public:
     ~QImPlotAxisInfo();
     QImPlotAxisId axisId() const;
     int imAxis() const;
-    // ��ȡplot
+    // 获取所属的 plot 节点
     QImPlotNode* plotNode() const;
-    // ��ǩ
+    // 坐标轴标签
     QString label() const;
     void setLabel(const QString& label);
 
-    // ��Χ����
+    // 范围限制
     double minLimits() const;
     void setMinLimits(double min);
     double maxLimits() const;
@@ -95,62 +95,62 @@ public:
     void setLimitsCondition(QImPlotCondition v);
 
     void setLimits(double min, double max, QImPlotCondition cond = QImPlotCondition::Once);
-    // About ImPlotAxisFlags / ����Ϊ����ӦQt������ϰ�ߣ�����Ϊ�϶�����
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_AutoFit / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_AutoFit
+    // About ImPlotAxisFlags / 为了更贴合 Qt 编程习惯，统一为肯定语义
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_AutoFit / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_AutoFit
     bool isAutoFit() const;
     void setAutoFit(bool on);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_Invert / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_Invert
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_Invert / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_Invert
     bool isInverted() const;
     void setInverted(bool on);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoLabel / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_NoLabel
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoLabel / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_NoLabel
     bool isLabelEnabled() const;
     void setLabelEnabled(bool enabled);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoGridLines / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_NoGridLines
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoGridLines / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_NoGridLines
     bool isGridLinesEnabled() const;
     void setGridLinesEnabled(bool enabled);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoTickMarks / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_NoTickMarks
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoTickMarks / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_NoTickMarks
     bool isTickMarksEnabled() const;
     void setTickMarksEnabled(bool enabled);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoTickLabels / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_NoTickLabels
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoTickLabels / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_NoTickLabels
     bool isTickLabelsEnabled() const;
     void setTickLabelsEnabled(bool enabled);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoInitialFit / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_NoInitialFit
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoInitialFit / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_NoInitialFit
     bool isInitialFitEnabled() const;
     void setInitialFitEnabled(bool enabled);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoMenus / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_NoMenus
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoMenus / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_NoMenus
     bool isMenusEnabled() const;
     void setMenusEnabled(bool enabled);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoSideSwitch / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_NoSideSwitch
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoSideSwitch / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_NoSideSwitch
     bool isSideSwitchEnabled() const;
     void setSideSwitchEnabled(bool enabled);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoHighlight / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_NoHighlight
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoHighlight / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_NoHighlight
     bool isHighlightEnabled() const;
     void setHighlightEnabled(bool enabled);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_Opposite / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_Opposite
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_Opposite / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_Opposite
     bool isOpposite() const;
     void setOpposite(bool on);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_Foreground / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_Foreground
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_Foreground / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_Foreground
     bool isForeground() const;
     void setForeground(bool on);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_RangeFit / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_RangeFit
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_RangeFit / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_RangeFit
     bool isRangeFit() const;
     void setRangeFit(bool on);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_PanStretch / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_PanStretch
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_PanStretch / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_PanStretch
     bool isPanStretch() const;
     void setPanStretch(bool on);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_LockMin / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_LockMin
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_LockMin / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_LockMin
     bool isLockMin() const;
     void setLockMin(bool on);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_LockMax / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_LockMax
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_LockMax / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_LockMax
     bool isLockMax() const;
     void setLockMax(bool on);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_Lock / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_Lock
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_Lock / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_Lock
     bool isLock() const;  // LockMin && LockMax
     void setLock(bool on);
-    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoDecorations / cn:��ӦImPlotAxisFlags::ImPlotAxisFlags_NoDecorations
+    // Corresponds to ImPlotAxisFlags::ImPlotAxisFlags_NoDecorations / cn:对应 ImPlotAxisFlags::ImPlotAxisFlags_NoDecorations
     bool isNoDecorations() const;
     void setNoDecorations(bool enabled);
-    // ԭʼ��־���ʣ��߼��÷���
+    // 原始标志接口，高级用法
     int axisFlags() const;
     void setAxisFlags(int flags);
     // Gets the current axis scale type (linear, logarithmic, time, etc.)
@@ -168,7 +168,7 @@ public:
     // Convenience methods for tick configuration
     void setAxisTicks(const QList<double>& values, const QList<QByteArray>& labels = {}, bool keepDefault = false);
     void setAxisTicksRange(double v_min, double v_max, int n_ticks, const QList<QByteArray>& labels = {}, bool keepDefault = false);
-    // ����������Ƿ���Ч�����ػ���ʾ������X1��Y1���ػ���ʾ��ͨ��setNoDecorations��ʵ�֣�
+    // 控制该坐标轴是否有效显示（仅控制会显示标签的，如X1、Y1；不可见的控制通过setNoDecorations来实现）
     bool isEnabled() const;
     void setEnabled(bool on);
 Q_SIGNALS:
@@ -184,12 +184,12 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief ���������ǩ�ı��ı�ʱ����
-     * @param label �µı�ǩ�ı��ַ��������ַ�����ʾʹ��Ĭ�������ƣ�
-     * @details �� setLabel() ���õ��±�ǩ�뵱ǰֵ��ͬʱ������
-     *          ͨ�����ڸ�����ʾ�����Ƶ� UI Ԫ�ػ�־û���ǩ�����
-     * @note ���ź��ڱ�ǩ�ɼ��Ա��ʱ**����**�������� labelEnabled ���Կ��ƣ���
-     *       ����ǩ�ı����ݱ���ᴥ�����źš�
+     * @brief 当坐标轴标签文本发生改变时触发
+     * @param label 新的标签文本字符串（空字符串表示使用默认轴名称）
+     * @details 当 setLabel() 设置的新标签与当前值不同时触发。
+     *          通常用于更新显示轴名称的 UI 元素或持久化标签变更。
+     * @note 该信号在标签可见性变化时**不会**触发（可见性由 labelEnabled 属性控制），
+     *       只有标签文本内容变更才会触发此信号。
      * @see setLabel(), isLabelEnabled()
      * \endif
      */
@@ -208,13 +208,13 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief �������᷶Χ���Ƹı�ʱ���䣨��Сֵ�����ֵ������ͬʱ��
-     * @param min ������ɼ���Χ������Сֵ
-     * @param max ������ɼ���Χ�������ֵ
-     * @details �� setMinLimits()��setMaxLimits() �� setLimits() ���õ�ֵ�뵱ǰ���Ʋ�ͬʱ������
-     *          ע�⣺�޸�����ֵ��������Ӱ���ͼ���������´λ�ͼ��Ⱦʱ���� SetupAxisLimits() ����Ӧ�ñ����
-     *          ���ź����� UI ��ӳ�����������Ʊ����
-     * @note ֵ**��**��֤ min < max����Ч��Χ��min >= max�����ܵ��� ImPlot ��Ⱦ���⡣
+     * @brief 当坐标轴范围限制改变时发出（最小值、最大值或两者同时）
+     * @param min 新的可见范围的最小值
+     * @param max 新的可见范围的最大值
+     * @details 当 setMinLimits()、setMaxLimits() 或 setLimits() 设置的值与当前限制不同时触发。
+     *          注意：修改限制值并不会立即影响图形，需要在下次绘图渲染时调用 SetupAxisLimits() 来应用变更。
+     *          该信号允许 UI 反映待处理的限制变更。
+     * @note 值**未**验证 min < max；无效范围（min >= max）可能导致 ImPlot 渲染问题。
      * @see setLimits(), ImPlot::SetupAxisLimits()
      * \endif
      */
@@ -235,14 +235,14 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief �������������־���Ա��ʱ���䣨autoFit��inverted��gridLinesEnabled �ȣ�
-     * @details ��**�κ�**�޸ı�־������������ setAutoFit()��setLock()��setDecorationsEnabled()��
-     *          ���µײ� ImPlotAxisFlags λ������ʱ�����������źžۺ����б�־����������Ч�� ��
-     *          �����ӵĲۺ������ѯ���������ȷ����������
-     * @note ���ñ�־Ϊ��ֵͬʱ**����**�������źţ�ͨ�� != �ȽϽ��б����⣩��
-     *       ֱ��ͨ�� axisFlags() getter ����**����**�������źţ�����������������
-     * @note ��ָʾ�����ĸ���־����������ۺ��������鵥�����Ի���� axisFlags() ��ȷ������ı�־��
-     *          ����ϸ���ȱ�����٣������ӵ������������źţ��� QML �е� onAutoFitChanged����
+     * @brief 当任意坐标轴标志属性变更时发出（autoFit、inverted、gridLinesEnabled 等）
+     * @details 当**任何**修改标志的设置器（如 setAutoFit()、setLock()、setDecorationsEnabled()）
+     *          导致底层 ImPlotAxisFlags 位掩码变化时触发。单一信号聚合所有标志变更以提高效率 ——
+     *          连接的槽函数应查询相关属性以确定确切变更。
+     * @note 设置标志为相同值时**不会**发出该信号（通过 != 比较进行检测）。
+     *       直接通过 axisFlags() getter 访问**不会**发出该信号（只有设置器会触发发出）。
+     * @note 不指示具体哪个标志发生了变化；槽函数必须检查各属性或调用 axisFlags() 来确定改变的标志。
+     *          对于细粒度变更跟踪，可连接到各独立属性信号（如 QML 中的 onAutoFitChanged）。
      * @see setAxisFlags(), axisFlags()
      * \endif
      */
@@ -250,7 +250,7 @@ Q_SIGNALS:
 
     /**
      * \if ENGLISH
-     * @brief Emitted when the axis scale type changes (linear �� log, time �� symlog, etc.)
+     * @brief Emitted when the axis scale type changes (linear → log, time → symlog, etc.)
      * @param scaleType The new scale type as QImPlotScaleType enum value
      * @details Triggered by setScaleType() when the new scale type differs from current type.
      *          Scale types control value transformation and formatting:
@@ -266,18 +266,18 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief ��������̶����ͱ��ʱ���䣨���� �� ������ʱ�� �� �Գƶ����ȣ�
-     * @param scaleType �� QImPlotScaleType ö��ֵ��ʾ���¿̶�����
-     * @details �� setScaleType() ���õ��¿̶������뵱ǰ���Ͳ�ͬʱ������
-     *          �̶����Ϳ���ֵ�ı任�͸�ʽ����
-     *          - Linear: ��׼����ӳ�䣨Ĭ�ϣ�
-     *          - Time:   Unix ʱ������ͣ�������/ʱ���ʽ��
-     *          - Log10:  �� 10 Ϊ�׵Ķ���ӳ�䣨Ҫ����ֵ��
-     *          - SymLog: �Գƶ���ӳ�䣨����㸽���ɴ�����ֵ��
-     * @note ʵ�ʿ̶ȱ�����ڻ�ͼ���ý׶ε��� ImPlot::SetupAxisScale() ����Ч��
-     *       ���ź����� UI ���������̶����͵Ŀؼ�������� Log10 ���ø�ֵ���룩��
-     * @note �����ݰ�������ֵʱ�л��� Log10 �̶ȿ��ܵ�����Ⱦ�쳣��
-     *         Ӧ��Ӧ�ڱ���̶�����ǰ��֤���ݼ����ԡ�
+     * @brief 当坐标轴刻度类型变更时发出（线性 → 对数、时间 → 对称对数等）
+     * @param scaleType 以 QImPlotScaleType 枚举值表示的新刻度类型
+     * @details 当 setScaleType() 设置的新刻度类型与当前类型不同时触发。
+     *          刻度类型控制值的变换和格式化：
+     *          - Linear: 标准线性映射（默认）
+     *          - Time:   Unix 时间戳解释，带日期/时间格式化
+     *          - Log10:  以 10 为底的对数映射（要求正值）
+     *          - SymLog: 对称对数映射（可处理零附近负数值）
+     * @note 实际刻度变更仅在绘图设置阶段调用 ImPlot::SetupAxisScale() 后生效。
+     *       该信号允许 UI 更新依赖于刻度类型的控件（如为 Log10 禁用负值输入）。
+     * @note 当数据包含非正值时切换到 Log10 刻度可能导致渲染异常。
+     *         应用应在变更刻度类型前验证数据兼容性。
      * @see setScaleType(), ImPlot::SetupAxisScale()
      * \endif
      */
@@ -291,9 +291,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief ���̶����ñ��ʱ���䣨�̶�ֵ����ǩ���Ƿ���Ĭ�Ͽ̶ȣ�
-     * @details �� setTickValues()��setTickLabels()��setKeepDefaultTicks()��setAxisTicks()
-     *          �� setAxisTicksRange() �޸Ŀ̶�����ʱ������
+     * @brief 当刻度配置变更时发出（刻度值、标签、是否保留默认刻度）
+     * @details 当 setTickValues()、setTickLabels()、setKeepDefaultTicks()、setAxisTicks()
+     *          或 setAxisTicksRange() 修改刻度配置时触发。
      * \endif
      */
     void tickConfigChanged();

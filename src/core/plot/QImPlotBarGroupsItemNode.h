@@ -31,16 +31,16 @@ class QImAbstractBarGroupsDataSeries;
  * \endif
  *
  * \if CHINESE
- * @brief ImPlot分组柱状图可视化的Qt风格封装
+ * @brief ImPlot分组柱状图可视化的Qt风格封装。
  *
- * @details 为ImPlot分组柱状图提供Qt风格的保留模式封装�?
- *          支持水平/垂直方向、可自定义组宽�?
- *          堆叠柱状图、偏移量，以及完整的Qt属性系统集成和信号槽事件处理�?
- *          继承自QImPlotItemNode，并遵循与QImPlotBarsItemNode相同的PIMPL设计模式以保持一致性�?
+ * @details 为ImPlot分组柱状图提供Qt风格的保留模式封装。
+ *          支持水平/垂直方向、可自定义组宽。
+ *          堆叠柱状图、偏移量，以及完整的Qt属性系统集成和信号槽事件处理。
+ *          继承自QImPlotItemNode，并遵循与QImPlotBarsItemNode相同的PIMPL设计模式以保持一致性。
  *
- * @note 分组柱状图使用并排的柱子可视化多个项目在不同组中的分布�?
- *       单系列柱状图请使用QImPlotBarsItemNode�?
- * @note 组宽更改需要重绘才能生效�?
+ * @note 分组柱状图使用并排的柱子可视化多个项目在不同组中的分布。
+ *       单系列柱状图请使用QImPlotBarsItemNode。
+ * @note 组宽更改需要重绘才能生效。
  *
  * @see QImPlotItemNode
  * @see QImPlotBarsItemNode
@@ -151,10 +151,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 组宽更改时触�?
-     * @param[in] width 新组宽（绘图单位�?
-     * @details 当值实际更改时由setGroupWidth()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 组宽更改时触发
+     * @param[in] width 新组宽（绘图单位）
+     * @details 当值实际更改时由setGroupWidth()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void groupWidthChanged(double width);
@@ -168,10 +168,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 方向更改时触�?
-     * @param[in] horizontal 新水平方向状�?
-     * @details 当值实际更改时由setHorizontal()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 方向更改时触发
+     * @param[in] horizontal 新水平方向状态
+     * @details 当值实际更改时由setHorizontal()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void orientationChanged(bool horizontal);
@@ -185,10 +185,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 堆叠标志更改时触�?
-     * @param[in] stacked 新堆叠状�?
-     * @details 当值实际更改时由setStacked()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 堆叠标志更改时触发
+     * @param[in] stacked 新堆叠状态
+     * @details 当值实际更改时由setStacked()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void stackedChanged(bool stacked);
@@ -202,10 +202,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 偏移量更改时触发
+     * @brief 偏移量更改时触发。
      * @param[in] shift 新偏移量（绘图单位）
-     * @details 当值实际更改时由setShift()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @details 当值实际更改时由setShift()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void shiftChanged(double shift);
@@ -219,10 +219,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 柱子颜色更改时触�?
-     * @param[in] color 新柱子颜�?
-     * @details 当值实际更改时由setColor()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 柱子颜色更改时触发
+     * @param[in] color 新柱子颜色
+     * @details 当值实际更改时由setColor()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void colorChanged(const QColor& color);
@@ -235,9 +235,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触�?
-     * @details 当分配新数据时由setData()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 数据系列更改时触发
+     * @details 当分配新数据时由setData()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void dataChanged();
@@ -250,9 +250,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 分组柱状图标志更改时触发
-     * @details 任何标志属性更改（水平方向、堆叠等）时触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 分组柱状图标志更改时触发。
+     * @details 任何标志属性更改（水平方向、堆叠等）时触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void barGroupsFlagChanged();

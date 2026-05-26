@@ -32,17 +32,17 @@ class QImAbstractErrorDataSeries;
  * \endif
  *
  * \if CHINESE
- * @brief ImPlot误差棒图的Qt风格封装
+ * @brief ImPlot误差棒图的Qt风格封装。
  *
- * @details 为ImPlot误差棒图提供Qt风格的保留模式封装�?
- *          支持对称和非对称误差棒，垂直和水平方向�?
+ * @details 为ImPlot误差棒图提供Qt风格的保留模式封装。
+ *          支持对称和非对称误差棒，垂直和水平方向。
  *          误差棒通常与线图或散点图组合使用，
- *          用于可视化数据不确定性或测量误差�?
- *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性�?
+ *          用于可视化数据不确定性或测量误差。
+ *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性。
  *
  * @note 误差棒可视化数据不确定性。label_id通常应与关联的线图或散点图匹配，
- *       以便在图例中分组显示�?
- * @note 对于非对称误差模式，正负误差数组必须与数据系列具有相同的大小�?
+ *       以便在图例中分组显示。
+ * @note 对于非对称误差模式，正负误差数组必须与数据系列具有相同的大小。
  *
  *
  * @see QImPlotItemNode
@@ -70,8 +70,8 @@ class QIM_CORE_API QImPlotErrorBarsItemNode : public QImPlotItemNode
      * @property QImPlotErrorBarsItemNode::horizontal
      * @brief 水平方向标志
      *
-     * @details 为true时，误差棒沿当前y轴水平渲染�?
-     *          为false时，误差棒垂直渲染（默认）�?
+     * @details 为true时，误差棒沿当前y轴水平渲染。
+     *          为false时，误差棒垂直渲染（默认）。
      * @accessors READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged
      * \endif
      */
@@ -91,8 +91,8 @@ class QIM_CORE_API QImPlotErrorBarsItemNode : public QImPlotItemNode
      * @property QImPlotErrorBarsItemNode::color
      * @brief 误差棒的颜色
      *
-     * @details 定义误差棒的颜色�?
-     *          未设置时，使用ImPlot的默认颜色序列�?
+     * @details 定义误差棒的颜色。
+     *          未设置时，使用ImPlot的默认颜色序列。
      * @accessors READ color WRITE setColor NOTIFY colorChanged
      * \endif
      */
@@ -186,10 +186,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 方向更改时触�?
-     * @param[in] horizontal 新水平方向状�?
-     * @details 当值实际更改时由setHorizontal()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 方向更改时触发
+     * @param[in] horizontal 新水平方向状态
+     * @details 当值实际更改时由setHorizontal()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void orientationChanged(bool horizontal);
@@ -203,10 +203,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 误差棒颜色更改时触发
+     * @brief 误差棒颜色更改时触发。
      * @param[in] color 新误差棒颜色
-     * @details 当值实际更改时由setColor()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @details 当值实际更改时由setColor()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void colorChanged(const QColor& color);
@@ -219,9 +219,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触�?
-     * @details 当分配新数据时由setData()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 数据系列更改时触发
+     * @details 当分配新数据时由setData()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void dataChanged();
@@ -234,9 +234,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 误差棒标志更改时触发
-     * @details 任何标志属性更改（水平方向等）时触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 误差棒标志更改时触发。
+     * @details 任何标志属性更改（水平方向等）时触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void errorBarsFlagChanged();

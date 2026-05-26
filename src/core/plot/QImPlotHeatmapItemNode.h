@@ -31,14 +31,14 @@ class QImAbstractHeatmapDataSeries;
  * \endif
  *
  * \if CHINESE
- * @brief ImPlot热力图可视化的Qt风格封装
+ * @brief ImPlot热力图可视化的Qt风格封装。
  *
- * @details 为ImPlot热力图提供Qt风格的保留模式封装�?
- *          支持具有可配置颜色缩放、边界、标签格式和列主序数据布局的二维矩阵数据�?
- *          继承自QImPlotItemNode，并遵循与QImPlotBarsItemNode相同的PIMPL设计模式以保持一致性�?
+ * @details 为ImPlot热力图提供Qt风格的保留模式封装。
+ *          支持具有可配置颜色缩放、边界、标签格式和列主序数据布局的二维矩阵数据。
+ *          继承自QImPlotItemNode，并遵循与QImPlotBarsItemNode相同的PIMPL设计模式以保持一致性。
  *
- * @note 热力图将二维数据可视化为颜色网格，适用于矩阵数据、相关矩阵和二维密度图�?
- * @note 大型热力图（>1000x1000）可能影响性能�?
+ * @note 热力图将二维数据可视化为颜色网格，适用于矩阵数据、相关矩阵和二维密度图。
+ * @note 大型热力图（>1000x1000）可能影响性能。
  *
  * @see QImPlotItemNode
  * @see QImPlotBarsItemNode
@@ -159,10 +159,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 最小缩放值更改时触发
-     * @param[in] min 新的最小缩放�?
-     * @details 当值实际更改时由setScaleMin()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 最小缩放值更改时触发。
+     * @param[in] min 新的最小缩放。
+     * @details 当值实际更改时由setScaleMin()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void scaleMinChanged(double min);
@@ -176,10 +176,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 最大缩放值更改时触发
-     * @param[in] max 新的最大缩放�?
-     * @details 当值实际更改时由setScaleMax()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 最大缩放值更改时触发。
+     * @param[in] max 新的最大缩放。
+     * @details 当值实际更改时由setScaleMax()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void scaleMaxChanged(double max);
@@ -193,10 +193,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 标签格式更改时触�?
-     * @param[in] format 新的标签格式字符�?
-     * @details 当值实际更改时由setLabelFormat()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 标签格式更改时触发
+     * @param[in] format 新的标签格式字符串
+     * @details 当值实际更改时由setLabelFormat()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void labelFormatChanged(const QString& format);
@@ -210,10 +210,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 左下角边界更改时触发
-     * @param[in] min 新的左下角边界位�?
-     * @details 当值实际更改时由setBoundsMin()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 左下角边界更改时触发。
+     * @param[in] min 新的左下角边界位置
+     * @details 当值实际更改时由setBoundsMin()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void boundsMinChanged(const QPointF& min);
@@ -227,10 +227,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 右上角边界更改时触发
-     * @param[in] max 新的右上角边界位�?
-     * @details 当值实际更改时由setBoundsMax()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 右上角边界更改时触发。
+     * @param[in] max 新的右上角边界位置
+     * @details 当值实际更改时由setBoundsMax()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void boundsMaxChanged(const QPointF& max);
@@ -244,10 +244,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 列主序布局标志更改时触�?
-     * @param[in] colMajor 新的列主序状�?
-     * @details 当值实际更改时由setColMajor()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 列主序布局标志更改时触发
+     * @param[in] colMajor 新的列主序状态
+     * @details 当值实际更改时由setColMajor()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void colMajorChanged(bool colMajor);
@@ -260,9 +260,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触�?
-     * @details 当分配新数据时由setData()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 数据系列更改时触发
+     * @details 当分配新数据时由setData()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void dataChanged();
@@ -275,9 +275,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 热力图标志更改时触发
-     * @details 任何标志属性更改（列主序等）时触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 热力图标志更改时触发。
+     * @details 任何标志属性更改（列主序等）时触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void heatmapFlagChanged();

@@ -30,16 +30,16 @@ class QImAbstractXYDataSeries;
  * \endif
  *
  * \if CHINESE
- * @brief ImPlot茎叶图的Qt风格封装
+ * @brief ImPlot茎叶图的Qt风格封装。
  *
- * @details 为ImPlot茎叶图提供Qt风格的保留模式封装�?
+ * @details 为ImPlot茎叶图提供Qt风格的保留模式封装。
  *          茎叶图从参考值（基线）绘制线条到每个数据点，
- *          适用于可视化离散数据点及其与基线的偏差�?
- *          支持垂直（默认）和水平方向�?
- *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性�?
+ *          适用于可视化离散数据点及其与基线的偏差。
+ *          支持垂直（默认）和水平方向。
+ *          继承自QImPlotItemNode，并遵循与QImPlotLineItemNode相同的PIMPL设计模式以保持一致性。
  *
- * @note 茎叶图通常用于可视化离散数据点及其与基线（通常是零）的关系�?
- * @note 应根据数据适当设置参考值（基线）�?
+ * @note 茎叶图通常用于可视化离散数据点及其与基线（通常是零）的关系。
+ * @note 应根据数据适当设置参考值（基线）。
  *
  *
  * @see QImPlotItemNode
@@ -64,10 +64,10 @@ class QIM_CORE_API QImPlotStemsItemNode : public QImPlotItemNode
      *
      * \if CHINESE
      * @property QImPlotStemsItemNode::referenceValue
-     * @brief 茎叶图的参考值（基线�?
+     * @brief 茎叶图的参考值（基线。
      *
-     * @details 控制茎叶图绘制的基线位置�?
-     *          默认值为0.0�?
+     * @details 控制茎叶图绘制的基线位置。
+     *          默认值为0.0。
      * @accessors READ referenceValue WRITE setReferenceValue NOTIFY referenceValueChanged
      * \endif
      */
@@ -87,8 +87,8 @@ class QIM_CORE_API QImPlotStemsItemNode : public QImPlotItemNode
      * @property QImPlotStemsItemNode::horizontal
      * @brief 水平方向标志
      *
-     * @details 为true时，茎叶图沿当前y轴水平渲染�?
-     *          为false时，茎叶图垂直渲染（默认）�?
+     * @details 为true时，茎叶图沿当前y轴水平渲染。
+     *          为false时，茎叶图垂直渲染（默认）。
      * @accessors READ isHorizontal WRITE setHorizontal NOTIFY orientationChanged
      * \endif
      */
@@ -108,8 +108,8 @@ class QIM_CORE_API QImPlotStemsItemNode : public QImPlotItemNode
      * @property QImPlotStemsItemNode::color
      * @brief 茎叶图的颜色
      *
-     * @details 定义茎叶图的颜色�?
-     *          未设置时，使用ImPlot的默认颜色序列�?
+     * @details 定义茎叶图的颜色。
+     *          未设置时，使用ImPlot的默认颜色序列。
      * @accessors READ color WRITE setColor NOTIFY colorChanged
      * \endif
      */
@@ -190,10 +190,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 参考值更改时触发
-     * @param[in] value 新参考�?
-     * @details 当值实际更改时由setReferenceValue()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 参考值更改时触发。
+     * @param[in] value 新参考值
+     * @details 当值实际更改时由setReferenceValue()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void referenceValueChanged(double value);
@@ -207,10 +207,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 方向更改时触�?
-     * @param[in] horizontal 新水平方向状�?
-     * @details 当值实际更改时由setHorizontal()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 方向更改时触发
+     * @param[in] horizontal 新水平方向状态
+     * @details 当值实际更改时由setHorizontal()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void orientationChanged(bool horizontal);
@@ -224,10 +224,10 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 茎叶图颜色更改时触发
+     * @brief 茎叶图颜色更改时触发。
      * @param[in] color 新茎叶图颜色
-     * @details 当值实际更改时由setColor()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @details 当值实际更改时由setColor()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void colorChanged(const QColor& color);
@@ -240,9 +240,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 数据系列更改时触�?
-     * @details 当分配新数据时由setData()触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 数据系列更改时触发
+     * @details 当分配新数据时由setData()触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void dataChanged();
@@ -255,9 +255,9 @@ Q_SIGNALS:
      * \endif
      *
      * \if CHINESE
-     * @brief 茎叶图标志更改时触发
-     * @details 任何标志属性更改（水平方向等）时触发�?
-     *          连接到更新UI元素或执行相关操作�?
+     * @brief 茎叶图标志更改时触发。
+     * @details 任何标志属性更改（水平方向等）时触发。
+     *          连接到更新UI元素或执行相关操作。
      * \endif
      */
     void stemsFlagChanged();
