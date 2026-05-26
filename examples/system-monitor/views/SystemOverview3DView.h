@@ -1,8 +1,6 @@
 #pragma once
 
 #include "collector/ProcessInfo.h"
-#include <QList>
-#include <vector>
 
 namespace QIM {
 class QImFigureWidget;
@@ -12,7 +10,7 @@ class QImPlot3DSurfaceItemNode;
 
 class HistoryBuffer;
 
-class CpuTimeline3DView {
+class SystemOverview3DView {
 public:
     void buildView(QIM::QImFigureWidget* figure, const QList<AggregatedProcessInfo>& data);
     void updateData(const QList<AggregatedProcessInfo>& data);

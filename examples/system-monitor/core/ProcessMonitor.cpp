@@ -8,7 +8,7 @@ ProcessMonitor::ProcessMonitor(QObject* parent)
     : QObject(parent)
     , m_collector(nullptr)
     , m_aggregator(new ProcessAggregator())
-    , m_historyBuffer(new HistoryBuffer())
+    , m_historyBuffer(new HistoryBuffer(300))
     , m_sustainedMetricsTracker(new SustainedMetricsTracker())
     , m_timer(new QTimer(this))
 {
