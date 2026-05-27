@@ -24,7 +24,6 @@ class QImPlotLineItemNode::PrivateData
     QIM_DECLARE_PUBLIC(QImPlotLineItemNode)
 public:
     PrivateData(QImPlotLineItemNode* p);
-    std::unique_ptr< QImAbstractXYDataSeries > data;
     QImDownsamplingController m_sampling;
     ImPlotLineFlags lineFlags { ImPlotLineFlags_None };
     QImOptionalColor color;                       ///< 颜色（延迟初始化：首次渲染时捕获ImPlot默认颜色）
@@ -49,7 +48,7 @@ QImPlotLineItemNode::PrivateData::PrivateData(QImPlotLineItemNode* p) : q_ptr(p)
  * @param[in] par 父 QObject（通常为 QImPlotNode）
  * \endif
  */
-QImPlotLineItemNode::QImPlotLineItemNode(QObject* par) : QImPlotItemNode(par), QIM_PIMPL_CONSTRUCT
+QImPlotLineItemNode::QImPlotLineItemNode(QObject* par) : QImAbstractXYSeriesItemNode(par), QIM_PIMPL_CONSTRUCT
 {
 }
 
@@ -64,44 +63,6 @@ QImPlotLineItemNode::QImPlotLineItemNode(QObject* par) : QImPlotItemNode(par), Q
  */
 QImPlotLineItemNode::~QImPlotLineItemNode()
 {
-}
-
-/**
- * \if ENGLISH
- * @brief Sets the data series for the line plot
- * @param[in] series Pointer to QImAbstractXYDataSeries (ownership transferred)
- * @details Stores the series and triggers adaptive sampling (LTTB) if enabled and data size exceeds threshold.
- * \endif
- *
- * \if CHINESE
- * @brief 设置线图的数据系列
- * @param[in] series QImAbstractXYDataSeries 指针（所有权转移）
- * @details 存储数据系列，如果启用自适应采样且数据量超过阈值，则触发 LTTB 降采样。
- * \endif
- */
-void QImPlotLineItemNode::setData(QImAbstractXYDataSeries* series)
-{
-    QIM_D(d);
-    d->data.reset(series);
-    d->m_sampling.setSource(series);
-    d->m_sampling.invalidate();
-}
-
-/**
- * \if ENGLISH
- * @brief Gets the current data series
- * @return Pointer to QImAbstractXYDataSeries, nullptr if no data set
- * \endif
- *
- * \if CHINESE
- * @brief 获取当前数据系列
- * @return QImAbstractXYDataSeries 指针，无数据时返回 nullptr
- * \endif
- */
-QImAbstractXYDataSeries* QImPlotLineItemNode::data() const
-{
-    QIM_DC(d);
-    return d->data.get();
 }
 
 // ===== 在 CPP 文件顶部添加辅助宏定义 =====
@@ -488,19 +449,21 @@ QImPlotLineItemNode_FLAG_ACCESSOR(Shaded, ImPlotLineFlags_Shaded)
     bool QImPlotLineItemNode::beginDraw()
 {
     QIM_D(d);
-    if (!d->data) {
+    QImAbstractXYDataSeries* rawData = this->data();
+    if (!rawData) {
         // 没有数据
         return false;
     }
-    QImAbstractXYDataSeries* series = d->data.get();
+    // Re-initialize sampling source each frame (data pointer may have changed)
+    d->m_sampling.setSource(rawData);
+
+    QImAbstractXYDataSeries* series = rawData;
 
     // Adaptive downsampling: resolve data series via controller
-    if (d->m_sampling.algorithm() != QImDownsampleAlgorithm::None && d->data && d->data->size() > d->m_sampling.threshold()) {
+    if (d->m_sampling.algorithm() != QImDownsampleAlgorithm::None && rawData && rawData->size() > d->m_sampling.threshold()) {
         ImPlotRect limits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
         int pixelWidth    = static_cast<int>(ImPlot::GetPlotSize().x);
         series = d->m_sampling.resolve(pixelWidth, limits.X.Min, limits.X.Max);
-    } else {
-        series = d->data.get();
     }
     if (!series) {
         return false;

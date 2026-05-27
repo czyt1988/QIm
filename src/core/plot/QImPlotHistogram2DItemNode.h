@@ -4,12 +4,10 @@
 #include "../../QImAPI.h"
 #include <QColor>
 #include <QPointF>
-#include "QImPlotItemNode.h"
-#include "QImPlotDataSeries.h"
+#include "QImAbstractXYSeriesItemNode.h"
 
 namespace QIM
 {
-class QImAbstractXYDataSeries;
 
 /**
  * \if ENGLISH
@@ -18,15 +16,13 @@ class QImAbstractXYDataSeries;
  * @details Provides Qt-style retained mode encapsulation for ImPlot 2D histograms (bivariate).
  *          Supports customizable binning in X and Y dimensions, range filtering,
  *          density normalization, outlier exclusion, and column-major data layout.
- *          Inherits from QImPlotItemNode and follows the same PIMPL design pattern
- *          as QImPlotHeatmapItemNode for consistency.
+ *          Inherits from QImAbstractXYSeriesItemNode for data management.
  *
  * @note 2D histograms visualize joint distribution of two variables as a heatmap of binned counts.
  *       Useful for correlation analysis, density estimation, and 2D data exploration.
  * @note Large bin counts (>100x100) may impact performance.
  *
- *
- * @see QImPlotItemNode
+ * @see QImAbstractXYSeriesItemNode
  * @see QImPlotHeatmapItemNode
  * @see QImPlotHistogramItemNode
  * \endif
@@ -37,46 +33,37 @@ class QImAbstractXYDataSeries;
  * @details 为ImPlot二维直方图（双变量）提供Qt风格的保留模式封装。
  *          支持可自定义的X和Y维度装箱、范围过滤。
  *          密度归一化、异常值排除和列主序数据布局。
- *          继承自QImPlotItemNode，并遵循与QImPlotHeatmapItemNode相同的PIMPL设计模式以保持一致性。
+ *          继承自QImAbstractXYSeriesItemNode以获得数据管理。
  *
  * @note 二维直方图将两个变量的联合分布可视化为装箱计数的热力图。
  *       适用于相关性分析、密度估计和二维数据探索。
  * @note 大量箱数。100x100）可能影响性能。
  *
- *
- * @see QImPlotItemNode
+ * @see QImAbstractXYSeriesItemNode
  * @see QImPlotHeatmapItemNode
  * @see QImPlotHistogramItemNode
  * \endif
  */
-class QIM_CORE_API QImPlotHistogram2DItemNode : public QImPlotItemNode
+class QIM_CORE_API QImPlotHistogram2DItemNode : public QImAbstractXYSeriesItemNode
 {
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotHistogram2DItemNode)
 
     Q_PROPERTY(int xBins READ xBins WRITE setXBins NOTIFY xBinsChanged)
-
     Q_PROPERTY(int yBins READ yBins WRITE setYBins NOTIFY yBinsChanged)
-
     Q_PROPERTY(double xRangeMin READ xRangeMin WRITE setXRangeMin NOTIFY xRangeChanged)
-
     Q_PROPERTY(double xRangeMax READ xRangeMax WRITE setXRangeMax NOTIFY xRangeChanged)
-
     Q_PROPERTY(double yRangeMin READ yRangeMin WRITE setYRangeMin NOTIFY yRangeChanged)
-
     Q_PROPERTY(double yRangeMax READ yRangeMax WRITE setYRangeMax NOTIFY yRangeChanged)
-
     Q_PROPERTY(bool density READ isDensity WRITE setDensity NOTIFY densityChanged)
-
     Q_PROPERTY(bool noOutliers READ isNoOutliers WRITE setNoOutliers NOTIFY noOutliersChanged)
-
     Q_PROPERTY(bool colMajor READ isColMajor WRITE setColMajor NOTIFY colMajorChanged)
 
 public:
     // Unique type identifier for QImPlotHistogram2DItemNode
     enum
     {
-        Type = InnerType + 12   // Ensure unique
+        Type = InnerType + 12
     };
 
     // Returns the type identifier of this plot item
@@ -92,256 +79,45 @@ public:
     ~QImPlotHistogram2DItemNode();
 
     //----------------------------------------------------
-    // Data setting interface
-    //----------------------------------------------------
-
-    // Sets the data series for the 2D histogram (X and Y arrays)
-    void setData(QImAbstractXYDataSeries* series);
-
-    // Sets 2D histogram data from X and Y containers
-    template< typename ContainerX, typename ContainerY >
-    QImAbstractXYDataSeries* setData(const ContainerX& xs, const ContainerY& ys);
-
-    // Sets 2D histogram data from X and Y containers (move semantics)
-    template< typename ContainerX, typename ContainerY >
-    QImAbstractXYDataSeries* setData(ContainerX&& xs, ContainerY&& ys);
-
-    // Gets the current data series
-    QImAbstractXYDataSeries* data() const;
-
-    //----------------------------------------------------
     // Style property accessors
     //----------------------------------------------------
 
     // Gets the X bin count or automatic method
     int xBins() const;
-
-    // Sets the X bin count or automatic method
     void setXBins(int bins);
-
-    // Gets the Y bin count or automatic method
     int yBins() const;
-
-    // Sets the Y bin count or automatic method
     void setYBins(int bins);
-
-    // Gets the X range minimum (0 = auto)
     double xRangeMin() const;
-
-    // Sets the X range minimum (0 = auto)
     void setXRangeMin(double min);
-
-    // Gets the X range maximum (0 = auto)
     double xRangeMax() const;
-
-    // Sets the X range maximum (0 = auto)
     void setXRangeMax(double max);
-
-    // Gets the Y range minimum (0 = auto)
     double yRangeMin() const;
-
-    // Sets the Y range minimum (0 = auto)
     void setYRangeMin(double min);
-
-    // Gets the Y range maximum (0 = auto)
     double yRangeMax() const;
-
-    // Sets the Y range maximum (0 = auto)
     void setYRangeMax(double max);
-
-    // Checks if density normalization is enabled
     bool isDensity() const;
-
-    // Sets density normalization
     void setDensity(bool density);
-
-    // Checks if outliers are excluded
     bool isNoOutliers() const;
-
-    // Sets exclude outliers flag
     void setNoOutliers(bool noOutliers);
-
-    // Checks if column-major layout is enabled
     bool isColMajor() const;
-
-    // Sets column-major layout
     void setColMajor(bool colMajor);
-
-    // Gets the raw ImPlotHistogramFlags
     int histogramFlags() const;
-
-    // Sets the raw ImPlotHistogramFlags
     void setHistogramFlags(int flags);
 
 Q_SIGNALS:
-    /**
-     * \if ENGLISH
-     * @brief Emitted when X bin count changes
-     * @param[in] bins New X bin count or method
-     * @details Triggered by setXBins() when value actually changes.
-     *          Connect to update UI elements or perform related actions.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief X箱数更改时触发
-     * @param[in] bins 新X箱数或方法
-     * @details 当值实际更改时由setXBins()触发。
-     *          连接到更新UI元素或执行相关操作。
-     * \endif
-     */
     void xBinsChanged(int bins);
-
-    /**
-     * \if ENGLISH
-     * @brief Emitted when Y bin count changes
-     * @param[in] bins New Y bin count or method
-     * @details Triggered by setYBins() when value actually changes.
-     *          Connect to update UI elements or perform related actions.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief Y箱数更改时触发
-     * @param[in] bins 新Y箱数或方法
-     * @details 当值实际更改时由setYBins()触发。
-     *          连接到更新UI元素或执行相关操作。
-     * \endif
-     */
     void yBinsChanged(int bins);
-
-    /**
-     * \if ENGLISH
-     * @brief Emitted when X or Y range changes
-     * @details Triggered by setXRangeMin(), setXRangeMax(), setYRangeMin(), setYRangeMax() when value actually changes.
-     *          Connect to update UI elements or perform related actions.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief X或Y范围更改时触发
-     * @details 当值实际更改时由setXRangeMin()、setXRangeMax()、setYRangeMin()、setYRangeMax()触发。
-     *          连接到更新UI元素或执行相关操作。
-     * \endif
-     */
     void xRangeChanged();
-
-    /**
-     * \if ENGLISH
-     * @brief Emitted when Y range changes
-     * @details Triggered by setYRangeMin() or setYRangeMax() when value actually changes.
-     *          Connect to update UI elements or perform related actions.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief Y范围更改时触发
-     * @details 当值实际更改时由setYRangeMin()或setYRangeMax()触发。
-     *          连接到更新UI元素或执行相关操作。
-     * \endif
-     */
     void yRangeChanged();
-
-    /**
-     * \if ENGLISH
-     * @brief Emitted when density flag changes
-     * @param[in] density New density flag state
-     * @details Triggered by setDensity() when value actually changes.
-     *          Connect to update UI elements or perform related actions.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 密度标志更改时触发
-     * @param[in] density 新密度标志状态
-     * @details 当值实际更改时由setDensity()触发。
-     *          连接到更新UI元素或执行相关操作。
-     * \endif
-     */
     void densityChanged(bool density);
-
-    /**
-     * \if ENGLISH
-     * @brief Emitted when exclude outliers flag changes
-     * @param[in] noOutliers New exclude outliers flag state
-     * @details Triggered by setNoOutliers() when value actually changes.
-     *          Connect to update UI elements or perform related actions.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 排除异常值标志更改时触发。
-     * @param[in] noOutliers 新排除异常值标志状态
-     * @details 当值实际更改时由setNoOutliers()触发。
-     *          连接到更新UI元素或执行相关操作。
-     * \endif
-     */
     void noOutliersChanged(bool noOutliers);
-
-    /**
-     * \if ENGLISH
-     * @brief Emitted when column-major layout flag changes
-     * @param[in] colMajor New column-major state
-     * @details Triggered by setColMajor() when value actually changes.
-     *          Connect to update UI elements or perform related actions.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 列主序布局标志更改时触发
-     * @param[in] colMajor 新列主序状态
-     * @details 当值实际更改时由setColMajor()触发。
-     *          连接到更新UI元素或执行相关操作。
-     * \endif
-     */
     void colMajorChanged(bool colMajor);
-
-    /**
-     * \if ENGLISH
-     * @brief Emitted when data series changes
-     * @details Triggered by setData() when new data is assigned.
-     *          Connect to update UI elements or perform related actions.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 数据系列更改时触发
-     * @details 当分配新数据时由setData()触发。
-     *          连接到更新UI元素或执行相关操作。
-     * \endif
-     */
-    void dataChanged();
-
-    /**
-     * \if ENGLISH
-     * @brief Emitted when histogram flags change
-     * @details Triggered by any flag property change (density, noOutliers, colMajor).
-     *          Connect to update UI elements or perform related actions.
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 直方图标志更改时触发。
-     * @details 任何标志属性更改（密度、排除异常值、列主序）时触发。
-     *          连接到更新UI元素或执行相关操作。
-     * \endif
-     */
     void histogramFlagChanged();
 
 protected:
     // Begins drawing the 2D histogram
     virtual bool beginDraw() override;
 };
-
-// Template function implementation
-template< typename ContainerX, typename ContainerY >
-inline QImAbstractXYDataSeries* QImPlotHistogram2DItemNode::setData(const ContainerX& xs, const ContainerY& ys)
-{
-    using ConcreteSeries = QImVectorXYDataSeries<ContainerX, ContainerY>;
-    ConcreteSeries* d = new ConcreteSeries(xs, ys);
-    setData(d);
-    return d;
-}
-
-template< typename ContainerX, typename ContainerY >
-inline QImAbstractXYDataSeries* QImPlotHistogram2DItemNode::setData(ContainerX&& xs, ContainerY&& ys)
-{
-    using ConcreteSeries = QImVectorXYDataSeries<ContainerX, ContainerY>;
-    ConcreteSeries* d = new ConcreteSeries(std::move(xs), std::move(ys));
-    setData(d);
-    return d;
-}
 
 }  // end namespace QIM
 

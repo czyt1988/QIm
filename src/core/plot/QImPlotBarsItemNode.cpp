@@ -14,7 +14,6 @@ class QImPlotBarsItemNode::PrivateData
 public:
     PrivateData(QImPlotBarsItemNode* p);
 
-    std::unique_ptr< QImAbstractXYDataSeries > data;
     ImPlotBarsFlags flags { ImPlotBarsFlags_None };
     double barWidth { 0.67 };  ///< Bar width in plot units
     // Style tracking values
@@ -36,7 +35,7 @@ QImPlotBarsItemNode::PrivateData::PrivateData(QImPlotBarsItemNode* p) : q_ptr(p)
  * @param parent 父QObject
  * \endif
  */
-QImPlotBarsItemNode::QImPlotBarsItemNode(QObject* parent) : QImPlotItemNode(parent), QIM_PIMPL_CONSTRUCT
+QImPlotBarsItemNode::QImPlotBarsItemNode(QObject* parent) : QImAbstractXYSeriesItemNode(parent), QIM_PIMPL_CONSTRUCT
 {
 }
 
@@ -51,41 +50,6 @@ QImPlotBarsItemNode::QImPlotBarsItemNode(QObject* parent) : QImPlotItemNode(pare
  */
 QImPlotBarsItemNode::~QImPlotBarsItemNode()
 {
-}
-
-/**
- * \if ENGLISH
- * @brief Set data series for the bar chart
- * @param series Pointer to QImAbstractXYDataSeries
- * \endif
- *
- * \if CHINESE
- * @brief 设置柱状图的数据系列
- * @param series QImAbstractXYDataSeries指针
- * \endif
- */
-void QImPlotBarsItemNode::setData(QImAbstractXYDataSeries* series)
-{
-    QIM_D(d);
-    d->data.reset(series);
-    Q_EMIT dataChanged();
-}
-
-/**
- * \if ENGLISH
- * @brief Get current data series
- * @return Pointer to QImAbstractXYDataSeries
- * \endif
- *
- * \if CHINESE
- * @brief 获取当前数据系列
- * @return QImAbstractXYDataSeries指针
- * \endif
- */
-QImAbstractXYDataSeries* QImPlotBarsItemNode::data() const
-{
-    QIM_DC(d);
-    return d->data.get();
 }
 
 /**
@@ -260,7 +224,8 @@ QColor QImPlotBarsItemNode::color() const
 bool QImPlotBarsItemNode::beginDraw()
 {
     QIM_D(d);
-    if (!d->data || d->data->size() == 0) {
+    QImAbstractXYDataSeries* rawData = this->data();
+    if (!rawData || rawData->size() == 0) {
         return false;
     }
 
@@ -271,11 +236,11 @@ bool QImPlotBarsItemNode::beginDraw()
     }
 
     // Call ImPlot API
-    if (d->data->isContiguous()) {
+    if (rawData->isContiguous()) {
         // Continuous memory mode: use zero-copy fast path
-        const double* xData = d->data->xRawData();
-        const double* yData = d->data->yRawData();
-        int size            = d->data->size();
+        const double* xData = rawData->xRawData();
+        const double* yData = rawData->yRawData();
+        int size            = rawData->size();
 
         if (xData) {
             // XY mode
@@ -285,8 +250,8 @@ bool QImPlotBarsItemNode::beginDraw()
             // Y-only mode - use xStart and xScale to generate X values
             // For Y-only mode, we need to create X values based on index
             std::vector< double > xValues(size);
-            double xStart = d->data->xStart();
-            double xScale = d->data->xScale();
+            double xStart = rawData->xStart();
+            double xScale = rawData->xScale();
             for (int i = 0; i < size; ++i) {
                 xValues[ i ] = xStart + i * xScale;
             }
@@ -301,8 +266,8 @@ bool QImPlotBarsItemNode::beginDraw()
                 QImAbstractXYDataSeries* series = static_cast< QImAbstractXYDataSeries* >(data);
                 return ImPlotPoint(series->xValue(idx), series->yValue(idx));
             },
-            d->data.get(),
-            d->data->size(),
+            rawData,
+            rawData->size(),
             d->barWidth,
             d->flags);
     }

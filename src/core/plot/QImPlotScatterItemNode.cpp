@@ -25,7 +25,6 @@ class QImPlotScatterItemNode::PrivateData
     QIM_DECLARE_PUBLIC(QImPlotScatterItemNode)
 public:
     PrivateData(QImPlotScatterItemNode* p);
-    std::unique_ptr< QImAbstractXYDataSeries > data;
     QImDownsamplingController m_sampling;
     QImTrackedValue< int > markerShape { ImPlotMarker_Circle };  ///< 标记形状
     bool markerFill { true };
@@ -52,7 +51,7 @@ QImPlotScatterItemNode::PrivateData::PrivateData(QImPlotScatterItemNode* p) : q_
  * @param[in] par 父 QObject（通常为 QImPlotNode）
  * \endif
  */
-QImPlotScatterItemNode::QImPlotScatterItemNode(QObject* par) : QImPlotItemNode(par), QIM_PIMPL_CONSTRUCT
+QImPlotScatterItemNode::QImPlotScatterItemNode(QObject* par) : QImAbstractXYSeriesItemNode(par), QIM_PIMPL_CONSTRUCT
 {
 }
 
@@ -67,45 +66,6 @@ QImPlotScatterItemNode::QImPlotScatterItemNode(QObject* par) : QImPlotItemNode(p
  */
 QImPlotScatterItemNode::~QImPlotScatterItemNode()
 {
-}
-
-/**
- * \if ENGLISH
- * @brief Sets the data series for the scatter plot
- * @param[in] series Pointer to QImAbstractXYDataSeries (ownership transferred)
- * @details Stores the series, triggers adaptive sampling if enabled, and emits dataChanged() signal.
- * \endif
- *
- * \if CHINESE
- * @brief 设置散点图的数据系列
- * @param[in] series QImAbstractXYDataSeries 指针（所有权转移）
- * @details 存储数据系列，如果启用自适应采样则触发降采样，并触发 dataChanged() 信号。
- * \endif
- */
-void QImPlotScatterItemNode::setData(QImAbstractXYDataSeries* series)
-{
-    QIM_D(d);
-    d->data.reset(series);
-    d->m_sampling.setSource(series);
-    d->m_sampling.invalidate();
-    Q_EMIT dataChanged();
-}
-
-/**
- * \if ENGLISH
- * @brief Gets the current data series
- * @return Pointer to QImAbstractXYDataSeries, nullptr if no data set
- * \endif
- *
- * \if CHINESE
- * @brief 获取当前数据系列
- * @return QImAbstractXYDataSeries 指针，无数据时返回 nullptr
- * \endif
- */
-QImAbstractXYDataSeries* QImPlotScatterItemNode::data() const
-{
-    QIM_DC(d);
-    return d->data.get();
 }
 
 /**
@@ -531,19 +491,21 @@ void QImPlotScatterItemNode::setScatterFlags(int flags)
 bool QImPlotScatterItemNode::beginDraw()
 {
     QIM_D(d);
-    if (!d->data) {
+    QImAbstractXYDataSeries* rawData = this->data();
+    if (!rawData) {
         // 没有数据
         return false;
     }
-    QImAbstractXYDataSeries* series = d->data.get();
+    // Re-initialize sampling source each frame (data pointer may have changed)
+    d->m_sampling.setSource(rawData);
+
+    QImAbstractXYDataSeries* series = rawData;
 
     // Adaptive downsampling: resolve data series via controller
-    if (d->m_sampling.algorithm() != QImDownsampleAlgorithm::None && d->data && d->data->size() > d->m_sampling.threshold()) {
+    if (d->m_sampling.algorithm() != QImDownsampleAlgorithm::None && rawData && rawData->size() > d->m_sampling.threshold()) {
         ImPlotRect limits = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
         int pixelWidth    = static_cast<int>(ImPlot::GetPlotSize().x);
         series = d->m_sampling.resolve(pixelWidth, limits.X.Min, limits.X.Max);
-    } else {
-        series = d->data.get();
     }
     if (!series) {
         return false;

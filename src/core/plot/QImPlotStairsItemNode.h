@@ -1,28 +1,27 @@
 #ifndef QIMPLOTSTAIRSITEMNODE_H
 #define QIMPLOTSTAIRSITEMNODE_H
-#include "QImPlotItemNode.h"
-#include "QImPlotDataSeries.h"
+#include "QImAbstractXYSeriesItemNode.h"
 
 namespace QIM
 {
-class QImAbstractXYDataSeries;
 
 /**
  * \if ENGLISH
  * @brief QImPlotStairsItemNode class for creating staircase plots
  * @details This class encapsulates ImPlot's PlotStairs functionality to create staircase plots
- *          with Qt-style properties and signals
- * @see QImPlotItemNode
+ *          with Qt-style properties and signals. Inherits from QImAbstractXYSeriesItemNode
+ *          for data management.
+ * @see QImAbstractXYSeriesItemNode
  * \endif
  *
  * \if CHINESE
  * @brief 用于创建阶梯图的QImPlotStairsItemNode类
  * @details 此类封装了ImPlot的PlotStairs功能，用于创建阶梯图
- *          并提供Qt风格的属性和信号
- * @see QImPlotItemNode
+ *          并提供Qt风格的属性和信号。继承自QImAbstractXYSeriesItemNode以获得数据管理。
+ * @see QImAbstractXYSeriesItemNode
  * \endif
  */
-class QIM_CORE_API QImPlotStairsItemNode : public QImPlotItemNode
+class QIM_CORE_API QImPlotStairsItemNode : public QImAbstractXYSeriesItemNode
 {
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotStairsItemNode)
@@ -66,19 +65,6 @@ public:
         return Type;
     }
     //----------------------------------------------------
-    // Data setting
-    //----------------------------------------------------
-    // Set data series for the stairs plot
-    void setData(QImAbstractXYDataSeries* series);
-    // Set data from containers
-    template< typename ContainerX, typename ContainerY >
-    QImAbstractXYDataSeries* setData(const ContainerX& x, const ContainerY& y);
-    // Set data from rvalue containers
-    template< typename ContainerX, typename ContainerY >
-    QImAbstractXYDataSeries* setData(ContainerX&& x, ContainerY&& y);
-    // Get current data series
-    QImAbstractXYDataSeries* data() const;
-    //----------------------------------------------------
     // ImPlotStairsFlags
     //----------------------------------------------------
     // Flag accessors (affirmative semantics)
@@ -120,21 +106,6 @@ protected:
     // Begin drawing implementation
     virtual bool beginDraw() override;
 };
-
-template< typename ContainerX, typename ContainerY >
-inline QImAbstractXYDataSeries* QImPlotStairsItemNode::setData(const ContainerX& x, const ContainerY& y)
-{
-    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(x, y);
-    setData(d);
-    return d;
-}
-template< typename ContainerX, typename ContainerY >
-QImAbstractXYDataSeries* QImPlotStairsItemNode::setData(ContainerX&& x, ContainerY&& y)
-{
-    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(x, y);
-    setData(d);
-    return d;
-}
 
 }  // end namespace QIM
 #endif  // QIMPLOTSTAIRSITEMNODE_H

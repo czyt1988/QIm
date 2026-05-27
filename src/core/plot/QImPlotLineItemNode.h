@@ -1,12 +1,10 @@
 #ifndef QIMPLOTLINEITEMNODE_H
 #define QIMPLOTLINEITEMNODE_H
-#include "QImPlotItemNode.h"
-#include "QImPlotDataSeries.h"
+#include "QImAbstractXYSeriesItemNode.h"
 #include "QImDownsamplingController.h"
 
 namespace QIM
 {
-class QImAbstractXYDataSeries;
 
 /**
  * \if ENGLISH
@@ -14,13 +12,13 @@ class QImAbstractXYDataSeries;
  * @details Provides Qt-style retained mode encapsulation for ImPlot line plots.
  *          Supports customizable line weight, data series binding (XY or Y-only mode),
  *          and full Qt property system integration with signal-slot event handling.
- *          Inherits from QImPlotItemNode and follows the same PIMPL design pattern
- *          for consistency with other plot item nodes.
+ *          Inherits from QImAbstractXYSeriesItemNode for data management and follows
+ *          the same PIMPL design pattern for consistency with other plot item nodes.
  *
  * @note Line plots visualize continuous data series; use QImPlotBarsItemNode for
  *       categorical/discrete data and QImPlotScatterItemNode for point distributions.
  *
- * @see QImPlotItemNode, QImAbstractXYDataSeries, QImPlotNode
+ * @see QImAbstractXYSeriesItemNode, QImAbstractXYDataSeries, QImPlotNode
  * \endif
  *
  * \if CHINESE
@@ -28,15 +26,15 @@ class QImAbstractXYDataSeries;
  * @details 为ImPlot折线图提供Qt风格的保留模式封装。
  *          支持可自定义线宽、数据系列绑定（XY或Y-only模式），
  *          以及完整的Qt属性系统集成和信号槽事件处理。
- *          继承自QImPlotItemNode，并遵循与其他绘图项目节点相同的PIMPL设计模式以保持一致性。
+ *          继承自QImAbstractXYSeriesItemNode以获得数据管理，并遵循与其他绘图项目节点相同的PIMPL设计模式以保持一致性。
  *
  * @note 折线图用于可视化连续数据系列；分类/离散数据请使用QImPlotBarsItemNode，
  *       点分布请使用QImPlotScatterItemNode。
  *
- * @see QImPlotItemNode, QImAbstractXYDataSeries, QImPlotNode
+ * @see QImAbstractXYSeriesItemNode, QImAbstractXYDataSeries, QImPlotNode
  * \endif
  */
-class QIM_CORE_API QImPlotLineItemNode : public QImPlotItemNode
+class QIM_CORE_API QImPlotLineItemNode : public QImAbstractXYSeriesItemNode
 {
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotLineItemNode)
@@ -64,16 +62,6 @@ public:
         return Type;
     }
     //----------------------------------------------------
-    // Data setting
-    //----------------------------------------------------
-    void setData(QImAbstractXYDataSeries* series);
-    template< typename ContainerX, typename ContainerY >
-    QImAbstractXYDataSeries* setData(const ContainerX& x, const ContainerY& y);
-    template< typename ContainerX, typename ContainerY >
-    QImAbstractXYDataSeries* setData(ContainerX&& x, ContainerY&& y);
-    // Get data
-    QImAbstractXYDataSeries* data() const;
-    //----------------------------------------------------
     // ImPlotLineFlags
     //----------------------------------------------------
     // Flag accessors (affirmative semantics)
@@ -96,7 +84,6 @@ public:
     int lineFlags() const;
     void setLineFlags(int flags);
     //
-
     //===============================================================
     // style
     //===============================================================
@@ -158,21 +145,6 @@ Q_SIGNALS:
 protected:
     virtual bool beginDraw() override;
 };
-
-template< typename ContainerX, typename ContainerY >
-inline QImAbstractXYDataSeries* QImPlotLineItemNode::setData(const ContainerX& x, const ContainerY& y)
-{
-    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(x, y);
-    setData(d);
-    return d;
-}
-template< typename ContainerX, typename ContainerY >
-QImAbstractXYDataSeries* QImPlotLineItemNode::setData(ContainerX&& x, ContainerY&& y)
-{
-    QImAbstractXYDataSeries* d = new QImVectorXYDataSeries(x, y);
-    setData(d);
-    return d;
-}
 
 }  // end namespace QIM
 #endif  // QIMPLOTLINEITEMNODE_H

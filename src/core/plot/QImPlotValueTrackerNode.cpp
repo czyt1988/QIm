@@ -11,7 +11,7 @@
 #include "imgui.h"
 #include "QImPlotNode.h"
 #include "QImPlotItemNode.h"
-#include "QImPlotLineItemNode.h"
+#include "QImAbstractXYSeriesItemNode.h"
 #include "QImPlotDataSeries.h"
 #include "QImPlotValueTrackerNodeGroup.h"
 #include "QtImGuiUtils.h"
@@ -102,9 +102,11 @@ void QImPlotValueTrackerNode::PrivateData::updateSupportSeries(QImPlotNode* plot
  */
 bool QImPlotValueTrackerNode::PrivateData::tryAddSeries(QImAbstractNode* n)
 {
-    if (QImPlotLineItemNode* line = qobject_cast< QImPlotLineItemNode* >(n)) {
-        supportSeries.push_back(line->data());
-        return true;
+    if (auto* xyItem = qobject_cast< QImAbstractXYSeriesItemNode* >(n)) {
+        if (auto* series = xyItem->data()) {
+            supportSeries.push_back(series);
+            return true;
+        }
     }
     return false;
 }
@@ -127,8 +129,10 @@ bool QImPlotValueTrackerNode::PrivateData::tryAddSeries(QImAbstractNode* n)
  */
 bool QImPlotValueTrackerNode::PrivateData::tryRemoveSeries(QImAbstractNode* n)
 {
-    if (QImPlotLineItemNode* line = qobject_cast< QImPlotLineItemNode* >(n)) {
-        return (supportSeries.removeAll(line->data()) > 0);
+    if (auto* xyItem = qobject_cast< QImAbstractXYSeriesItemNode* >(n)) {
+        if (auto* series = xyItem->data()) {
+            return (supportSeries.removeAll(series) > 0);
+        }
     }
     return false;
 }
@@ -207,17 +211,16 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
                 continue;
             }
 
-            if (QImPlotLineItemNode* lineItem = qobject_cast< QImPlotLineItemNode* >(itemNode)) {
-                QImAbstractXYDataSeries* series = lineItem->data();
-                const int size                  = series->size();
-                if (!series || size <= 0) {
+            if (auto* xyItem = qobject_cast< QImAbstractXYSeriesItemNode* >(itemNode)) {
+                QImAbstractXYDataSeries* series = xyItem->data();
+                if (!series || series->size() <= 0) {
                     continue;
                 }
-                QPointF plotPos = lineItem->pixelsToPlot(mouseScreenPos.x, mouseScreenPos.y);
+                QPointF plotPos = xyItem->pixelsToPlot(mouseScreenPos.x, mouseScreenPos.y);
                 // 检查X值是否在数据范围内（优化：避免无效查询）
 
                 double firstX = series->xValue(0);
-                double lastX  = series->xValue(size - 1);
+                double lastX  = series->xValue(series->size() - 1);
                 if (plotPos.x() < firstX || plotPos.x() > lastX) {
                     continue;  // X值超出数据范围，跳过
                 }
@@ -233,19 +236,19 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
                 }
 
                 // 获取曲线颜色
-                QColor lineColor = lineItem->color();
+                QColor lineColor = xyItem->itemColor();
                 if (!lineColor.isValid()) {
                     ImVec4 lastItemColor = ImPlot::GetLastItemColor();
                     lineColor            = toQColor(lastItemColor);
                 }
 
                 TrackedValue trackedValue;
-                trackedValue.label       = lineItem->labelConstData();
+                trackedValue.label       = xyItem->labelConstData();
                 trackedValue.color       = lineColor;
                 trackedValue.xValue      = plotPos.x();  // 所有序列共享同一个X值
                 trackedValue.yValue      = yVal;
-                trackedValue.xValueLabel = plotNode->axisValueText(plotPos.x(), lineItem->xAxisId());
-                trackedValue.yValueLabel = plotNode->axisValueText(yVal, lineItem->yAxisId());
+                trackedValue.xValueLabel = plotNode->axisValueText(plotPos.x(), xyItem->xAxisId());
+                trackedValue.yValueLabel = plotNode->axisValueText(yVal, xyItem->yAxisId());
                 trackedValues.emplace_back(trackedValue);
             }
         }
