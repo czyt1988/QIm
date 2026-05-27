@@ -1,6 +1,7 @@
 #include "QImPlot3DMousePickerNode.h"
 #include "QImPlot3DNode.h"
 #include <QColor>
+#include <cmath>
 #include <limits>
 #include "implot3d.h"
 #include "imgui.h"
@@ -15,32 +16,36 @@ class QImPlot3DMousePickerNode::PrivateData
 public:
     PrivateData(QImPlot3DMousePickerNode* q);
 
-    // Configuration
-    QImPlane3D plane { QImPlane3D::XZ };
-    bool maskEnabled { true };
-    bool showMarker { true };
-    bool showCoordinatesText { true };
-    ImVec4 markerColorImV4 { 1.0f, 1.0f, 0.0f, 1.0f };
-    float markerSize { 5.0f };
+    // Data
+    QImAbstractXYZDataSeries* dataSeries {nullptr};
+
+    // Visual
+    bool showMarker {true};
+    bool showCoordinatesText {true};
+    ImVec4 markerColorImV4 {1.0f, 1.0f, 0.0f, 1.0f};   // yellow
+    float markerSize {5.0f};
+
+    // Helper line
+    ImVec4 helperLineColorImV4 {1.0f, 1.0f, 0.0f, 1.0f};  // yellow
+    float helperLineWidth {2.0f};
 
     // Frame state (NaN = "no value")
     static constexpr double sNaN = std::numeric_limits<double>::quiet_NaN();
 
-    QImPlot3DRay mouseRay {{ sNaN, sNaN, sNaN }, { sNaN, sNaN, sNaN }};
-    QImPlot3DPoint hoveredPoint { sNaN, sNaN, sNaN };
-    bool plotHovered { false };
-    bool clicked { false };
-    bool doubleClicked { false };
-    bool rightClicked { false };
-    QImPlot3DPoint clickedPoint { sNaN, sNaN, sNaN };
+    QImPlot3DPoint hoveredPoint {sNaN, sNaN, sNaN};
+    int hoveredIndex {-1};
+    bool plotHovered {false};
+    bool clicked {false};
+    bool doubleClicked {false};
+    bool rightClicked {false};
 
     // Previous frame values for change detection
-    bool prevHovered { false };
-    QImPlot3DPoint prevHoveredPoint { sNaN, sNaN, sNaN };
-    QImPlot3DRay prevMouseRay {{ sNaN, sNaN, sNaN }, { sNaN, sNaN, sNaN }};
-    bool prevClicked { false };
-    bool prevDoubleClicked { false };
-    bool prevRightClicked { false };
+    bool prevHovered {false};
+    QImPlot3DPoint prevHoveredPoint {sNaN, sNaN, sNaN};
+    int prevHoveredIndex {-1};
+    bool prevClicked {false};
+    bool prevDoubleClicked {false};
+    bool prevRightClicked {false};
 };
 
 QImPlot3DMousePickerNode::PrivateData::PrivateData(QImPlot3DMousePickerNode* q)
@@ -56,21 +61,17 @@ QImPlot3DMousePickerNode::PrivateData::PrivateData(QImPlot3DMousePickerNode* q)
  * \if ENGLISH
  * @brief Constructor for QImPlot3DMousePickerNode
  * @param parent Parent QObject (typically a QImPlot3DNode)
- * @details Initializes the picker with default configuration:
- *          - XZ ground plane, mask enabled
- *          - Yellow marker with coordinate text display
- *          - Auto-ID disabled, always renders (RenderIgnoreVisible)
- *          - High z-order (99999) to render on top of other items
+ * @details Initializes the picker with defaults:
+ *          - Yellow marker and helper line, coordinate text display
+ *          - Always renders (RenderIgnoreVisible), high z-order (99999)
  * \endif
  *
  * \if CHINESE
  * @brief QImPlot3DMousePickerNode 构造函数
  * @param parent 父 QObject（通常是 QImPlot3DNode）
  * @details 使用默认配置初始化拾取器：
- *          - XZ 地面平面，遮罩启用
- *          - 黄色标记并显示坐标文本
- *          - 自动 ID 禁用，始终渲染（RenderIgnoreVisible）
- *          - 高 z-order（99999）以渲染在其他元素之上
+ *          - 黄色标记和辅助线，显示坐标文本
+ *          - 始终渲染（RenderIgnoreVisible），高 z-order（99999）
  * \endif
  */
 QImPlot3DMousePickerNode::QImPlot3DMousePickerNode(QObject* parent)
@@ -97,85 +98,46 @@ QImPlot3DMousePickerNode::~QImPlot3DMousePickerNode()
 }
 
 //----------------------------------------------------
-// Configuration
+// Data
 //----------------------------------------------------
 
 /**
  * \if ENGLISH
- * @brief Gets the intersection plane
- * @return Current QImPlane3D value (YZ, XZ, or XY)
+ * @brief Sets the data series to pick from
+ * @param series Data series (not owned by this node; caller manages lifetime)
  * \endif
  *
  * \if CHINESE
- * @brief 获取交点平面
- * @return 当前 QImPlane3D 值（YZ、XZ 或 XY）
+ * @brief 设置用于拾取的数据系列
+ * @param series 数据系列（非此节点拥有；由调用者管理生命周期）
  * \endif
  */
-QImPlane3D QImPlot3DMousePickerNode::plane() const
-{
-    QIM_DC(d);
-    return d->plane;
-}
-
-/**
- * \if ENGLISH
- * @brief Sets the intersection plane for ray-plane intersection
- * @param plane New plane value (QImPlane3D::YZ, XZ, or XY)
- * @details The plane determines which axis-aligned plane the mouse ray
- *          intersects with. XZ is the default "ground plane" in 3D plots.
- * \endif
- *
- * \if CHINESE
- * @brief 设置射线-平面交点的平面
- * @param plane 新的平面值（QImPlane3D::YZ、XZ 或 XY）
- * @details 平面决定鼠标射线与哪个轴对齐平面相交。XZ 是 3D 绘图中的默认"地面平面"。
- * \endif
- */
-void QImPlot3DMousePickerNode::setPlane(QImPlane3D plane)
+void QImPlot3DMousePickerNode::setData(QImAbstractXYZDataSeries* series)
 {
     QIM_D(d);
-    if (d->plane != plane) {
-        d->plane = plane;
-        Q_EMIT planeChanged(plane);
-    }
+    d->dataSeries = series;
 }
 
 /**
  * \if ENGLISH
- * @brief Checks if out-of-range masking is enabled
- * @return true if masking is enabled (intersections outside axis limits return NaN)
+ * @brief Gets the current data series
+ * @return Current data series pointer (nullptr if not set)
  * \endif
  *
  * \if CHINESE
- * @brief 检查超范围遮罩是否启用
- * @return 如果遮罩启用则返回 true（超出坐标轴范围的交点返回 NaN）
+ * @brief 获取当前数据系列
+ * @return 当前数据系列指针（未设置时为 nullptr）
  * \endif
  */
-bool QImPlot3DMousePickerNode::isMaskEnabled() const
+QImAbstractXYZDataSeries* QImPlot3DMousePickerNode::data() const
 {
     QIM_DC(d);
-    return d->maskEnabled;
+    return d->dataSeries;
 }
 
-/**
- * \if ENGLISH
- * @brief Sets out-of-range masking enabled state
- * @param enabled New mask state
- * \endif
- *
- * \if CHINESE
- * @brief 设置超范围遮罩启用状态
- * @param enabled 新的遮罩状态
- * \endif
- */
-void QImPlot3DMousePickerNode::setMaskEnabled(bool enabled)
-{
-    QIM_D(d);
-    if (d->maskEnabled != enabled) {
-        d->maskEnabled = enabled;
-        Q_EMIT maskEnabledChanged(enabled);
-    }
-}
+//----------------------------------------------------
+// Visual
+//----------------------------------------------------
 
 /**
  * \if ENGLISH
@@ -251,10 +213,6 @@ void QImPlot3DMousePickerNode::setShowCoordinatesText(bool show)
     }
 }
 
-//----------------------------------------------------
-// Visual
-//----------------------------------------------------
-
 /**
  * \if ENGLISH
  * @brief Gets the marker color
@@ -328,18 +286,94 @@ void QImPlot3DMousePickerNode::setMarkerSize(float size)
 }
 
 //----------------------------------------------------
+// Helper line
+//----------------------------------------------------
+
+/**
+ * \if ENGLISH
+ * @brief Gets the helper line color
+ * @return Current helper line color as QColor
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取辅助线颜色
+ * @return 当前辅助线颜色（QColor）
+ * \endif
+ */
+QColor QImPlot3DMousePickerNode::helperLineColor() const
+{
+    QIM_DC(d);
+    return toQColor(d->helperLineColorImV4);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the helper line color
+ * @param color New helper line color (converted to ImVec4 in setter for beginDraw efficiency)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置辅助线颜色
+ * @param color 新的辅助线颜色（在 setter 中转换为 ImVec4 以提高 beginDraw 效率）
+ * \endif
+ */
+void QImPlot3DMousePickerNode::setHelperLineColor(const QColor& color)
+{
+    QIM_D(d);
+    d->helperLineColorImV4 = toImVec4(color);
+    Q_EMIT helperLineColorChanged(color);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Gets the helper line width in pixels
+ * @return Current helper line width
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取辅助线宽度（像素）
+ * @return 当前辅助线宽度
+ * \endif
+ */
+float QImPlot3DMousePickerNode::helperLineWidth() const
+{
+    QIM_DC(d);
+    return d->helperLineWidth;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the helper line width in pixels
+ * @param width New helper line width
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置辅助线宽度（像素）
+ * @param width 新的辅助线宽度
+ * \endif
+ */
+void QImPlot3DMousePickerNode::setHelperLineWidth(float width)
+{
+    QIM_D(d);
+    if (d->helperLineWidth != width) {
+        d->helperLineWidth = width;
+        Q_EMIT helperLineWidthChanged(width);
+    }
+}
+
+//----------------------------------------------------
 // Read-only state
 //----------------------------------------------------
 
 /**
  * \if ENGLISH
  * @brief Gets the hovered 3D point
- * @return Current hovered point (NaN components if no valid intersection)
+ * @return Current hovered point (NaN components if no valid data point nearby)
  * \endif
  *
  * \if CHINESE
  * @brief 获取悬停的三维点
- * @return 当前悬停点（无有效交点时各分量为 NaN）
+ * @return 当前悬停点（附近无有效数据点时分量为 NaN）
  * \endif
  */
 QImPlot3DPoint QImPlot3DMousePickerNode::hoveredPoint() const
@@ -350,19 +384,19 @@ QImPlot3DPoint QImPlot3DMousePickerNode::hoveredPoint() const
 
 /**
  * \if ENGLISH
- * @brief Gets the current mouse ray
- * @return Current ray from camera through mouse pixel
+ * @brief Gets the index of the closest data point
+ * @return Index in the data series (-1 if none)
  * \endif
  *
  * \if CHINESE
- * @brief 获取当前鼠标射线
- * @return 从相机穿过鼠标像素的当前射线
+ * @brief 获取最近数据点的索引
+ * @return 数据系列中的索引（无时为 -1）
  * \endif
  */
-QImPlot3DRay QImPlot3DMousePickerNode::mouseRay() const
+int QImPlot3DMousePickerNode::hoveredIndex() const
 {
     QIM_DC(d);
-    return d->mouseRay;
+    return d->hoveredIndex;
 }
 
 /**
@@ -454,54 +488,43 @@ bool QImPlot3DMousePickerNode::hasValidHoveredPoint() const
     return !d->hoveredPoint.IsNaN();
 }
 
-/**
- * \if ENGLISH
- * @brief Gets the last clicked 3D point
- * @return 3D point of the most recent left-click (NaN if never clicked)
- * \endif
- *
- * \if CHINESE
- * @brief 获取最后一次点击的三维点
- * @return 最近一次左键点击的三维点（从未点击时为 NaN）
- * \endif
- */
-QImPlot3DPoint QImPlot3DMousePickerNode::lastClickedPoint() const
-{
-    QIM_DC(d);
-    return d->clickedPoint;
-}
-
 //----------------------------------------------------
 // Rendering
 //----------------------------------------------------
 
 /**
  * \if ENGLISH
- * @brief Performs per-frame mouse picking and visual feedback rendering
+ * @brief Per-frame mouse picking and visual feedback rendering
  * @return false (no endDraw needed, no child nodes to render)
- * @details Execution flow each frame:
+ * @details Execution each frame:
  *          1. Get mouse screen position from ImGui
- *          2. Convert to ray using parent plot's pixelsToPlotRay wrapper
- *          3. Convert to plane intersection point using pixelsToPlotPlane wrapper
- *          4. Detect plot hover via ImGui::IsItemHovered
- *          5. Detect click/double-click/right-click events
- *          6. Emit Qt signals for state changes and user actions
- *          7. Render marker (PlotScatter) and coordinate text (PlotText) at hovered point
- *          All conversions use QImPlot3DNode wrappers — no direct ImPlot3D internal access.
+ *          2. Check if mouse is over the plot via GetPlotRectPos/GetPlotRectSize
+ *          3. If hovered and data exists, iterate all data points
+ *          4. For each point, ImPlot3D::PlotToPixels → compute screen-space distance
+ *          5. Find closest point, draw helper line via ImPlot3D::GetPlotDrawList
+ *          6. Draw marker at closest point (draw list circle)
+ *          7. Draw coordinate text via ImPlot3D::PlotText
+ *          8. Show tooltip with point info
+ *          9. Detect click/double-click/right-click + emit signals
+ *
+ *          Pattern follows DemoCustomOverlay from implot3d_demo.cpp.
  * \endif
  *
  * \if CHINESE
- * @brief 执行每帧鼠标拾取和视觉反馈渲染
+ * @brief 每帧鼠标拾取和视觉反馈渲染
  * @return false（无需 endDraw，无子节点需渲染）
- * @details 每帧执行流程：
+ * @details 每帧执行：
  *          1. 从 ImGui 获取鼠标屏幕位置
- *          2. 使用父绘图节点的 pixelsToPlotRay 封装转换为射线
- *          3. 使用 pixelsToPlotPlane 封装转换为平面交点
- *          4. 通过 ImGui::IsItemHovered 检测绘图区域悬停
- *          5. 检测点击/双击/右击事件
- *          6. 发射 Qt 信号通知状态变化和用户操作
- *          7. 在悬停点渲染标记（PlotScatter）和坐标文本（PlotText）
- *          所有转换使用 QImPlot3DNode 封装方法——无直接 ImPlot3D 内部访问。
+ *          2. 通过 GetPlotRectPos/GetPlotRectSize 检查鼠标是否在绘图区域
+ *          3. 如果悬停且有数据，遍历所有数据点
+ *          4. 对每个点 ImPlot3D::PlotToPixels → 计算屏幕空间距离
+ *          5. 找到最近点，通过 ImPlot3D::GetPlotDrawList 画辅助线
+ *          6. 在最近点画标记（draw list 圆圈）
+ *          7. 通过 ImPlot3D::PlotText 画坐标文本
+ *          8. 显示 tooltip 含点信息
+ *          9. 检测点击/双击/右击 + 发射信号
+ *
+ *          模式参考 implot3d_demo.cpp 中的 DemoCustomOverlay。
  * \endif
  */
 bool QImPlot3DMousePickerNode::beginDraw()
@@ -510,86 +533,145 @@ bool QImPlot3DMousePickerNode::beginDraw()
     QImPlot3DNode* plot = plot3DNode();
     if (!plot) return false;
 
-    // 1. Get mouse position from ImGui (screen space)
+    // 1. Get mouse position in screen space
     ImVec2 mouseScreenPos = ImGui::GetMousePos();
-    QPointF mousePos(mouseScreenPos.x, mouseScreenPos.y);
 
-    // 2. Convert to ray using parent plot's wrapper method
-    QImPlot3DRay ray = plot->pixelsToPlotRay(mousePos);
+    // 2. Check if mouse is over the plot area
+    ImVec2 plotPos = ImPlot3D::GetPlotRectPos();
+    ImVec2 plotSize = ImPlot3D::GetPlotRectSize();
+    bool isHovered = (mouseScreenPos.x >= plotPos.x && mouseScreenPos.x <= plotPos.x + plotSize.x &&
+                      mouseScreenPos.y >= plotPos.y && mouseScreenPos.y <= plotPos.y + plotSize.y);
 
-    bool rayChanged = !fuzzyEqual(ray.Origin, d->prevMouseRay.Origin) ||
-                      !fuzzyEqual(ray.Direction, d->prevMouseRay.Direction);
-    d->mouseRay = ray;
-    if (rayChanged) {
-        Q_EMIT mouseRayChanged(ray);
-    }
-    d->prevMouseRay = ray;
-
-    // 3. Convert to point on selected plane
-    QImPlot3DPoint point = plot->pixelsToPlotPlane(mousePos, d->plane, d->maskEnabled);
-
-    bool pointChanged = !fuzzyEqual(point, d->prevHoveredPoint);
-    d->hoveredPoint = point;
-    if (pointChanged) {
-        Q_EMIT hoveredPointChanged(point);
-    }
-    d->prevHoveredPoint = point;
-
-    bool pointValid = !point.IsNaN();
-
-    // 4. Check if mouse is hovering over the plot area
-    d->plotHovered = ImGui::IsItemHovered();
+    d->plotHovered = isHovered;
     if (d->plotHovered != d->prevHovered) {
         Q_EMIT plotHoveredChanged(d->plotHovered);
     }
     d->prevHovered = d->plotHovered;
 
-    // 5. Detect mouse clicks (only when hovering + point is valid)
-    bool click = d->plotHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && pointValid;
-    bool dblClick = d->plotHovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && pointValid;
-    bool rClick = d->plotHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right) && pointValid;
+    // 3. Find closest data point to mouse in screen space
+    int closestIndex = -1;
+    float minDistSq = 1e10f;
+    ImVec2 closestPx;
+    double closestX = d->sNaN, closestY = d->sNaN, closestZ = d->sNaN;
+    float closestDist = 0.0f;
+
+    if (isHovered && d->dataSeries && d->dataSeries->isValid()) {
+        ImDrawList* drawList = ImPlot3D::GetPlotDrawList();
+        int n = d->dataSeries->size();
+
+        for (int i = 0; i < n; i++) {
+            double px = d->dataSeries->xValue(i);
+            double py = d->dataSeries->yValue(i);
+            double pz = d->dataSeries->zValue(i);
+            ImVec2 pointPx = ImPlot3D::PlotToPixels(px, py, pz);
+            float dx = pointPx.x - mouseScreenPos.x;
+            float dy = pointPx.y - mouseScreenPos.y;
+            float distSq = dx * dx + dy * dy;
+            if (distSq < minDistSq) {
+                minDistSq = distSq;
+                closestIndex = i;
+                closestPx = pointPx;
+                closestX = px;
+                closestY = py;
+                closestZ = pz;
+            }
+        }
+
+        if (closestIndex >= 0) {
+            closestDist = ImSqrt(minDistSq);
+
+            // 4. Draw helper line from mouse to closest point
+            if (d->helperLineWidth > 0.0f) {
+                ImU32 lineColor = ImGui::ColorConvertFloat4ToU32(d->helperLineColorImV4);
+                drawList->AddLine(mouseScreenPos, closestPx, lineColor, d->helperLineWidth);
+            }
+
+            // 5. Draw marker at closest point
+            if (d->showMarker) {
+                ImU32 markerColor = ImGui::ColorConvertFloat4ToU32(d->markerColorImV4);
+                drawList->AddCircleFilled(closestPx, d->markerSize, markerColor);
+                drawList->AddCircle(closestPx, d->markerSize + 1.0f, IM_COL32(255, 255, 255, 200), 1.0f);
+            }
+
+            // 6. Draw coordinate text at the closest data point
+            if (d->showCoordinatesText) {
+                char buf[64];
+                snprintf(buf, sizeof(buf), "(%.2f, %.2f, %.2f)", closestX, closestY, closestZ);
+                ImPlot3D::PlotText(buf, closestX, closestY, closestZ, 0.0, ImVec2(10, -10));
+            }
+
+            // 7. Show tooltip
+            ImGui::BeginTooltip();
+            renderTooltip(closestIndex, closestX, closestY, closestZ, closestDist, mouseScreenPos);
+            ImGui::EndTooltip();
+        }
+    }
+
+    // 8. Update hovered point and emit signals
+    QImPlot3DPoint newHoveredPoint = (closestIndex >= 0)
+        ? QImPlot3DPoint(closestX, closestY, closestZ)
+        : QImPlot3DPoint(d->sNaN, d->sNaN, d->sNaN);
+
+    bool pointChanged = !fuzzyEqual(newHoveredPoint, d->prevHoveredPoint);
+    d->hoveredPoint = newHoveredPoint;
+    d->hoveredIndex = closestIndex;
+
+    if (pointChanged) {
+        Q_EMIT hoveredPointChanged(newHoveredPoint);
+    }
+    if (closestIndex != d->prevHoveredIndex) {
+        Q_EMIT hoveredIndexChanged(closestIndex);
+    }
+    d->prevHoveredPoint = newHoveredPoint;
+    d->prevHoveredIndex = closestIndex;
+
+    // 9. Detect mouse clicks
+    bool pointValid = (closestIndex >= 0);
+    bool click = isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && pointValid;
+    bool dblClick = isHovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && pointValid;
+    bool rClick = isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right) && pointValid;
 
     d->clicked = click;
     d->doubleClicked = dblClick;
     d->rightClicked = rClick;
 
     if (click) {
-        d->clickedPoint = point;
-        Q_EMIT clicked(point);
+        Q_EMIT clicked(newHoveredPoint);
     }
     if (dblClick) {
-        Q_EMIT doubleClicked(point);
+        Q_EMIT doubleClicked(newHoveredPoint);
     }
     if (rClick) {
-        Q_EMIT rightClicked(point);
+        Q_EMIT rightClicked(newHoveredPoint);
     }
 
     if (click != d->prevClicked) { Q_EMIT clickedChanged(click); d->prevClicked = click; }
     if (dblClick != d->prevDoubleClicked) { Q_EMIT doubleClickedChanged(dblClick); d->prevDoubleClicked = dblClick; }
     if (rClick != d->prevRightClicked) { Q_EMIT rightClickedChanged(rClick); d->prevRightClicked = rClick; }
 
-    // 6. Render visual feedback: marker at hovered point
-    if (d->showMarker && d->plotHovered && pointValid) {
-        ImPlot3D::SetNextMarkerStyle(
-            ImPlot3DMarker_Circle,
-            d->markerSize,
-            d->markerColorImV4,
-            1.0f,
-            d->markerColorImV4);
-        ImPlot3D::PlotScatter("##PickerMarker",
-            &point.x, &point.y, &point.z, 1,
-            ImPlot3DScatterFlags_NoLegend | ImPlot3DScatterFlags_NoFit);
-    }
-
-    // 7. Render coordinate text next to marker
-    if (d->showCoordinatesText && d->plotHovered && pointValid) {
-        char buf[64];
-        snprintf(buf, sizeof(buf), "(%.2f, %.2f, %.2f)",
-                 point.x, point.y, point.z);
-        ImPlot3D::PlotText(buf, point.x, point.y, point.z, 0.0, ImVec2(10, -10));
-    }
-
     return false;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Default tooltip rendering — shows mouse position, point index, coordinates, and distance
+ * @details Override this in a subclass to customize. Called inside BeginTooltip/EndTooltip scope.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 默认 tooltip 渲染——显示鼠标位置、点索引、坐标和距离
+ * @details 在子类中重写此方法以自定义。在 BeginTooltip/EndTooltip 作用域内调用。
+ * \endif
+ */
+void QImPlot3DMousePickerNode::renderTooltip(int index, double x, double y, double z,
+                                              float distancePx, const ImVec2& mouseScreenPos)
+{
+    ImGui::Text("Mouse: (%.1f, %.1f)", mouseScreenPos.x, mouseScreenPos.y);
+
+    if (index >= 0) {
+        ImGui::Text("Point #%d: (%.3f, %.3f, %.3f)", index, x, y, z);
+        ImGui::Text("Distance: %.1f px", distancePx);
+    }
 }
 
 }  // namespace QIM

@@ -8,6 +8,7 @@
 #include "plot/QImPlotLegendNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlot.h"
+#include "plot/QImPlotValueTrackerNode.h"
 #include "aggregator/HistoryBuffer.h"
 #include "aggregator/ProcessAggregator.h"
 
@@ -55,6 +56,12 @@ void CpuUsageView::buildView(QIM::QImFigureWidget* figure, const QList<Aggregate
         legend->setOutside(true);
         legend->setLocation(QIM::QImPlotLegendLocation::South);
     }
+
+    // Value tracker: hover tooltip showing stacked bar values at cursor position
+    valueTracker_ = new QIM::QImPlotValueTrackerNode(plotNode_);
+    valueTracker_->setFixedWidth(240.0f);
+    valueTracker_->setSkipNanFiniteValues(true);
+    plotNode_->addChildNode(valueTracker_);
 
     updateData(data);
 }

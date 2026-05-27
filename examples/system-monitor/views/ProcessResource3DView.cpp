@@ -6,6 +6,8 @@
 #include "QImFigureWidget.h"
 #include "plot3d/QImPlot3DNode.h"
 #include "plot3d/QImPlot3DScatterItemNode.h"
+#include "plot3d/QImPlot3DMousePickerNode.h"
+#include "plot3d/QImPlot3DDataSeries.h"
 #include "plot3d/QImPlot3D.h"
 #include "collector/ProcessInfo.h"
 #include "aggregator/ProcessAggregator.h"
@@ -24,6 +26,11 @@ void ProcessResource3DView::buildView(QIM::QImFigureWidget* figure, const QList<
         return;
 
     scatterItems_.clear();
+    delete combinedDataSeries_;
+    combinedDataSeries_ = nullptr;
+    combinedXs_.clear();
+    combinedYs_.clear();
+    combinedZs_.clear();
 
     // Clear any existing 2D subplot grid
     figure->setSubplotGrid(1, 1);
@@ -36,6 +43,13 @@ void ProcessResource3DView::buildView(QIM::QImFigureWidget* figure, const QList<
 
     plotNode_->setTitle(QStringLiteral("Resource Usage"));
     plotNode_->setupAxes(QByteArray("CPU Time(%\xc2\xb7s)"), QByteArray("Avg Memory(MB)"), QByteArray("Disk(KB)"));
+
+    // Mouse picker: shows hovered 3D coordinate as floating text with marker
+    mousePicker_ = new QIM::QImPlot3DMousePickerNode(plotNode_);
+    mousePicker_->setShowCoordinatesText(true);
+    mousePicker_->setShowMarker(true);
+    mousePicker_->setMarkerSize(6.0f);
+    mousePicker_->setMarkerColor(QColor(255, 255, 0, 220));
 
     updateData(data);
 }
@@ -137,6 +151,8 @@ void ProcessResource3DView::updateData(const QList<AggregatedProcessInfo>& data)
     for (auto it = scatterItems_.begin(); it != scatterItems_.end(); ++it) {
         it.value()->setVisible(activeNames.contains(it.key()));
     }
+
+    rebuildCombinedData();
 }
 
 void ProcessResource3DView::updateDataInstantaneous(const QList<AggregatedProcessInfo>& data)
@@ -190,4 +206,37 @@ void ProcessResource3DView::updateDataInstantaneous(const QList<AggregatedProces
     for (auto it = scatterItems_.begin(); it != scatterItems_.end(); ++it) {
         it.value()->setVisible(activeNames.contains(it.key()));
     }
+
+    rebuildCombinedData();
+}
+
+void ProcessResource3DView::rebuildCombinedData()
+{
+    combinedXs_.clear();
+    combinedYs_.clear();
+    combinedZs_.clear();
+
+    for (auto it = scatterItems_.begin(); it != scatterItems_.end(); ++it) {
+        const auto* scatter = it.value();
+        if (!scatter->isVisible())
+            continue;
+
+        const auto* series = scatter->data();
+        if (!series || !series->isValid())
+            continue;
+
+        for (int i = 0; i < series->size(); ++i) {
+            combinedXs_.push_back(series->xValue(i));
+            combinedYs_.push_back(series->yValue(i));
+            combinedZs_.push_back(series->zValue(i));
+        }
+    }
+
+    delete combinedDataSeries_;
+    combinedDataSeries_ = new QIM::QImVectorXYZDataSeries<
+        std::vector<double>, std::vector<double>, std::vector<double>>(
+        combinedXs_, combinedYs_, combinedZs_);
+
+    if (mousePicker_)
+        mousePicker_->setData(combinedDataSeries_);
 }

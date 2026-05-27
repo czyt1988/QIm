@@ -11,6 +11,7 @@
 namespace QIM {
 class QImFigureWidget;
 class QImPlotNode;
+class QImPlotValueTrackerNode;
 }
 
 class HistoryBuffer;
@@ -29,4 +30,6 @@ private:
     QStringList orderedNames_;
     // Bar groups node for stacked bar chart with deterministic colors
     ColoredBarGroupsNode* barGroups_ = nullptr;
+    // Value tracker for hover-data tooltip on bar groups
+    QIM::QImPlotValueTrackerNode* valueTracker_ = nullptr;
 };

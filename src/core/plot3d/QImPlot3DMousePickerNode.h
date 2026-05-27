@@ -5,6 +5,7 @@
 #include "QImPlot3DItemNode.h"
 #include "QImPlot3DTypes.h"
 #include "QImPlot3D.h"
+#include "QImPlot3DDataSeries.h"
 
 namespace QIM {
 
@@ -12,28 +13,20 @@ class QImPlot3DNode;
 
 /**
  * \if ENGLISH
- * @brief 3D mouse picker node that wraps ImPlot3D raycasting APIs with visual feedback
- * @details Provides real-time mouse interaction with 3D plots by converting mouse
- *          screen coordinates to plot-space rays and plane intersection points.
- *          Emits Qt signals for hover, click, double-click, and right-click events
- *          with 3D coordinates. Renders a visual marker and coordinate text at
- *          the hovered position. Uses QImPlot3DNode wrapper methods (pixelsToPlotRay,
- *          pixelsToPlotPlane) instead of direct ImPlot3D internal access.
- * @note This is an interaction tool node (like 2D DragPoint/Annotation), not a data
- *       visualization node. It always renders regardless of visible state
- *       (RenderIgnoreVisible=true) and does not participate in axis fitting or legend.
- * @see QImPlot3DNode, QImPlot3DItemNode, QImPlane3D
+ * @brief 3D mouse picker node that finds the closest data point to the mouse in screen space
+ * @details Uses ImPlot3D::PlotToPixels to project data series points to pixels, then finds the
+ *          nearest point and renders a helper line, marker, and coordinate text.
+ *          Inspired by DemoCustomOverlay in implot3d_demo.cpp.
+ * @note Requires setData() to provide the data series to pick from.
+ * @see QImPlot3DNode, QImPlot3DItemNode, QImAbstractXYZDataSeries
  * \endif
  *
  * \if CHINESE
- * @brief 3D 鼠标拾取节点，封装 ImPlot3D 射线检测 API 并提供视觉反馈
- * @details 通过将鼠标屏幕坐标转换为绘图空间的射线和平面交点，实现与 3D 绘图的实时鼠标交互。
- *          发射 Qt 信号通知悬停、单击、双击和右击事件，附带 3D 坐标。
- *          在悬停位置渲染可视化标记和坐标文本。使用 QImPlot3DNode 封装方法
- *          （pixelsToPlotRay、pixelsToPlotPlane），而非直接访问 ImPlot3D 内部。
- * @note 这是交互工具节点（类似 2D 的 DragPoint/Annotation），不是数据可视化节点。
- *       它始终渲染（RenderIgnoreVisible=true），不参与坐标轴拟合或图例。
- * @see QImPlot3DNode, QImPlot3DItemNode, QImPlane3D
+ * @brief 3D 鼠标拾取节点，在屏幕空间中查找离鼠标最近的数据点
+ * @details 使用 ImPlot3D::PlotToPixels 将数据系列点投影到像素空间，然后找到最近点并
+ *          渲染辅助线、标记和坐标文本。参考 implot3d_demo.cpp 中的 DemoCustomOverlay。
+ * @note 需要通过 setData() 提供数据系列以供拾取。
+ * @see QImPlot3DNode, QImPlot3DItemNode, QImAbstractXYZDataSeries
  * \endif
  */
 class QIM_CORE_API QImPlot3DMousePickerNode : public QImPlot3DItemNode
@@ -42,15 +35,15 @@ class QIM_CORE_API QImPlot3DMousePickerNode : public QImPlot3DItemNode
     QIM_DECLARE_PRIVATE(QImPlot3DMousePickerNode)
     Q_DISABLE_COPY(QImPlot3DMousePickerNode)
 
-    Q_PROPERTY(QImPlane3D plane READ plane WRITE setPlane NOTIFY planeChanged)
-    Q_PROPERTY(bool maskEnabled READ isMaskEnabled WRITE setMaskEnabled NOTIFY maskEnabledChanged)
     Q_PROPERTY(bool showMarker READ isShowMarker WRITE setShowMarker NOTIFY showMarkerChanged)
     Q_PROPERTY(bool showCoordinatesText READ isShowCoordinatesText WRITE setShowCoordinatesText NOTIFY showCoordinatesTextChanged)
     Q_PROPERTY(QColor markerColor READ markerColor WRITE setMarkerColor NOTIFY markerColorChanged)
     Q_PROPERTY(float markerSize READ markerSize WRITE setMarkerSize NOTIFY markerSizeChanged)
+    Q_PROPERTY(QColor helperLineColor READ helperLineColor WRITE setHelperLineColor NOTIFY helperLineColorChanged)
+    Q_PROPERTY(float helperLineWidth READ helperLineWidth WRITE setHelperLineWidth NOTIFY helperLineWidthChanged)
 
     Q_PROPERTY(QImPlot3DPoint hoveredPoint READ hoveredPoint NOTIFY hoveredPointChanged)
-    Q_PROPERTY(QImPlot3DRay mouseRay READ mouseRay NOTIFY mouseRayChanged)
+    Q_PROPERTY(int hoveredIndex READ hoveredIndex NOTIFY hoveredIndexChanged)
     Q_PROPERTY(bool plotHovered READ isPlotHovered NOTIFY plotHoveredChanged)
     Q_PROPERTY(bool clicked READ isClicked NOTIFY clickedChanged)
     Q_PROPERTY(bool doubleClicked READ isDoubleClicked NOTIFY doubleClickedChanged)
@@ -63,25 +56,29 @@ public:
     explicit QImPlot3DMousePickerNode(QObject* parent = nullptr);
     ~QImPlot3DMousePickerNode() override;
 
-    // Configuration
-    QImPlane3D plane() const;
-    void setPlane(QImPlane3D plane);
-    bool isMaskEnabled() const;
-    void setMaskEnabled(bool enabled);
+    // Data
+    void setData(QImAbstractXYZDataSeries* series);
+    QImAbstractXYZDataSeries* data() const;
+
+    // Visual
     bool isShowMarker() const;
     void setShowMarker(bool show);
     bool isShowCoordinatesText() const;
     void setShowCoordinatesText(bool show);
-
-    // Visual
     QColor markerColor() const;
     void setMarkerColor(const QColor& color);
     float markerSize() const;
     void setMarkerSize(float size);
 
+    // Helper line
+    QColor helperLineColor() const;
+    void setHelperLineColor(const QColor& color);
+    float helperLineWidth() const;
+    void setHelperLineWidth(float width);
+
     // Read-only state (cached per-frame)
     QImPlot3DPoint hoveredPoint() const;
-    QImPlot3DRay mouseRay() const;
+    int hoveredIndex() const;
     bool isPlotHovered() const;
     bool isClicked() const;
     bool isDoubleClicked() const;
@@ -89,35 +86,8 @@ public:
 
     // Convenience
     bool hasValidHoveredPoint() const;
-    QImPlot3DPoint lastClickedPoint() const;
 
 Q_SIGNALS:
-    /**
-     * \if ENGLISH
-     * @brief Emitted when the intersection plane changes
-     * @param plane New plane value (QImPlane3D::YZ, XZ, or XY)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 交点平面改变时发射
-     * @param plane 新的平面值（QImPlane3D::YZ、XZ 或 XY）
-     * \endif
-     */
-    void planeChanged(QImPlane3D plane);
-
-    /**
-     * \if ENGLISH
-     * @brief Emitted when mask enabled state changes
-     * @param enabled New mask state (true masks out-of-range values)
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 遮罩启用状态改变时发射
-     * @param enabled 新的遮罩状态（true 遮蔽超范围值）
-     * \endif
-     */
-    void maskEnabledChanged(bool enabled);
-
     /**
      * \if ENGLISH
      * @brief Emitted when show marker state changes
@@ -172,6 +142,32 @@ Q_SIGNALS:
 
     /**
      * \if ENGLISH
+     * @brief Emitted when helper line color changes
+     * @param color New helper line color
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 辅助线颜色改变时发射
+     * @param color 新的辅助线颜色
+     * \endif
+     */
+    void helperLineColorChanged(const QColor& color);
+
+    /**
+     * \if ENGLISH
+     * @brief Emitted when helper line width changes
+     * @param width New helper line width in pixels
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 辅助线宽度改变时发射
+     * @param width 新的辅助线宽度（像素）
+     * \endif
+     */
+    void helperLineWidthChanged(float width);
+
+    /**
+     * \if ENGLISH
      * @brief Emitted when hovered 3D point changes (each frame when hover state changes)
      * @param point New hovered 3D point (NaN if no valid intersection)
      * \endif
@@ -185,16 +181,16 @@ Q_SIGNALS:
 
     /**
      * \if ENGLISH
-     * @brief Emitted when mouse ray changes (each frame when mouse moves over plot)
-     * @param ray New mouse ray from camera through mouse pixel
+     * @brief Emitted when hovered data index changes
+     * @param index Index of the closest data point (-1 if none)
      * \endif
      *
      * \if CHINESE
-     * @brief 鼠标射线改变时发射（每帧鼠标在绘图区域移动时）
-     * @param ray 新的从相机穿过鼠标像素的射线
+     * @brief 悬停数据索引改变时发射
+     * @param index 最近数据点的索引（无时为 -1）
      * \endif
      */
-    void mouseRayChanged(const QImPlot3DRay& ray);
+    void hoveredIndexChanged(int index);
 
     /**
      * \if ENGLISH
@@ -288,6 +284,53 @@ Q_SIGNALS:
     void rightClickedChanged(bool rightClicked);
 
 protected:
+    /**
+     * \if ENGLISH
+     * @brief Override to customize the tooltip content when a data point is hovered
+     * @param index Data point index in the data series (-1 if none)
+     * @param x X coordinate of the closest point (NaN if no valid point)
+     * @param y Y coordinate of the closest point
+     * @param z Z coordinate of the closest point
+     * @param distancePx Screen-space distance from mouse to closest point (pixels)
+     * @param mouseScreenPos Mouse position in screen coordinates
+     * @details Called inside ImGui::BeginTooltip()/EndTooltip() scope when the mouse
+     *          hovers over the plot area. The default implementation shows mouse position,
+     *          point index, coordinates, and distance.
+     *          Override this to customize the tooltip — call ImGui::Text() etc. directly.
+     *
+     * Example custom override:
+     * @code
+     * void MyPicker::renderTooltip(int idx, double x, double y, double z, float d, const ImVec2& mp) override {
+     *     ImGui::Text("Point #%d", idx);
+     *     ImGui::Text("Value: (%.1f, %.1f, %.1f)", x, y, z);
+     * }
+     * @endcode
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 重写此方法以自定义数据点悬停时的 tooltip 内容
+     * @param index 数据系列中的数据点索引（无有效点时为 -1）
+     * @param x 最近点的 X 坐标（无有效点时为 NaN）
+     * @param y 最近点的 Y 坐标
+     * @param z 最近点的 Z 坐标
+     * @param distancePx 鼠标到最近点的屏幕空间距离（像素）
+     * @param mouseScreenPos 鼠标屏幕坐标
+     * @details 当鼠标悬停在绘图区域时，在 ImGui::BeginTooltip()/EndTooltip() 作用域内调用。
+     *          默认实现显示鼠标位置、点索引、坐标和距离。
+     *          重写此方法以自定义 tooltip——直接调用 ImGui::Text() 等。
+     *
+     * 自定义重写示例：
+     * @code
+     * void MyPicker::renderTooltip(int idx, double x, double y, double z, float d, const ImVec2& mp) override {
+     *     ImGui::Text("Point #%d", idx);
+     *     ImGui::Text("Value: (%.1f, %.1f, %.1f)", x, y, z);
+     * }
+     * @endcode
+     * \endif
+     */
+    virtual void renderTooltip(int index, double x, double y, double z,
+                               float distancePx, const ImVec2& mouseScreenPos);
+
     bool beginDraw() override;
 };
 
