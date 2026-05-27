@@ -5,7 +5,7 @@
 #include "implot_internal.h"
 #include <QDebug>
 #include <cmath>
-
+#include "QImOptionalColor.h"
 namespace QIM
 {
 // ImPlotMarker_None   ->   无标记

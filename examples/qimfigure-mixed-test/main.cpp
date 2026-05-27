@@ -5,6 +5,7 @@
 
 #include "QImFigureWidget.h"
 #include "QImGridNode.h"
+#include "implot.h"
 #include "plot/QImPlotNode.h"
 #include "plot/QImPlotScatterItemNode.h"
 #include "plot3d/QImPlot3DNode.h"

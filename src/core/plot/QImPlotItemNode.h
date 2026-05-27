@@ -2,12 +2,9 @@
 #define QIMPLOTITEMNODE_H
 #include "QImAbstractNode.h"
 #include "QImPlot.h"
-#include <optional>
-#include "QImTrackedValue.hpp"
-#include "QtImGuiUtils.h"
 
 struct ImPlotItem;
-struct ImVec4;
+
 
 namespace QIM
 {
@@ -16,21 +13,6 @@ namespace QIM
 // Type alias definitions - simplifies Plot Item color property declarations
 // ============================================================
 
-/**
- * @brief Tracked ImVec4 color value with dirty flag
- * @details Wraps ImVec4 with change detection, used when tracking color
- *          changes and emitting signals.
- */
-using QImTrackedColor = QImTrackedValue<ImVec4, ImVecComparator<ImVec4>>;
-
-/**
- * @brief Optional tracked color value
- * @details Used for Plot Item color properties:
- *          - std::nullopt: user hasn't set a color, use ImPlot default
- *          - has value: user set a color, or captured ImPlot default
- *          Compatible with deferred initialization pattern in beginDraw().
- */
-using QImOptionalColor = std::optional<QImTrackedColor>;
 
 
 class QImPlotNode;

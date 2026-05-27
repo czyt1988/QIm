@@ -5,7 +5,7 @@
 #include "implot3d.h"
 #include "implot3d_internal.h"
 #include <QVector>
-
+#include "QImOptionalColor.h"
 namespace QIM
 {
 
@@ -26,10 +26,10 @@ public:
     int markerShape{ImPlot3DMarker_None};
     float markerSize{4.0f};
     float markerWeight{1.0f};
-    QImOptional3DColor fillColor;
-    QImOptional3DColor lineColor;
-    QImOptional3DColor markerFillColor;
-    QImOptional3DColor markerOutlineColor;
+    QImOptionalColor fillColor;
+    QImOptionalColor lineColor;
+    QImOptionalColor markerFillColor;
+    QImOptionalColor markerOutlineColor;
     float lineWidth{1.0f};
     float fillAlpha{-1.0f};  // IMPLOT3D_AUTO
     // Per-triangle color storage (ImVec4 for SetNextFillStyle/SetNextLineStyle)

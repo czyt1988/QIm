@@ -3,7 +3,7 @@
 #include "implot3d_internal.h"
 #include <QColor>
 #include <memory>
-
+#include "QImOptionalColor.h"
 namespace QIM
 {
 
@@ -41,8 +41,8 @@ public:
     }
 
     std::unique_ptr<QImAbstractXYZDataSeries> dataSeries;      ///< XYZ data series (managed)
-    QImOptional3DColor markerFillColor;                        ///< Marker fill color (nullopt = use ImPlot3D default)
-    QImOptional3DColor markerOutlineColor;                     ///< Marker outline color (nullopt = use ImPlot3D default)
+    QImOptionalColor markerFillColor;                        ///< Marker fill color (nullopt = use ImPlot3D default)
+    QImOptionalColor markerOutlineColor;                     ///< Marker outline color (nullopt = use ImPlot3D default)
     QImTrackedValue<float> markerSize {4.0f};                  ///< Marker size in pixels (actual default, not sentinel)
     QImTrackedValue<float> markerWeight {1.0f};                ///< Marker outline weight in pixels
     int markerShape {ImPlot3DMarker_None};                     ///< Marker shape (ImPlot3DMarker enum, None=0 default)
@@ -257,7 +257,7 @@ bool QImPlot3DScatterItemNode::beginDraw()
     }
 
     // Always call SetNextMarkerStyle to prevent style state bleeding in immediate mode
-    // Use QImOptional3DColor: if set, use captured value; if unset, pass IMPLOT3D_AUTO_COL
+    // Use QImOptionalColor: if set, use captured value; if unset, pass IMPLOT3D_AUTO_COL
     const ImVec4 fill = d->markerFillColor.has_value() ? d->markerFillColor->value() : IMPLOT3D_AUTO_COL;
     const ImVec4 outline = d->markerOutlineColor.has_value() ? d->markerOutlineColor->value() : IMPLOT3D_AUTO_COL;
     ImPlot3D::SetNextMarkerStyle(static_cast<ImPlot3DMarker>(d->markerShape), d->markerSize.value(), fill, d->markerWeight.value(), outline);

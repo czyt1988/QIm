@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <vector>
-
+#include <QSet>
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
 #include "plot/QImPlotLineItemNode.h"

@@ -4,7 +4,7 @@
 #include "implot3d_internal.h"
 #include "QImTrackedValue.hpp"
 #include "QtImGuiUtils.h"
-
+#include "QImOptionalColor.h"
 namespace QIM
 {
 
@@ -15,7 +15,7 @@ public:
     PrivateData(QImPlot3DDummyItemNode* p);
 
     // Style tracking values
-    QImOptional3DColor color;
+    QImOptionalColor color;
 };
 
 QImPlot3DDummyItemNode::PrivateData::PrivateData(QImPlot3DDummyItemNode* p)

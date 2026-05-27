@@ -3,10 +3,9 @@
 #include <optional>
 #include "implot3d.h"
 #include "implot3d_internal.h"
-#include "QImTrackedValue.hpp"
 #include "QtImGuiUtils.h"
 #include <QDebug>
-
+#include "QImOptionalColor.h"
 namespace QIM
 {
 
@@ -22,7 +21,7 @@ public:
     ImPlot3DPoint axisV { 0.0, 1.0, 0.0 };
     ImVec2 uv0 { 0.0f, 0.0f };
     ImVec2 uv1 { 1.0f, 1.0f };
-    QImOptional3DColor tintColor;
+    QImOptionalColor tintColor;
     ImPlot3DImageFlags flags { ImPlot3DImageFlags_None };
 
     bool quadModeEnabled { false };

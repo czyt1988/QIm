@@ -3,10 +3,9 @@
 #include <optional>
 #include "implot.h"
 #include "implot_internal.h"
-#include "QImTrackedValue.hpp"
 #include "QtImGuiUtils.h"
 #include <QDebug>
-
+#include "QImOptionalColor.h"
 namespace QIM
 {
 

@@ -4,10 +4,8 @@
 #include "QImAbstractNode.h"
 #include "QImPlot3D.h"
 #include <optional>
-#include "QImTrackedValue.hpp"
-#include "QtImGuiUtils.h"
-#include "../plot/QImPlotItemNode.h"
 
+struct ImVec4;
 namespace QIM
 {
 
@@ -15,14 +13,6 @@ namespace QIM
 // Type alias definitions - simplifies 3D Plot Item color property declarations
 // ============================================================
 
-/**
- * @brief Optional tracked color value for 3D plot items
- * @details Reuses 2D QImOptionalColor infrastructure (zero-cost alias).
- *          - std::nullopt: user hasn't set a color, use ImPlot3D default
- *          - has value: user set a color, or captured ImPlot3D default
- *          Compatible with deferred initialization pattern in beginDraw().
- */
-using QImOptional3DColor = QImOptionalColor;
 
 class QImPlot3DNode;
 

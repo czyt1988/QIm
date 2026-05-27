@@ -35,17 +35,6 @@ public:
     QImPlot3DPoint hoveredPoint {sNaN, sNaN, sNaN};
     int hoveredIndex {-1};
     bool plotHovered {false};
-    bool clicked {false};
-    bool doubleClicked {false};
-    bool rightClicked {false};
-
-    // Previous frame values for change detection
-    bool prevHovered {false};
-    QImPlot3DPoint prevHoveredPoint {sNaN, sNaN, sNaN};
-    int prevHoveredIndex {-1};
-    bool prevClicked {false};
-    bool prevDoubleClicked {false};
-    bool prevRightClicked {false};
 };
 
 QImPlot3DMousePickerNode::PrivateData::PrivateData(QImPlot3DMousePickerNode* q)
@@ -139,353 +128,124 @@ QImAbstractXYZDataSeries* QImPlot3DMousePickerNode::data() const
 // Visual
 //----------------------------------------------------
 
-/**
- * \if ENGLISH
- * @brief Checks if hover marker is visible
- * @return true if marker rendering is enabled
- * \endif
- *
- * \if CHINESE
- * @brief 检查悬停标记是否可见
- * @return 如果标记渲染启用则返回 true
- * \endif
- */
 bool QImPlot3DMousePickerNode::isShowMarker() const
 {
     QIM_DC(d);
     return d->showMarker;
 }
 
-/**
- * \if ENGLISH
- * @brief Sets hover marker visibility
- * @param show New marker visibility state
- * \endif
- *
- * \if CHINESE
- * @brief 设置悬停标记可见性
- * @param show 新的标记可见状态
- * \endif
- */
 void QImPlot3DMousePickerNode::setShowMarker(bool show)
 {
     QIM_D(d);
-    if (d->showMarker != show) {
-        d->showMarker = show;
-        Q_EMIT showMarkerChanged(show);
-    }
+    d->showMarker = show;
 }
 
-/**
- * \if ENGLISH
- * @brief Checks if coordinate text is visible
- * @return true if coordinate text rendering is enabled
- * \endif
- *
- * \if CHINESE
- * @brief 检查坐标文本是否可见
- * @return 如果坐标文本渲染启用则返回 true
- * \endif
- */
 bool QImPlot3DMousePickerNode::isShowCoordinatesText() const
 {
     QIM_DC(d);
     return d->showCoordinatesText;
 }
 
-/**
- * \if ENGLISH
- * @brief Sets coordinate text visibility
- * @param show New coordinate text visibility state
- * \endif
- *
- * \if CHINESE
- * @brief 设置坐标文本可见性
- * @param show 新的坐标文本可见状态
- * \endif
- */
 void QImPlot3DMousePickerNode::setShowCoordinatesText(bool show)
 {
     QIM_D(d);
-    if (d->showCoordinatesText != show) {
-        d->showCoordinatesText = show;
-        Q_EMIT showCoordinatesTextChanged(show);
-    }
+    d->showCoordinatesText = show;
 }
 
-/**
- * \if ENGLISH
- * @brief Gets the marker color
- * @return Current marker color as QColor
- * \endif
- *
- * \if CHINESE
- * @brief 获取标记颜色
- * @return 当前标记颜色（QColor）
- * \endif
- */
 QColor QImPlot3DMousePickerNode::markerColor() const
 {
     QIM_DC(d);
     return toQColor(d->markerColorImV4);
 }
 
-/**
- * \if ENGLISH
- * @brief Sets the marker color
- * @param color New marker color (converted to ImVec4 in setter for beginDraw efficiency)
- * \endif
- *
- * \if CHINESE
- * @brief 设置标记颜色
- * @param color 新的标记颜色（在 setter 中转换为 ImVec4 以提高 beginDraw 效率）
- * \endif
- */
 void QImPlot3DMousePickerNode::setMarkerColor(const QColor& color)
 {
     QIM_D(d);
     d->markerColorImV4 = toImVec4(color);
-    Q_EMIT markerColorChanged(color);
 }
 
-/**
- * \if ENGLISH
- * @brief Gets the marker size in pixels
- * @return Current marker size
- * \endif
- *
- * \if CHINESE
- * @brief 获取标记大小（像素）
- * @return 当前标记大小
- * \endif
- */
 float QImPlot3DMousePickerNode::markerSize() const
 {
     QIM_DC(d);
     return d->markerSize;
 }
 
-/**
- * \if ENGLISH
- * @brief Sets the marker size in pixels
- * @param size New marker size
- * \endif
- *
- * \if CHINESE
- * @brief 设置标记大小（像素）
- * @param size 新的标记大小
- * \endif
- */
 void QImPlot3DMousePickerNode::setMarkerSize(float size)
 {
     QIM_D(d);
-    if (d->markerSize != size) {
-        d->markerSize = size;
-        Q_EMIT markerSizeChanged(size);
-    }
+    d->markerSize = size;
 }
 
 //----------------------------------------------------
 // Helper line
 //----------------------------------------------------
 
-/**
- * \if ENGLISH
- * @brief Gets the helper line color
- * @return Current helper line color as QColor
- * \endif
- *
- * \if CHINESE
- * @brief 获取辅助线颜色
- * @return 当前辅助线颜色（QColor）
- * \endif
- */
 QColor QImPlot3DMousePickerNode::helperLineColor() const
 {
     QIM_DC(d);
     return toQColor(d->helperLineColorImV4);
 }
 
-/**
- * \if ENGLISH
- * @brief Sets the helper line color
- * @param color New helper line color (converted to ImVec4 in setter for beginDraw efficiency)
- * \endif
- *
- * \if CHINESE
- * @brief 设置辅助线颜色
- * @param color 新的辅助线颜色（在 setter 中转换为 ImVec4 以提高 beginDraw 效率）
- * \endif
- */
 void QImPlot3DMousePickerNode::setHelperLineColor(const QColor& color)
 {
     QIM_D(d);
     d->helperLineColorImV4 = toImVec4(color);
-    Q_EMIT helperLineColorChanged(color);
 }
 
-/**
- * \if ENGLISH
- * @brief Gets the helper line width in pixels
- * @return Current helper line width
- * \endif
- *
- * \if CHINESE
- * @brief 获取辅助线宽度（像素）
- * @return 当前辅助线宽度
- * \endif
- */
 float QImPlot3DMousePickerNode::helperLineWidth() const
 {
     QIM_DC(d);
     return d->helperLineWidth;
 }
 
-/**
- * \if ENGLISH
- * @brief Sets the helper line width in pixels
- * @param width New helper line width
- * \endif
- *
- * \if CHINESE
- * @brief 设置辅助线宽度（像素）
- * @param width 新的辅助线宽度
- * \endif
- */
 void QImPlot3DMousePickerNode::setHelperLineWidth(float width)
 {
     QIM_D(d);
-    if (d->helperLineWidth != width) {
-        d->helperLineWidth = width;
-        Q_EMIT helperLineWidthChanged(width);
-    }
+    d->helperLineWidth = width;
 }
 
 //----------------------------------------------------
 // Read-only state
 //----------------------------------------------------
 
-/**
- * \if ENGLISH
- * @brief Gets the hovered 3D point
- * @return Current hovered point (NaN components if no valid data point nearby)
- * \endif
- *
- * \if CHINESE
- * @brief 获取悬停的三维点
- * @return 当前悬停点（附近无有效数据点时分量为 NaN）
- * \endif
- */
 QImPlot3DPoint QImPlot3DMousePickerNode::hoveredPoint() const
 {
     QIM_DC(d);
     return d->hoveredPoint;
 }
 
-/**
- * \if ENGLISH
- * @brief Gets the index of the closest data point
- * @return Index in the data series (-1 if none)
- * \endif
- *
- * \if CHINESE
- * @brief 获取最近数据点的索引
- * @return 数据系列中的索引（无时为 -1）
- * \endif
- */
 int QImPlot3DMousePickerNode::hoveredIndex() const
 {
     QIM_DC(d);
     return d->hoveredIndex;
 }
 
-/**
- * \if ENGLISH
- * @brief Checks if the mouse is hovering over the plot area
- * @return true if mouse is within the plot bounds
- * \endif
- *
- * \if CHINESE
- * @brief 检查鼠标是否悬停在绘图区域上方
- * @return 如果鼠标在绘图边界内则返回 true
- * \endif
- */
 bool QImPlot3DMousePickerNode::isPlotHovered() const
 {
     QIM_DC(d);
     return d->plotHovered;
 }
 
-/**
- * \if ENGLISH
- * @brief Checks if left mouse button was clicked this frame
- * @return true on the frame a left click occurred on a valid point
- * \endif
- *
- * \if CHINESE
- * @brief 检查当前帧是否发生左键点击
- * @return 在有效点上发生左键点击的帧返回 true
- * \endif
- */
-bool QImPlot3DMousePickerNode::isClicked() const
-{
-    QIM_DC(d);
-    return d->clicked;
-}
-
-/**
- * \if ENGLISH
- * @brief Checks if left mouse button was double-clicked this frame
- * @return true on the frame a double-click occurred on a valid point
- * \endif
- *
- * \if CHINESE
- * @brief 检查当前帧是否发生左键双击
- * @return 在有效点上发生左键双击的帧返回 true
- * \endif
- */
-bool QImPlot3DMousePickerNode::isDoubleClicked() const
-{
-    QIM_DC(d);
-    return d->doubleClicked;
-}
-
-/**
- * \if ENGLISH
- * @brief Checks if right mouse button was clicked this frame
- * @return true on the frame a right click occurred on a valid point
- * \endif
- *
- * \if CHINESE
- * @brief 检查当前帧是否发生右键点击
- * @return 在有效点上发生右键点击的帧返回 true
- * \endif
- */
-bool QImPlot3DMousePickerNode::isRightClicked() const
-{
-    QIM_DC(d);
-    return d->rightClicked;
-}
-
-//----------------------------------------------------
-// Convenience
-//----------------------------------------------------
-
-/**
- * \if ENGLISH
- * @brief Checks if the hovered point is valid (not NaN)
- * @return true if hoveredPoint has non-NaN coordinates
- * \endif
- *
- * \if CHINESE
- * @brief 检查悬停点是否有效（非 NaN）
- * @return 如果 hoveredPoint 的坐标非 NaN 则返回 true
- * \endif
- */
 bool QImPlot3DMousePickerNode::hasValidHoveredPoint() const
 {
     QIM_DC(d);
     return !d->hoveredPoint.IsNaN();
+}
+
+//----------------------------------------------------
+// Helper: ImGuiMouseButton → Qt::MouseButton
+//----------------------------------------------------
+
+namespace {
+    Qt::MouseButton toQtMouseButton(int imguiButton)
+    {
+        switch (imguiButton) {
+        case ImGuiMouseButton_Left:   return Qt::LeftButton;
+        case ImGuiMouseButton_Right:  return Qt::RightButton;
+        case ImGuiMouseButton_Middle: return Qt::MiddleButton;
+        default:                      return Qt::NoButton;
+        }
+    }
 }
 
 //----------------------------------------------------
@@ -504,10 +264,11 @@ bool QImPlot3DMousePickerNode::hasValidHoveredPoint() const
  *          5. Find closest point, draw helper line via ImPlot3D::GetPlotDrawList
  *          6. Draw marker at closest point (draw list circle)
  *          7. Draw coordinate text via ImPlot3D::PlotText
- *          8. Show tooltip with point info
- *          9. Detect click/double-click/right-click + emit signals
+ *          8. Show tooltip via virtual renderTooltip()
+ *          9. Detect clicks + emit picked/doubleClicked with button enum
  *
  *          Pattern follows DemoCustomOverlay from implot3d_demo.cpp.
+ *          No per-frame state-change signals — only event signals on clicks.
  * \endif
  *
  * \if CHINESE
@@ -521,10 +282,11 @@ bool QImPlot3DMousePickerNode::hasValidHoveredPoint() const
  *          5. 找到最近点，通过 ImPlot3D::GetPlotDrawList 画辅助线
  *          6. 在最近点画标记（draw list 圆圈）
  *          7. 通过 ImPlot3D::PlotText 画坐标文本
- *          8. 显示 tooltip 含点信息
- *          9. 检测点击/双击/右击 + 发射信号
+ *          8. 通过虚函数 renderTooltip() 显示 tooltip
+ *          9. 检测点击 + 用按钮枚举发射 picked/doubleClicked
  *
  *          模式参考 implot3d_demo.cpp 中的 DemoCustomOverlay。
+ *          无每帧状态变化信号——仅在点击时发射事件信号。
  * \endif
  */
 bool QImPlot3DMousePickerNode::beginDraw()
@@ -543,10 +305,6 @@ bool QImPlot3DMousePickerNode::beginDraw()
                       mouseScreenPos.y >= plotPos.y && mouseScreenPos.y <= plotPos.y + plotSize.y);
 
     d->plotHovered = isHovered;
-    if (d->plotHovered != d->prevHovered) {
-        Q_EMIT plotHoveredChanged(d->plotHovered);
-    }
-    d->prevHovered = d->plotHovered;
 
     // 3. Find closest data point to mouse in screen space
     int closestIndex = -1;
@@ -602,52 +360,38 @@ bool QImPlot3DMousePickerNode::beginDraw()
 
             // 7. Show tooltip
             ImGui::BeginTooltip();
-            renderTooltip(closestIndex, closestX, closestY, closestZ, closestDist, mouseScreenPos);
+            renderTooltip(closestIndex, closestX, closestY, closestZ, closestDist, mouseScreenPos.x,mouseScreenPos.y);
             ImGui::EndTooltip();
         }
     }
 
-    // 8. Update hovered point and emit signals
-    QImPlot3DPoint newHoveredPoint = (closestIndex >= 0)
+    // 8. Cache hovered state for getter access
+    d->hoveredPoint = (closestIndex >= 0)
         ? QImPlot3DPoint(closestX, closestY, closestZ)
         : QImPlot3DPoint(d->sNaN, d->sNaN, d->sNaN);
-
-    bool pointChanged = !fuzzyEqual(newHoveredPoint, d->prevHoveredPoint);
-    d->hoveredPoint = newHoveredPoint;
     d->hoveredIndex = closestIndex;
 
-    if (pointChanged) {
-        Q_EMIT hoveredPointChanged(newHoveredPoint);
-    }
-    if (closestIndex != d->prevHoveredIndex) {
-        Q_EMIT hoveredIndexChanged(closestIndex);
-    }
-    d->prevHoveredPoint = newHoveredPoint;
-    d->prevHoveredIndex = closestIndex;
-
-    // 9. Detect mouse clicks
+    // 9. Detect mouse clicks — emit event signals only on click frames
     bool pointValid = (closestIndex >= 0);
-    bool click = isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && pointValid;
-    bool dblClick = isHovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && pointValid;
-    bool rClick = isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right) && pointValid;
+    if (isHovered && pointValid) {
+        const QImPlot3DPoint pt(closestX, closestY, closestZ);
 
-    d->clicked = click;
-    d->doubleClicked = dblClick;
-    d->rightClicked = rClick;
+        // Single-click: check all mouse buttons
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+            Q_EMIT picked(Qt::LeftButton, pt);
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+            Q_EMIT picked(Qt::RightButton, pt);
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+            Q_EMIT picked(Qt::MiddleButton, pt);
 
-    if (click) {
-        Q_EMIT clicked(newHoveredPoint);
+        // Double-click: check all mouse buttons
+        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+            Q_EMIT doubleClicked(Qt::LeftButton, pt);
+        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Right))
+            Q_EMIT doubleClicked(Qt::RightButton, pt);
+        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Middle))
+            Q_EMIT doubleClicked(Qt::MiddleButton, pt);
     }
-    if (dblClick) {
-        Q_EMIT doubleClicked(newHoveredPoint);
-    }
-    if (rClick) {
-        Q_EMIT rightClicked(newHoveredPoint);
-    }
-
-    if (click != d->prevClicked) { Q_EMIT clickedChanged(click); d->prevClicked = click; }
-    if (dblClick != d->prevDoubleClicked) { Q_EMIT doubleClickedChanged(dblClick); d->prevDoubleClicked = dblClick; }
-    if (rClick != d->prevRightClicked) { Q_EMIT rightClickedChanged(rClick); d->prevRightClicked = rClick; }
 
     return false;
 }
@@ -664,9 +408,9 @@ bool QImPlot3DMousePickerNode::beginDraw()
  * \endif
  */
 void QImPlot3DMousePickerNode::renderTooltip(int index, double x, double y, double z,
-                                              float distancePx, const ImVec2& mouseScreenPos)
+                                              float distancePx, float mouseScreenPosX, float mouseScreenPosY)
 {
-    ImGui::Text("Mouse: (%.1f, %.1f)", mouseScreenPos.x, mouseScreenPos.y);
+    ImGui::Text("Mouse: (%.1f, %.1f)", mouseScreenPosX, mouseScreenPosY);
 
     if (index >= 0) {
         ImGui::Text("Point #%d: (%.3f, %.3f, %.3f)", index, x, y, z);

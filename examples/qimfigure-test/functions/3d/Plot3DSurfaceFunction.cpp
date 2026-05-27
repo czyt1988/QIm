@@ -4,7 +4,7 @@
 #include "plot3d/QImPlot3DAxisInfo.h"
 #include "plot3d/QImPlot3DSurfaceItemNode.h"
 #include "plot3d/QImPlot3DDataSeries.h"
-
+#include "implot3d.h"
 #include <QVector>
 #include <cmath>
 

@@ -8,7 +8,7 @@
 #include "implot3d.h"
 #include "implot3d_internal.h"
 #include "QtImGuiUtils.h"
-
+#include "QImOptionalColor.h"
 namespace QIM
 {
 
@@ -25,7 +25,7 @@ public:
     double angleRad { 0.0 };               ///< Rotation angle in radians (internally stored)
     double pixelOffsetX { 0.0 };           ///< Pixel offset X
     double pixelOffsetY { 0.0 };           ///< Pixel offset Y
-    QImOptional3DColor color;              ///< Text color (lazy capture)
+    QImOptionalColor color;              ///< Text color (lazy capture)
 };
 
 QImPlot3DTextItemNode::PrivateData::PrivateData(QImPlot3DTextItemNode* p) : q_ptr(p)

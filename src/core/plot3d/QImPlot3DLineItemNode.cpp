@@ -2,7 +2,7 @@
 #include <QColor>
 #include "implot3d.h"
 #include "implot3d_internal.h"
-
+#include "QImOptionalColor.h"
 namespace QIM
 {
 
@@ -15,7 +15,7 @@ public:
 
 public:
     std::unique_ptr<QImAbstractXYZDataSeries> dataSeries;            ///< XYZ data series
-    QImOptional3DColor color;                                         ///< 颜色（延迟初始化：首次渲染时捕获ImPlot3D默认颜色）
+    QImOptionalColor color;                                         ///< 颜色（延迟初始化：首次渲染时捕获ImPlot3D默认颜色）
     QImTrackedValue< float > lineWeight { 1.0f };                    ///< 线宽
     ImPlot3DLineFlags flags { ImPlot3DLineFlags_None };              ///< Line flags (must be named 'flags' for macros)
 };
