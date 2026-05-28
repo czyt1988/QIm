@@ -102,8 +102,20 @@ void QImPlotValueTrackerNode::PrivateData::processBarGroupsTracking(QImPlotBarGr
     int nearestItem   = static_cast< int >(std::round(mouseCoord - shift));
     nearestItem       = qBound(0, nearestItem, itemCount - 1);
 
-    // Get labels
-    QStringList itemLabels = series->labels();
+    // Get labels with axis tick priority over series labels
+    QStringList primaryLabels;
+    const QImPlotAxisInfo* relevantAxis = horizontal
+        ? plotNode->y1Axis()
+        : plotNode->x1Axis();
+    if (relevantAxis && !relevantAxis->tickLabels().isEmpty()) {
+        QList<QByteArray> tickLabels = relevantAxis->tickLabels();
+        for (const auto& tl : tickLabels) {
+            primaryLabels << QString::fromUtf8(tl);
+        }
+    }
+    if (primaryLabels.isEmpty()) {
+        primaryLabels = series->labels();
+    }
 
     // Build group labels as "Group 0", "Group 1", ...
     QStringList groupLabels;
@@ -117,15 +129,11 @@ void QImPlotValueTrackerNode::PrivateData::processBarGroupsTracking(QImPlotBarGr
             continue;
         }
 
-        QColor color = barItem->color();
-        if (!color.isValid()) {
-            ImVec4 c = ImPlot::GetColormapColor(g);
-            color    = toQColor(c);
-        }
+        QColor color = toQColor(ImPlot::GetColormapColor(g));
 
         TrackedValue tv;
         tv.sourceType = SourceType::BarGroups;
-        tv.label      = QStringLiteral("%1 [%2]").arg(itemLabels.value(nearestItem), groupLabels.value(g)).toStdString();
+        tv.label      = QStringLiteral("%1 [%2]").arg(primaryLabels.value(nearestItem), groupLabels.value(g)).toStdString();
         tv.color      = color;
         tv.xValue     = nearestItem;
         tv.yValue     = val;
