@@ -16,6 +16,9 @@ class TestPlot3DSurfaceMesh : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
+    void cleanupTestCase();
+
     // Surface tests
     void testSurfaceConstruction();
     void testSurfaceFillVisible();
@@ -44,6 +47,14 @@ private Q_SLOTS:
     void testQuadFillVisible();
     void testQuadFlagSignalDedup();
 };
+
+void TestPlot3DSurfaceMesh::initTestCase()
+{
+}
+
+void TestPlot3DSurfaceMesh::cleanupTestCase()
+{
+}
 
 // ============================================================================
 // Surface Tests

@@ -253,3 +253,25 @@ target_include_directories(tst_qimplot_tracker_selection PRIVATE
     ${CMAKE_SOURCE_DIR}/src/core/plot
 )
 add_test(NAME tst_qimplot_tracker_selection COMMAND tst_qimplot_tracker_selection)
+
+# Test 24: Plot Legend Node
+add_executable(tst_qimplotlegendnode tst_qimplotlegendnode.cpp)
+target_link_libraries(tst_qimplotlegendnode PRIVATE
+    Qt${QT_VERSION_MAJOR}::Test
+    QIm::Core
+)
+target_include_directories(tst_qimplotlegendnode PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/core/plot
+)
+add_test(NAME tst_qimplotlegendnode COMMAND tst_qimplotlegendnode)
+
+# Test 24: Plot Line Item Node
+add_executable(tst_qimplotlineitemnode tst_qimplotlineitemnode.cpp)
+target_link_libraries(tst_qimplotlineitemnode PRIVATE
+    Qt${QT_VERSION_MAJOR}::Test
+    QIm::Core
+)
+target_include_directories(tst_qimplotlineitemnode PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/core/plot
+)
+add_test(NAME tst_qimplotlineitemnode COMMAND tst_qimplotlineitemnode)

@@ -15,6 +15,9 @@ class TestDragTools : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
+    void cleanupTestCase();
+
     // --- QImPlotDragPointNode ---
     void pointDefaultConstruction();
     void pointPositionGetterSetter();
@@ -36,6 +39,14 @@ private Q_SLOTS:
     void lineYValueSignalDedup();
     void lineYColorGetterSetter();
 };
+
+void TestDragTools::initTestCase()
+{
+}
+
+void TestDragTools::cleanupTestCase()
+{
+}
 
 // ============================================================================
 // QImPlotDragPointNode

@@ -13,6 +13,9 @@ class TestTrackerSelection : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
+    void cleanupTestCase();
+
     // --- Section 1: QImPlotValueTrackerNode (smoke) ---
     void valueTracker_construction();
     void valueTracker_parentChild();
@@ -37,6 +40,14 @@ private Q_SLOTS:
     void selection_autoCancelSignal();
     void selection_autoCancelSignalDedup();
 };
+
+void TestTrackerSelection::initTestCase()
+{
+}
+
+void TestTrackerSelection::cleanupTestCase()
+{
+}
 
 // ============================================================================
 // Section 1: QImPlotValueTrackerNode (smoke tests — zero Q_PROPERTYs)

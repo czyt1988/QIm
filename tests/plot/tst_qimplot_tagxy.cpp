@@ -16,6 +16,9 @@ class TestTagX : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
+    void cleanupTestCase();
+
     void testDefaultConstruction();
     void testValueGetterSetter();
     void testValueChangedSignal();
@@ -28,6 +31,14 @@ private Q_SLOTS:
     void testRoundChangedSignal();
     void testType();
 };
+
+void TestTagX::initTestCase()
+{
+}
+
+void TestTagX::cleanupTestCase()
+{
+}
 
 void TestTagX::testDefaultConstruction()
 {
@@ -178,6 +189,9 @@ class TestTagY : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
+    void cleanupTestCase();
+
     void testDefaultConstruction();
     void testValueGetterSetter();
     void testValueChangedSignal();
@@ -190,6 +204,14 @@ private Q_SLOTS:
     void testRoundChangedSignal();
     void testType();
 };
+
+void TestTagY::initTestCase()
+{
+}
+
+void TestTagY::cleanupTestCase()
+{
+}
 
 void TestTagY::testDefaultConstruction()
 {
