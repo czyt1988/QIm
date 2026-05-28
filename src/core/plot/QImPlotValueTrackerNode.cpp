@@ -5,11 +5,7 @@
 #include "QImPlotValueTrackerNode.h"
 #include <algorithm>
 #include <cmath>
-#include <limits>
 #include <QtGlobal>
-#include <QPainter>
-#include <QStyleOption>
-#include <QDebug>
 #include "implot.h"
 #include "implot_internal.h"
 #include "imgui.h"
@@ -24,6 +20,12 @@
 #include "QImPlotAxisInfo.h"
 namespace QIM
 {
+
+namespace {
+constexpr double kPieCenterEpsilon  = 0.001;   // Threshold for atan2(0,0) guard at pie center
+constexpr float  kTooltipOffsetPx   = 10.0f;   // Horizontal offset between cursor and tooltip
+constexpr int    kTrackerZOrder      = 99999;   // Z-order to render tracker above all items
+} // anonymous namespace
 
 class QImPlotValueTrackerNode::PrivateData
 {
@@ -175,7 +177,7 @@ void QImPlotValueTrackerNode::PrivateData::processPieChartTracking(QImPlotPieCha
     double dist = std::sqrt(dx * dx + dy * dy);
 
     // Outside the pie radius or at the exact center (atan2 undefined)
-    if (dist > radius || dist < 0.001) {
+    if (dist > radius || dist < kPieCenterEpsilon) {
         return;
     }
 
@@ -403,11 +405,8 @@ QImPlotValueTrackerNode::QImPlotValueTrackerNode(QImPlotNode* plotNode, QObject*
     QIM_D(d);
     d->plotNode = plotNode;
     setObjectName(QStringLiteral("QImPlotValueTrackerNode"));
-    setZOrder(99999);  // 确保绘制在最上层
+    setZOrder(kTrackerZOrder);  // 确保绘制在最上层
     setAutoIdEnabled(true);
-
-    if (plotNode) {
-    }
 }
 
 /**
@@ -666,11 +665,11 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
     float tooltipHeight = contentHeight + 2 * d->tooltipPadding + 2.0f;
 
     // === 3. 智能定位tooltip（避免超出屏幕）===
-    float tooltipX = mouseScreenPos.x() + 10;
+    float tooltipX = mouseScreenPos.x() + kTooltipOffsetPx;
     float tooltipY = mouseScreenPos.y();
 
     if (tooltipX + tooltipWidth > screenSize.x) {
-        tooltipX = (mouseScreenPos.x() > tooltipWidth + 10) ? mouseScreenPos.x() - tooltipWidth - 10 : d->tooltipPadding;
+        tooltipX = (mouseScreenPos.x() > tooltipWidth + kTooltipOffsetPx) ? mouseScreenPos.x() - tooltipWidth - kTooltipOffsetPx : d->tooltipPadding;
     }
     if (tooltipY + tooltipHeight > screenSize.y) {
         tooltipY = screenSize.y - tooltipHeight - d->tooltipPadding;
