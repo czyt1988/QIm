@@ -155,3 +155,36 @@ target_include_directories(tst_subplots3d_node PRIVATE
     ${CMAKE_SOURCE_DIR}/src/core/plot3d
 )
 add_test(NAME tst_subplots3d_node COMMAND tst_subplots3d_node)
+
+# Test 17: Plot3D Line + Scatter
+add_executable(tst_qimplot3d_line_scatter tst_qimplot3d_line_scatter.cpp)
+target_link_libraries(tst_qimplot3d_line_scatter PRIVATE
+    Qt${QT_VERSION_MAJOR}::Test
+    QIm::Core
+)
+target_include_directories(tst_qimplot3d_line_scatter PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/core/plot3d
+)
+add_test(NAME tst_qimplot3d_line_scatter COMMAND tst_qimplot3d_line_scatter)
+
+# Test 18: Plot3D Surface + Mesh
+add_executable(tst_qimplot3d_surface_mesh tst_qimplot3d_surface_mesh.cpp)
+target_link_libraries(tst_qimplot3d_surface_mesh PRIVATE
+    Qt${QT_VERSION_MAJOR}::Test
+    QIm::Core
+)
+target_include_directories(tst_qimplot3d_surface_mesh PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/core/plot3d
+)
+add_test(NAME tst_qimplot3d_surface_mesh COMMAND tst_qimplot3d_surface_mesh)
+
+# Test 19: Plot3D Image + Text
+add_executable(tst_qimplot3d_image_text tst_qimplot3d_image_text.cpp)
+target_link_libraries(tst_qimplot3d_image_text PRIVATE
+    Qt${QT_VERSION_MAJOR}::Test
+    QIm::Core
+)
+target_include_directories(tst_qimplot3d_image_text PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/core/plot3d
+)
+add_test(NAME tst_qimplot3d_image_text COMMAND tst_qimplot3d_image_text)
