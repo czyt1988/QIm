@@ -30,17 +30,9 @@ class QImPlotValueTrackerNode::PrivateData
     QIM_DECLARE_PUBLIC(QImPlotValueTrackerNode)
 public:
     PrivateData(QImPlotValueTrackerNode* p);
-    void updateSupportSeries(QImPlotNode* plot);
-    bool tryAddSeries(QImAbstractNode* n);
-    bool tryRemoveSeries(QImAbstractNode* n);
-    void clear();
 
     std::vector< TrackedValue > trackedValues;
     QImPlotNode* plotNode { nullptr };                ///< 绘图节点
-    QList< QImAbstractXYDataSeries* > supportSeries;  ///< 记录支持的序列
-    QList< QImPlotBarGroupsItemNode* > barGroupsNodes;  ///< 分组柱状图节点
-    QList< QImPlotPieChartItemNode* > pieChartNodes;    ///< 饼图节点
-    int maxVisiblePieSlices { 10 };                     ///< 饼图最多显示扇区数
     bool isActive { false };                          ///< 是否激活
     bool lastActiveState { false };  ///< 记录上次激活状态,这个是用于识别首次active状态变化的辅助变量
     bool skipNanFiniteValues { false };  ///< 是否跳过nan
@@ -71,121 +63,6 @@ public:
 
 QImPlotValueTrackerNode::PrivateData::PrivateData(QImPlotValueTrackerNode* p) : q_ptr(p)
 {
-}
-
-/**
- * \if ENGLISH
- * @brief Clears all tracked data and node registrations
- * \endif
- *
- * \if CHINESE
- * @brief 清除所有追踪数据和节点注册
- * \endif
- */
-void QImPlotValueTrackerNode::PrivateData::clear()
-{
-    trackedValues.clear();
-    supportSeries.clear();
-    barGroupsNodes.clear();
-    pieChartNodes.clear();
-}
-
-/**
- * \if ENGLISH
- * @brief Clears and rebuilds the support series list from plot item nodes
- * @param[in] plot The plot node whose item nodes to scan
- * @details Iterates all child plot item nodes in the plot, extracting their
- *          data series via tryAddSeries().
- * \endif
- *
- * \if CHINESE
- * @brief 清除并重建支持序列列表
- * @param[in] plot 要扫描的绘图节点
- * @details 遍历绘图中的所有子绘图项目节点，通过tryAddSeries()提取其数据序列。
- * \endif
- */
-void QImPlotValueTrackerNode::PrivateData::updateSupportSeries(QImPlotNode* plot)
-{
-    supportSeries.clear();
-    barGroupsNodes.clear();
-    pieChartNodes.clear();
-    const auto items = plot->plotItemNodes();
-    for (QImAbstractNode* n : items) {
-        tryAddSeries(n);
-    }
-}
-
-/**
- * \if ENGLISH
- * @brief Attempts to add a data series from a child node
- * @param[in] n The node to extract a data series from
- * @return true if a series was successfully added, false otherwise
- * @details Checks if the node is a QImAbstractXYSeriesItemNode, QImPlotBarGroupsItemNode,
- *          or QImPlotPieChartItemNode and registers it accordingly.
- * \endif
- *
- * \if CHINESE
- * @brief 尝试添加子节点的数据序列
- * @param[in] n 要提取数据序列的节点
- * @return 成功添加序列返回true，否则返回false
- * @details 检查节点是否为QImAbstractXYSeriesItemNode、QImPlotBarGroupsItemNode
- *          或QImPlotPieChartItemNode并进行相应注册。
- * \endif
- */
-bool QImPlotValueTrackerNode::PrivateData::tryAddSeries(QImAbstractNode* n)
-{
-    if (auto* xyItem = qobject_cast< QImAbstractXYSeriesItemNode* >(n)) {
-        if (auto* series = xyItem->data()) {
-            supportSeries.push_back(series);
-            return true;
-        }
-    }
-    if (auto* barItem = qobject_cast< QImPlotBarGroupsItemNode* >(n)) {
-        if (barItem->data()) {
-            barGroupsNodes.push_back(barItem);
-            return true;
-        }
-    }
-    if (auto* pieItem = qobject_cast< QImPlotPieChartItemNode* >(n)) {
-        if (pieItem->data()) {
-            pieChartNodes.push_back(pieItem);
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * \if ENGLISH
- * @brief Attempts to remove a data series associated with a child node
- * @param[in] n The node whose data series to remove
- * @return true if a series was successfully removed, false otherwise
- * @details Checks if the node is a QImAbstractXYSeriesItemNode, QImPlotBarGroupsItemNode,
- *          or QImPlotPieChartItemNode and unregisters it accordingly.
- * \endif
- *
- * \if CHINESE
- * @brief 尝试移除子节点关联的数据序列
- * @param[in] n 要移除数据序列的节点
- * @return 成功移除序列返回true，否则返回false
- * @details 检查节点是否为QImAbstractXYSeriesItemNode、QImPlotBarGroupsItemNode
- *          或QImPlotPieChartItemNode并进行相应注销。
- * \endif
- */
-bool QImPlotValueTrackerNode::PrivateData::tryRemoveSeries(QImAbstractNode* n)
-{
-    if (auto* xyItem = qobject_cast< QImAbstractXYSeriesItemNode* >(n)) {
-        if (auto* series = xyItem->data()) {
-            return (supportSeries.removeAll(series) > 0);
-        }
-    }
-    if (auto* barItem = qobject_cast< QImPlotBarGroupsItemNode* >(n)) {
-        return (barGroupsNodes.removeAll(barItem) > 0);
-    }
-    if (auto* pieItem = qobject_cast< QImPlotPieChartItemNode* >(n)) {
-        return (pieChartNodes.removeAll(pieItem) > 0);
-    }
-    return false;
 }
 
 /**
@@ -530,9 +407,6 @@ QImPlotValueTrackerNode::QImPlotValueTrackerNode(QImPlotNode* plotNode, QObject*
     setAutoIdEnabled(true);
 
     if (plotNode) {
-        connect(plotNode, &QImPlotNode::childNodeAdded, this, &QImPlotValueTrackerNode::onChildNodeAdded);
-        connect(plotNode, &QImPlotNode::childNodeRemoved, this, &QImPlotValueTrackerNode::onChildNodeRemoved);
-        d->updateSupportSeries(plotNode);
     }
 }
 
@@ -614,44 +488,6 @@ QImPlotValueTrackerNodeGroup* QImPlotValueTrackerNode::group() const
 {
     QIM_DC(d);
     return d->group;
-}
-
-/**
- * \if ENGLISH
- * @brief Slot invoked when a child node is added to the plot
- * @param[in] n The newly added child node
- * @details Attempts to register the node's data series via tryAddSeries().
- * \endif
- *
- * \if CHINESE
- * @brief 子节点添加到绘图时触发的槽函数
- * @param[in] n 新添加的子节点
- * @details 通过tryAddSeries()尝试注册该节点的数据序列。
- * \endif
- */
-void QImPlotValueTrackerNode::onChildNodeAdded(QImAbstractNode* n)
-{
-    QIM_D(d);
-    d->tryAddSeries(n);
-}
-
-/**
- * \if ENGLISH
- * @brief Slot invoked when a child node is removed from the plot
- * @param[in] n The removed child node
- * @details Attempts to unregister the node's data series via tryRemoveSeries().
- * \endif
- *
- * \if CHINESE
- * @brief 子节点从绘图移除时触发的槽函数
- * @param[in] n 被移除的子节点
- * @details 通过tryRemoveSeries()尝试注销该节点的数据序列。
- * \endif
- */
-void QImPlotValueTrackerNode::onChildNodeRemoved(QImAbstractNode* n)
-{
-    QIM_D(d);
-    d->tryRemoveSeries(n);
 }
 
 /**

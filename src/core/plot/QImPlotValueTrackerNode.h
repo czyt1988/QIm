@@ -106,10 +106,6 @@ Q_SIGNALS:
 protected:
     bool beginDraw() override;
     virtual void renderTooltip(const std::vector< TrackedValue >& values, const QPointF& mouseScreenPos);
-private Q_SLOTS:
-    void onChildNodeAdded(QIM::QImAbstractNode* n);
-    void onChildNodeRemoved(QIM::QImAbstractNode* n);
-
 };
 }
 
