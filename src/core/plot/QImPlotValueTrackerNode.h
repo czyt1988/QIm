@@ -2,6 +2,8 @@
 #define QIMPLOTVALUETRACKERNODE_H
 #include "QImAbstractNode.h"
 #include <QColor>
+#include <string>
+#include <vector>
 namespace QIM
 {
 class QImPlotNode;
@@ -35,13 +37,21 @@ class QIM_CORE_API QImPlotValueTrackerNode : public QImAbstractNode
     Q_OBJECT
     QIM_DECLARE_PRIVATE(QImPlotValueTrackerNode)
 public:
+    enum class SourceType : uint8_t
+    {
+        XY,
+        BarGroups,
+        PieChart
+    };
+
     // Tracked value at a specific X position
     struct TrackedValue
     {
-        const char* label;
+        SourceType sourceType = SourceType::XY;
+        std::string label;
         QColor color;
-        double xValue;
-        double yValue;
+        double xValue = 0.0;
+        double yValue = 0.0;
         std::string xValueLabel;
         std::string yValueLabel;
     };

@@ -1,3 +1,7 @@
+// MSVC requires _USE_MATH_DEFINES for M_PI
+#ifndef _USE_MATH_DEFINES
+#    define _USE_MATH_DEFINES
+#endif
 #include "QImPlotValueTrackerNode.h"
 #include <algorithm>
 #include <cmath>
@@ -12,6 +16,8 @@
 #include "QImPlotNode.h"
 #include "QImPlotItemNode.h"
 #include "QImAbstractXYSeriesItemNode.h"
+#include "QImPlotBarGroupsItemNode.h"
+#include "QImPlotPieChartItemNode.h"
 #include "QImPlotDataSeries.h"
 #include "QImPlotValueTrackerNodeGroup.h"
 #include "QtImGuiUtils.h"
@@ -27,10 +33,14 @@ public:
     void updateSupportSeries(QImPlotNode* plot);
     bool tryAddSeries(QImAbstractNode* n);
     bool tryRemoveSeries(QImAbstractNode* n);
+    void clear();
 
     std::vector< TrackedValue > trackedValues;
     QImPlotNode* plotNode { nullptr };                ///< 绘图节点
     QList< QImAbstractXYDataSeries* > supportSeries;  ///< 记录支持的序列
+    QList< QImPlotBarGroupsItemNode* > barGroupsNodes;  ///< 分组柱状图节点
+    QList< QImPlotPieChartItemNode* > pieChartNodes;    ///< 饼图节点
+    int maxVisiblePieSlices { 10 };                     ///< 饼图最多显示扇区数
     bool isActive { false };                          ///< 是否激活
     bool lastActiveState { false };  ///< 记录上次激活状态,这个是用于识别首次active状态变化的辅助变量
     bool skipNanFiniteValues { false };  ///< 是否跳过nan
@@ -55,10 +65,29 @@ public:
     ImU32 trackerLineColor = IM_COL32(216, 234, 248, 255);
     // 纯数据状态更新（无任何 ImGui/ImPlot 调用！）
     void updateTrackingState();
+    void processBarGroupsTracking(QImPlotBarGroupsItemNode* barItem);
+    void processPieChartTracking(QImPlotPieChartItemNode* pieItem);
 };
 
 QImPlotValueTrackerNode::PrivateData::PrivateData(QImPlotValueTrackerNode* p) : q_ptr(p)
 {
+}
+
+/**
+ * \if ENGLISH
+ * @brief Clears all tracked data and node registrations
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 清除所有追踪数据和节点注册
+ * \endif
+ */
+void QImPlotValueTrackerNode::PrivateData::clear()
+{
+    trackedValues.clear();
+    supportSeries.clear();
+    barGroupsNodes.clear();
+    pieChartNodes.clear();
 }
 
 /**
@@ -78,6 +107,8 @@ QImPlotValueTrackerNode::PrivateData::PrivateData(QImPlotValueTrackerNode* p) : 
 void QImPlotValueTrackerNode::PrivateData::updateSupportSeries(QImPlotNode* plot)
 {
     supportSeries.clear();
+    barGroupsNodes.clear();
+    pieChartNodes.clear();
     const auto items = plot->plotItemNodes();
     for (QImAbstractNode* n : items) {
         tryAddSeries(n);
@@ -89,15 +120,16 @@ void QImPlotValueTrackerNode::PrivateData::updateSupportSeries(QImPlotNode* plot
  * @brief Attempts to add a data series from a child node
  * @param[in] n The node to extract a data series from
  * @return true if a series was successfully added, false otherwise
- * @details Checks if the node is a QImPlotLineItemNode and, if so, adds its
- *          data series to the support series list.
+ * @details Checks if the node is a QImAbstractXYSeriesItemNode, QImPlotBarGroupsItemNode,
+ *          or QImPlotPieChartItemNode and registers it accordingly.
  * \endif
  *
  * \if CHINESE
  * @brief 尝试添加子节点的数据序列
  * @param[in] n 要提取数据序列的节点
  * @return 成功添加序列返回true，否则返回false
- * @details 检查节点是否为QImPlotLineItemNode，若是则将其数据序列添加到支持序列列表。
+ * @details 检查节点是否为QImAbstractXYSeriesItemNode、QImPlotBarGroupsItemNode
+ *          或QImPlotPieChartItemNode并进行相应注册。
  * \endif
  */
 bool QImPlotValueTrackerNode::PrivateData::tryAddSeries(QImAbstractNode* n)
@@ -105,6 +137,18 @@ bool QImPlotValueTrackerNode::PrivateData::tryAddSeries(QImAbstractNode* n)
     if (auto* xyItem = qobject_cast< QImAbstractXYSeriesItemNode* >(n)) {
         if (auto* series = xyItem->data()) {
             supportSeries.push_back(series);
+            return true;
+        }
+    }
+    if (auto* barItem = qobject_cast< QImPlotBarGroupsItemNode* >(n)) {
+        if (barItem->data()) {
+            barGroupsNodes.push_back(barItem);
+            return true;
+        }
+    }
+    if (auto* pieItem = qobject_cast< QImPlotPieChartItemNode* >(n)) {
+        if (pieItem->data()) {
+            pieChartNodes.push_back(pieItem);
             return true;
         }
     }
@@ -116,15 +160,16 @@ bool QImPlotValueTrackerNode::PrivateData::tryAddSeries(QImAbstractNode* n)
  * @brief Attempts to remove a data series associated with a child node
  * @param[in] n The node whose data series to remove
  * @return true if a series was successfully removed, false otherwise
- * @details Checks if the node is a QImPlotLineItemNode and, if so, removes
- *          its data series from the support series list.
+ * @details Checks if the node is a QImAbstractXYSeriesItemNode, QImPlotBarGroupsItemNode,
+ *          or QImPlotPieChartItemNode and unregisters it accordingly.
  * \endif
  *
  * \if CHINESE
  * @brief 尝试移除子节点关联的数据序列
  * @param[in] n 要移除数据序列的节点
  * @return 成功移除序列返回true，否则返回false
- * @details 检查节点是否为QImPlotLineItemNode，若是则从支持序列列表中移除其数据序列。
+ * @details 检查节点是否为QImAbstractXYSeriesItemNode、QImPlotBarGroupsItemNode
+ *          或QImPlotPieChartItemNode并进行相应注销。
  * \endif
  */
 bool QImPlotValueTrackerNode::PrivateData::tryRemoveSeries(QImAbstractNode* n)
@@ -134,7 +179,199 @@ bool QImPlotValueTrackerNode::PrivateData::tryRemoveSeries(QImAbstractNode* n)
             return (supportSeries.removeAll(series) > 0);
         }
     }
+    if (auto* barItem = qobject_cast< QImPlotBarGroupsItemNode* >(n)) {
+        return (barGroupsNodes.removeAll(barItem) > 0);
+    }
+    if (auto* pieItem = qobject_cast< QImPlotPieChartItemNode* >(n)) {
+        return (pieChartNodes.removeAll(pieItem) > 0);
+    }
     return false;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Processes tracking for BarGroups (grouped bar chart) nodes
+ * @details For each visible BarGroups node, computes the nearest group index
+ *          from the mouse X position and emits tracked values with group labels.
+ *          Accounts for shift offset, horizontal orientation, and colormap colors.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理分组柱状图节点的追踪
+ * @details 对每个可见的分组柱状图节点，根据鼠标X位置计算最近的组索引，
+ *          并使用组标签发出追踪值。考虑偏移量、水平方向和颜色映射。
+ * \endif
+ */
+void QImPlotValueTrackerNode::PrivateData::processBarGroupsTracking(QImPlotBarGroupsItemNode* barItem)
+{
+    if (!barItem->isVisible() || !barItem->isEnabled()) {
+        return;
+    }
+    auto* series = barItem->data();
+    if (!series || series->itemCount() <= 0 || series->groupCount() <= 0) {
+        return;
+    }
+
+    QPointF plotPos = barItem->pixelsToPlot(mouseScreenPos.x, mouseScreenPos.y);
+    int itemCount   = series->itemCount();
+    int groupCount  = series->groupCount();
+    bool horizontal = barItem->isHorizontal();
+    double shift    = barItem->shift();
+
+    // Compute the nearest item index from the mouse plot position
+    double mouseCoord = horizontal ? plotPos.y() : plotPos.x();
+    int nearestItem   = static_cast< int >(std::round(mouseCoord - shift));
+    nearestItem       = qBound(0, nearestItem, itemCount - 1);
+
+    // Get labels
+    QStringList itemLabels = series->labels();
+
+    // Build group labels as "Group 0", "Group 1", ...
+    QStringList groupLabels;
+    for (int g = 0; g < groupCount; ++g) {
+        groupLabels << QStringLiteral("Group %1").arg(g);
+    }
+
+    for (int g = 0; g < groupCount; ++g) {
+        double val = series->value(nearestItem, g);
+        if (skipNanFiniteValues && (std::isnan(val) || std::isinf(val) || !std::isfinite(val))) {
+            continue;
+        }
+
+        QColor color = barItem->color();
+        if (!color.isValid()) {
+            ImVec4 c = ImPlot::GetColormapColor(g);
+            color    = toQColor(c);
+        }
+
+        TrackedValue tv;
+        tv.sourceType = SourceType::BarGroups;
+        tv.label      = QStringLiteral("%1 [%2]").arg(itemLabels.value(nearestItem), groupLabels.value(g)).toStdString();
+        tv.color      = color;
+        tv.xValue     = nearestItem;
+        tv.yValue     = val;
+        char buf[ 64 ];
+        ImFormatString(buf, sizeof(buf), "%.3f", tv.yValue);
+        tv.yValueLabel = buf;
+        char xbuf[ 32 ];
+        ImFormatString(xbuf, sizeof(xbuf), "%d", nearestItem);
+        tv.xValueLabel = xbuf;
+        trackedValues.emplace_back(tv);
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Processes tracking for PieChart nodes using angle-based nearest-slice detection
+ * @details For the given PieChart node, converts mouse position to plot coordinates,
+ *          computes distance and angle from the pie center, and identifies the single
+ *          hovered slice. Emits one TrackedValue for the hovered slice using colormap
+ *          color. Guards against clicks outside the pie radius or at the exact center.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用角度最近扇区检测处理饼图节点的追踪
+ * @details 对给定的饼图节点，将鼠标位置转换为绘图坐标，计算与饼图中心的距离和角度，
+ *          识别鼠标悬停的单个扇区。使用颜色映射颜色发出一个追踪值。
+ *          防止点击饼图半径外或中心点时的无效检测。
+ * \endif
+ */
+void QImPlotValueTrackerNode::PrivateData::processPieChartTracking(QImPlotPieChartItemNode* pieItem)
+{
+    auto* series = pieItem->data();
+    if (!series || series->sliceCount() <= 0) {
+        return;
+    }
+
+    QPointF center      = pieItem->center();
+    double radius       = pieItem->radius();
+    double startAngle   = pieItem->startAngle();
+    QString labelFmt    = pieItem->labelFormat();
+    bool normalized     = pieItem->isNormalized();
+
+    // Convert mouse screen position to plot coordinates
+    QPointF mousePlot = pieItem->pixelsToPlot(mouseScreenPos.x, mouseScreenPos.y);
+
+    // Compute distance from mouse to pie center
+    double dx   = mousePlot.x() - center.x();
+    double dy   = mousePlot.y() - center.y();
+    double dist = std::sqrt(dx * dx + dy * dy);
+
+    // Outside the pie radius or at the exact center (atan2 undefined)
+    if (dist > radius || dist < 0.001) {
+        return;
+    }
+
+    // Compute mouse angle in degrees, normalized to [0, 360)
+    double mouseAngleDeg = std::atan2(dy, dx) * 180.0 / M_PI;
+    if (mouseAngleDeg < 0.0) {
+        mouseAngleDeg += 360.0;
+    }
+
+    // Convert to ImPlot coordinate system (relative to start angle)
+    double relativeAngle = mouseAngleDeg - startAngle;
+    if (relativeAngle < 0.0) {
+        relativeAngle += 360.0;
+    }
+
+    // Find which slice the mouse angle falls into
+    int sliceCount    = series->sliceCount();
+    double total      = 0.0;
+    for (int i = 0; i < sliceCount; ++i) {
+        total += series->value(i);
+    }
+
+    int hoveredSlice    = -1;
+    double cumulativeAngle = 0.0;
+    for (int i = 0; i < sliceCount; ++i) {
+        double val      = series->value(i);
+        double sliceArc = (total > 0.0) ? (val / total) * 360.0 : 0.0;
+        if (relativeAngle >= cumulativeAngle && relativeAngle < (cumulativeAngle + sliceArc)) {
+            hoveredSlice = i;
+            break;
+        }
+        cumulativeAngle += sliceArc;
+    }
+
+    if (hoveredSlice < 0) {
+        return;
+    }
+
+    double val = series->value(hoveredSlice);
+    if (skipNanFiniteValues && (std::isnan(val) || std::isinf(val) || !std::isfinite(val))) {
+        return;
+    }
+
+    // Build a single TrackedValue for the hovered slice (colormap color only)
+    QColor color;
+    ImVec4 c = ImPlot::GetColormapColor(hoveredSlice);
+    color    = toQColor(c);
+
+    TrackedValue tv;
+    tv.sourceType = SourceType::PieChart;
+    tv.color      = color;
+
+    QStringList labels = series->labels();
+    QString sliceLabel = labels.value(hoveredSlice, QStringLiteral("Slice %1").arg(hoveredSlice));
+    if (labelFmt.isEmpty()) {
+        tv.label = sliceLabel.toStdString();
+    } else {
+        double pct = (total > 0.0) ? (val / total * 100.0) : 0.0;
+        char lblBuf[ 128 ];
+        ImFormatString(lblBuf, sizeof(lblBuf), labelFmt.toUtf8().constData(), sliceLabel.toUtf8().constData(), pct);
+        tv.label = lblBuf;
+    }
+
+    tv.xValue = hoveredSlice;
+    tv.yValue = normalized ? (total > 0.0 ? val / total : 0.0) : val;
+
+    char ybuf[ 64 ];
+    ImFormatString(ybuf, sizeof(ybuf), "%.3f", tv.yValue);
+    tv.yValueLabel = ybuf;
+    char xbuf[ 32 ];
+    ImFormatString(xbuf, sizeof(xbuf), "%d", hoveredSlice);
+    tv.xValueLabel = xbuf;
+    trackedValues.emplace_back(tv);
 }
 
 /**
@@ -143,24 +380,20 @@ bool QImPlotValueTrackerNode::PrivateData::tryRemoveSeries(QImAbstractNode* n)
  * @details Core state machine that determines whether the tracker is active based on
  *          mouse hover state, handles group synchronization for multi-plot tracking,
  *          and computes Y values for all visible line items at the current mouse X position.
+ *          Also processes BarGroups and PieChart items.
  *          Updates tracked values only when the mouse has moved significantly.
  * \endif
  *
  * \if CHINESE
  * @brief 更新追踪状态并计算鼠标位置处的追踪值
  * @details 核心状态机，根据鼠标悬停状态确定追踪器是否激活，处理多子图联动的组同步，
- *          并计算当前鼠标X位置处所有可见折线项目的Y值。仅在鼠标发生显著移动时更新追踪值。
+ *          并计算当前鼠标X位置处所有可见折线项目的Y值。
+ *          同时处理分组柱状图和饼图项目。
+ *          仅在鼠标发生显著移动时更新追踪值。
  * \endif
  */
 void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
 {
-    // bool mouseInPlot = (plotScreenSize.x > 0 && plotScreenSize.y > 0)
-    //                    && (mouseScreenPos.x >= plotScreenPos.x && mouseScreenPos.x <= plotScreenPos.x + plotScreenSize.x
-    //                        && mouseScreenPos.y >= plotScreenPos.y
-    //                        && mouseScreenPos.y <= plotScreenPos.y + plotScreenSize.y);
-    // qDebug() << "isMouseInCanvas=" << isMouseOnPlot << "mouseScreenPos=" << mouseScreenPos
-    //          << ",plotScreenPos=" << plotScreenPos << ",plotScreenSize=" << plotScreenSize
-    //          << ",plotCanvasRect=" << plotCanvasRect;
     bool isMouseOnPlot = plotNode->isPlotHovered();
     if (isMouseOnPlot) {
         this->isActive        = true;
@@ -189,7 +422,6 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
         float groupPixelRatio = this->group->pixelRatio();
 
         if (groupPixelRatio >= 0.0f && groupPixelRatio <= 1.0f) {
-            // TODO:目前只有x有用
             mouseScreenPos.x = plotScreenPos.x + (plotScreenSize.x * groupPixelRatio);
             mouseScreenPos.y = plotCanvasRect.GetTL().y;
         } else {
@@ -203,9 +435,7 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
         lastCalcMouseScreenPos = mouseScreenPos;
         trackedValues.clear();
 
-        // 优化：提前计算plot坐标，避免在循环内重复转换
-
-        // 遍历所有可见且启用的序列
+        // === XY series tracking ===
         for (QImAbstractNode* itemNode : plotNode->plotItemNodes()) {
             if (!itemNode->isVisible() || !itemNode->isEnabled()) {
                 continue;
@@ -217,25 +447,21 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
                     continue;
                 }
                 QPointF plotPos = xyItem->pixelsToPlot(mouseScreenPos.x, mouseScreenPos.y);
-                // 检查X值是否在数据范围内（优化：避免无效查询）
 
                 double firstX = series->xValue(0);
                 double lastX  = series->xValue(series->size() - 1);
                 if (plotPos.x() < firstX || plotPos.x() > lastX) {
-                    continue;  // X值超出数据范围，跳过
+                    continue;
                 }
 
-                // 获取Y值
                 double yVal = series->yValueAtX(plotPos.x());
 
-                // 严格检查Y值有效性（跳过NaN/Inf/超出范围值）
                 if (skipNanFiniteValues) {
                     if (std::isnan(yVal) || std::isinf(yVal) || !std::isfinite(yVal)) {
                         continue;
                     }
                 }
 
-                // 获取曲线颜色
                 QColor lineColor = xyItem->itemColor();
                 if (!lineColor.isValid()) {
                     ImVec4 lastItemColor = ImPlot::GetLastItemColor();
@@ -243,13 +469,32 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
                 }
 
                 TrackedValue trackedValue;
+                trackedValue.sourceType  = SourceType::XY;
                 trackedValue.label       = xyItem->labelConstData();
                 trackedValue.color       = lineColor;
-                trackedValue.xValue      = plotPos.x();  // 所有序列共享同一个X值
+                trackedValue.xValue      = plotPos.x();
                 trackedValue.yValue      = yVal;
                 trackedValue.xValueLabel = plotNode->axisValueText(plotPos.x(), xyItem->xAxisId());
                 trackedValue.yValueLabel = plotNode->axisValueText(yVal, xyItem->yAxisId());
                 trackedValues.emplace_back(trackedValue);
+            }
+        }
+
+        // === BarGroups tracking (dynamic) ===
+        for (QImAbstractNode* itemNode : plotNode->plotItemNodes()) {
+            if (!itemNode->isVisible() || !itemNode->isEnabled()) continue;
+            if (auto* barItem = qobject_cast<QImPlotBarGroupsItemNode*>(itemNode)) {
+                if (barItem->data() && barItem->data()->itemCount() > 0 && barItem->data()->groupCount() > 0)
+                    processBarGroupsTracking(barItem);
+            }
+        }
+
+        // === PieChart tracking (dynamic) ===
+        for (QImAbstractNode* itemNode : plotNode->plotItemNodes()) {
+            if (!itemNode->isVisible() || !itemNode->isEnabled()) continue;
+            if (auto* pieItem = qobject_cast<QImPlotPieChartItemNode*>(itemNode)) {
+                if (pieItem->data() && pieItem->data()->sliceCount() > 0)
+                    processPieChartTracking(pieItem);
             }
         }
     }
@@ -534,7 +779,7 @@ bool QImPlotValueTrackerNode::beginDraw()
 
     // 仅当需要显示时调用渲染（符合 ImGui 声明式原则）
     if (d->isActive) {
-        renderTooltip(d->trackedValues, QPointF(d->mouseScreenPos.x, d->mouseScreenPos.y));  // 移除 isHover 参数
+        renderTooltip(d->trackedValues, QPointF(d->mouseScreenPos.x, d->mouseScreenPos.y));
     }
 
     return false;  // 不渲染子节点
@@ -542,86 +787,6 @@ bool QImPlotValueTrackerNode::beginDraw()
 
 void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& values, const QPointF& mouseScreenPos)
 {
-#if 0
-    QIM_D(d);
-
-    if (!d->isActive || !d->plotNode) {
-        return;
-    }
-
-    ImDrawList* drawList = ImPlot::GetPlotDrawList();
-
-            // 如果没有数据，不显示tooltip
-    if (values.empty()) {
-        return;
-    }
-
-            // 准备绘制tooltip
-    ImVec2 plotPos    = ImPlot::GetPlotPos();
-    ImVec2 plotSize   = ImPlot::GetPlotSize();
-    ImVec2 screenSize = ImGui::GetIO().DisplaySize;
-
-    // 计算tooltip位置，避免超出屏幕
-    float tooltipX = mouseScreenPos.x() + 10;
-    float tooltipY = mouseScreenPos.y();
-
-            // 检查是否超出右侧边界
-    if (tooltipX + d->fixedWidth > screenSize.x) {
-        tooltipX = (mouseScreenPos.x() > d->fixedWidth + 10) ? mouseScreenPos.x() - d->fixedWidth - 10 : 10;
-    }
-
-            // 按Y轴分组绘制
-    float currentY = tooltipY;
-    // 计算此Y轴组的tooltip尺寸
-    float groupWidth = d->fixedWidth;
-    float itemHeight = d->fontSize + d->tooltipPadding;
-    float groupHeight = d->tooltipPadding * 2 + values.size() * itemHeight + d->fontSize  // 这里的fontSize是给x轴数据的
-                        + 2;
-    // 检查是否超出屏幕底部
-    if (currentY + groupHeight > screenSize.y) {
-        currentY = screenSize.y - groupHeight - 2;
-    }
-    // 检查是否超出屏幕顶部
-    if (currentY < 0) {
-        currentY = 2;
-    }
-    // 绘制背景
-    ImVec2 bgMin(tooltipX, currentY);
-    ImVec2 bgMax(tooltipX + groupWidth, currentY + groupHeight);
-    drawList->AddRectFilled(bgMin, bgMax, toImU32(d->bgColor), 3.0f);
-    drawList->AddRect(bgMin, bgMax, toImU32(d->borderColor), 3.0f);
-    float itemY = currentY + d->tooltipPadding;
-    for (auto yAxisIt = values.begin(); yAxisIt != values.end(); ++yAxisIt) {
-        const TrackedValue& value = *yAxisIt;
-        float textX               = tooltipX + d->tooltipPadding;
-        // 绘制色块//这里应该垂直居中
-        ImVec2 colorBoxMin(textX, itemY);
-        ImVec2 colorBoxMax(textX + d->colorBoxSize, itemY + d->colorBoxSize);
-        drawList->AddRectFilled(colorBoxMin, colorBoxMax, toImU32(value.color), 2.0f);
-        // 绘制标签文本
-        float labelX = textX + d->colorBoxSize + d->tooltipPadding;
-        drawList->AddText(ImVec2(labelX, itemY - 1), toImU32(d->textColor), value.label);
-
-                // 绘制Y值（使用ImFormatString避免QString转换）
-        char yValueText[32];
-        ImFormatString(yValueText, sizeof(yValueText), "%.3f", value.yValue);
-        float valueWidth  = ImGui::CalcTextSize(yValueText).x;
-        float valueX      = tooltipX + groupWidth - d->tooltipPadding - valueWidth;
-        drawList->AddText(ImVec2(valueX, itemY - 1), toImU32(d->textColor), yValueText);
-
-        itemY += itemHeight;
-    }
-    // 绘制分隔线
-    drawList->AddLine(ImVec2(tooltipX + d->tooltipPadding, itemY),
-                      ImVec2(tooltipX + groupWidth - d->tooltipPadding, itemY),
-                      toImU32(d->borderColor),
-                      1.0f);
-    // 显示x值
-    //  绘制垂直线
-    ImVec2 lineStart(mouseScreenPos.x(), plotPos.y);
-    ImVec2 lineEnd(mouseScreenPos.x(), plotPos.y + plotSize.y);
-    drawList->AddLine(lineStart, lineEnd, d->trackerLineColor, 1.0f);
-#else
     QIM_D(d);
     if (!d->isActive || values.empty() || !d->plotNode) {
         return;
@@ -632,62 +797,48 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
     ImVec2 plotSize      = ImPlot::GetPlotSize();
     ImVec2 screenSize    = ImGui::GetIO().DisplaySize;
 
+    // Check if any value has an xValueLabel (XY series do, PieChart/BarGroups may not)
+    bool showXValue = !values[ 0 ].xValueLabel.empty();
+
     // === 1. 动态计算tooltip宽度 ===
-    bool showXValue    = d->plotNode->x1Axis()->isLabelEnabled();
-    float xLabelHeight = -1.0f;
-    float maxWidth     = 0;
+    float maxWidth = 0;
     if (d->autoWidth) {
         // 计算每个数据行所需宽度（色块 + 标签 + Y值）
         for (const auto& value : values) {
-            // 标签宽度
-            float labelWidth  = ImGui::CalcTextSize(value.label).x;
+            float labelWidth  = ImGui::CalcTextSize(value.label.c_str()).x;
             float yValueWidth = ImGui::CalcTextSize(value.yValueLabel.c_str()).x;
-
-            // 行总宽度 = 色块 + 间距 + 标签 + 间距 + Y值
-            float rowWidth = d->colorBoxSize + 2 * d->tooltipPadding + labelWidth + d->tooltipPadding + yValueWidth;
-            maxWidth       = std::max(maxWidth, rowWidth);
+            float rowWidth    = d->colorBoxSize + 2 * d->tooltipPadding + labelWidth + d->tooltipPadding + yValueWidth;
+            maxWidth          = std::max(maxWidth, rowWidth);
         }
         // 计算x值宽度
         if (showXValue) {
-            auto xfontSize = ImGui::CalcTextSize(values[ 0 ].xValueLabel.c_str());
-            xLabelHeight   = xfontSize.y;
-            maxWidth       = std::max(maxWidth, (d->tooltipPadding + xfontSize.x));
+            float xLabelWidth = ImGui::CalcTextSize(values[ 0 ].xValueLabel.c_str()).x;
+            maxWidth          = std::max(maxWidth, (d->tooltipPadding + xLabelWidth));
         }
     } else {
         maxWidth = d->fixedWidth;
     }
 
-    // 限制最大宽度
-    float tooltipWidth = maxWidth + 2 * d->tooltipPadding;  // 总宽度 = 内容宽度 + 两侧padding
+    float tooltipWidth = maxWidth + 2 * d->tooltipPadding;
 
     // === 2. 计算tooltip高度 ===
     float itemHeight    = d->fontSize + d->tooltipPadding;
-    float contentHeight = values.size() * itemHeight;  // 数据行
-    // 递增x值行高，x值的文字可能会换行，不能共用y的高度
+    float contentHeight = values.size() * itemHeight;
     if (showXValue) {
-        if (d->autoWidth) {
-            contentHeight += xLabelHeight;
-        } else {
-            contentHeight += ImGui::CalcTextSize(values[ 0 ].xValueLabel.c_str()).y;
-        }
+        contentHeight += d->fontSize;
     }
-    float tooltipHeight = contentHeight + 2 * d->tooltipPadding + 2.0f;  // + 分隔线高度
+    float tooltipHeight = contentHeight + 2 * d->tooltipPadding + 2.0f;
 
     // === 3. 智能定位tooltip（避免超出屏幕）===
     float tooltipX = mouseScreenPos.x() + 10;
     float tooltipY = mouseScreenPos.y();
 
-    // 检查右侧边界
     if (tooltipX + tooltipWidth > screenSize.x) {
         tooltipX = (mouseScreenPos.x() > tooltipWidth + 10) ? mouseScreenPos.x() - tooltipWidth - 10 : d->tooltipPadding;
     }
-
-    // 检查底部边界
     if (tooltipY + tooltipHeight > screenSize.y) {
         tooltipY = screenSize.y - tooltipHeight - d->tooltipPadding;
     }
-
-    // 检查顶部边界
     if (tooltipY < d->tooltipPadding) {
         tooltipY = d->tooltipPadding;
     }
@@ -703,16 +854,14 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
     float contentStartX = tooltipX + d->tooltipPadding;
 
     for (const auto& value : values) {
-        // 绘制色块（垂直居中）
         float colorBoxY = currentY + (itemHeight - d->colorBoxSize) * 0.5f;
         drawList->AddRectFilled(ImVec2(contentStartX, colorBoxY),
                                 ImVec2(contentStartX + d->colorBoxSize, colorBoxY + d->colorBoxSize),
                                 toImU32(value.color),
                                 2.0f);
 
-        // 绘制标签
         float labelX = contentStartX + d->colorBoxSize + d->tooltipPadding;
-        drawList->AddText(ImVec2(labelX, currentY - 1.0f), toImU32(d->textColor), value.label);
+        drawList->AddText(ImVec2(labelX, currentY - 1.0f), toImU32(d->textColor), value.label.c_str());
 
         // 绘制Y值（右对齐）
         char yValueText[ 32 ];
@@ -733,19 +882,16 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
                       ImVec2(tooltipX + tooltipWidth - d->tooltipPadding, currentY),
                       toImU32(d->borderColor),
                       1.0f);
-    currentY += 2.0f;  // 分隔线高度
+    currentY += 2.0f;
 
-    // === 7. 绘制X值（底部）===
-
+    // === 7. 绘制X值（底部，仅当有xValueLabel时）===
     if (showXValue) {
-        // X值（紧随标签后）
         drawList->AddText(ImVec2(contentStartX, currentY - 1.0f), toImU32(d->textColor), values[ 0 ].xValueLabel.c_str());
     }
 
     // === 8. 绘制垂直跟踪线 ===
     drawList->AddLine(
         ImVec2(mouseScreenPos.x(), plotPos.y), ImVec2(mouseScreenPos.x(), plotPos.y + plotSize.y), d->trackerLineColor, 1.0f);
-#endif
 }
 
 }  // namespace QIM
