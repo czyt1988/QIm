@@ -70,15 +70,14 @@ QImPlotValueTrackerNode::PrivateData::PrivateData(QImPlotValueTrackerNode* p) : 
 /**
  * \if ENGLISH
  * @brief Processes tracking for BarGroups (grouped bar chart) nodes
- * @details For each visible BarGroups node, computes the nearest group index
- *          from the mouse X position and emits tracked values with group labels.
- *          Accounts for shift offset, horizontal orientation, and colormap colors.
+ * @details For each visible BarGroups node, emits a single TrackedValue for the
+ *          nearest (item, group) pair under the mouse, using colormap color per group.
  * \endif
  *
  * \if CHINESE
  * @brief 处理分组柱状图节点的追踪
- * @details 对每个可见的分组柱状图节点，根据鼠标X位置计算最近的组索引，
- *          并使用组标签发出追踪值。考虑偏移量、水平方向和颜色映射。
+ * @details 对每个可见的分组柱状图节点，发出鼠标下最接近的 (item, group) 对的
+ *          单个追踪值，使用每组对应的 colormap 颜色。
  * \endif
  */
 void QImPlotValueTrackerNode::PrivateData::processBarGroupsTracking(QImPlotBarGroupsItemNode* barItem)
@@ -97,19 +96,27 @@ void QImPlotValueTrackerNode::PrivateData::processBarGroupsTracking(QImPlotBarGr
     bool horizontal = barItem->isHorizontal();
     double shift    = barItem->shift();
 
-    // Compute the nearest item index from the mouse plot position
-    double mouseCoord = horizontal ? plotPos.y() : plotPos.x();
-    int nearestItem   = static_cast< int >(std::round(mouseCoord - shift));
-    nearestItem       = qBound(0, nearestItem, itemCount - 1);
+    // Compute nearest item and nearest group from mouse position
+    // For ImPlot horizontal bars: both items and groups are positioned along the Y axis
+    // For vertical bars: both are positioned along the X axis
+    double mouseCoordForItem = horizontal ? plotPos.y() : plotPos.x();
+    int nearestItem  = static_cast< int >(std::round(mouseCoordForItem - shift));
+    nearestItem      = qBound(0, nearestItem, itemCount - 1);
 
-    // Get labels with axis tick priority over series labels
+    double mouseCoordForGroup = horizontal ? plotPos.y() : plotPos.x();
+    int nearestGroup = static_cast< int >(std::round(mouseCoordForGroup - shift));
+    nearestGroup     = qBound(0, nearestGroup, groupCount - 1);
+
+    double val = series->value(nearestItem, nearestGroup);
+    if (skipNanFiniteValues && (std::isnan(val) || std::isinf(val) || !std::isfinite(val))) {
+        return;
+    }
+
+    // Labels: prefer axis tick labels over series labels
     QStringList primaryLabels;
-    const QImPlotAxisInfo* relevantAxis = horizontal
-        ? plotNode->y1Axis()
-        : plotNode->x1Axis();
+    const QImPlotAxisInfo* relevantAxis = horizontal ? plotNode->y1Axis() : plotNode->x1Axis();
     if (relevantAxis && !relevantAxis->tickLabels().isEmpty()) {
-        QList<QByteArray> tickLabels = relevantAxis->tickLabels();
-        for (const auto& tl : tickLabels) {
+        for (const auto& tl : relevantAxis->tickLabels()) {
             primaryLabels << QString::fromUtf8(tl);
         }
     }
@@ -117,34 +124,21 @@ void QImPlotValueTrackerNode::PrivateData::processBarGroupsTracking(QImPlotBarGr
         primaryLabels = series->labels();
     }
 
-    // Build group labels as "Group 0", "Group 1", ...
-    QStringList groupLabels;
-    for (int g = 0; g < groupCount; ++g) {
-        groupLabels << QStringLiteral("Group %1").arg(g);
-    }
+    QColor color = toQColor(ImPlot::GetColormapColor(nearestGroup));
 
-    for (int g = 0; g < groupCount; ++g) {
-        double val = series->value(nearestItem, g);
-        if (skipNanFiniteValues && (std::isnan(val) || std::isinf(val) || !std::isfinite(val))) {
-            continue;
-        }
-
-        QColor color = toQColor(ImPlot::GetColormapColor(g));
-
-        TrackedValue tv;
-        tv.sourceType = SourceType::BarGroups;
-        tv.label      = QStringLiteral("%1 [%2]").arg(primaryLabels.value(nearestItem), groupLabels.value(g)).toStdString();
-        tv.color      = color;
-        tv.xValue     = nearestItem;
-        tv.yValue     = val;
-        char buf[ 64 ];
-        ImFormatString(buf, sizeof(buf), "%.3f", tv.yValue);
-        tv.yValueLabel = buf;
-        char xbuf[ 32 ];
-        ImFormatString(xbuf, sizeof(xbuf), "%d", nearestItem);
-        tv.xValueLabel = xbuf;
-        trackedValues.emplace_back(tv);
-    }
+    TrackedValue tv;
+    tv.sourceType = SourceType::BarGroups;
+    tv.label      = primaryLabels.value(nearestItem).toStdString();
+    tv.color      = color;
+    tv.xValue     = nearestItem;
+    tv.yValue     = val;
+    char buf[ 64 ];
+    ImFormatString(buf, sizeof(buf), "%.3f", tv.yValue);
+    tv.yValueLabel = buf;
+    char xbuf[ 32 ];
+    ImFormatString(xbuf, sizeof(xbuf), "%d", nearestGroup);
+    tv.xValueLabel = xbuf;
+    trackedValues.emplace_back(tv);
 }
 
 /**
