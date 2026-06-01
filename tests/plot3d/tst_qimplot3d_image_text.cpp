@@ -9,7 +9,7 @@
 #include "QImPlot3DImageItemNode.h"
 #include "QImPlot3DTextItemNode.h"
 #include "QImPlot3DDummyItemNode.h"
-#include "../../core/TestHelpers.h"
+#include "../core/TestHelpers.h"
 
 using namespace QIM;
 

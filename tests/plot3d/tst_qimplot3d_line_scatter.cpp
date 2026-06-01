@@ -8,7 +8,7 @@
 
 #include "QImPlot3DLineItemNode.h"
 #include "QImPlot3DScatterItemNode.h"
-#include "../../core/TestHelpers.h"
+#include "../core/TestHelpers.h"
 
 using namespace QIM;
 

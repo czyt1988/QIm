@@ -5,6 +5,7 @@
 #include "QImPlotNode.h"
 #include "QImPlotLineItemNode.h"
 #include "QImPlotAxisInfo.h"
+#include "implot.h"
 
 using namespace QIM;
 
