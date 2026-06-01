@@ -100,7 +100,11 @@ CI 测试（Ubuntu）需要 `-DQIM_BUILD_TESTS=ON`，运行 `ctest --output-on-f
 
 - `beginDraw()` 只做 API 调用，直接传递已准备数据——禁止数据转换、条件组装、复杂计算
 - 字符串只存 `QByteArray`（UTF8），不存 `QString`；getter 从 UTF8 转 QString，setter 接 QString 后立即转 UTF8
-- 所有 QColor→ImVec4 转换在 setter 完成，beginDraw 直接用 `constData()` 传递
+- 类的成员变量存储imgui所需要的类型，头文件暴露的接口使用Qt的类型，所有转换在 setter 完成，setter 把qt类型转换为imgui所需要的类型，在beginDraw函数中不需要进行任何的转换直接使用，避免高速刷新的时候带来不必要的转换操作，例如：
+  - 所有 QColor→ImVec4 转换在 setter 完成，beginDraw 直接用成员变量 ImVec4
+  - QPointF/QPoint同理，一些点的设置在头文件的函数中保留给用户，但如果需要保存则应在setter中转换为ImVec2，作为成员变量保存
+- `src\core\QtImGuiUtils.h`定义了ImGui和Qt常见类型的转换，你应该尽量复用，如果发现有ImGui类型和Qt类型需要转换，但`QtImGuiUtils.h`没有定义，你应该判断这个是否是一个通用功能，如果是，你应该加入到`QtImGuiUtils.h`中以便复用
+- `src\core\plot\QImPlot.h`定义了ImPlot的枚举和QIm定义的枚举的转换
 - ImPlot::SetNextLineStyle 等"每帧设置"API 必须每帧调用（ImGui 即时模式，状态不持久跨帧）
 
 ### 枚举语义转换（2D vs 3D 不同）

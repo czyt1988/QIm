@@ -3,6 +3,7 @@
 #include "QImFigureWidget.h"
 #include "plot/QImPlotNode.h"
 #include "plot/QImPlotPieChartItemNode.h"
+#include "plot/QImPlotValueTrackerNode.h"
 #include "plot/QImPlotAxisInfo.h"
 #include "plot/QImPlot.h"
 #include "aggregator/SustainedMetricsTracker.h"
@@ -53,6 +54,10 @@ void ResourcePieView::buildView(QIM::QImFigureWidget* figure, const QList<Aggreg
     diskPie_->setCenter(QPointF(0.5, 0.5));
     diskPie_->setRadius(0.40);
     diskPie_->setLabelFormat(QStringLiteral("%.1f MB"));
+
+    cpuPlot_->addChildNode(new QIM::QImPlotValueTrackerNode(cpuPlot_));
+    memPlot_->addChildNode(new QIM::QImPlotValueTrackerNode(memPlot_));
+    diskPlot_->addChildNode(new QIM::QImPlotValueTrackerNode(diskPlot_));
 
     updateData(data);
 }

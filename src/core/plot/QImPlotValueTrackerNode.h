@@ -54,6 +54,10 @@ public:
         double yValue = 0.0;
         std::string xValueLabel;
         std::string yValueLabel;
+        // PieChart-specific geometry for indicator line rendering
+        bool isOutside = false;
+        QPointF pieCenterScreen;
+        QPointF pieEdgeScreen;
     };
 
 public:
@@ -86,6 +90,10 @@ public:
     void setSkipNanFiniteValues(bool on);
     bool isSkipNanFiniteValues() const;
     //
+
+public Q_SLOTS:
+    // Invalidates the cached tracking values, forcing recomputation on next frame
+    void invalidateCache();
 
 Q_SIGNALS:
     /**

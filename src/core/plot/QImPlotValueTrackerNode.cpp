@@ -57,15 +57,91 @@ public:
     QColor bgColor { 30, 30, 30, 150 };
     QColor borderColor { 100, 100, 100, 255 };
     ImU32 trackerLineColor = IM_COL32(216, 234, 248, 255);
+    // 数据脏标记：当追踪的绘图项数据变更时置为true，强制重新计算缓存
+    bool dataDirty { false };
+    // 已连接dataChanged信号的绘图项节点集合，避免重复连接
+    QSet< QImPlotItemNode* > connectedItems;
+
     // 纯数据状态更新（无任何 ImGui/ImPlot 调用！）
     void updateTrackingState();
     void processBarGroupsTracking(QImPlotBarGroupsItemNode* barItem);
     void processPieChartTracking(QImPlotPieChartItemNode* pieItem);
+    // 连接绘图项的dataChanged信号到invalidateCache
+    void connectItemDataSignals();
+    // 连接单个绘图项的dataChanged信号
+    void connectItemDataSignal(QImPlotItemNode* item);
 };
 
 QImPlotValueTrackerNode::PrivateData::PrivateData(QImPlotValueTrackerNode* p) : q_ptr(p)
 {
-}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Connects dataChanged signals from all existing plot item nodes
+ * @details Iterates over plotNode->plotItemNodes() and connects each item's
+ *          dataChanged signal to invalidateCache(). Also connects to
+ *          childNodeAdded/childNodeRemoved to automatically manage connections.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 连接所有已有绘图项节点的dataChanged信号
+ * @details 遍历plotNode->plotItemNodes()并将每个项的dataChanged信号连接到
+ *          invalidateCache()。同时连接childNodeAdded/childNodeRemoved以自动管理连接。
+ * \endif
+ */
+void QImPlotValueTrackerNode::PrivateData::connectItemDataSignals()
+{
+    if (!plotNode) {
+        return;
+    }
+    for (QImPlotItemNode* item : plotNode->plotItemNodes()) {
+        connectItemDataSignal(item);
+    }
+    QObject::connect(plotNode, &QImPlotNode::childNodeAdded,
+                     q_func(), [this](QImAbstractNode* child) {
+        if (auto* item = qobject_cast< QImPlotItemNode* >(child)) {
+            connectItemDataSignal(item);
+        }
+    });
+    QObject::connect(plotNode, &QImPlotNode::childNodeRemoved,
+                     q_func(), [this](QImAbstractNode* child) {
+        if (auto* item = qobject_cast< QImPlotItemNode* >(child)) {
+            QObject::disconnect(item, nullptr, q_func(), nullptr);
+            connectedItems.remove(item);
+        }
+    });
+}
+
+/**
+ * \if ENGLISH
+ * @brief Connects a single plot item's dataChanged signal to invalidateCache()
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 连接单个绘图项的dataChanged信号到invalidateCache()
+ * \endif
+ */
+void QImPlotValueTrackerNode::PrivateData::connectItemDataSignal(QImPlotItemNode* item)
+{
+    if (!item || connectedItems.contains(item)) {
+        return;
+    }
+    connectedItems.insert(item);
+    if (auto* xyItem = qobject_cast< QImAbstractXYSeriesItemNode* >(item)) {
+        QObject::connect(xyItem, &QImAbstractXYSeriesItemNode::dataChanged,
+                         q_func(), &QImPlotValueTrackerNode::invalidateCache);
+    }
+    if (auto* barItem = qobject_cast< QImPlotBarGroupsItemNode* >(item)) {
+        QObject::connect(barItem, &QImPlotBarGroupsItemNode::dataChanged,
+                         q_func(), &QImPlotValueTrackerNode::invalidateCache);
+    }
+    if (auto* pieItem = qobject_cast< QImPlotPieChartItemNode* >(item)) {
+        QObject::connect(pieItem, &QImPlotPieChartItemNode::dataChanged,
+                         q_func(), &QImPlotValueTrackerNode::invalidateCache);
+    }
+}
+
 /**
  * \if ENGLISH
  * @brief Processes tracking for BarGroups (grouped/stacked bar chart) nodes
@@ -184,17 +260,22 @@ void QImPlotValueTrackerNode::PrivateData::processBarGroupsTracking(QImPlotBarGr
 /**
  * \if ENGLISH
  * @brief Processes tracking for PieChart nodes using angle-based nearest-slice detection
- * @details For the given PieChart node, converts mouse position to plot coordinates,
- *          computes distance and angle from the pie center, and identifies the single
- *          hovered slice. Emits one TrackedValue for the hovered slice using colormap
- *          color. Guards against clicks outside the pie radius or at the exact center.
+ * @details Converts mouse position to plot coordinates, computes distance and angle
+ *          from the pie center, and identifies the single hovered slice by
+ *          angle matching (screen y-down mapped to math CCW to align with ImPlot's
+ *          rendering direction). Unlike XY trackers, distance is not used as a gating
+ *          condition — the angle determines the slice, and the distance only decides
+ *          whether to draw the external indicator line. Emits one TrackedValue for
+ *          the hovered slice with the pure slice label and the user-formatted value.
  * \endif
  *
  * \if CHINESE
  * @brief 使用角度最近扇区检测处理饼图节点的追踪
- * @details 对给定的饼图节点，将鼠标位置转换为绘图坐标，计算与饼图中心的距离和角度，
- *          识别鼠标悬停的单个扇区。使用颜色映射颜色发出一个追踪值。
- *          防止点击饼图半径外或中心点时的无效检测。
+ * @details 将鼠标位置转换为绘图坐标，计算与饼图中心的距离和角度，
+ *          通过角度匹配（屏幕y向下映射到数学CCW方向，与ImPlot渲染方向一致）识别
+ *          鼠标悬停的单个扇区。与XY追踪器不同，距离不作为门禁条件——角度决定扇区，
+ *          距离仅用于判断是否绘制外部指示线。发出一个追踪值，包含纯扇区标签和
+ *          用户格式化的值。
  * \endif
  */
 void QImPlotValueTrackerNode::PrivateData::processPieChartTracking(QImPlotPieChartItemNode* pieItem)
@@ -204,49 +285,57 @@ void QImPlotValueTrackerNode::PrivateData::processPieChartTracking(QImPlotPieCha
         return;
     }
 
-    QPointF center      = pieItem->center();
-    double radius       = pieItem->radius();
-    double startAngle   = pieItem->startAngle();
-    QString labelFmt    = pieItem->labelFormat();
-    bool normalized     = pieItem->isNormalized();
+    QPointF center    = pieItem->center();
+    double radius     = pieItem->radius();
+    double startAngle = pieItem->startAngle();
+    QString labelFmt  = pieItem->labelFormat();
+    bool normalized   = pieItem->isNormalized();
 
     // Convert mouse screen position to plot coordinates
     QPointF mousePlot = pieItem->pixelsToPlot(mouseScreenPos.x, mouseScreenPos.y);
 
-    // Compute distance from mouse to pie center
+    // Delta in plot space (pixelsToPlot already maps to math convention: y up)
     double dx   = mousePlot.x() - center.x();
     double dy   = mousePlot.y() - center.y();
     double dist = std::sqrt(dx * dx + dy * dy);
 
-    // Outside the pie radius or at the exact center (atan2 undefined)
-    if (dist > radius || dist < kPieCenterEpsilon) {
+    // Degeneracy guard: mouse sitting on the exact center — direction is undefined
+    if (dist < kPieCenterEpsilon) {
         return;
     }
 
-    // Compute mouse angle in degrees, normalized to [0, 360)
+    const bool isOutside = (dist > radius);
+
+    // === Angle matching ===
+    // pixelsToPlot converts screen pixels to plot coordinates where y points up
+    // (standard math convention), matching ImPlot's rendering direction.
+    // Use atan2(dy, dx) directly — no negation needed.
     double mouseAngleDeg = std::atan2(dy, dx) * 180.0 / M_PI;
     if (mouseAngleDeg < 0.0) {
         mouseAngleDeg += 360.0;
     }
-
-    // Convert to ImPlot coordinate system (relative to start angle)
     double relativeAngle = mouseAngleDeg - startAngle;
-    if (relativeAngle < 0.0) {
-        relativeAngle += 360.0;
-    }
+    // Normalize to [0, 360) robustly (handles large negative offsets)
+    relativeAngle = std::fmod(relativeAngle + 720.0, 360.0);
 
-    // Find which slice the mouse angle falls into
-    int sliceCount    = series->sliceCount();
-    double total      = 0.0;
+    // Sum slices — normalize is also triggered by ImPlot when total > 1.0
+    int sliceCount = series->sliceCount();
+    double total   = 0.0;
     for (int i = 0; i < sliceCount; ++i) {
         total += series->value(i);
     }
+    const bool useNormalize = normalized || (total > 1.0);
 
-    int hoveredSlice    = -1;
+    // Find which slice the mouse angle falls into
+    int hoveredSlice       = -1;
     double cumulativeAngle = 0.0;
     for (int i = 0; i < sliceCount; ++i) {
         double val      = series->value(i);
-        double sliceArc = (total > 0.0) ? (val / total) * 360.0 : 0.0;
+        double pct      = useNormalize ? (total > 0.0 ? val / total : 0.0) : val;
+        double sliceArc = pct * 360.0;
+        if (sliceArc <= 0.0) {
+            continue;
+        }
         if (relativeAngle >= cumulativeAngle && relativeAngle < (cumulativeAngle + sliceArc)) {
             hoveredSlice = i;
             break;
@@ -263,35 +352,65 @@ void QImPlotValueTrackerNode::PrivateData::processPieChartTracking(QImPlotPieCha
         return;
     }
 
-    // Build a single TrackedValue for the hovered slice (colormap color only)
+    // === Build TrackedValue ===
+    // Pure slice name as label — tooltip renders "color-box | label | value".
+    // Do NOT apply labelFormat to the label (it's reserved for yValueLabel units).
+    //
+    // Read the actual color from the ImPlotItem rather than via GetColormapColor(hoveredSlice).
+    // The colormap index is advanced globally by every plot item (lines, bars, etc.) drawn
+    // before the pie chart, so GetColormapColor(hoveredSlice) returns the WRONG color when
+    // the pie is not the first item in the plot.
+    QStringList labels     = series->labels();
+    QString sliceLabel     = labels.value(hoveredSlice, QStringLiteral("Slice %1").arg(hoveredSlice));
+
     QColor color;
-    ImVec4 c = ImPlot::GetColormapColor(hoveredSlice);
-    color    = toQColor(c);
+    {
+        const auto ptrs        = series->labelPtrs();
+        const char* itemLabel  = (hoveredSlice < static_cast<int>(ptrs.size())) ? ptrs[hoveredSlice] : nullptr;
+        ImPlotItem* plotItem   = itemLabel ? ImPlot::GetItem(itemLabel) : nullptr;
+        if (plotItem) {
+            color = toQColor(ImGui::ColorConvertU32ToFloat4(plotItem->Color));
+        } else {
+            // Fallback: only hit when the ImPlotItem hasn't been registered yet (e.g. first frame)
+            color = toQColor(ImPlot::GetColormapColor(hoveredSlice));
+        }
+    }
 
     TrackedValue tv;
     tv.sourceType = SourceType::PieChart;
     tv.color      = color;
+    tv.label      = sliceLabel.toStdString();
 
-    QStringList labels = series->labels();
-    QString sliceLabel = labels.value(hoveredSlice, QStringLiteral("Slice %1").arg(hoveredSlice));
+    // yValueLabel: use the pie's own labelFormat (e.g. "%.1f MB") when provided,
+    // falling back to a default "%.3f". This preserves the user-intended units.
     if (labelFmt.isEmpty()) {
-        tv.label = sliceLabel.toStdString();
+        char buf[64];
+        ImFormatString(buf, sizeof(buf), "%.3f", val);
+        tv.yValueLabel = buf;
     } else {
-        double pct = (total > 0.0) ? (val / total * 100.0) : 0.0;
-        char lblBuf[ 128 ];
-        ImFormatString(lblBuf, sizeof(lblBuf), labelFmt.toUtf8().constData(), sliceLabel.toUtf8().constData(), pct);
-        tv.label = lblBuf;
+        char buf[64];
+        ImFormatString(buf, sizeof(buf), labelFmt.toUtf8().constData(), val);
+        tv.yValueLabel = buf;
     }
 
     tv.xValue = hoveredSlice;
-    tv.yValue = normalized ? (total > 0.0 ? val / total : 0.0) : val;
+    tv.yValue = useNormalize ? (total > 0.0 ? val / total : 0.0) : val;
 
-    char ybuf[ 64 ];
-    ImFormatString(ybuf, sizeof(ybuf), "%.3f", tv.yValue);
-    tv.yValueLabel = ybuf;
-    char xbuf[ 32 ];
-    ImFormatString(xbuf, sizeof(xbuf), "%d", hoveredSlice);
-    tv.xValueLabel = xbuf;
+    // No x-axis label makes sense for a pie — leave empty so renderTooltip
+    // suppresses the bottom x-value footer for pie tooltips.
+    tv.xValueLabel.clear();
+
+    // === Geometry for the indicator line (when mouse is outside the pie) ===
+    tv.isOutside       = isOutside;
+    tv.pieCenterScreen = pieItem->plotToPixels(center.x(), center.y());
+    // Edge point: on the pie circumference along the mouse direction (in plot space,
+    // then projected to screen pixels). This guarantees the indicator line terminates
+    // on the pie ring, not overshooting it.
+    double dirx      = dx / dist;
+    double diry      = dy / dist;
+    QPointF edgePlot(center.x() + radius * dirx, center.y() + radius * diry);
+    tv.pieEdgeScreen = pieItem->plotToPixels(edgePlot.x(), edgePlot.y());
+
     trackedValues.emplace_back(tv);
 }
 
@@ -351,9 +470,11 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
         }
     }
 
-    // 仅当激活且鼠标移动时更新数据（优化：避免重复计算）
-    if (isActive && !fuzzyEqual(lastCalcMouseScreenPos, mouseScreenPos, 0.5f)) {
+    // 仅当激活且(鼠标移动或数据变更)时更新数据
+    const bool mouseMoved = !fuzzyEqual(lastCalcMouseScreenPos, mouseScreenPos, 0.5f);
+    if (isActive && (mouseMoved || dataDirty)) {
         lastCalcMouseScreenPos = mouseScreenPos;
+        dataDirty = false;
         trackedValues.clear();
 
         // === XY series tracking ===
@@ -449,6 +570,7 @@ QImPlotValueTrackerNode::QImPlotValueTrackerNode(QImPlotNode* plotNode, QObject*
     setObjectName(QStringLiteral("QImPlotValueTrackerNode"));
     setZOrder(kTrackerZOrder);  // 确保绘制在最上层
     setAutoIdEnabled(true);
+    d->connectItemDataSignals();
 }
 
 /**
@@ -625,6 +747,12 @@ QColor QImPlotValueTrackerNode::borderColor() const
     return d->borderColor;
 }
 
+void QImPlotValueTrackerNode::invalidateCache()
+{
+    QIM_D(d);
+    d->dataDirty = true;
+}
+
 void QImPlotValueTrackerNode::setTrackerLineColor(const QColor& color)
 {
     QIM_D(d);
@@ -674,8 +802,11 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
     ImVec2 plotSize      = ImPlot::GetPlotSize();
     ImVec2 screenSize    = ImGui::GetIO().DisplaySize;
 
+    // Detect pie-only tooltip: suppress XY crosshair and x-axis footer for pie charts.
+    const bool isPieTooltip = (values[0].sourceType == SourceType::PieChart);
+
     // Check if any value has an xValueLabel (XY series do, PieChart/BarGroups may not)
-    bool showXValue = !values[ 0 ].xValueLabel.empty();
+    bool showXValue = !isPieTooltip && !values[ 0 ].xValueLabel.empty();
 
     // === 1. 动态计算tooltip宽度 ===
     float maxWidth = 0;
@@ -766,9 +897,26 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
         drawList->AddText(ImVec2(contentStartX, currentY - 1.0f), toImU32(d->textColor), values[ 0 ].xValueLabel.c_str());
     }
 
-    // === 8. 绘制垂直跟踪线 ===
-    drawList->AddLine(
-        ImVec2(mouseScreenPos.x(), plotPos.y), ImVec2(mouseScreenPos.x(), plotPos.y + plotSize.y), d->trackerLineColor, 1.0f);
+    // === 8. 绘制跟踪线 ===
+    if (isPieTooltip) {
+        // Pie chart: draw indicator line from mouse position to the pie edge
+        // only when the mouse is outside the pie radius. When the mouse is on
+        // the pie surface, the tooltip appears at the cursor — no line needed,
+        // avoiding visual clutter on top of the slice.
+        for (const auto& v : values) {
+            if (v.sourceType == SourceType::PieChart && v.isOutside) {
+                drawList->AddLine(ImVec2(mouseScreenPos.x(), mouseScreenPos.y()),
+                                  ImVec2(v.pieEdgeScreen.x(), v.pieEdgeScreen.y()),
+                                  d->trackerLineColor, 1.0f);
+                break;   // one indicator per plot is enough
+            }
+        }
+    } else {
+        // XY / BarGroups: vertical crosshair spanning the entire plot
+        drawList->AddLine(
+            ImVec2(mouseScreenPos.x(), plotPos.y), ImVec2(mouseScreenPos.x(), plotPos.y + plotSize.y), d->trackerLineColor, 1.0f);
+    }
 }
 
 }  // namespace QIM
+
