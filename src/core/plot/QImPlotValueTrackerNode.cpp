@@ -53,9 +53,9 @@ public:
     float tooltipPadding { 3.0f };
     float colorBoxSize { 12.0f };
     float fontSize { 13.0f };
-    QColor textColor { 255, 255, 255 };
-    QColor bgColor { 30, 30, 30, 150 };
-    QColor borderColor { 100, 100, 100, 255 };
+    ImU32 textColor = IM_COL32(255, 255, 255, 255);
+    ImU32 bgColor = IM_COL32(30, 30, 30, 150);
+    ImU32 borderColor = IM_COL32(100, 100, 100, 255);
     ImU32 trackerLineColor = IM_COL32(216, 234, 248, 255);
     // 数据脏标记：当追踪的绘图项数据变更时置为true，强制重新计算缓存
     bool dataDirty { false };
@@ -238,10 +238,10 @@ void QImPlotValueTrackerNode::PrivateData::processBarGroupsTracking(QImPlotBarGr
         }
 
         TrackedValue tv;
-        tv.sourceType = SourceType::BarGroups;
-        tv.label      = itemLabels.value(nearestItem).toStdString();
-        tv.color      = toQColor(ImPlot::GetColormapColor(nearestItem));
-        tv.xValue     = nearestGroup;
+            tv.sourceType = SourceType::BarGroups;
+            tv.label      = itemLabels.value(nearestItem).toStdString();
+            tv.color      = toQColor(ImPlot::GetColormapColor(nearestItem));
+            tv.xValue     = nearestGroup;
         tv.yValue     = val;
         char buf[64];
         ImFormatString(buf, sizeof(buf), "%.3f", tv.yValue);
@@ -514,7 +514,7 @@ void QImPlotValueTrackerNode::PrivateData::updateTrackingState()
                 trackedValue.sourceType  = SourceType::XY;
                 trackedValue.label       = xyItem->labelConstData();
                 trackedValue.color       = lineColor;
-                trackedValue.xValue      = plotPos.x();
+                trackedValue.xValue  = plotPos.x();
                 trackedValue.yValue      = yVal;
                 trackedValue.xValueLabel = plotNode->axisValueText(plotPos.x(), xyItem->xAxisId());
                 trackedValue.yValueLabel = plotNode->axisValueText(yVal, xyItem->yAxisId());
@@ -714,37 +714,37 @@ bool QImPlotValueTrackerNode::isAutoWidthEnabled() const
 void QImPlotValueTrackerNode::setTextColor(const QColor& color)
 {
     QIM_D(d);
-    d->textColor = color;
+    d->textColor = toImU32(color);
 }
 
 QColor QImPlotValueTrackerNode::textColor() const
 {
     QIM_DC(d);
-    return d->textColor;
+    return toQColor(d->textColor);
 }
 
 void QImPlotValueTrackerNode::setBackgroundColor(const QColor& color)
 {
     QIM_D(d);
-    d->bgColor = color;
+    d->bgColor = toImU32(color);
 }
 
 QColor QImPlotValueTrackerNode::backgroundColor() const
 {
     QIM_DC(d);
-    return d->bgColor;
+    return toQColor(d->bgColor);
 }
 
 void QImPlotValueTrackerNode::setBorderColor(const QColor& color)
 {
     QIM_D(d);
-    d->borderColor = color;
+    d->borderColor = toImU32(color);
 }
 
 QColor QImPlotValueTrackerNode::borderColor() const
 {
     QIM_DC(d);
-    return d->borderColor;
+    return toQColor(d->borderColor);
 }
 
 void QImPlotValueTrackerNode::invalidateCache()
@@ -854,8 +854,8 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
     // === 4. 绘制背景 ===
     ImVec2 bgMin(tooltipX, tooltipY);
     ImVec2 bgMax(tooltipX + tooltipWidth, tooltipY + tooltipHeight);
-    drawList->AddRectFilled(bgMin, bgMax, toImU32(d->bgColor), 3.0f);
-    drawList->AddRect(bgMin, bgMax, toImU32(d->borderColor), 3.0f);
+    drawList->AddRectFilled(bgMin, bgMax, d->bgColor, 3.0f);
+    drawList->AddRect(bgMin, bgMax, d->borderColor, 3.0f);
 
     // === 5. 绘制数据行 ===
     float currentY      = tooltipY + d->tooltipPadding;
@@ -869,7 +869,7 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
                                 2.0f);
 
         float labelX = contentStartX + d->colorBoxSize + d->tooltipPadding;
-        drawList->AddText(ImVec2(labelX, currentY - 1.0f), toImU32(d->textColor), value.label.c_str());
+        drawList->AddText(ImVec2(labelX, currentY - 1.0f), d->textColor, value.label.c_str());
 
         // 绘制Y值（右对齐）
         char yValueText[ 32 ];
@@ -880,21 +880,23 @@ void QImPlotValueTrackerNode::renderTooltip(const std::vector< TrackedValue >& v
         }
         float yValueWidth = ImGui::CalcTextSize(yValueText).x;
         float valueX      = tooltipX + tooltipWidth - d->tooltipPadding - yValueWidth;
-        drawList->AddText(ImVec2(valueX, currentY - 1.0f), toImU32(d->textColor), yValueText);
+        drawList->AddText(ImVec2(valueX, currentY - 1.0f), d->textColor, yValueText);
 
         currentY += itemHeight;
     }
 
-    // === 6. 绘制分隔线 ===
-    drawList->AddLine(ImVec2(tooltipX + d->tooltipPadding, currentY),
-                      ImVec2(tooltipX + tooltipWidth - d->tooltipPadding, currentY),
-                      toImU32(d->borderColor),
-                      1.0f);
-    currentY += 2.0f;
+
 
     // === 7. 绘制X值（底部，仅当有xValueLabel时）===
     if (showXValue) {
-        drawList->AddText(ImVec2(contentStartX, currentY - 1.0f), toImU32(d->textColor), values[ 0 ].xValueLabel.c_str());
+        // === 6. 绘制分隔线 ===
+        drawList->AddLine(ImVec2(tooltipX + d->tooltipPadding, currentY),
+                        ImVec2(tooltipX + tooltipWidth - d->tooltipPadding, currentY),
+                        d->borderColor,
+                        1.0f);
+        currentY += 2.0f;
+
+        drawList->AddText(ImVec2(contentStartX, currentY - 1.0f), d->textColor, values[ 0 ].xValueLabel.c_str());
     }
 
     // === 8. 绘制跟踪线 ===

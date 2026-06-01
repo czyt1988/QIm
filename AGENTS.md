@@ -101,10 +101,13 @@ CI 测试（Ubuntu）需要 `-DQIM_BUILD_TESTS=ON`，运行 `ctest --output-on-f
 - `beginDraw()` 只做 API 调用，直接传递已准备数据——禁止数据转换、条件组装、复杂计算
 - 字符串只存 `QByteArray`（UTF8），不存 `QString`；getter 从 UTF8 转 QString，setter 接 QString 后立即转 UTF8
 - 类的成员变量存储imgui所需要的类型，头文件暴露的接口使用Qt的类型，所有转换在 setter 完成，setter 把qt类型转换为imgui所需要的类型，在beginDraw函数中不需要进行任何的转换直接使用，避免高速刷新的时候带来不必要的转换操作，例如：
-  - 所有 QColor→ImVec4 转换在 setter 完成，beginDraw 直接用成员变量 ImVec4
+  - 所有 QColor→ImVec4/ImU32 转换在 setter 完成，beginDraw 直接用成员变量 ImVec4/ImU32
   - QPointF/QPoint同理，一些点的设置在头文件的函数中保留给用户，但如果需要保存则应在setter中转换为ImVec2，作为成员变量保存
+- **零转换铁律**：`beginDraw()`、`applyStyle()`、`renderTooltip()` 等所有每帧执行的函数及其调用链中，不应该出现渲染外的逻辑，如一些转换（ `toImVec4()`、`toImU32()`、`toQColor()` ），相关转换操作须在 setter 或数据准备阶段完成，并存储为 ImGui 原生类型
+- **PrivateData 存储规则**：`PrivateData` 中如果此变量用于渲染，应该保存为 ImGui 原生类型，以便在渲染函数中直接使用，而getter函数通过转换函数转换为Qt的类型给到用户
+- 头文件中的公共结构体**尽量避免引入 `imgui.h`**，QIm的目的是用户无需了解ImGui的数据类型即可使用，因此不应该暴露ImGui的类型
 - `src\core\QtImGuiUtils.h`定义了ImGui和Qt常见类型的转换，你应该尽量复用，如果发现有ImGui类型和Qt类型需要转换，但`QtImGuiUtils.h`没有定义，你应该判断这个是否是一个通用功能，如果是，你应该加入到`QtImGuiUtils.h`中以便复用
-- `src\core\plot\QImPlot.h`定义了ImPlot的枚举和QIm定义的枚举的转换
+- `src\core\plot\QImPlot.h`和`src\core\plot3d\QImPlot3D.h`定义了ImPlot/ImPlot3D的枚举和QIm定义的枚举的转换，如果开发新功能，你需要考虑是否要添加对应枚举转换
 - ImPlot::SetNextLineStyle 等"每帧设置"API 必须每帧调用（ImGui 即时模式，状态不持久跨帧）
 
 ### 枚举语义转换（2D vs 3D 不同）
@@ -189,3 +192,4 @@ MkDocs + i18n 插件（中英双语站点）。Doxygen API 文档由 CI 生成�
 - **标志宏两种风格**：全局宏(`QIMPLOT_FLAG_*`)定义在QImPlot.h；本地宏(`ClassName_FLAG_ACCESSOR`)定义在各.cpp顶部——本地宏更常用
 - **PrivateData中flags必须命名`flags`**：标志宏通过`d_ptr->flags`访问，变量名不可改
 - **file(GLOB)收集源文件**：CMakeLists用GLOB而非手动列举，新增文件需重配CMake
+- **QImPlot3DStyleNode.cpp 违反颜色存储原则**：PrivateData 中 11 个颜色成员使用 `QColor` 而非 `ImVec4`，导致 `applyStyle()` 中每帧执行 11 次 `toImVec4()` 转换。需要重构为 `ImVec4` 存储，setter/getter 中完成转换，并妥善处理 `IMPLOT3D_AUTO_COL` 哨兵值
