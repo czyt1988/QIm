@@ -192,4 +192,3 @@ MkDocs + i18n 插件（中英双语站点）。Doxygen API 文档由 CI 生成�
 - **标志宏两种风格**：全局宏(`QIMPLOT_FLAG_*`)定义在QImPlot.h；本地宏(`ClassName_FLAG_ACCESSOR`)定义在各.cpp顶部——本地宏更常用
 - **PrivateData中flags必须命名`flags`**：标志宏通过`d_ptr->flags`访问，变量名不可改
 - **file(GLOB)收集源文件**：CMakeLists用GLOB而非手动列举，新增文件需重配CMake
-- **QImPlot3DStyleNode.cpp 违反颜色存储原则**：PrivateData 中 11 个颜色成员使用 `QColor` 而非 `ImVec4`，导致 `applyStyle()` 中每帧执行 11 次 `toImVec4()` 转换。需要重构为 `ImVec4` 存储，setter/getter 中完成转换，并妥善处理 `IMPLOT3D_AUTO_COL` 哨兵值
