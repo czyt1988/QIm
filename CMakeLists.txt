@@ -30,7 +30,7 @@ option(QIM_BUILD_EXAMPLES "Build examples" ON)
 option(QIM_BUILD_SHARED "Build as shared library" ON)
 option(QIM_BUILD_WIDGETS "Build Qt Widgets compatibility layer" ON)
 option(QIM_ENABLE_DEBUG_PRINT "Enable Debug Print" ON)
-option(QIM_ENABLE_DEBUG_PRINT_FPS "Enable Debug Print fps" ON)
+option(QIM_ENABLE_DEBUG_PRINT_FPS "Enable Debug Print fps" OFF)
 option(QIM_ENABLE_BENCHMARK "Enable build benchmark" ON)
 option(QIM_BUILD_QML "Build QML compatibility layer" OFF) # TODO:QML
 option(QIM_BUILD_TESTS "Build tests" OFF)
