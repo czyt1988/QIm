@@ -185,6 +185,6 @@ void MyClass::onPlotChanged(QIM::QImPlotNode* plot, bool attach) {
 
 ## References
 
-- Related docs: [QImPlotNode](plot-node.md), [Render Node](render-node.md)
+- Related docs: [QImPlotNode](plot-node.md), [Render Node](../render-node.md)
 - Example code: `examples/qimfigure-test`
 - API Reference: `src/widgets/QImFigureWidget.h`

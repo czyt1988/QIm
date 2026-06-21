@@ -96,5 +96,5 @@ void QImAbstractNode::render() {
 
 ## References
 
-- Related docs: [Object Tree](object-tree.md), [Custom Node](custom-node.md)
+- Related docs: [Object Tree](object-tree.md), [Custom Node](dev/custom-node.md)
 - API Reference: `src/core/QImAbstractNode.h`

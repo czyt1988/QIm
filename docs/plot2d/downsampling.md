@@ -74,5 +74,5 @@ line->setAdaptivesSampling(false);
 
 ## References
 
-- Related docs: [Performance](performance.md)
+- Related docs: [Performance](../performance.md)
 - API Reference: `src/core/plot/QImLTTBDownsampler.h`

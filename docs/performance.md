@@ -61,4 +61,4 @@ Tests designed around **fairness, reproducibility, realism**:
 2. **OpenGL acceleration has limited actual benefit** when downsampling is enabled
 3. **Memory usage shows significant differences**
 
-See [Chinese version](../zh/performance.md) for detailed test methodology and full results.
+See [Chinese version](zh/performance.md) for detailed test methodology and full results.

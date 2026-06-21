@@ -293,7 +293,7 @@ plot->popColormap(2);
 
 `pushColormap()` 在 `beginDraw()` 中生效，`popColormap()` 在 `endDraw()` 中执行。
 自定义 colormap 可通过 `QImPlotColormapManager` 注册，
-详见[颜色映射文档](colormap.md)。
+详见[颜色映射文档](../colormap.md)。
 
 ## API参考
 

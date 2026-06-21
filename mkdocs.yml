@@ -1,4 +1,5 @@
 site_name: QIm
+site_url: https://czyt1988.github.io/QIm/
 site_author: 'Chen ZongYan'
 site_description: 'Qt 4 ImGui'
 repo_url: https://github.com/czyt1988/QIm
@@ -14,28 +15,36 @@ extra:
   site_name:
     zh: QIm
     en: QIm
-    
+  alternate:
+    - name: English
+      link: /QIm/
+      lang: en
+    - name: 中文
+      link: /QIm/zh/
+      lang: zh
+
 # 主题
 theme:
   name: material
-  language: zh
+  language: en
   palette:
     - scheme: default
       toggle:
         icon: material/brightness-4
-        name: 切换浅色
+        name: Switch to dark
     - scheme: slate
       toggle:
         icon: material/brightness-7
-        name: 切换深色
+        name: Switch to light
   features:
+    - navigation.tabs          # 顶部栏分类导航
     - navigation.sections # 侧边栏章节可折叠
-    - navigation.top # 右下角“回到顶部”按钮
+    - navigation.top # 右下角"回到顶部"按钮
     - navigation.path # 顶部面包屑导航条
     - navigation.expand        # 默认展开全部章节，一眼看到整本书
     - navigation.indexes       # 允许章节首页可点击
     - navigation.footer  # 底部导航条
-    - content.code.copy # 代码块右上角出现“复制”按钮
+    - content.code.copy # 代码块右上角出现"复制"按钮
     - content.code.annotate # 代码块行内注释气泡
     - search.suggest # 搜索框实时联想补全
     - search.highlight # 点击结果后正文高亮匹配关键词
@@ -46,116 +55,114 @@ theme:
 plugins:
   - search
   - i18n:
+      docs_structure: folder
       languages:
-        - locale: zh
-          name: 中文
-          default: true
-          build: true
-          # 中文导航配置
-          nav:
-            - 概述: 
-                - QIm简介: zh/index.md
-            - 核心概念:
-                - 渲染节点: zh/render-node.md
-                - 对象树: zh/object-tree.md
-                - PIMPL模式: zh/pimpl-pattern.md
-                - 信号槽: zh/signal-slot.md
-                - 属性系统: zh/property-system.md
-                - 颜色映射: zh/colormap.md
-            - 2D绘图:
-                - 概述: zh/plot2d/index.md
-                - Figure Widget: zh/plot2d/figure-widget.md
-                - 绘图容器: zh/plot2d/plot-node.md
-                - 坐标轴配置: zh/plot2d/plot-axis.md
-                - 基本图表: zh/plot2d/plot-basic-charts.md
-                - 线条图: zh/plot2d/plot-line.md
-                - 柱状图类: zh/plot2d/plot-bar-charts.md
-                - 填充区域: zh/plot2d/plot-area-charts.md
-                - 特殊图表: zh/plot2d/plot-special-charts.md
-                - 标注类: zh/plot2d/plot-annotations.md
-                - 交互工具: zh/plot2d/plot-tools.md
-                - 数值跟踪器: zh/plot2d/value-tracker.md
-                - 数据系列: zh/plot2d/data-series.md
-                - 降采样: zh/plot2d/downsampling.md
-            - 3D绘图:
-                - 概述: zh/plot3d/index.md
-                - 基本图表: zh/plot3d/basic-charts.md
-                - 曲面图表: zh/plot3d/surface-charts.md
-                - 网格: zh/plot3d/mesh.md
-                - 标注: zh/plot3d/annotations.md
-                - 配置: zh/plot3d/configuration.md
-            - 开发规范:
-                - 概述: zh/dev/index.md
-                - Qt集成规范: zh/dev/qt-integration.md
-                - 代码风格与注释规范: zh/dev/coding-standards.md
-                - PIMPL开发规范: zh/dev/pimpl-dev-guide.md
-                - 渲染性能规范: zh/dev/render-guidelines.md
-                - 枚举语义转换规范: zh/dev/flag-mapping.md
-                - 新节点开发指南: zh/dev/new-node-guide.md
-                - 自定义节点: zh/dev/custom-node.md
-                - 初始化时序陷阱: zh/dev/lifecycle-pitfalls.md
-            - 使用指南:
-                - 渲染模式: zh/render-mode.md
-            - API参考:
-                - C++ API文档: zh/api-reference.md
-            - 其它:
-                - 性能对比: zh/performance.md
-                - 字体: zh/font.md
         - locale: en
           name: English
+          default: true
           build: true
           nav:
-            - Overview:
-                - Introduction: en/index.md
+            - Home: index.md
             - Core Concepts:
-                - Render Node: en/render-node.md
-                - Object Tree: en/object-tree.md
-                - PIMPL Pattern: en/pimpl-pattern.md
-                - Signal/Slot: en/signal-slot.md
-                - Property System: en/property-system.md
-                - Color Mapping: en/colormap.md
+                - Render Node: render-node.md
+                - Object Tree: object-tree.md
+                - PIMPL Pattern: pimpl-pattern.md
+                - Signal/Slot: signal-slot.md
+                - Property System: property-system.md
+                - Color Mapping: colormap.md
             - 2D Plot:
-                - Overview: en/plot2d/index.md
-                - Figure Widget: en/plot2d/figure-widget.md
-                - Plot Container: en/plot2d/plot-node.md
-                - Axis Configuration: en/plot2d/plot-axis.md
-                - Basic Charts: en/plot2d/plot-basic-charts.md
-                - Line Plot: en/plot2d/plot-line.md
-                - Bar Charts: en/plot2d/plot-bar-charts.md
-                - Area Charts: en/plot2d/plot-area-charts.md
-                - Special Charts: en/plot2d/plot-special-charts.md
-                - Annotations: en/plot2d/plot-annotations.md
-                - Interactive Tools: en/plot2d/plot-tools.md
-                - Value Tracker: en/plot2d/value-tracker.md
-                - Data Series: en/plot2d/data-series.md
-                - Downsampling: en/plot2d/downsampling.md
+                - Overview: plot2d/index.md
+                - Figure Widget: plot2d/figure-widget.md
+                - Plot Container: plot2d/plot-node.md
+                - Axis Configuration: plot2d/plot-axis.md
+                - Basic Charts: plot2d/plot-basic-charts.md
+                - Line Plot: plot2d/plot-line.md
+                - Bar Charts: plot2d/plot-bar-charts.md
+                - Area Charts: plot2d/plot-area-charts.md
+                - Special Charts: plot2d/plot-special-charts.md
+                - Annotations: plot2d/plot-annotations.md
+                - Interactive Tools: plot2d/plot-tools.md
+                - Value Tracker: plot2d/value-tracker.md
+                - Data Series: plot2d/data-series.md
+                - Downsampling: plot2d/downsampling.md
             - 3D Plot:
-                - Overview: en/plot3d/index.md
-                - Basic Charts: en/plot3d/basic-charts.md
-                - Surface Charts: en/plot3d/surface-charts.md
-                - Mesh Charts: en/plot3d/mesh.md
-                - Annotations: en/plot3d/annotations.md
-                - Configuration: en/plot3d/configuration.md
+                - Overview: plot3d/index.md
+                - Basic Charts: plot3d/basic-charts.md
+                - Surface Charts: plot3d/surface-charts.md
+                - Mesh Charts: plot3d/mesh.md
+                - Annotations: plot3d/annotations.md
+                - Configuration: plot3d/configuration.md
             - Development Standards:
-                - Overview: en/dev/index.md
-                - Qt Integration Standards: en/dev/qt-integration.md
-                - Coding & Comment Standards: en/dev/coding-standards.md
-                - PIMPL Development Guide: en/dev/pimpl-dev-guide.md
-                - Render Performance Guidelines: en/dev/render-guidelines.md
-                - Flag Mapping Standards: en/dev/flag-mapping.md
-                - New Node Development Guide: en/dev/new-node-guide.md
-                - Custom Node: en/dev/custom-node.md
-                - Lifecycle Pitfalls: en/dev/lifecycle-pitfalls.md
+                - Overview: dev/index.md
+                - Qt Integration Standards: dev/qt-integration.md
+                - Coding & Comment Standards: dev/coding-standards.md
+                - PIMPL Development Guide: dev/pimpl-dev-guide.md
+                - Render Performance Guidelines: dev/render-guidelines.md
+                - Flag Mapping Standards: dev/flag-mapping.md
+                - New Node Development Guide: dev/new-node-guide.md
+                - Custom Node: dev/custom-node.md
+                - Lifecycle Pitfalls: dev/lifecycle-pitfalls.md
             - Usage Guide:
-                - Render Mode: en/render-mode.md
+                - Render Mode: render-mode.md
             - API Reference:
-                - C++ API Docs: en/api-reference.md
+                - C++ API Docs: api-reference.md
             - Others:
-                - Performance: en/performance.md
-                - Font: en/font.md
+                - Performance: performance.md
+                - Font: font.md
+        - locale: zh
+          name: 中文
+          build: true
+          nav:
+            - 首页: index.md
+            - 核心概念:
+                - 渲染节点: render-node.md
+                - 对象树: object-tree.md
+                - PIMPL模式: pimpl-pattern.md
+                - 信号槽: signal-slot.md
+                - 属性系统: property-system.md
+                - 颜色映射: colormap.md
+            - 2D绘图:
+                - 概述: plot2d/index.md
+                - Figure Widget: plot2d/figure-widget.md
+                - 绘图容器: plot2d/plot-node.md
+                - 坐标轴配置: plot2d/plot-axis.md
+                - 基本图表: plot2d/plot-basic-charts.md
+                - 线条图: plot2d/plot-line.md
+                - 柱状图类: plot2d/plot-bar-charts.md
+                - 填充区域: plot2d/plot-area-charts.md
+                - 特殊图表: plot2d/plot-special-charts.md
+                - 标注类: plot2d/plot-annotations.md
+                - 交互工具: plot2d/plot-tools.md
+                - 数值跟踪器: plot2d/value-tracker.md
+                - 数据系列: plot2d/data-series.md
+                - 降采样: plot2d/downsampling.md
+            - 3D绘图:
+                - 概述: plot3d/index.md
+                - 基本图表: plot3d/basic-charts.md
+                - 曲面图表: plot3d/surface-charts.md
+                - 网格: plot3d/mesh.md
+                - 标注: plot3d/annotations.md
+                - 配置: plot3d/configuration.md
+            - 开发规范:
+                - 概述: dev/index.md
+                - Qt集成规范: dev/qt-integration.md
+                - 代码风格与注释规范: dev/coding-standards.md
+                - PIMPL开发规范: dev/pimpl-dev-guide.md
+                - 渲染性能规范: dev/render-guidelines.md
+                - 枚举语义转换规范: dev/flag-mapping.md
+                - 新节点开发指南: dev/new-node-guide.md
+                - 自定义节点: dev/custom-node.md
+                - 初始化时序陷阱: dev/lifecycle-pitfalls.md
+            - 使用指南:
+                - 渲染模式: render-mode.md
+            - API参考:
+                - C++ API文档: api-reference.md
+            - 其它:
+                - 性能对比: performance.md
+                - 字体: font.md
   # 需要版本切换再打开下面
   # - git-revision-date
-  # - mike:                       
+  # - mike:
   #    version_selector: true
   # 需要导出pdf再打开下面
   # - with-pdf:
@@ -164,7 +171,7 @@ plugins:
   #      cover: true
   #      cover_title: DAWorkBench 用户手册
   #      cover_subtitle: 基于工作流数据的分析工具
-  #      cover_logo: assets/icon.png 
+  #      cover_logo: assets/icon.png
   #      verbose: true
 
 markdown_extensions:
@@ -189,7 +196,18 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-          
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
 # 添加额外的 CSS 文件
 extra_css:
   - stylesheets/extra.css

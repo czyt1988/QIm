@@ -41,7 +41,7 @@ classDiagram
 
 示例代码位于:`examples/qimfigure-test`，效果截图如下：
 
-![FigureWidget示例](../assets/plot2D/rt.gif)
+![FigureWidget示例](../../assets/plot2D/rt.gif)
 
 ### 1. 基本使用
 
@@ -185,6 +185,6 @@ void MyClass::onPlotChanged(QIM::QImPlotNode* plot, bool attach) {
 
 ## 参考
 
-- 相关文档：[QImPlotNode](plot-node.md)、[渲染节点](render-node.md)
+- 相关文档：[QImPlotNode](plot-node.md)、[渲染节点](../render-node.md)
 - 示例代码：`examples/qimfigure-test`
 - API参考：`src/widgets/QImFigureWidget.h`

@@ -439,4 +439,4 @@ public:
 - MinMaxLTTB：[predict-idlab/MinMaxLTTB](https://github.com/predict-idlab/MinMaxLTTB)
 - SIMD argminmax参考实现：[tsdownsample/argminmax](https://github.com/predict-idlab/tsdownsample)
 - QIm源码：`QImLTTBDownsampler.h/.cpp`、`QImMinMaxLTTBDownsampler.h/.cpp`、`QImSimdArgMinMax.h/.cpp`、`QImDownsamplingController.h/.cpp`
-- 相关文档：[性能对比](performance.md)、[渲染性能规范](../dev/render-guidelines.md)
+- 相关文档：[性能对比](../performance.md)、[渲染性能规范](../dev/render-guidelines.md)

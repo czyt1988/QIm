@@ -293,7 +293,7 @@ The `QImPlotColormap` enum provides 16 built-in colormaps:
 
 `pushColormap()` takes effect in `beginDraw()`, and `popColormap()` executes in `endDraw()`.
 Custom colormaps can be registered via `QImPlotColormapManager`.
-See [Colormap Documentation](colormap.md) for details.
+See [Colormap Documentation](../colormap.md) for details.
 
 ## API Reference
 

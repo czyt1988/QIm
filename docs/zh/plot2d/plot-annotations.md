@@ -62,7 +62,7 @@ graph TD
 
 该组件的示例位于 `examples/qimfigure-test` 中的 TextFunction，示例截图如下：
 
-![Text示例](../assets/screenshots/text-example.png)
+![Text示例](../../assets/screenshots/text-example.png)
 
 创建文本标签并定位到绘图坐标：
 
@@ -233,7 +233,7 @@ void TextFunction::createPlot(QIM::QImFigureWidget* figure)
 
 该组件的示例位于 `examples/qimfigure-test` 中的 DummyFunction，示例截图如下：
 
-![Dummy示例](../assets/screenshots/dummy-example.png)
+![Dummy示例](../../assets/screenshots/dummy-example.png)
 
 创建虚拟项作为图例占位：
 
@@ -446,7 +446,7 @@ errorBars->setHorizontal(true);   // 误差棒沿 X 轴方向显示
 
 该组件的示例位于 `examples/qimfigure-test` 中的 ErrorBarsFunction，示例截图如下：
 
-![ErrorBars示例](../assets/screenshots/errorbars-example.png)
+![ErrorBars示例](../../assets/screenshots/errorbars-example.png)
 
 创建误差棒并与散点图配合使用：
 

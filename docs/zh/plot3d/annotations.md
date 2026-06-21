@@ -192,7 +192,7 @@ image3D->setTintColor(QColor(255, 200, 0));
 
 该组件的示例位于 `examples/qimfigure-test` 中的 Plot3DImageFunction，示例截图如下：
 
-![3D Image示例](../assets/screenshots/3d-image-example.png)
+![3D Image示例](../../assets/screenshots/3d-image-example.png)
 
 使用标准模式在 3D 空间中渲染图像纹理：
 
@@ -462,7 +462,7 @@ void Plot3DImageFunction::createPlot(QIM::QImFigureWidget* figure)
 
 该组件的示例位于 `examples/qimfigure-test` 中的 Plot3DTextFunction，示例截图如下：
 
-![3D Text示例](../assets/screenshots/3d-text-example.png)
+![3D Text示例](../../assets/screenshots/3d-text-example.png)
 
 创建 3D 文本标签并定位到绘图坐标：
 
@@ -654,7 +654,7 @@ void Plot3DTextFunction::createPlot(QIM::QImFigureWidget* figure)
 
 该组件的示例位于 `examples/qimfigure-test` 中的 Plot3DDummyFunction，示例截图如下：
 
-![3D Dummy示例](../assets/screenshots/3d-dummy-example.png)
+![3D Dummy示例](../../assets/screenshots/3d-dummy-example.png)
 
 创建虚拟项作为图例占位：
 
