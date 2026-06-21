@@ -1,287 +1,297 @@
-# QIm介绍
+---
+title: QIm — Qt × ImGui 可视化
+description: 通过保留模式封装，将 Dear ImGui、ImPlot、ImPlot3D 引入 Qt 的高性能 2D/3D 数据可视化库。
+hide:
+  - navigation
+  - toc
+---
 
-`QIm` 是一个将 `Dear ImGui`、`ImPlot`、`ImPlot3D` 等ImGui生态集成到Qt框架中的开源库。它通过保留模式（Retained Mode）的封装，让Qt开发者能够使用熟悉的Qt编程范式（信号槽、属性系统、对象树）来构建高性能的实时数据可视化应用。
+<div class="qim-hero">
+<div class="qim-hero-bg"></div>
+<div class="qim-hero-inner">
 
-基于`QIm`，你无需学习 `ImGui`，即可直接使用熟悉的 Qt 信号槽、属性系统与对象树管理机制，构建实时数据监控、科学绘图2D/3D界面、工程仿真可视化等高性能应用场景。
+<p class="qim-hero-badge">开源 &middot; MIT 协议</p>
 
-`QIm`计划把ImGui生态的成熟库进行封装，目前正在做`ImPlot`和`ImPlot3D`的封装，旨在为Qt开发环境提供一款开箱即用的数据可视化库。
+<h1 class="qim-hero-title">Qt &times; ImGui 可视化</h1>
 
-## 效果
+<p class="qim-hero-desc">
+通过保留模式封装，将 Dear ImGui、ImPlot、ImPlot3D 引入 Qt
+的高性能 2D/3D 数据可视化库 &mdash;
+信号槽、属性系统、对象树，一切如你所熟悉的 Qt 范式。
+</p>
 
-通过`QIm`的`Plot`模块，可以实现如下数据可视化效果：
+<div class="qim-hero-pills">
+<span>C++17</span>
+<span>CMake</span>
+<span>Qt 5.14+ / Qt 6</span>
+<span>OpenGL</span>
+</div>
 
-### 2D绘图
+<div class="qim-hero-actions">
+<a href="plot2d/" class="qim-btn qim-btn-primary">快速开始</a>
+<a href="https://github.com/czyt1988/QIm" class="qim-btn qim-btn-ghost">GitHub</a>
+</div>
 
-|  |  |  |
-|:---:|:---:|:---:|
-| ![bars](../assets/plot2D/bars.gif) | ![candle](../assets/plot2D/candle.gif) | ![controls](../assets/plot2D/controls.gif) |
-| ![dnd](../assets/plot2D/dnd.gif) | ![heat](../assets/plot2D/heat.gif) | ![markers](../assets/plot2D/markers.gif) |
-| ![pie](../assets/plot2D/pie.gif) | ![query](../assets/plot2D/query.gif) | ![realtime](../assets/plot2D/rt.gif) |
-| ![shaded](../assets/plot2D/shaded.gif) | ![stem](../assets/plot2D/stem.gif) | ![tables](../assets/plot2D/tables.gif) |
+</div>
+</div>
 
-### 3D绘图
+<div class="qim-stats-bar">
+<div class="qim-stat">
+<strong>2D &amp; 3D</strong>
+<span>双引擎可视化</span>
+</div>
+<div class="qim-stat-divider"></div>
+<div class="qim-stat">
+<strong>25+</strong>
+<span>图表类型</span>
+</div>
+<div class="qim-stat-divider"></div>
+<div class="qim-stat">
+<strong>Qt 5 &amp; 6</strong>
+<span>完全兼容</span>
+</div>
+<div class="qim-stat-divider"></div>
+<div class="qim-stat">
+<strong>MIT</strong>
+<span>商用友好</span>
+</div>
+</div>
 
-|  |  |  |
-|:---:|:---:|:---:|
-|![3D demo1](../assets/plot3D/plot3d-demo1.gif)|![3D demo2](../assets/plot3D/plot3d-demo2.gif)|![3D demo3](../assets/plot3D/plot3d-demo3.gif)|
-|![3D demo4](../assets/plot3D/plot3d-demo4.gif)|![3D demo5](../assets/plot3D/plot3d-demo5.gif)|![3D demo6](../assets/plot3D/plot3d-demo6.gif)|
+<div class="qim-container">
 
-## 核心设计
+<div class="qim-section-head">
+<h2>核心特性</h2>
+<p>在 Qt 应用中构建高性能实时数据可视化所需的一切。</p>
+</div>
 
-`ImGui` 原生采用即时模式（Immediate Mode）：每次渲染都需重新构建 UI 结构，与 Qt 编程习惯差异较大：
+<div class="qim-card-grid">
 
-```cpp
-// 传统ImGui代码即时模式代码,这段带码每次刷新帧都要执行一遍
-if (ImGui::Begin("Window")) {
-    if (ImPlot::BeginPlot("Plot")) {
-        ImPlot::PlotLine(...);
-        ImPlot::EndPlot();
-    }
-    ImGui::End();
-}
-```
+<div class="qim-card">
+<div class="qim-card-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+</div>
+<h3>高性能渲染</h3>
+<p>基于 OpenGL 加速的渲染管线，可流畅处理百万级数据点。在原生渲染场景下，性能领先 QPainter 类库 1.5~2 倍。</p>
+</div>
 
-`QIm` 将其转换为 Qt 开发者熟悉的保留模式（Retained Mode），通过面向对象 + 对象树的方式管理 UI 组件，属性与交互完全贴合 Qt 生态：
+<div class="qim-card">
+<div class="qim-card-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path><path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path><path d="M12 3c0 1 1 3 3 3s3-2 3-3-1-3-3-3-3 2-3 3"></path><path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"></path></svg>
+</div>
+<h3>Qt 范式</h3>
+<p>原生支持 Qt 信号槽、属性系统（<code>Q_PROPERTY</code>）与 QObject 对象树。无需学习 ImGui，用你已熟悉的方式编程。</p>
+</div>
 
-```cpp
-// QIm方式 - 面向对象，更符合Qt习惯
-auto window = new QImWindowNode(root);
-window->setTitle("Window");
+<div class="qim-card">
+<div class="qim-card-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+</div>
+<h3>2D &amp; 3D 双引擎</h3>
+<p>统一 API 封装 ImPlot（2D）与 ImPlot3D（3D）。折线、散点、柱状、曲面、网格、热力图、饼图、K 线 &mdash; 25+ 图表类型，一个 <code>QImFigureWidget</code> 搞定。</p>
+</div>
 
-auto plot = new QImPlotNode(window);  // 自动成为子节点
-plot->setTitle("Plot");
+<div class="qim-card">
+<div class="qim-card-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+</div>
+<h3>LTTB 降采样</h3>
+<p>内置 <code>QImLTTBDownsampler</code>，支持 SIMD 加速。自适应采样在保证可视化精度的同时，驯服百万级数据点。</p>
+</div>
 
-auto line = new QImPlotLineNode(plot);
-line->setData(...);
-```
+<div class="qim-card">
+<div class="qim-card-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"></path><path d="M8 3H3v5"></path><path d="M21 16v5h-5"></path><path d="M3 16v5h5"></path><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg>
+</div>
+<h3>保留模式封装</h3>
+<p>将 ImGui 的即时模式转换为 Qt 友好的保留模式。通过对象树构建 UI &mdash; 属性只需设置一次，框架每帧自动渲染。</p>
+</div>
 
-`QIm`的核心是将 `ImGui` 生态的组件映射为 Qt 节点对象，将 `ImGui` 属性映射为 Qt 属性系统，同时保留信号槽机制
+<div class="qim-card">
+<div class="qim-card-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+</div>
+<h3>丰富的交互</h3>
+<p>内置拖拽点/线/框、注释标注、轴标签，以及自动拾取光标附近数据点的 <code>ValueTracker</code>（值追踪器）&mdash; 支持多子图联动追踪，全部通过 Qt 信号槽实时响应。</p>
+</div>
 
-## 快速开始
+</div>
+</div>
 
+<div class="qim-showcase">
 
-### 编译和安装
+<div class="qim-section-head">
+<h2>可视化展示</h2>
+<p>从实时监控到三维科学可视化。</p>
+</div>
 
-项目使用`cmake`构建,建议执行安装(install)后使用
+<div class="qim-gallery">
 
-```cmake
-# 创建构建目录
-mkdir build && cd build
-# 配置（指定 Qt 安装路径，或确保 Qt 已加入环境变量）
-cmake .. -G "Visual Studio 17 2022" -A x64 ^
-         -DCMAKE_PREFIX_PATH="C:/Qt/6.5.0/msvc2019_64" ^
-         -DCMAKE_BUILD_TYPE=Release
-# 构建
-cmake --build . --config Release
-# 安装（可选，默认安装到 build/install 目录）
-cmake --install .
-```
-### 项目集成
+<a class="qim-gallery-item" href="plot2d/plot-line/">
+<img src="../assets/plot2D/rt.gif" alt="实时绘图" loading="lazy">
+<span>实时绘图</span>
+</a>
 
-在你的 Qt 项目 `CMakeLists.txt` 中引入 `QIm`：
+<a class="qim-gallery-item" href="plot2d/plot-bar-charts/">
+<img src="../assets/plot2D/bars.gif" alt="柱状图" loading="lazy">
+<span>柱状图</span>
+</a>
 
-```cmake
-# 基础 Qt 组件依赖
-set(MIN_QT_VERSION 5.14)
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} ${MIN_QT_VERSION} COMPONENTS
-    Core
-    Gui
-    Widgets
-    OpenGL
-    REQUIRED
-)
+<a class="qim-gallery-item" href="plot2d/plot-basic-charts/">
+<img src="../assets/plot2D/candle.gif" alt="K线图" loading="lazy">
+<span>K 线图</span>
+</a>
 
-# Qt6 需额外引入 OpenGLWidgets
-if(${QT_VERSION_MAJOR} EQUAL 6)
-    find_package(Qt${QT_VERSION_MAJOR} ${MIN_QT_VERSION} COMPONENTS
-        OpenGLWidgets
-        REQUIRED
+<a class="qim-gallery-item" href="plot2d/plot-special-charts/">
+<img src="../assets/plot2D/pie.gif" alt="饼图" loading="lazy">
+<span>饼图</span>
+</a>
+
+<a class="qim-gallery-item" href="plot2d/plot-special-charts/">
+<img src="../assets/plot2D/heat.gif" alt="热力图" loading="lazy">
+<span>热力图</span>
+</a>
+
+<a class="qim-gallery-item" href="plot2d/plot-area-charts/">
+<img src="../assets/plot2D/shaded.gif" alt="填充区域" loading="lazy">
+<span>填充区域</span>
+</a>
+
+<a class="qim-gallery-item" href="plot2d/plot-basic-charts/">
+<img src="../assets/plot2D/stem.gif" alt="茎叶图" loading="lazy">
+<span>茎叶图</span>
+</a>
+
+<a class="qim-gallery-item" href="plot2d/plot-special-charts/">
+<img src="../assets/plot2D/tables.gif" alt="表格" loading="lazy">
+<span>表格</span>
+</a>
+
+<a class="qim-gallery-item" href="plot3d/">
+<img src="../assets/plot3D/plot3d-demo1.gif" alt="三维曲面" loading="lazy">
+<span>三维曲面</span>
+</a>
+
+<a class="qim-gallery-item" href="plot3d/basic-charts/">
+<img src="../assets/plot3D/plot3d-demo2.gif" alt="三维散点" loading="lazy">
+<span>三维散点</span>
+</a>
+
+<a class="qim-gallery-item" href="plot3d/mesh/">
+<img src="../assets/plot3D/plot3d-demo3.gif" alt="三维网格" loading="lazy">
+<span>三维网格</span>
+</a>
+
+<a class="qim-gallery-item" href="plot3d/surface-charts/">
+<img src="../assets/plot3D/plot3d-demo4.gif" alt="三维可视化" loading="lazy">
+<span>三维可视化</span>
+</a>
+
+</div>
+
+</div>
+
+<div class="qim-quickstart" markdown>
+
+<div class="qim-quickstart-inner" markdown>
+
+<div class="qim-section-head">
+<h2>快速开始</h2>
+<p>几分钟内将 QIm 集成到你的 Qt 项目。</p>
+</div>
+
+=== "CMake 集成"
+
+    ```cmake
+    # 查找并链接 QIm
+    find_package(QIm REQUIRED)
+
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Gui
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::OpenGL
+        QIm::Core
+        QIm::Widgets
     )
-    target_link_libraries(<your_target> PRIVATE
-        Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-    )
-endif()
 
-# 引入 QIm
-find_package(QIm REQUIRED)
+    # Qt6 需额外引入 OpenGLWidgets
+    if(${QT_VERSION_MAJOR} EQUAL 6)
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+        )
+    endif()
+    ```
 
-# 链接依赖
-target_link_libraries(<your_target> PRIVATE 
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Gui
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::OpenGL
-    QIm::Core 
-    QIm::Widgets
-)
+=== "第一个 2D 图"
 
-```
+    ```cpp
+    #include <QImFigureWidget.h>
 
-### 简单示例
+    // 创建 2x2 子图网格的图窗
+    auto* figure = new QIM::QImFigureWidget(this);
+    figure->setSubplotGrid(2, 2);
 
-`QIm`目前把`ImPlot`进行了封装，同步封装了对应的`Widget`窗口，在一个Qt桌面应用程序中，像建立窗口一样即可实现ImGui的界面，同时还支持信号槽，实现Qt环境的数据交互
-
-```cpp
-#include <QImFigureWidget.h>
-
-class MainWindow : public QMainWindow {
-    Q_OBJECT
-public:
-    MainWindow(QWidget* parent = nullptr) : QMainWindow(parent) {
-        // 创建绘图窗口
-        QIM::QImFigureWidget* figure = new QIM::QImFigureWidget(this);
-        setCentralWidget(figure);
-        
-        // 配置2行1列的子图
-        figure->setSubplotGrid(2, 1);
-        
-        // 创建第一个子图
-        QIM::QImPlotNode* plot1 = figure->createPlotNode();
-        plot1->x1Axis()->setLabel("时间 (s)");
-        plot1->y1Axis()->setLabel("幅度");
-        
-        // 添加数据
-        QVector<double> x = {0, 1, 2, 3, 4};
-        QVector<double> y = {0, 1, 4, 9, 16};
-        plot1->addLine(x, y, "二次曲线");
-        
-        // 第二个子图
-        QIM::QImPlotNode* plot2 = figure->createPlotNode();
-        plot2->setLegendEnabled(true);
-        
-        // 添加多条曲线
-        std::vector<double> x2 = {0, 1, 2, 3, 4};
-        std::vector<double> sin_y, cos_y;
-        for (double val : x2) {
-            sin_y.push_back(std::sin(val));
-            cos_y.push_back(std::cos(val));
+    // 子图1 - 折线图
+    if (auto* plot = figure->createPlotNode()) {
+        plot->setTitle("正弦波");
+        std::vector<double> x, y;
+        for (int i = 0; i < 400; ++i) {
+            double v = i * 2.0 * M_PI / 399.0;
+            x.push_back(v);
+            y.push_back(std::sin(v));
         }
-        plot2->addLine(x2, sin_y, "sin(x)");
-        plot2->addLine(x2, cos_y, "cos(x)");
+        plot->addLine(x, y, "sin(x)");
     }
-};
-```
 
-### 大规模数据处理
-
-针对超大数据量（>50 万点）的渲染压力，QIm 内置基于 `LTTB` 算法的降采样模块（QImLTTBDownsampler），默认开启自适应采样，兼顾渲染性能与数据可视化精度。
-
-### 渲染模式控制
-
-QIm提供三种渲染策略适应不同场景，你可以通过`QImWidget::setRenderMode`根据你面对的场景选择合适的渲染模式：
-
-```cpp
-QImWidget* widget = new QImWidget();
-widget->setRenderMode(QImWidget::RenderAdaptive);  // 默认：智能自适应
-
-// 三种模式：
-// 1. RenderAdaptive: 交互时高帧率(18FPS)，静止时低帧率(1FPS)
-// 2. RenderContinuous: 持续渲染(18FPS)，适合动画
-// 3. RenderOnDemand: 仅在事件触发时渲染，最节能
-```
-
-### 自定义节点开发
-
-继承`QImAbstractNode`创建自定义组件：
-
-```cpp
-class CustomPlotNode : public QImAbstractNode {
-    Q_OBJECT
-public:
-    CustomPlotNode(QObject* parent = nullptr) : QImAbstractNode(parent) {}
-    
-protected:
-    bool beginDraw() override {
-        // 对应 ImGui::Begin("MyCustomWindow")
-        return ImGui::Begin("MyCustomWindow", nullptr, m_flags);
+    // 子图2 - 散点图
+    if (auto* plot = figure->createPlotNode()) {
+        plot->setTitle("散点图");
+        std::vector<double> x{0.2, 0.5, 0.9, 1.3, 1.8, 2.1, 2.6, 3.0};
+        std::vector<double> y{1.4, 1.0, 1.8, 1.3, 2.0, 1.7, 2.3, 2.1};
+        auto* scatter = new QIM::QImPlotScatterItemNode(plot);
+        scatter->setData(x, y);
+        scatter->setColor(QColor(0, 114, 189));
     }
-    
-    void endDraw() override {
-        ImGui::End();
-    }
-    
-private:
-    ImGuiWindowFlags m_flags = 0;
-};
-```
+    ```
 
-## 已知限制
+=== "自定义节点"
 
-当前`QIm`的`Plot`模块存在如下**缺陷**，选用请自行评估
+    ```cpp
+    // 继承 QImAbstractNode 封装任意 ImGui 组件
+    class CustomPlotNode : public QImAbstractNode {
+        Q_OBJECT
+    public:
+        CustomPlotNode(QObject* parent = nullptr) : QImAbstractNode(parent) {}
 
-- 不能任意添加字体，你需要先加载字体文件才能加载对应字体
-- 不支持线形，你无法指定虚线、点划线等操作
+    protected:
+        bool beginDraw() override {
+            // 对应 ImGui::Begin("MyCustomWindow")
+            return ImGui::Begin("MyCustomWindow", nullptr, m_flags);
+        }
 
-## 绘图性能对比测试
+        void endDraw() override {
+            ImGui::End();
+        }
 
-Qt 生态里能画图的库不多，主流的为`QCustomPlot`、`Qwt`、`Qt Charts`和`KDChart`，后两者性能低，和前两者不是一个数量级，这里不做讨论，在性能对比测试中，主要对比`QCustomPlot`和`Qwt`
+    private:
+        ImGuiWindowFlags m_flags = 0;
+    };
+    ```
 
-`QCustomPlot`和`Qwt`都自带了降采样算法，在点数非常多的时候可与高效绘图，`Qwt`默认不开启降采样算法，`QCustomplot`默认是开启降采样算法的，Qwt可以通过`QwtPlotCurve::setPaintAttribute(QwtPlotCurve::FilterPointsAggressive);`开启降采样算法，性能可以极大提高，下面对比区分开启降采样算法和不开启降采样算法以及开启OpenGL和不开启OpenGL的情况
+</div>
+</div>
 
-下面是`QIm`和`QCustomPlot`、`Qwt`在「100万点绘图」场景下进行性能对比（渲染100次取平均），测试覆盖不同降采样/OpenGL 配置：
+<div class="qim-footer">
+<div class="qim-footer-inner">
 
-### 测试1：降采样关闭 + OpenGL 关闭
+<h2>立即开始构建</h2>
+<p>查阅文档或浏览源代码。</p>
 
-| 绘图库 | 单次绘图耗时(MS) | FPS |
-|--------|------------------|-----|
-| QCustomPlot | 249.3 | 4.01123 |
-| Qwt | 144.1 | 6.93963 |
-| QIm | 92.45 | 10.8167 |
+<div class="qim-footer-links">
+<a href="plot2d/" class="qim-btn qim-btn-primary">阅读文档</a>
+<a href="../" class="qim-btn qim-btn-ghost">English</a>
+<a href="https://github.com/czyt1988/QIm" class="qim-btn qim-btn-ghost">GitHub</a>
+</div>
 
-### 测试2：降采样开启 + OpenGL 关闭
-
-| 绘图库 | 单次绘图耗时(MS) | FPS |
-|--------|------------------|-----|
-| QCustomPlot | 39.58 | 25.2653 |
-| Qwt | 41.51 | 24.0906 |
-| QIm | 36.61 | 27.3149 |
-
-### 测试3：降采样关闭 + OpenGL 开启
-
-| 绘图库 | 单次绘图耗时(MS) | FPS |
-|--------|------------------|-----|
-| QCustomPlot | 152.93 | 6.53894 |
-| Qwt | 121.78 | 8.21153 |
-| QIm | 80.72 | 12.3885 |
-
-### 测试4：降采样开启 + OpenGL 开启
-
-| 绘图库 | 单次绘图耗时(MS) | FPS |
-|--------|------------------|-----|
-| QCustomPlot | 44.56 | 22.4417 |
-| Qwt | 43.58 | 22.9463 |
-| QIm | 38.73 | 25.8198 |
-
-### 结论
-
-| 场景 | 性能排序 | 关键特征 |
-|------|----------|----------|
-| **无降采样 + 无OpenGL** | **QIm ≫ Qwt > QCustomPlot** | QIm 凭借 OpenGL 渲染管线优势，在百万级数据下性能领先 1.5~2 倍 |
-| **开启降采样（LTTB）** | **三者性能趋同** | 降采样成为性能瓶颈，库间差异缩小至 10% 以内 |
-| **内存占用** | **Qwt ≈ QCustomPlot ≪ QIm** | QIm 内存开销约为其他库的 5~15 倍（架构特性决定） |
-
-#### 1. 降采样是大数据量渲染的决定性因素
-
-- **10万点以下**：原生渲染性能差异显著（QIm 优势明显）
-- **50万点以上**：开启降采样后，三者渲染耗时差距缩小至 5% 以内
-- **结论**：>10万点场景**必须启用降采样**，此时选择库应优先考虑功能与易用性，而非纯渲染性能
-
-#### 2. OpenGL 加速的实际收益有限
-
-对于Qwt,QCustomPlot等库
-- 在**已开启降采样**的前提下，启用 OpenGL 对 FPS 提升 <5%
-- 仅在**无降采样 + 超大数据量**场景下，OpenGL 能带来 30%+ 性能增益（但此时帧率仍低于 10 FPS，实用性低）
-- **建议**：优先启用降采样，OpenGL 作为辅助优化手段
-
-#### 3. 内存占用呈现明显差异
-
-| 库 | 100万点内存 | 500万点内存 | 特点 |
-|----|-------------|-------------|------|
-| QIm | ~460 MB | ~1.4 GB | ImGui 架构需维护双缓冲+GPU资源，内存开销大 |
-| Qwt | ~21 MB | ~134 MB | 内存效率高 |
-| QCustomPlot | ~21 MB | ~82 MB | 内存控制优秀，500万点时反超Qwt |
-
-**注：**测试中的内存检测是检测整个测试过程的峰值内存差值，可能会存在偏差
-
-具体测试代码见`benchmark/performance`
+</div>
+</div>

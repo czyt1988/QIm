@@ -1,6 +1,531 @@
-/* 导航栏一级标题样式 */
+/* ============================================================
+   QIm Documentation Styles
+   Indigo aesthetic with dark/light mode
+   ============================================================ */
+
+/* ----- Design Tokens ----- */
+:root {
+    --qim-primary: #6366f1;
+    --qim-primary-hover: #818cf8;
+    --qim-glow: rgba(99, 102, 241, 0.25);
+
+    --qim-surface: #ffffff;
+    --qim-surface-raised: #f8fafc;
+    --qim-border: #e2e8f0;
+    --qim-text: #1e293b;
+    --qim-text-secondary: #475569;
+    --qim-text-muted: #94a3b8;
+
+    --qim-card-bg: #ffffff;
+    --qim-card-border: #e2e8f0;
+    --qim-card-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --qim-card-shadow-hover: 0 8px 24px rgba(0,0,0,0.1);
+
+    --qim-code-bg: #0f172a;
+
+    --qim-hero-bg: linear-gradient(160deg, #0f172a 0%, #312e81 40%, #1e1b4b 100%);
+    --qim-hero-text: #f1f5f9;
+    --qim-hero-muted: #94a3b8;
+    --qim-hero-pill-bg: rgba(255,255,255,0.08);
+    --qim-hero-pill-border: rgba(255,255,255,0.15);
+
+    --qim-footer-bg: linear-gradient(160deg, #0f172a 0%, #1e1b4b 100%);
+    --qim-footer-text: #f1f5f9;
+    --qim-footer-muted: #64748b;
+
+    --qim-icon-color: #6366f1;
+}
+
+[data-md-color-scheme="slate"] {
+    --qim-primary: #818cf8;
+    --qim-primary-hover: #a5b4fc;
+    --qim-glow: rgba(129, 140, 248, 0.2);
+
+    --qim-surface: #1e293b;
+    --qim-surface-raised: #0f172a;
+    --qim-border: #334155;
+    --qim-text: #e2e8f0;
+    --qim-text-secondary: #cbd5e1;
+    --qim-text-muted: #64748b;
+
+    --qim-card-bg: #1e293b;
+    --qim-card-border: #334155;
+    --qim-card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --qim-card-shadow-hover: 0 8px 24px rgba(0,0,0,0.4);
+
+    --qim-code-bg: #020617;
+
+    --qim-hero-bg: linear-gradient(160deg, #020617 0%, #0f172a 40%, #0a0f2c 100%);
+    --qim-hero-text: #f1f5f9;
+    --qim-hero-muted: #64748b;
+    --qim-hero-pill-bg: rgba(255,255,255,0.05);
+    --qim-hero-pill-border: rgba(255,255,255,0.1);
+
+    --qim-footer-bg: linear-gradient(160deg, #020617 0%, #0f172a 100%);
+    --qim-footer-text: #e2e8f0;
+    --qim-footer-muted: #475569;
+
+    --qim-icon-color: #818cf8;
+}
+
+/* ----- Nav section headers ----- */
 .md-nav__item--section > .md-nav__link {
-    color: #497cad !important; /* 蓝色 */
+    color: var(--qim-primary) !important;
     font-weight: bold;
     font-size: 1.1em;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.qim-hero {
+    position: relative;
+    padding: 80px 24px 56px;
+    text-align: center;
+    overflow: hidden;
+    margin: -24px -24px 0;
+    background: var(--qim-hero-bg);
+    color: var(--qim-hero-text);
+}
+
+.qim-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+
+.qim-hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.qim-hero-badge {
+    display: inline-block;
+    padding: 5px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #94a3b8 !important;
+    background: var(--qim-hero-pill-bg);
+    border: 1px solid var(--qim-hero-pill-border);
+    border-radius: 100px;
+    margin: 0 0 24px;
+}
+
+.qim-hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 0 0 20px;
+    color: #ffffff !important;
+}
+
+.qim-hero-desc {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #94a3b8 !important;
+    margin: 0 auto 32px;
+    max-width: 540px;
+}
+
+.qim-hero-pills {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+}
+
+.qim-hero-pills span {
+    display: inline-block;
+    padding: 6px 16px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #cbd5e1 !important;
+    background: var(--qim-hero-pill-bg);
+    border: 1px solid var(--qim-hero-pill-border);
+    border-radius: 6px;
+}
+
+.qim-hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ----- Buttons ----- */
+.qim-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 24px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.qim-btn-primary {
+    background: var(--qim-primary);
+    color: #fff !important;
+    box-shadow: 0 2px 12px var(--qim-glow);
+}
+
+.qim-btn-primary:hover {
+    background: var(--qim-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px var(--qim-glow);
+}
+
+.qim-btn-ghost {
+    background: transparent;
+    color: var(--qim-hero-text) !important;
+    border: 1px solid var(--qim-hero-pill-border);
+}
+
+.qim-btn-ghost:hover {
+    background: var(--qim-hero-pill-bg);
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   STATS BAR
+   ============================================================ */
+.qim-stats-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 32px 24px;
+    background: var(--qim-surface);
+    border-bottom: 1px solid var(--qim-border);
+    flex-wrap: wrap;
+}
+
+.qim-stat {
+    text-align: center;
+    padding: 8px 40px;
+}
+
+.qim-stat strong {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--qim-primary);
+    line-height: 1.2;
+}
+
+.qim-stat span {
+    font-size: 0.8rem;
+    color: var(--qim-text-muted);
+    font-weight: 500;
+}
+
+.qim-stat-divider {
+    width: 1px;
+    height: 36px;
+    background: var(--qim-border);
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   CONTAINER & SECTION HEAD
+   ============================================================ */
+.qim-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 64px 24px;
+}
+
+.qim-section-head {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.qim-section-head h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--qim-text) !important;
+    margin: 0 0 10px !important;
+    letter-spacing: -0.02em;
+}
+
+.qim-section-head p {
+    font-size: 1.05rem;
+    color: var(--qim-text-secondary) !important;
+    margin: 0;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+/* ============================================================
+   FEATURE CARDS
+   ============================================================ */
+.qim-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.qim-card {
+    background: var(--qim-card-bg);
+    border: 1px solid var(--qim-card-border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    transition: all 0.25s ease;
+    box-shadow: var(--qim-card-shadow);
+}
+
+.qim-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--qim-card-shadow-hover);
+    border-color: var(--qim-primary);
+}
+
+.qim-card-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 16px;
+    color: var(--qim-icon-color);
+}
+
+.qim-card-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.qim-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--qim-text) !important;
+    margin: 0 0 8px !important;
+}
+
+.qim-card p {
+    font-size: 0.88rem;
+    color: var(--qim-text-secondary) !important;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.qim-card code {
+    font-size: 0.82rem;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--qim-surface-raised);
+    border: 1px solid var(--qim-border);
+}
+
+/* ============================================================
+   SHOWCASE GALLERY
+   ============================================================ */
+.qim-showcase {
+    background: var(--qim-surface-raised);
+    padding: 64px 24px;
+}
+
+.qim-gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    max-width: 1100px;
+    margin: 0 auto 16px;
+}
+
+.qim-gallery-item {
+    position: relative;
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--qim-card-bg);
+    border: 1px solid var(--qim-card-border);
+    box-shadow: var(--qim-card-shadow);
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.qim-gallery-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--qim-card-shadow-hover);
+    border-color: var(--qim-primary);
+}
+
+.qim-gallery-item img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+}
+
+.qim-gallery-item span {
+    display: block;
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--qim-text) !important;
+    text-align: center;
+}
+
+/* ============================================================
+   QUICK START
+   ============================================================ */
+.qim-quickstart {
+    background: var(--qim-code-bg);
+    padding: 64px 24px;
+}
+
+.qim-quickstart-inner {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.qim-quickstart .qim-section-head h2 {
+    color: #f1f5f9 !important;
+}
+
+.qim-quickstart .qim-section-head p {
+    color: #94a3b8 !important;
+}
+
+.qim-quickstart .tabbed-set {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* Tab labels sit on the dark quickstart background — force light text so
+   the default-theme dark labels are readable, with the active tab in indigo. */
+.qim-quickstart .tabbed-labels {
+    background: #020617;
+}
+
+.qim-quickstart .tabbed-labels label {
+    color: #94a3b8 !important;
+}
+
+.qim-quickstart .tabbed-set input:nth-of-type(1):checked ~ .tabbed-labels label:nth-of-type(1),
+.qim-quickstart .tabbed-set input:nth-of-type(2):checked ~ .tabbed-labels label:nth-of-type(2),
+.qim-quickstart .tabbed-set input:nth-of-type(3):checked ~ .tabbed-labels label:nth-of-type(3) {
+    color: #818cf8 !important;
+}
+
+/* ============================================================
+   FOOTER CTA
+   ============================================================ */
+.qim-footer {
+    background: var(--qim-footer-bg);
+    padding: 64px 24px;
+    text-align: center;
+    color: var(--qim-footer-text);
+    position: relative;
+    overflow: hidden;
+}
+
+.qim-footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+
+.qim-footer-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.qim-footer h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: var(--qim-footer-text) !important;
+}
+
+.qim-footer p {
+    font-size: 1.05rem;
+    color: var(--qim-footer-muted) !important;
+    margin: 0 0 32px;
+}
+
+.qim-footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+    .qim-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .qim-gallery {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .qim-hero {
+        padding: 48px 16px 40px;
+    }
+    .qim-hero-title {
+        font-size: 2.2rem;
+    }
+    .qim-hero-desc {
+        font-size: 1rem;
+    }
+    .qim-card-grid {
+        grid-template-columns: 1fr;
+    }
+    .qim-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .qim-stats-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .qim-stat {
+        padding: 8px 20px;
+    }
+    .qim-stat-divider {
+        display: none;
+    }
+    .qim-container,
+    .qim-showcase {
+        padding: 40px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .qim-hero-title {
+        font-size: 1.75rem;
+    }
+    .qim-gallery {
+        grid-template-columns: 1fr;
+    }
+    .qim-hero-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    .qim-footer-links {
+        flex-direction: column;
+        align-items: center;
+    }
 }
