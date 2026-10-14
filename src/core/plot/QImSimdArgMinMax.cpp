@@ -84,7 +84,7 @@ static ArgMinMaxResult argMinMaxScalar(const double* data, int count)
 }
 
 // ===== SSE4.2 implementation =====
-#if defined(__SSE4_2__) || (defined(_MSC_VER) && _MSC_VER >= 1700)
+#if defined(QIM_X86_INTRINSICS_AVAILABLE) && (defined(__SSE4_2__) || (defined(_MSC_VER) && _MSC_VER >= 1700))
 
 static ArgMinMaxResult argMinMaxSSE42(const double* data, int count)
 {
@@ -156,7 +156,7 @@ static ArgMinMaxResult argMinMaxSSE42(const double* data, int count)
 #endif
 
 // ===== AVX2 implementation =====
-#if defined(__AVX2__) || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#if defined(QIM_X86_INTRINSICS_AVAILABLE) && (defined(__AVX2__) || (defined(_MSC_VER) && _MSC_VER >= 1800))
 
 static ArgMinMaxResult argMinMaxAVX2(const double* data, int count)
 {
