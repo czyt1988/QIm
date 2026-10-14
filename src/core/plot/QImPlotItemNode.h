@@ -2,6 +2,7 @@
 #define QIMPLOTITEMNODE_H
 #include "QImAbstractNode.h"
 #include "QImPlot.h"
+#include <QPointF>
 
 struct ImPlotItem;
 

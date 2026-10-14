@@ -2,6 +2,7 @@
 #define QIMPLOTVALUETRACKERNODE_H
 #include "QImAbstractNode.h"
 #include <QColor>
+#include <QPointF>
 #include <string>
 #include <vector>
 namespace QIM

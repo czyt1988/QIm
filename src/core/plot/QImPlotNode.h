@@ -4,6 +4,7 @@
 #include <QSizeF>
 #include <QRectF>
 #include <QColor>
+#include <QPointF>
 #include "QImPlot.h"
 #include "QImPlotLineItemNode.h"
 namespace QIM
