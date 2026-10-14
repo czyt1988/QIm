@@ -33,7 +33,7 @@ private Q_SLOTS:
     void testAutoSizeGetterSetter();
     void testAutoSizeChangedSignal();
 
-    // ImPlotFlags - negative to positive semantics (NoXxx �?xxxEnabled)
+    // ImPlotFlags - negative to positive semantics (NoXxxxxxEnabled)
     void testTitleEnabledFlag();
     void testLegendEnabledFlag();
     void testMouseTextEnabledFlag();
@@ -75,11 +75,11 @@ private Q_SLOTS:
     void testChildManagement();
 
 private:
-    static std::vector<double> makeTestData(int n)
+    static std::vector< double > makeTestData(int n)
     {
-        std::vector<double> data(n);
+        std::vector< double > data(n);
         for (int i = 0; i < n; ++i)
-            data[i] = static_cast<double>(i);
+            data[ i ] = static_cast< double >(i);
         return data;
     }
 };
@@ -118,7 +118,7 @@ void TestPlotNode::testTitleGetterSetter()
     plot.setTitle("Test Title");
     QCOMPARE(plot.title(), QString("Test Title"));
 
-    // Same value �?no change
+    // Same valueno change
     plot.setTitle("Test Title");
     QCOMPARE(plot.title(), QString("Test Title"));
 
@@ -136,7 +136,7 @@ void TestPlotNode::testTitleChangedSignal()
     QCOMPARE(spy.count(), 1);
     QCOMPARE(spy.at(0).at(0).toString(), QString("New Title"));
 
-    // Same value �?no signal
+    // Same valueno signal
     plot.setTitle("New Title");
     QCOMPARE(spy.count(), 1);
 
@@ -160,7 +160,7 @@ void TestPlotNode::testSizeGetterSetter()
     plot.setSize(QSizeF(800, 600));
     QCOMPARE(plot.size(), QSizeF(800, 600));
 
-    // Negative �?auto-size
+    // Negativeauto-size
     plot.setSize(QSizeF(-1, -1));
     QVERIFY(plot.size().width() < 0);
 }
@@ -173,7 +173,7 @@ void TestPlotNode::testSizeChangedSignal()
     plot.setSize(QSizeF(400, 300));
     QCOMPARE(spy.count(), 1);
 
-    // Same value �?no signal
+    // Same valueno signal
     plot.setSize(QSizeF(400, 300));
     QCOMPARE(spy.count(), 1);
 
@@ -197,7 +197,7 @@ void TestPlotNode::testAutoSizeGetterSetter()
     plot.setAutoSize(true);
     QVERIFY(plot.isAutoSize());
 
-    // Setting same value �?no change
+    // Setting same valueno change
     plot.setAutoSize(true);
     QVERIFY(plot.isAutoSize());
 }
@@ -211,7 +211,7 @@ void TestPlotNode::testAutoSizeChangedSignal()
     QCOMPARE(spy.count(), 1);
     QCOMPARE(spy.at(0).at(0).toBool(), false);
 
-    // Same value �?no signal
+    // Same valueno signal
     plot.setAutoSize(false);
     QCOMPARE(spy.count(), 1);
 
@@ -226,7 +226,7 @@ void TestPlotNode::testAutoSizeChangedSignal()
 void TestPlotNode::testTitleEnabledFlag()
 {
     QImPlotNode plot;
-    QVERIFY(plot.isTitleEnabled());  // Default: NoTitle NOT set �?enabled
+    QVERIFY(plot.isTitleEnabled());  // Default: NoTitle NOT setenabled
 
     plot.setTitleEnabled(false);
     QVERIFY(!plot.isTitleEnabled());
@@ -340,7 +340,7 @@ void TestPlotNode::testCrosshairsFlag()
 void TestPlotNode::testCanvasEnabledFlag()
 {
     QImPlotNode plot;
-    QVERIFY(plot.isCanvasEnabled());  // Default: CanvasOnly NOT set �?all decorations visible
+    QVERIFY(plot.isCanvasEnabled());  // Default: CanvasOnly NOT setall decorations visible
 
     plot.setCanvasEnabled(false);
     QVERIFY(!plot.isCanvasEnabled());
@@ -364,11 +364,11 @@ void TestPlotNode::testSetImPlotFlagsRaw()
     QSignalSpy spy(&plot, &QImPlotNode::plotFlagChanged);
 
     plot.setImPlotFlags(ImPlotFlags_NoTitle);
-    QCOMPARE(plot.imPlotFlags(), static_cast<int>(ImPlotFlags_NoTitle));
+    QCOMPARE(plot.imPlotFlags(), static_cast< int >(ImPlotFlags_NoTitle));
     QVERIFY(!plot.isTitleEnabled());
     QCOMPARE(spy.count(), 1);
 
-    // Same value �?no signal
+    // Same valueno signal
     plot.setImPlotFlags(ImPlotFlags_NoTitle);
     QCOMPARE(spy.count(), 1);
 }
@@ -384,14 +384,14 @@ void TestPlotNode::testPlotFlagChangedSignal()
     plot.setEqual(true);
     QCOMPARE(spy.count(), 1);
 
-    // Same value �?no signal
+    // Same valueno signal
     plot.setEqual(true);
     QCOMPARE(spy.count(), 1);
 
     plot.setCrosshairs(true);
     QCOMPARE(spy.count(), 2);
 
-    // CanvasEnabled is combined: setting false sets 5 flags �?should emit
+    // CanvasEnabled is combined: setting false sets 5 flagsshould emit
     plot.setCanvasEnabled(false);
     QCOMPARE(spy.count(), 3);
 }
