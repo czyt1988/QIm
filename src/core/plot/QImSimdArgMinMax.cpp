@@ -20,7 +20,13 @@ enum SimdLevel { Scalar, SSE42, AVX2 };
 
 SimdLevel detectSimdLevel()
 {
-#if defined(Q_OS_WIN)
+    /*
+        The platform is detected with the compiler's own macros instead of
+        Q_OS_WIN / Q_OS_LINUX: whether Qt's platform macros are visible in this
+        translation unit depends on the include chain of the caller's headers,
+        which silently degraded the whole dispatch to the scalar fallback.
+     */
+#if defined(_WIN32)
     // MSVC: __cpuid / __cpuidex intrinsics
     int cpuinfo[4];
     __cpuid(cpuinfo, 0);
@@ -33,13 +39,11 @@ SimdLevel detectSimdLevel()
     // SSE4.2: leaf 1, ECX bit 20
     if (cpuinfo[2] & (1 << 20)) return SSE42;
     return Scalar;
-#elif defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-#if defined(__GNUC__)
+#elif defined(__GNUC__) && (defined(__linux__) || defined(__APPLE__))
     // GCC/Clang: __builtin_cpu_supports
     __builtin_cpu_init();
     if (__builtin_cpu_supports("avx2")) return AVX2;
     if (__builtin_cpu_supports("sse4.2")) return SSE42;
-#endif
     return Scalar;
 #else
     return Scalar;
@@ -93,12 +97,15 @@ static ArgMinMaxResult argMinMaxSSE42(const double* data, int count)
         // min comparison and index update
         __m128d cmp_min = _mm_cmp_pd(vals, min_vec, _CMP_LT_OQ);
         min_idx_vec = _mm_blendv_pd(min_idx_vec, current_idx, cmp_min);
-        min_vec = _mm_min_pd(min_vec, vals);
+        // Updating through the ordered compare mask instead of _mm_min_pd:
+        // min(NaN, x) propagates the NaN, which then poisons the running
+        // minimum of the lane and hides every later value of that lane.
+        min_vec = _mm_blendv_pd(min_vec, vals, cmp_min);
 
         // max comparison and index update
         __m128d cmp_max = _mm_cmp_pd(vals, max_vec, _CMP_GT_OQ);
         max_idx_vec = _mm_blendv_pd(max_idx_vec, current_idx, cmp_max);
-        max_vec = _mm_max_pd(max_vec, vals);
+        max_vec = _mm_blendv_pd(max_vec, vals, cmp_max);
     }
 
     // Horizontal reduce: extract from 2 lanes
@@ -165,12 +172,14 @@ static ArgMinMaxResult argMinMaxAVX2(const double* data, int count)
         // min comparison and index update
         __m256d cmp_min = _mm256_cmp_pd(vals, min_vec, _CMP_LT_OQ);
         min_idx_vec = _mm256_blendv_pd(min_idx_vec, current_idx, cmp_min);
-        min_vec = _mm256_min_pd(min_vec, vals);
+        // See the SSE4.2 kernel: the ordered compare mask keeps NaNs out of
+        // the running extrema, _mm256_min_pd would propagate them.
+        min_vec = _mm256_blendv_pd(min_vec, vals, cmp_min);
 
         // max comparison and index update
         __m256d cmp_max = _mm256_cmp_pd(vals, max_vec, _CMP_GT_OQ);
         max_idx_vec = _mm256_blendv_pd(max_idx_vec, current_idx, cmp_max);
-        max_vec = _mm256_max_pd(max_vec, vals);
+        max_vec = _mm256_blendv_pd(max_vec, vals, cmp_max);
     }
 
     // Horizontal reduce: extract from 4 lanes
@@ -230,9 +239,9 @@ ArgMinMaxResult simdArgMinMax(const double* data, int count)
     }();
     auto result = kFn(data, count);
 
-    // IEEE 754: min(NaN,x) / max(NaN,x) propagate NaN on x86.
-    // When all input values are NaN, SIMD paths produce NaN results.
-    // Return canonical sentinel: {0, 0, DBL_MAX, -DBL_MAX}
+    // The scalar fallback propagates NaN for an all-NaN input, the SIMD paths
+    // keep the DBL_MAX / -DBL_MAX seeds. Normalize both to the documented
+    // sentinel: {0, 0, DBL_MAX, -DBL_MAX}
     if (std::isnan(result.min_val) || std::isnan(result.max_val))
         return {0, 0, DBL_MAX, -DBL_MAX};
 
