@@ -17,8 +17,6 @@ namespace QIM
 
 class QImPlot3DAxisInfo;
 class QImPlot3DItemNode;
-class QImPlot3DLineItemNode;
-class QImPlot3DScatterItemNode;
 class QImPlot3DStyleNode;
 class QImPlot3DMeshItemNode;
 
