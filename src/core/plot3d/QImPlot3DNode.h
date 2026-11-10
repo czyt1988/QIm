@@ -6,6 +6,8 @@
 #include <QSizeF>
 #include <QQuaternion>
 #include "QImPlot3D.h"
+#include "QImPlot3DScatterItemNode.h"
+#include "QImPlot3DLineItemNode.h"
 
 // Include ImGui for ImDrawList type
 #include "imgui.h"
@@ -15,8 +17,6 @@ namespace QIM
 
 class QImPlot3DAxisInfo;
 class QImPlot3DItemNode;
-class QImPlot3DLineItemNode;
-class QImPlot3DScatterItemNode;
 class QImPlot3DStyleNode;
 class QImPlot3DMeshItemNode;
 
