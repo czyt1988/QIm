@@ -3,10 +3,14 @@
 #include <cmath>
 #include <cstddef>
 
+#if defined(__x86_64__) || defined(_M_X64)
+#define QIM_X86_INTRINSICS_AVAILABLE 1
+#endif
+
 // Platform-specific intrinsics headers
-#if defined(_MSC_VER)
+#if defined(QIM_X86_INTRINSICS_AVAILABLE) && defined(_MSC_VER)
     #include <intrin.h>
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(QIM_X86_INTRINSICS_AVAILABLE) && (defined(__GNUC__) || defined(__clang__))
     #include <x86intrin.h>
 #endif
 
@@ -25,8 +29,9 @@ SimdLevel detectSimdLevel()
         Q_OS_WIN / Q_OS_LINUX: whether Qt's platform macros are visible in this
         translation unit depends on the include chain of the caller's headers,
         which silently degraded the whole dispatch to the scalar fallback.
+        QIM_X86_INTRINSICS_AVAILABLE keeps this block out of the ARM builds.
      */
-#if defined(_WIN32)
+#if defined(_WIN32) && defined(QIM_X86_INTRINSICS_AVAILABLE)
     // MSVC: __cpuid / __cpuidex intrinsics
     int cpuinfo[4];
     __cpuid(cpuinfo, 0);
@@ -39,7 +44,8 @@ SimdLevel detectSimdLevel()
     // SSE4.2: leaf 1, ECX bit 20
     if (cpuinfo[2] & (1 << 20)) return SSE42;
     return Scalar;
-#elif defined(__GNUC__) && (defined(__linux__) || defined(__APPLE__))
+#elif defined(QIM_X86_INTRINSICS_AVAILABLE) && (defined(__GNUC__) || defined(__clang__)) \
+    && (defined(__linux__) || defined(__APPLE__))
     // GCC/Clang: __builtin_cpu_supports
     __builtin_cpu_init();
     if (__builtin_cpu_supports("avx2")) return AVX2;
@@ -78,7 +84,7 @@ static ArgMinMaxResult argMinMaxScalar(const double* data, int count)
 }
 
 // ===== SSE4.2 implementation =====
-#if defined(__SSE4_2__) || (defined(_MSC_VER) && _MSC_VER >= 1700)
+#if defined(QIM_X86_INTRINSICS_AVAILABLE) && (defined(__SSE4_2__) || (defined(_MSC_VER) && _MSC_VER >= 1700))
 
 static ArgMinMaxResult argMinMaxSSE42(const double* data, int count)
 {
@@ -150,7 +156,7 @@ static ArgMinMaxResult argMinMaxSSE42(const double* data, int count)
 #endif
 
 // ===== AVX2 implementation =====
-#if defined(__AVX2__) || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#if defined(QIM_X86_INTRINSICS_AVAILABLE) && (defined(__AVX2__) || (defined(_MSC_VER) && _MSC_VER >= 1800))
 
 static ArgMinMaxResult argMinMaxAVX2(const double* data, int count)
 {

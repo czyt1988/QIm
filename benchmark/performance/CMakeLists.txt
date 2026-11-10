@@ -118,7 +118,6 @@ endif()
 find_package(OpenGL REQUIRED)
 target_link_libraries(PlotPerformance PRIVATE
     OpenGL::GL     # opengl32.lib
-    OpenGL::GLU    # glu32.lib
 )
 
 if(ENABLE_QCUSTOMPLOT)
